@@ -1,0 +1,171 @@
+#############################
+###                       ###
+###   Plugin Properties   ###
+###                       ###
+#############################
+
+# Plugin Infos
+name: FKX
+version: 1.0
+description: "\n\n    §6--------[ §9§lFKX §6]--------§r\n\n        This plugin is the AzionMC's Mining\n          Servers Plugin.§r\n        Version 1.0 - Made by Luzog78§r\n        In January 2022§r\n        Enjoy !\n\n    §6---------------------------------"
+
+# Authors Infos
+author: Luzog78
+authors: [ ]
+website: https://discord.io/Luzog78
+
+# Dev Infos
+main: fr.luzog.pl.fkx.Main
+prefix: FKX
+load: STARTUP # STARTUP / POSTWORLD
+depend: [ ]
+
+
+
+#############################
+###                       ###
+###   Server Properties   ###
+###                       ###
+#############################
+
+# Server Commands
+commands:
+
+  test:
+    aliases: [ test ]
+    description: Test
+
+
+
+  # Admin
+  execute:
+    description: Force to execute command
+  invsee:
+    aliases: [ seeinventory ]
+    description: See an inventory
+  sun:
+    description: Change Weather.
+  rain:
+    description: Change Weather.
+  thunder:
+    description: Change Weather.
+  gm:
+    aliases: [ g ]
+    description: Change GameMode
+  gm0:
+    aliases: [ g0 ]
+    description: Change GameMode
+  gm1:
+    aliases: [ g1 ]
+    description: Change GameMode
+  gm2:
+    aliases: [ g2 ]
+    description: Change GameMode
+  gm3:
+    aliases: [ g3 ]
+    description: Change GameMode
+  vanish:
+    aliases: [ v ]
+    description: Toggle Vanish Mod
+
+
+
+  # Chat's Commands [bc, event, prevent, warn, alert]
+  broadcast:
+    description: Send a broadcast
+  bc:
+    description: Send a broadcast
+  event:
+    description: Send a broadcast
+  prevent:
+    description: Send a broadcast
+  warn:
+    description: Send a broadcast
+  alert:
+    description: Send a broadcast
+
+
+
+  # Cheat
+  ench:
+    aliases: [ enchantment ]
+    description: Enchant an item
+  feed:
+    aliases: [ nourriture ]
+    description: Feed - Saturation Effect
+  god:
+    description: Become Invulnerable
+  heal:
+    aliases: [ guerissement ]
+    description: Heal - Instant Heal Effect
+  sethealth:
+    description: Set Max Health
+  speed:
+    description: Set Walk/Fly Speed
+  i:
+    aliases: [ item, giveitem ]
+    description: Give an item
+
+
+
+  # Fun commands
+  hat:
+    description: Change ur helmet ^^
+  head:
+    description: Get Player's Head
+  rename:
+    description: Modify the Name or the Lore of an Item
+#  funcommands:
+#    description: Send all Fun Commands
+#  roll:
+#    description: Roll a Dice
+  lightning:
+    description: Strike a lightning !!
+#  damage:
+#    description: Give damages X_X
+  freeze:
+    description: Freeze a player -_-
+  bounce:
+    description: Bounce a player high in the sky ! :)
+#  burn:
+#    description: Set on fire a player xD
+#  explode:
+#    description: Create an explosion ;)
+  shuffle:
+    description: Shuffle Player's inventory x)
+
+
+  # Location Commands
+  #  home:
+  #    aliases: [h]
+  #    description: Goto, Set or Del a Personnal Home
+  #  lobby:
+  #    aliases: [lb, lbby]
+  #    description: Go to lobby
+  #  spawn:
+  #    aliases: [sp, spwn]
+  #    description: Go to spawn
+  #  warp:
+  #    aliases: [warp, w]
+  #    description: All warps (Lobby, Spawn, Bases, etc...)
+
+
+  # Server's Commands
+  r:
+    description: Aliases [reload, rl, r]
+  save:
+    description: Save and Reload the Config
+
+
+
+  # Utils - Players
+  info:
+    aliases: [ test ]
+    description: Get server's or player's infos.
+  ec:
+    aliases: [ enderchest, viewec, viewenderchest ]
+    description: See an EnderChest
+  craft:
+    description: Open the Workbench
+  trash:
+    description: Open the Trash

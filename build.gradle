@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+}
+
+group 'fr.luzog.pl'
+version 'alpha1.0'
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+    maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/central' }
+}
+
+dependencies {
+    implementation 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
+    implementation 'com.github.azbh111:craftbukkit-1.8.8:R'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar.destinationDir = new File("C:/Users/Luzog/Servers/Minecraft Servers/1.8.8 - FKX Plugin/plugins")
