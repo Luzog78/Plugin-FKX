@@ -265,6 +265,10 @@ public class Items {
         return new Builder(mat);
     }
 
+    public static Builder builder(ItemStack item) {
+        return new Builder(item.clone());
+    }
+
     public static class Builder {
         private ItemStack item;
         private ItemMeta meta;

@@ -46,6 +46,7 @@ public class Events implements Listener {
         add(new EntityDamageHandler());
         add(new BlockPlaceHandler());
         add(new BlockBreakHandler());
+        add(new PlayerMoveHandler());
     }};
 
     public static final String canInteractTag = "canInteract";
@@ -450,32 +451,6 @@ public class Events implements Listener {
                 .add(0.25, new ItemStack(Material.NETHER_STAR), -2, null)
         ));
     }};
-
-    public static void initRecipes() {
-        registerRecipe(Items.i(Material.DIAMOND_AXE, 2, new Pair<>(Enchantment.DIG_SPEED, 150)), Material.SUGAR_CANE, Material.SUGAR_CANE, Material.SUGAR_CANE, Material.SUGAR_CANE, Material.SUGAR_CANE);
-    }
-
-    public static ShapedRecipe registerRecipe(ItemStack result, String line1, String line2, String line3, Material... ingredients) {
-        ShapedRecipe r = new ShapedRecipe(result);
-        r.shape(line1, line2, line3);
-        char[] l = (line1 + line2 + line3).toCharArray();
-        int j = 0;
-        for (char c : l)
-            if (c != ' ') {
-                r.setIngredient(c, ingredients[j]);
-                j++;
-            }
-        Bukkit.getServer().addRecipe(r);
-        return r;
-    }
-
-    public static ShapelessRecipe registerRecipe(ItemStack result, Material... ingredients) {
-        ShapelessRecipe r = new ShapelessRecipe(result);
-        for (Material mat : ingredients)
-            r.addIngredient(1, mat);
-        Bukkit.getServer().addRecipe(r);
-        return r;
-    }
 
     public static class BlockLootsItem {
         private List<Material> materials;

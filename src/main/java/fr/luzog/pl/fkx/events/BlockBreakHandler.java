@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKAuth;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -13,7 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 public class BlockBreakHandler implements Listener {
 
@@ -22,16 +24,14 @@ public class BlockBreakHandler implements Listener {
     }
 
     public static void dropNormally(Location loc, Collection<ItemStack> is) {
-        Location l = loc.clone();
-        l.add(0.5, 0.5, 0.5);
+        Location l = Utils.normalize(loc);
         is.forEach(i -> l.getWorld().dropItemNaturally(l, i));
     }
 
     @EventHandler
     public static void onBreakBlock(BlockBreakEvent e) {
-        FKPlayer fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getUniqueId());
-
-        if (!fp.hasAuthorization(Events.specialMat.contains(e.getBlock().getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, e.getBlock().getLocation())) {
+        FKPlayer fp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
+        if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBlock().getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, e.getBlock().getLocation())) {
             e.setCancelled(true);
             return;
         }
@@ -42,7 +42,7 @@ public class BlockBreakHandler implements Listener {
             return;
         }
 
-        if(e.getPlayer().getGameMode() == GameMode.CREATIVE || e.getPlayer().getGameMode() == GameMode.SPECTATOR)
+        if (e.getPlayer().getGameMode() == GameMode.CREATIVE || e.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;
 
         int chanceLvl = e.getPlayer().getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
@@ -52,16 +52,15 @@ public class BlockBreakHandler implements Listener {
                 && (e.getBlock().getType() == Material.LEAVES || e.getBlock().getType() == Material.LEAVES_2))
             silkTouch = true;
 
-        int finalChanceLvl = chanceLvl;
         boolean finalSilkTouch = silkTouch;
         Events.breakBlockLoots.forEach(item -> {
             if (item.getMaterials().contains(e.getBlock().getType())) {
                 e.setCancelled(true);
                 e.getBlock().setType(Material.AIR, true);
-                if(item.isExclusive())
-                    dropNormally(e.getBlock().getLocation(), item.getLoots().lootsExclusive(finalChanceLvl, finalSilkTouch));
+                if (item.isExclusive())
+                    dropNormally(e.getBlock().getLocation(), item.getLoots().lootsExclusive(chanceLvl, finalSilkTouch));
                 else
-                    dropNormally(e.getBlock().getLocation(), item.getLoots().lootsInclusive(finalChanceLvl, finalSilkTouch));
+                    dropNormally(e.getBlock().getLocation(), item.getLoots().lootsInclusive(chanceLvl, finalSilkTouch));
             }
         });
     }

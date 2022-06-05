@@ -17,7 +17,7 @@ public class FKTeam {
     private String id, name, prefix;
     private ChatColor color;
     private Location spawn;
-    private int radius;
+    private double radius;
 
     private List<FKPlayer> players;
 
@@ -25,7 +25,7 @@ public class FKTeam {
 
     private FKAuth authorizations;
 
-    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, int radius, FKAuth authorizations, @Nullable List<FKPlayer> players) {
+    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKAuth authorizations, @Nullable List<FKPlayer> players) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
@@ -42,9 +42,14 @@ public class FKTeam {
 
     public boolean isInside(Location loc){
         Location l1 = spawn.clone(), l2 = spawn.clone();
-        l1.setY(0);
-        l2.setY(255);
+        l1.setY(-1);
+        l2.setY(256);
         return Utils.isInside(loc, l1.add(radius, 0, radius), l2.subtract(radius, 0, radius));
+    }
+
+    public FKZone getZone(boolean friendly) {
+        return new FKZone(getId(), friendly ? FKZone.Type.FRIENDLY : FKZone.Type.HOSTILE, getSpawn().clone(),
+                getSpawn().clone().subtract(radius, radius, radius), getSpawn().clone().add(radius, radius, radius), getAuthorizations());
     }
 
     public FKPlayer getPlayer(UUID uuid) {
@@ -119,11 +124,11 @@ public class FKTeam {
         this.spawn = spawn;
     }
 
-    public int getRadius() {
+    public double getRadius() {
         return radius;
     }
 
-    public void setRadius(int radius) {
+    public void setRadius(double radius) {
         this.radius = radius;
     }
 

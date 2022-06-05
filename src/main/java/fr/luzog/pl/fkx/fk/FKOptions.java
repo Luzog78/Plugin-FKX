@@ -5,7 +5,7 @@ public class FKOptions {
     private FKManager manager;
     private FKOption pvp, nether, assauts, end;
 
-    public FKOptions(FKOption pvp, FKOption nether, FKOption assauts, FKOption end){
+    public FKOptions(FKOption pvp, FKOption nether, FKOption assauts, FKOption end) {
         this.pvp = pvp.getOptionListener() != null ? pvp : pvp.setOptionListener(new FKOptionListener() {
             @Override
             public void onActivate() {
@@ -52,6 +52,10 @@ public class FKOptions {
         });
     }
 
+    public static FKOptions getDefaultOptions() {
+        return new FKOptions(FKOption.getDefaultOptionPvP(), FKOption.getDefaultOptionNether(), FKOption.getDefaultOptionAssaults(), FKOption.getDefaultOptionEnd());
+    }
+
     public static interface FKOptionListener {
         void onActivate();
 
@@ -75,6 +79,22 @@ public class FKOptions {
             this.activationDay = activationDay;
             this.activated = activated;
             this.optionListener = optionListener;
+        }
+
+        public static FKOption getDefaultOptionPvP() {
+            return new FKOptions.FKOption("PvP", 2, false);
+        }
+
+        public static FKOption getDefaultOptionNether() {
+            return new FKOptions.FKOption("Nether", 4, false);
+        }
+
+        public static FKOption getDefaultOptionAssaults() {
+            return new FKOptions.FKOption("Assauts", 6, false);
+        }
+
+        public static FKOption getDefaultOptionEnd() {
+            return new FKOptions.FKOption("End", 6, false);
         }
 
         public String getName() {

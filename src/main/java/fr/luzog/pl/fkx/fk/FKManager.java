@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.text.DecimalFormat;
@@ -18,8 +20,10 @@ public class FKManager {
 
     private String id;
 
-    private int day = 1;
-    private int weather = 0; // 0 >> Clear ; 1 >> Raining ; 2 >> Thundering
+    private int day;
+    private int weather; // 0 >> Clear ; 1 >> Raining ; 2 >> Thundering
+    private int time;
+    private boolean linkedToSun;
 
     private FKOptions options;
     private FKListener listener;
@@ -39,50 +43,121 @@ public class FKManager {
     private FKAuth hostile;
 
 
-    public FKManager(String id, int day, int weather, FKOptions options, FKListener listener,
+    public FKManager(String id) {
+        this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        this.id = id;
+        setDay(1);
+        setWeather(0);
+        setTime(0);
+        setLinkedToSun(true);
+        setOptions(FKOptions.getDefaultOptions());
+        setListener(new FKListener("FALLEN KINGDOM X"));
+        setLobby(new FKZone(null, FKZone.Type.LOBBY,
+                new Location(Main.world, 0, 0, 0),
+                new Location(Main.world, 0, 0, 0),
+                new Location(Main.world, 0, 0, 0),
+                new FKAuth(FKAuth.Definition.OFF)));
+        setSpawn(new FKZone(null, FKZone.Type.SPAWN,
+                new Location(Main.world, 0, 0, 0),
+                new Location(Main.world, 0, 0, 0),
+                new Location(Main.world, 0, 0, 0),
+                new FKAuth(FKAuth.Definition.DEFAULT,
+                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
+                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
+        setZones(new ArrayList<>());
+        setGods(new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null));
+        setSpecs(new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null));
+        setTeams(new ArrayList<>());
+        setGlobals(new FKAuth(FKAuth.Definition.OFF,
+                new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
+                new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
+                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON)));
+        setNeutral(new FKAuth(FKAuth.Definition.DEFAULT,
+                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
+                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)));
+        setFriendly(new FKAuth(FKAuth.Definition.DEFAULT,
+                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
+                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.ON)));
+        setHostile(new FKAuth(FKAuth.Definition.DEFAULT,
+                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
+                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)));
+    }
+
+
+    public FKManager(String id, int day, int weather, int time, boolean linkedToSun, FKOptions options, FKListener listener,
                      FKZone lobby, FKZone spawn, List<FKZone> zones, FKTeam gods, FKTeam specs, List<FKTeam> teams,
                      FKAuth globals, FKAuth neutral, FKAuth friendly, FKAuth hostile) {
-        this.id = id;
-        this.day = day;
-        this.weather = weather;
-        this.options = options;
-        this.listener = listener;
-        this.lobby = lobby;
-        this.spawn = spawn;
-        this.zones = zones;
-        this.gods = gods;
-        this.specs = specs;
-        this.teams = teams;
-        this.globals = globals;
-        this.neutral = neutral;
-        this.friendly = friendly;
-        this.hostile = hostile;
-
         this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.options.setManager(this);
-        this.listener.setManager(this);
-        this.lobby.setManager(this);
-        this.spawn.setManager(this);
-        this.zones.forEach(z -> z.setManager(this));
-        this.gods.setManager(this);
-        this.specs.setManager(this);
-        this.teams.forEach(t -> t.setManager(this));
+        this.id = id;
+        setDay(day);
+        setWeather(weather);
+        setTime(time);
+        setLinkedToSun(linkedToSun);
+        setOptions(options);
+        setListener(listener);
+        setLobby(lobby);
+        setSpawn(spawn);
+        setZones(zones);
+        setGods(gods);
+        setSpecs(specs);
+        setTeams(teams);
+        setGlobals(globals);
+        setNeutral(neutral);
+        setFriendly(friendly);
+        setHostile(hostile);
+    }
 
+    public void register() {
         registered.add(this);
+        currentGameId = id;
+    }
+
+    public void unregister() {
+        registered.remove(this);
+        currentGameId = registered.isEmpty() ? null : registered.get(0).getId();
     }
 
     public static FKManager getCurrentGame() {
+// TODO -> Check if currentGameId is null
+//        if(currentGameId == null)
+//            currentGameId = Main.getInstance().getConfig().getString("current-game");
         return getGame(currentGameId);
+    }
+
+    public static FKManager setCurrentGame(String id) {
+        currentGameId = id;
+// TODO -> Check if currentGameId is null
+//        Main.getInstance().getConfig().set("current-game", id);
+//        Main.getInstance().saveConfig();
+        return getGame(id);
     }
 
     public static FKManager getGame(String id) {
         for (FKManager game : registered)
-            if (game.getId() == id || game.getId().equalsIgnoreCase(id))
+            if (game.getId() == id || (game.getId() != null && game.getId().equalsIgnoreCase(id)))
                 return game;
         return null;
     }
 
+    public static FKPlayer getGlobalPlayer(UUID uuid) {
+        for (FKManager game : registered)
+            for (FKTeam team : game.getTeams())
+                for (FKPlayer player : team.getPlayers())
+                    if (player.getUuid().equals(uuid))
+                        return player;
+        return null;
+    }
+
+    public static List<FKPlayer> getGlobalPlayers() {
+        return new ArrayList<>(new HashSet<FKPlayer>() {{
+            for (FKManager game : registered)
+                for (FKTeam team : game.getTeams())
+                    this.addAll(team.getPlayers());
+        }});
+    }
+
     public void refresh() {
+// TODO -> refresh all
 //        final int dayDuration = 1200;
 //        if (time + 1 >= dayDuration) {
 //            day += (int) ((time + 1) / dayDuration);
@@ -122,6 +197,22 @@ public class FKManager {
 //        refreshEntries();
     }
 
+    public void start() {
+        // TODO -> start game
+    }
+
+    public void pause() {
+        // TODO -> pause game
+    }
+
+    public void resume() {
+        // TODO -> resume game
+    }
+
+    public void end() {
+        // TODO -> end game
+    }
+
     public FKTeam getTeam(String id) {
         for (FKTeam team : teams)
             if (team.getId().equalsIgnoreCase(id))
@@ -156,14 +247,6 @@ public class FKManager {
         return df.format((int) (getTime() / 1200)) + ":" + df.format((int) ((getTime() % 1200) / 20));
     }
 
-    public long getTime() {
-        return Main.world.getTime();
-    }
-
-    public void setTime(long time) {
-        Main.world.setTime(time);
-    }
-
     public String getId() {
         return id;
     }
@@ -180,6 +263,10 @@ public class FKManager {
         this.day = day;
     }
 
+    public void increaseDay() {
+        day++;
+    }
+
     public int getWeather() {
         return weather;
     }
@@ -188,11 +275,36 @@ public class FKManager {
         this.weather = weather;
     }
 
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+        if(isLinkedToSun())
+            Main.world.setTime(this.time);
+    }
+
+    public void increaseTime(int time) {
+        this.time += time;
+        if(isLinkedToSun())
+            Main.world.setTime(this.time);
+    }
+
+    public boolean isLinkedToSun() {
+        return linkedToSun;
+    }
+
+    public void setLinkedToSun(boolean linkedToSun) {
+        this.linkedToSun = linkedToSun;
+    }
+
     public FKOptions getOptions() {
         return options;
     }
 
     public void setOptions(FKOptions options) {
+        options.setManager(this);
         this.options = options;
     }
 
@@ -201,6 +313,7 @@ public class FKManager {
     }
 
     public void setListener(FKListener listener) {
+        listener.setManager(this);
         this.listener = listener;
     }
 
@@ -217,6 +330,7 @@ public class FKManager {
     }
 
     public void setLobby(FKZone lobby) {
+        lobby.setManager(this);
         this.lobby = lobby;
     }
 
@@ -225,6 +339,7 @@ public class FKManager {
     }
 
     public void setSpawn(FKZone spawn) {
+        spawn.setManager(this);
         this.spawn = spawn;
     }
 
@@ -233,6 +348,7 @@ public class FKManager {
     }
 
     public void setZones(List<FKZone> zones) {
+        zones.forEach(z -> z.setManager(this));
         this.zones = zones;
     }
 
@@ -241,6 +357,7 @@ public class FKManager {
     }
 
     public void setGods(FKTeam gods) {
+        gods.setManager(this);
         this.gods = gods;
     }
 
@@ -249,6 +366,7 @@ public class FKManager {
     }
 
     public void setSpecs(FKTeam specs) {
+        specs.setManager(this);
         this.specs = specs;
     }
 
@@ -257,6 +375,7 @@ public class FKManager {
     }
 
     public void setTeams(List<FKTeam> teams) {
+        teams.forEach(t -> t.setManager(this));
         this.teams = teams;
     }
 

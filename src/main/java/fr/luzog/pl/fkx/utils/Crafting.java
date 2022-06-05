@@ -4,13 +4,12 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.events.Events;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -80,7 +79,7 @@ public class Crafting implements Listener {
             brown_mushroom = new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.BROWN_MUSHROOM)),
             red_mushroom = new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.RED_MUSHROOM)),
             bowl = new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.BOWL)),
-            spider_eye  = new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.SPIDER_EYE));
+            spider_eye = new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.SPIDER_EYE));
 
     public static ItemStack getItem() {
         return Items.builder(Material.WORKBENCH).setName(NAME).setLore(
@@ -101,7 +100,23 @@ public class Crafting implements Listener {
                 "§7 Amusez-vous !",
                 " ",
                 "§8------------------------"
-        ).getNBT().setBoolean(Events.canClickOnTag, false).build();
+        ).getNBT().setBoolean(Events.canClickOnTag, true).build();
+    }
+
+    public static ItemStack getNone() {
+        return Items.builder(Items.l_gray()).setName("§4------------------------").setLore(
+                " ",
+                "§c Il est possible que les",
+                "§c  crafts n'aient pas été",
+                "§c  mis à jour.",
+                " ",
+                "§c Vous n'avez qu'à",
+                "§c  cliquer n'importe où",
+                "§c  pour rafraichir",
+                "§c  l'inventaire.",
+                " ",
+                "§4------------------------"
+        ).getNBT().setBoolean(Events.canClickOnTag, true).build();
     }
 
     public static Inventory getInv() {
@@ -111,7 +126,7 @@ public class Crafting implements Listener {
         Utils.fill(inv, 3, 5, Items.orange());
         inv.setItem(4, getItem());
         SLOTS.forEach(s -> inv.setItem(s, Items.air()));
-        inv.setItem(RESULT, Items.l_gray());
+        inv.setItem(RESULT, getNone());
         return inv;
     }
 
@@ -216,6 +231,8 @@ public class Crafting implements Listener {
         new ShapedCraft(Items.i(Material.LADDER, 3)).setIngredient(stick, 0, 1, 2, 4, 6, 7, 8).register();
         new ShapelessCraft(Items.i(Material.BREWING_STAND_ITEM)).addIngredient(rod).addIngredient(cobble).addIngredient(cobble).addIngredient(cobble).register();
         new ShapedCraft(Items.i(Material.CAULDRON_ITEM)).setIngredient(iron, 0, 1, 2, 5, 6, 7, 8).register();
+        new ShapedCraft(Items.i(Material.ANVIL)).setIngredient(iron, 2, 4, 5, 8)
+                .setIngredient(new Ingredient(SeverityLevel.SIMILAR, Items.i(Material.IRON_BLOCK)), 0, 3, 6).register();
 
 
         /* -- ------------ -- */
@@ -452,6 +469,22 @@ public class Crafting implements Listener {
     }
 
     @EventHandler
+    public static void onBlockInteract(PlayerInteractEvent e) {
+        if (!e.hasBlock() || e.getClickedBlock().getType() != Material.WORKBENCH)
+            return;
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                e.getPlayer().closeInventory();
+
+                if (!e.getPlayer().isSneaking())
+                    e.getPlayer().openInventory(getInv());
+            }
+        }.runTask(Main.instance);
+    }
+
+    @EventHandler
     public static void onClick(InventoryClickEvent e) {
         if (!e.getInventory().getName().equals(NAME))
             return;
@@ -482,11 +515,13 @@ public class Crafting implements Listener {
                         cursor.setAmount(1);
                         ItemStack result = r.getResult().clone();
                         result.setAmount(1);
-                        if (cursor.isSimilar(result)) {
+                        if (cursor.isSimilar(result) && e.getCursor().getAmount() + r.getResult().getAmount() <= result.getMaxStackSize()) {
                             result.setAmount(e.getCursor().getAmount() + r.getResult().getAmount());
                             e.setCursor(result);
-                        } else
+                        } else {
+                            e.setCancelled(true);
                             break;
+                        }
                     }
 
                     ItemStack[] after = r.after(ingredients);
@@ -562,7 +597,7 @@ public class Crafting implements Listener {
                 break;
             }
         if (!craft)
-            inv.setItem(RESULT, Items.l_gray());
+            inv.setItem(RESULT, getNone());
     }
 
     public static enum SeverityLevel {TYPE, TYPE_AMOUNT, TYPE_NAME, TYPE_NAME_AMOUNT, NBT, SIMILAR, SIMILAR_AMOUNT}

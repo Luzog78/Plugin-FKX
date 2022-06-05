@@ -23,6 +23,7 @@ public class CmdUtils {
     public static final String err_unknown_enchant = "Enchantement inconnu.";
     public static final String err_inventory_full = "Inventaire plein.";
     public static final String err_not_enough_args = "Pas assez d'arguments, vérifiez la syntaxe";
+    public static final String err_no_gui_for_this_instance = "Pas de GUI pour cette instance.\nTapez /%CMD% help pour plus d'informations.";
 
     private CommandSender sender;
     private Command cmd;
@@ -119,7 +120,7 @@ public class CmdUtils {
         String s = color;
         for (Object ob : o)
             s += ob + " ";
-        sender.sendMessage(s.substring(0, s.length() - 1).replace("§r", "§r" + color));
+        sender.sendMessage(s.substring(0, s.length() - 1).replace("§r", "§r" + (color == null ? "" : color)));
     }
 
     public void err(Object... o) {

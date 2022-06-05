@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.utils.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -13,12 +14,16 @@ public class FKPlayer {
     private UUID uuid;
     private String name, customName;
 
+    private PlayerStats stats;
+
     private FKAuth personalAuthorizations;
 
-    public FKPlayer(UUID uuid, String name, String customName, @Nullable FKAuth personalAuthorizations) {
+    public FKPlayer(UUID uuid, String name, String customName, PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
         this.uuid = uuid;
         this.name = name;
         this.customName = customName;
+
+        this.stats = stats;
 
         if (personalAuthorizations != null)
             this.personalAuthorizations = personalAuthorizations;
@@ -40,67 +45,64 @@ public class FKPlayer {
             return personalAuthorizations.getAuthorization(authorizationType) == FKAuth.Definition.ON;
         if (team.getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
             return team.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-        switch (getZone(loc)) {
-            case LOBBY:
-                if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+        if (getZone(loc) != null)
+            switch (getZone(loc).getType()) {
+                case LOBBY:
+                    if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case SPAWN:
+                    if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case ZONE:
+                    for (FKZone zone : getManager().getZones())
+                        if (zone.isInside(loc))
+                            if (zone.getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+                                return zone.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
                     break;
-                return getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
 
-            case SPAWN:
-                if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                case FRIENDLY:
+                    if (getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case HOSTILE:
+                    if (getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case NEUTRAL:
+                default:
                     break;
-                return getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-
-            case ZONE:
-                for (FKZone zone : getManager().getZones())
-                    if (zone.isInside(Bukkit.getPlayer(uuid).getLocation()))
-                        if (zone.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
-                            continue;
-                        else
-                            return zone.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-                break;
-
-            case FRIENDLY:
-                if (getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
-                    break;
-                return getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-
-            case HOSTILE:
-                if (getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
-                    break;
-                return getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-
-            case NEUTRAL:
-                if (getManager().getNeutral().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
-                    break;
-                return getManager().getNeutral().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-
-            default:
-                break;
-        }
+            }
+        if (getManager().getNeutral().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+            return getManager().getNeutral().getAuthorization(authorizationType) == FKAuth.Definition.ON;
         return getManager().getGlobals().getAuthorization(authorizationType) == FKAuth.Definition.ON;
     }
 
-    public FKZone.Type getZone(){
+    public FKZone getZone() {
         if (!Bukkit.getOfflinePlayer(uuid).isOnline())
             return null;
         return getZone(Bukkit.getPlayer(uuid).getLocation());
     }
 
-    public FKZone.Type getZone(Location loc) {
+    public FKZone getZone(Location loc) {
         if (getManager().getLobby().isInside(loc))
-            return getManager().getLobby().getType();
+            return getManager().getLobby();
         if (getManager().getSpawn().isInside(loc))
-            return getManager().getSpawn().getType();
+            return getManager().getSpawn();
         for (FKZone zone : getManager().getZones())
             if (zone.isInside(loc))
-                return zone.getType();
+                return zone;
         if (team.isInside(loc))
-            return FKZone.Type.FRIENDLY;
+            return team.getZone(true);
         for (FKTeam team : getManager().getTeams())
             if (team.isInside(loc))
-                return FKZone.Type.HOSTILE;
-        return FKZone.Type.NEUTRAL;
+                return team.getZone(false);
+        return null;
     }
 
     public FKManager getManager() {
@@ -137,6 +139,14 @@ public class FKPlayer {
 
     public void setCustomName(String customName) {
         this.customName = customName;
+    }
+
+    public PlayerStats getStats() {
+        return stats;
+    }
+
+    public void setStats(PlayerStats stats) {
+        this.stats = stats;
     }
 
     public FKAuth getPersonalAuthorizations() {

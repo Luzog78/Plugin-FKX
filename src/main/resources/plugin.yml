@@ -36,6 +36,10 @@ commands:
     description: Test
 
 
+  fk:
+    aliases: [ fallenkingdom ]
+    description: FK Commands
+
 
   # Admin
   execute:

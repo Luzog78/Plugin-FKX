@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Crafting;
+import fr.luzog.pl.fkx.utils.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -14,8 +15,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -58,8 +59,6 @@ public class Main extends JavaPlugin implements Listener {
         CommandManager.init();
 
         Bukkit.getLogger().log(Level.INFO, PREFIX + "Initialisation des crafts.");
-        Bukkit.getServer().resetRecipes();
-        Events.initRecipes();
         Crafting.initCrafts();
 
         Bukkit.getLogger().log(Level.INFO, PREFIX + "Plugin Actif !");
@@ -67,7 +66,7 @@ public class Main extends JavaPlugin implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                new FKManager(null, 1, 0,
+                FKManager man = new FKManager("null", 1, 0, 0, true,
                         new FKOptions(
                                 new FKOptions.FKOption("PvP", 2, false),
                                 new FKOptions.FKOption("Nether", 4, false),
@@ -75,37 +74,43 @@ public class Main extends JavaPlugin implements Listener {
                                 new FKOptions.FKOption("End", 6, true)
                         ),
                         new FKListener("FALLEN KINGDOM X"),
-                        new FKZone(null, FKZone.Type.LOBBY,
-                                new Location(Main.world, 0, 0, 0),
-                                new Location(Main.world, 0, 0, 0),
-                                new Location(Main.world, 0, 0, 0),
+                        new FKZone("Lobby", FKZone.Type.LOBBY,
+                                new Location(Main.world, 51, 225, -26),
+                                new Location(Main.world, 56, 224, -25),
+                                new Location(Main.world, 47, 226, -27),
                                 new FKAuth(FKAuth.Definition.OFF)
                         ),
-                        new FKZone(null, FKZone.Type.SPAWN,
-                                new Location(Main.world, 0, 0, 0),
-                                new Location(Main.world, 0, 0, 0),
-                                new Location(Main.world, 0, 0, 0),
-                                new FKAuth(FKAuth.Definition.OFF)
+                        new FKZone("Spawn", FKZone.Type.SPAWN,
+                                new Location(Main.world, 51, 225, -31),
+                                new Location(Main.world, 56, 224, -30),
+                                new Location(Main.world, 47, 226, -32),
+                                new FKAuth(FKAuth.Definition.DEFAULT,
+                                        new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
+                                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))
                         ),
-                        Collections.singletonList(
-                                new FKZone(null, FKZone.Type.ZONE,
-                                        new Location(Main.world, 0, 0, 0),
-                                        new Location(Main.world, 0, 0, 0),
-                                        new Location(Main.world, 0, 0, 0),
-                                        new FKAuth(FKAuth.Definition.OFF)
-                                )
-                        ),
+                        new ArrayList<>(),
                         new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null),
                         new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§l[§rR§l]", ChatColor.RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                                new FKTeam("blue", "§l[§rBleue§l]", "§l[§rB§l]", ChatColor.BLUE, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.ON), null)),
-                        new FKAuth(FKAuth.Definition.OFF),
-                        new FKAuth(FKAuth.Definition.OFF, new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.ON)),
-                        new FKAuth(FKAuth.Definition.OFF),
-                        new FKAuth(FKAuth.Definition.OFF)
-                ).getListener().scheduleTask();
+                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§l[§rR§l]", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
+                                new FKTeam("blue", "§l[§rBleue§l]", "§l[§rB§l]", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
+                        new FKAuth(FKAuth.Definition.OFF,
+                                new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
+                                new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
+                                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON)),
+                        new FKAuth(FKAuth.Definition.DEFAULT,
+                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
+                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)),
+                        new FKAuth(FKAuth.Definition.DEFAULT,
+                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
+                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.ON)),
+                        new FKAuth(FKAuth.Definition.DEFAULT,
+                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
+                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))
+                );
+                man.register();
+                man.getListener().scheduleTask();
 
-                new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", "[Lulu]", null)
+                new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", "[Lulu]", new PlayerStats(), null)
                         .register(FKManager.getCurrentGame().getTeam("blue"));
             }
         }.runTaskLater(this, 20);

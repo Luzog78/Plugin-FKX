@@ -61,9 +61,16 @@ public class FKListener {
                 } else
                     delayer--;
 
-                // TODO -> FKManager.refresh();
                 // TODO -> refreshScoreName();
-                objective.setDisplayName(scoreName);
+                // TODO -> objective.setDisplayName(scoreName);
+
+                manager.increaseTime(4); // 4 per 4 ticks due to period of 5 ticks (20 ticks = 1 sec)
+
+                if(manager.getTime() >= 100) {
+                    manager.increaseDay();
+                    manager.setTime(0);
+                    Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
+                }
 
                 setScoreLines();
                 updateScoreLines();
