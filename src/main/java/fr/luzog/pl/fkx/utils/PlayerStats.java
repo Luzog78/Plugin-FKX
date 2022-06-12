@@ -2,7 +2,8 @@ package fr.luzog.pl.fkx.utils;
 
 public class PlayerStats {
 
-    private int kills, deaths, blocksBroken, blocksPlaced, oresBroken, arrowsShot, arrowsHit, pickedItems, droppedItems, enchantedItems, jumps;
+    private int kills, deaths, blocksBroken, blocksPlaced, oresBroken, arrowsShot, arrowsHit, pickedItems, droppedItems,
+            enchantedItems, jumps, chats, inventoriesOpened, clickOnInventory;
     private double damageDealt, damageTaken, regainedHealth, regainedFood;
 
     public PlayerStats() {
@@ -17,6 +18,9 @@ public class PlayerStats {
         this.droppedItems = 0;
         this.enchantedItems = 0;
         this.jumps = 0;
+        this.chats = 0;
+        this.inventoriesOpened = 0;
+        this.clickOnInventory = 0;
         this.damageDealt = 0;
         this.damageTaken = 0;
         this.regainedHealth = 0;
@@ -25,7 +29,8 @@ public class PlayerStats {
 
     public PlayerStats(int kills, int deaths, int blocksBroken, int blocksPlaced, int oresBroken,
                        int arrowsShot, int arrowsHit, int pickedItems, int droppedItems, int enchantedItems, int jumps,
-                       double damageDealt, double damageTaken, double regainedHealth, double regainedFood) {
+                       int chats, int inventoriesOpened, int clickOnInventory, double damageDealt, double damageTaken,
+                       double regainedHealth, double regainedFood) {
         this.kills = kills;
         this.deaths = deaths;
         this.blocksBroken = blocksBroken;
@@ -37,6 +42,9 @@ public class PlayerStats {
         this.droppedItems = droppedItems;
         this.enchantedItems = enchantedItems;
         this.jumps = jumps;
+        this.chats = chats;
+        this.inventoriesOpened = inventoriesOpened;
+        this.clickOnInventory = clickOnInventory;
         this.damageDealt = damageDealt;
         this.damageTaken = damageTaken;
         this.regainedHealth = regainedHealth;
@@ -173,6 +181,42 @@ public class PlayerStats {
 
     public void increaseJumps() {
         this.jumps++;
+    }
+
+    public int getChats() {
+        return chats;
+    }
+
+    public void setChats(int chats) {
+        this.chats = chats;
+    }
+
+    public void increaseChats() {
+        this.chats++;
+    }
+
+    public int getInventoriesOpened() {
+        return inventoriesOpened;
+    }
+
+    public void setInventoriesOpened(int inventoriesOpened) {
+        this.inventoriesOpened = inventoriesOpened;
+    }
+
+    public void increaseInventoriesOpened() {
+        this.inventoriesOpened++;
+    }
+
+    public int getClickOnInventory() {
+        return clickOnInventory;
+    }
+
+    public void setClickOnInventory(int clickOnInventory) {
+        this.clickOnInventory = clickOnInventory;
+    }
+
+    public void increaseClickOnInventory() {
+        this.clickOnInventory++;
     }
 
     public double getDamageDealt() {

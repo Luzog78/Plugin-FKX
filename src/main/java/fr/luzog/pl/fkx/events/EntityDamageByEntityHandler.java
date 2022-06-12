@@ -14,23 +14,23 @@ import org.bukkit.metadata.FixedMetadataValue;
 public class EntityDamageByEntityHandler implements Listener {
 
     @EventHandler
-    public static void onEntityDamageByEntity(EntityDamageByEntityEvent event){
-        if(!(event.getDamager() instanceof Player))
+    public static void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if (!(event.getDamager() instanceof Player))
             return;
         Player p = (Player) event.getDamager();
         FKPlayer fp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
 
-        event.getEntity().setMetadata(Events.lastDamageLootingLevelTag,
-                new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)));
-        event.getEntity().setMetadata(Events.lastDamageSilkTouchTag,
-                new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0));
+        if (!(event.getEntity() instanceof Player)) {
+            event.getEntity().setMetadata(Events.lastDamageLootingLevelTag,
+                    new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)));
+            event.getEntity().setMetadata(Events.lastDamageSilkTouchTag,
+                    new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0));
+        } else {
+            Player e = (Player) event.getEntity();
+            FKPlayer fe = FKManager.getCurrentGame().getPlayer(e.getUniqueId());
 
-        if(!(event.getEntity() instanceof Player))
-            return;
-        Player e = (Player) event.getEntity();
-        FKPlayer fe = FKManager.getCurrentGame().getPlayer(e.getUniqueId());
-
-        event.setCancelled(!fp.hasAuthorization(fp.getTeam().getPlayers().contains(fe) ? FKAuth.Type.FRIENDLY_FIRE : FKAuth.Type.PVP, e.getLocation()));
+            event.setCancelled(!fp.hasAuthorization(fp.getTeam().getPlayers().contains(fe) ? FKAuth.Type.FRIENDLY_FIRE : FKAuth.Type.PVP, e.getLocation()));
+        }
     }
 
 }

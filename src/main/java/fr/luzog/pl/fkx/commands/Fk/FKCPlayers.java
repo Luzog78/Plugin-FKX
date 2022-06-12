@@ -39,13 +39,13 @@ public class FKCPlayers {
             if (args.length >= 3)
                 if (args[2].equalsIgnoreCase("info")) {
                     Player p = Bukkit.getPlayer(args[1]);
-                    DecimalFormat df = new DecimalFormat("#.00");
+                    DecimalFormat df = new DecimalFormat("0.00");
                     FKPlayer fkp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
                     u.succ("Joueur :");
                     u.succ(" - Nom : §f" + p.getName());
                     if (fkp != null)
                         u.succ(" - Team : §f" + fkp.getTeam().getName());
-                    u.succ(" - Nom d'Affichage : §f" + (fkp == null || fkp.getCustomName() == null ? p.getDisplayName() : fkp.getTeam().getPrefix() + fkp.getCustomName()));
+                    u.succ(" - Nom d'Affichage : §f" + (fkp == null ? p.getDisplayName() : fkp.getDisplayName()));
                     u.succ(" - Vie : §c" + df.format(p.getHealth()) + "§7 /" + p.getMaxHealth());
                     u.succ(" - Nourriture : §a" + df.format(p.getFoodLevel()) + "§7 /20.0");
                     u.succ(" - Saturation : §e" + df.format(p.getSaturation()) + "§7 /20.0");

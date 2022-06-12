@@ -42,6 +42,7 @@ public class Events implements Listener {
         add(new BlockBreakHandler());
         add(new PlayerMoveHandler());
         add(new BucketHandler());
+        add(new PlayerChatHandler());
     }};
 
     public static final String canInteractTag = "canInteract";

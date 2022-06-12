@@ -71,6 +71,7 @@ public class FKTeam {
         if (registerToTeamList && manager.getTeam(getId()) == null)
             manager.getTeams().add(this);
         scoreboardTeam = this.manager.getMainScoreboard().registerNewTeam(id);
+        updateParams();
         updatePlayers();
     }
 
@@ -80,8 +81,8 @@ public class FKTeam {
     }
 
     public void updateParams() {
-        scoreboardTeam.setDisplayName(name);
-        scoreboardTeam.setPrefix(prefix);
+        scoreboardTeam.setDisplayName(getName());
+        scoreboardTeam.setPrefix(getPrefix());
         scoreboardTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
         scoreboardTeam.setCanSeeFriendlyInvisibles(false);
         scoreboardTeam.setAllowFriendlyFire(true);
@@ -113,7 +114,16 @@ public class FKTeam {
     }
 
     public String getPrefix() {
-        return color + prefix.replace("§r", color.toString()) + color;
+        String p = color + prefix.replace("§r", color.toString());
+        if(prefix.contains("§"))
+            for (String s : prefix.toLowerCase().split("§"))
+                if (!s.startsWith("r") && !s.startsWith((color.getChar() + "").toLowerCase())) {
+                    p += color;
+                    break;
+                }
+        while (p.contains(color + "" + color))
+            p = p.replace(color + "" + color, color.toString());
+        return p;
     }
 
     public void setPrefix(String prefix) {

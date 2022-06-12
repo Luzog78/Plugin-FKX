@@ -13,16 +13,15 @@ public class FKPlayer {
     private FKTeam team;
 
     private UUID uuid;
-    private String name, customName;
+    private String name;
 
     private PlayerStats stats;
 
     private FKAuth personalAuthorizations;
 
-    public FKPlayer(UUID uuid, String name, String customName, @Nullable PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
+    public FKPlayer(UUID uuid, String name, @Nullable PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
         this.uuid = uuid;
         this.name = name;
-        this.customName = customName;
 
         this.stats = stats == null ? new PlayerStats() : stats;
         this.personalAuthorizations = personalAuthorizations == null ? new FKAuth(FKAuth.Definition.DEFAULT) : personalAuthorizations;
@@ -138,19 +137,12 @@ public class FKPlayer {
         this.name = name;
     }
 
-    public String getCustomName() {
-        return customName;
-    }
-
-    public void setCustomName(String customName) {
-        this.customName = customName;
-    }
-
     public String getDisplayName() {
         return (Vanish.vanished.contains(uuid) && Vanish.isPrefix ? Vanish.pre_suf_ix : "")
                 + (team != null ? team.getPrefix() : "")
-                + (customName != null && !customName.isEmpty() ? customName : name)
-                + (Vanish.vanished.contains(uuid) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "") + "§r";
+                + name
+                + (Vanish.vanished.contains(uuid) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "")
+                + "§r";
     }
 
     public PlayerStats getStats() {

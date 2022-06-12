@@ -87,24 +87,17 @@ public class FKListener {
                 updateScoreLines();
 
                 Bukkit.getOnlinePlayers().forEach(p -> {
-                    String displayName = p.getName();
-                    if (manager.getPlayer(p.getUniqueId()) != null)
-                        if (manager.getPlayer(p.getUniqueId()).getCustomName() != null)
-                            displayName = manager.getPlayer(p.getUniqueId()).getTeam().getPrefix() + manager.getPlayer(p.getUniqueId()).getCustomName();
-                        else
-                            displayName = manager.getPlayer(p.getUniqueId()).getTeam().getPrefix() + displayName;
+                    String displayName = manager.getPlayer(p.getUniqueId()) != null ? manager.getPlayer(p.getUniqueId()).getDisplayName() : p.getName();
+
+                    p.setDisplayName(displayName);
+
                     if (Vanish.vanished.contains(p.getUniqueId()))
                         if (Vanish.isPrefix)
                             displayName = Vanish.pre_suf_ix + displayName;
                         else
                             displayName += Vanish.pre_suf_ix;
-//                  TODO ->
-//                    if (!p.getDisplayName().equals(displayName)) {
-//                        p.setDisplayName(displayName);
-//                        p.setCustomName(displayName);
-//                        p.setCustomNameVisible(true);
-//                        p.setPlayerListName(displayName);
-//                    }
+
+                    p.setPlayerListName(displayName);
 
                     if (!p.getScoreboard().equals(manager.getMainScoreboard()))
                         p.setScoreboard(manager.getMainScoreboard());
