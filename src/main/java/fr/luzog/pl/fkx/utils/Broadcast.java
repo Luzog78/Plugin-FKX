@@ -99,6 +99,17 @@ public class Broadcast {
     }
 
     /**
+     * <strong>Announcements BroadCast (WITH LINES)</strong>
+     * <br>
+     * <br><strong>&nbsp; - Base Color :</strong> GREEN
+     * <br><strong>&nbsp; - Base Color :</strong> RED
+     * <br><strong>&nbsp; - Line Color :</strong> DARK_GREEN
+     */
+    public static void announcement(String mess) {
+        Bukkit.broadcastMessage(bd(mess, ChatColor.GREEN, ChatColor.RED, ChatColor.DARK_GREEN));
+    }
+
+    /**
      * <strong>Warns BroadCast (WITH LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> RED
@@ -117,7 +128,7 @@ public class Broadcast {
      * <br><strong>&nbsp; - Base Color :</strong> Custom
      * <br><strong>&nbsp; - Line Color :</strong> Custom
      */
-    private static void custom(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {
+    public static void custom(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {
         Bukkit.broadcastMessage(bd(mess, base, bold, lines));
     }
 
@@ -128,7 +139,7 @@ public class Broadcast {
      * <br><strong>&nbsp; - Base Color :</strong> Custom
      * <br><strong>&nbsp; - Line Color :</strong> Custom
      */
-    private static String bd(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {
+    public static String bd(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {
         return (lines != null ? "\n§" + lines.getChar() + "-------------------------§r\n \n  " : "\n")
                 + form(mess, base, bold) + "\n"
                 + (lines != null ? " \n§" + lines.getChar() + "-------------------------" : "");

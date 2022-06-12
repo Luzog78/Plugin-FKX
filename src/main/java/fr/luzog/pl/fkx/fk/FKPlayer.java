@@ -112,8 +112,10 @@ public class FKPlayer {
     }
 
     public void leaveTeam() {
-        if (team != null)
+        if (team != null) {
             team.getPlayers().remove(this);
+            team.updatePlayers();
+        }
         team = null;
     }
 

@@ -43,7 +43,7 @@ public class FKTeam {
     }
 
     public boolean isInside(Location loc) {
-        Location l1 = spawn.clone(), l2 = spawn.clone();
+        Location l1 = getSpawn().clone(), l2 = getSpawn().clone();
         l1.setY(-1);
         l2.setY(256);
         return Utils.isInside(loc, l1.add(radius, 0, radius), l2.subtract(radius, 0, radius));
@@ -139,7 +139,7 @@ public class FKTeam {
     }
 
     public Location getSpawn() {
-        return spawn;
+        return spawn == null ? manager == null ? null : manager.getSpawn().getSpawn() : spawn;
     }
 
     public void setSpawn(Location spawn) {

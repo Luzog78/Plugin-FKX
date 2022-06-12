@@ -3,7 +3,10 @@ package fr.luzog.pl.fkx.fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.Broadcast;
-import net.minecraft.server.v1_8_R3.*;
+import fr.luzog.pl.fkx.utils.SpecialChars;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -20,8 +23,8 @@ public class FKListener {
 
     public static enum FKState {WAITING, RUNNING, PAUSE, END;}
 
-    public static final String y = "§2✔";
-    public static final String n = "§4✖";
+    public static final String y = "§2" + SpecialChars.YES;
+    public static final String n = "§4" + SpecialChars.NO;
     public static final String[] a = new String[]{"⬆", "⬈", "➡", "⬊", "⬇", "⬋", "⬅", "⬉", "⬌", "⬍", "§d۞§r"};
     public static final String deactivated = "§c§oDesactivé";
     public static final String no_team = "§4§lAucune équipe";
@@ -67,6 +70,7 @@ public class FKListener {
                 if (manager.getTime() >= 24000) {
                     manager.increaseDay();
                     manager.setTime(0);
+                    manager.checkActivations(false);
                     Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
                 } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
                     Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
@@ -139,20 +143,20 @@ public class FKListener {
 
     public void setScoreLines() {
         l.clear();
-        l.put("§r", /* ............................................................................ */ 12);
-        l.put("§8Jour : §3" + manager.getDay(), /* ................................................ */ 11);
-        l.put("§8Heure : §3" + manager.getFormattedTime(), /* ..................................... */ 10);
-        l.put("§c----------", /* ................................................................... */ 9);
+        l.put("§r", /* ...................................................................................................... */ 12);
+        l.put("§8Jour : §3" + manager.getDay(), /* .......................................................................... */ 11);
+        l.put("§8Heure : §3" + manager.getFormattedTime(), /* ............................................................... */ 10);
+        l.put("§c----------", /* ............................................................................................. */ 9);
         for (int i = 0; i < 4; i++) {
             FKOptions.FKOption o = new FKOptions.FKOption[]{manager.getOptions().getPvp(), manager.getOptions().getNether(),
                     manager.getOptions().getAssauts(), manager.getOptions().getEnd()}[i];
-            l.put("§a" + o.getName() + "§a : " + (o.isActivated() ? y : n), /* ................ */ -i + 8);
+            l.put("§a" + o.getName() + "§a : " + (o.isActivated() ? y : n + "§7§O (J" + o.getActivationDay() + ")"), /* . */ -i + 8);
         }
-        l.put("§c---------- ", /* .................................................................. */ 4);
-        l.put("§9Type : §9Normal", /* .............................................................. */ 3);
-        l.put("§9Chest : §4None", /* ............................................................... */ 2);
-        l.put("§c----------  ", /* ................................................................. */ 1);
-        l.put("§d{EVENT}", /* ...................................................................... */ 0);
+        l.put("§c---------- ", /* ............................................................................................ */ 4);
+        l.put("§9Type : §9Normal", /* ........................................................................................ */ 3);
+        l.put("§9Chest : §4None", /* ......................................................................................... */ 2);
+        l.put("§c----------  ", /* ........................................................................................... */ 1);
+        l.put("§d{EVENT}", /* ................................................................................................ */ 0);
     }
 
     public void updateScoreLines() {
@@ -270,6 +274,8 @@ public class FKListener {
      * Formules de <strong style='color: #ff0000'>Luzog78</strong> !<br>
      * Très (trop) fier de lui !<br>
      * Car il les a trouvé <n>seul</n> en <span style='color: #ffffff'>3h15</span>.<br>
+     * <br>
+     * &nbsp; &nbsp; <strong>--> EDIT : </strong> Au final, ça marche toujours pas bien. ^^'<br>
      *
      * <br>
      *

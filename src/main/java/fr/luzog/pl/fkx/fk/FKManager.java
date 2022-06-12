@@ -65,8 +65,8 @@ public class FKManager {
                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                         new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
         setZones(new ArrayList<>());
-        setGods(new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.ON), null));
-        setSpecs(new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.OFF), null));
+        setGods(new FKTeam("gods", "Dieux", "§lD§r ||", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null));
+        setSpecs(new FKTeam("specs", "Specs", "§lS§r ||", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null));
         setTeams(new ArrayList<>());
         setGlobals(new FKAuth(FKAuth.Definition.OFF,
                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
@@ -269,6 +269,18 @@ public class FKManager {
     public String getFormattedTime() {
         DecimalFormat df = new DecimalFormat("00");
         return df.format((int) (getTime() / 1200)) + ":" + df.format((int) ((getTime() % 1200) / 20));
+    }
+
+    public void checkActivations(boolean force) {
+        for (FKOptions.FKOption opt : options.getOptions())
+            if (force) {
+                if (day >= opt.getActivationDay()) {
+                    if (!opt.isActivated())
+                        opt.activate();
+                } else if (opt.isActivated())
+                    opt.deactivate();
+            } else if (day == opt.getActivationDay())
+                opt.activate();
     }
 
     public String getId() {

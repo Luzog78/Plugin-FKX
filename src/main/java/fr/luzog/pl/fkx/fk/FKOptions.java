@@ -1,5 +1,10 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.utils.Broadcast;
+
+import java.util.Arrays;
+import java.util.List;
+
 public class FKOptions {
 
     private FKManager manager;
@@ -9,12 +14,14 @@ public class FKOptions {
         this.pvp = pvp.getOptionListener() != null ? pvp : pvp.setOptionListener(new FKOptionListener() {
             @Override
             public void onActivate() {
-
+                Broadcast.announcement("Le !PVP est activé.");
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PVP, FKAuth.Definition.ON);
             }
 
             @Override
-            public void onInactivate() {
-
+            public void onDeactivate() {
+                Broadcast.warn("Le !PVP est désactivé.");
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PVP, FKAuth.Definition.OFF);
             }
         });
         this.nether = nether.getOptionListener() != null ? nether : nether.setOptionListener(new FKOptionListener() {
@@ -24,19 +31,23 @@ public class FKOptions {
             }
 
             @Override
-            public void onInactivate() {
+            public void onDeactivate() {
 
             }
         });
         this.assauts = assauts.getOptionListener() != null ? assauts : assauts.setOptionListener(new FKOptionListener() {
             @Override
             public void onActivate() {
-
+                Broadcast.announcement("Les !Assauts sont activés.");
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PLACESPE, FKAuth.Definition.ON);
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON);
             }
 
             @Override
-            public void onInactivate() {
-
+            public void onDeactivate() {
+                Broadcast.warn("Les !Assauts sont désactivés.");
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PLACESPE, FKAuth.Definition.OFF);
+                FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.BREAKSPE, FKAuth.Definition.OFF);
             }
         });
         this.end = end.getOptionListener() != null ? end : end.setOptionListener(new FKOptionListener() {
@@ -46,7 +57,7 @@ public class FKOptions {
             }
 
             @Override
-            public void onInactivate() {
+            public void onDeactivate() {
 
             }
         });
@@ -59,7 +70,7 @@ public class FKOptions {
     public static interface FKOptionListener {
         void onActivate();
 
-        void onInactivate();
+        void onDeactivate();
     }
 
     public static class FKOption {
@@ -117,8 +128,16 @@ public class FKOptions {
             return activated;
         }
 
-        public void setActivated(boolean activated) {
-            this.activated = activated;
+        public void activate() {
+            this.activated = true;
+            if (optionListener != null)
+                optionListener.onActivate();
+        }
+
+        public void deactivate() {
+            this.activated = false;
+            if (optionListener != null)
+                optionListener.onDeactivate();
         }
 
         public FKOptionListener getOptionListener() {
@@ -129,6 +148,10 @@ public class FKOptions {
             this.optionListener = optionListener;
             return this;
         }
+    }
+
+    public List<FKOption> getOptions() {
+        return Arrays.asList(pvp, nether, assauts, end);
     }
 
     public FKManager getManager() {
