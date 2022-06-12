@@ -24,6 +24,18 @@ public class FKZone {
         this.authorizations = authorizations;
     }
 
+    @Override
+    public String toString() {
+        return "FKZone{" +
+                "id='" + id + '\'' +
+                ", type=" + type +
+                ", spawn=" + spawn +
+                ", pos1=" + pos1 +
+                ", pos2=" + pos2 +
+                ", authorizations=" + authorizations +
+                '}';
+    }
+
     public boolean isInside(Location loc){
         return Utils.isInside(loc, pos1, pos2);
     }

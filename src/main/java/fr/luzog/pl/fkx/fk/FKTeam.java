@@ -1,8 +1,10 @@
 package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nullable;
@@ -40,7 +42,7 @@ public class FKTeam {
         this.players.forEach(p -> p.setTeam(this));
     }
 
-    public boolean isInside(Location loc){
+    public boolean isInside(Location loc) {
         Location l1 = spawn.clone(), l2 = spawn.clone();
         l1.setY(-1);
         l2.setY(256);
@@ -52,36 +54,46 @@ public class FKTeam {
                 getSpawn().clone().subtract(radius, radius, radius), getSpawn().clone().add(radius, radius, radius), getAuthorizations());
     }
 
-    public FKPlayer getPlayer(UUID uuid) {
-        for (FKPlayer player : players)
-            if (player.getUuid().equals(uuid))
-                return player;
-        return null;
-    }
-
-    public void addPlayer(FKPlayer player) {
-        if (getPlayer(player.getUuid()) == null)
-            players.add(player);
-    }
-
-    public void removePlayer(FKPlayer player) {
-        if (getPlayer(player.getUuid()) != null)
-            players.remove(player);
-    }
-
     public FKManager getManager() {
         return manager;
     }
 
     public void setManager(FKManager manager) {
-        if (this.manager != null)
-            if (manager.getMainScoreboard().getTeam(this.id) != null)
-                manager.getMainScoreboard().getTeam(this.id).unregister();
+        setManager(manager, true);
+    }
+
+    public void setManager(FKManager manager, boolean registerToTeamList) {
+        if (this.manager != null) {
+            leaveManager();
+            return;
+        }
         this.manager = manager;
-        this.scoreboardTeam = this.manager.getMainScoreboard().registerNewTeam(this.id);
-        this.scoreboardTeam.setDisplayName(this.name);
-        this.scoreboardTeam.setPrefix(this.prefix);
-        this.players.forEach(p -> this.scoreboardTeam.addEntry(p.getName()));
+        if (registerToTeamList && manager.getTeam(getId()) == null)
+            manager.getTeams().add(this);
+        scoreboardTeam = this.manager.getMainScoreboard().registerNewTeam(id);
+        updatePlayers();
+    }
+
+    public void updatePlayers() {
+        scoreboardTeam.getPlayers().forEach(p -> scoreboardTeam.removePlayer(p));
+        players.forEach(p -> scoreboardTeam.addPlayer(Bukkit.getOfflinePlayer(p.getUuid())));
+    }
+
+    public void updateParams() {
+        scoreboardTeam.setDisplayName(name);
+        scoreboardTeam.setPrefix(prefix);
+        scoreboardTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
+        scoreboardTeam.setCanSeeFriendlyInvisibles(false);
+        scoreboardTeam.setAllowFriendlyFire(true);
+    }
+
+    public void leaveManager() {
+        if (scoreboardTeam != null)
+            scoreboardTeam.unregister();
+        if (this.manager != null)
+            manager.getTeams().remove(this);
+        this.manager = null;
+        this.scoreboardTeam = null;
     }
 
     public String getId() {
@@ -93,7 +105,7 @@ public class FKTeam {
     }
 
     public String getName() {
-        return color + name.replace("§r", color.toString()) + color;
+        return color + name.replace("§r", color.toString()) + color + "§r";
     }
 
     public void setName(String name) {
@@ -140,10 +152,38 @@ public class FKTeam {
         this.players = players;
     }
 
+    public FKPlayer getPlayer(UUID uuid) {
+        if (players != null)
+            for (FKPlayer player : players)
+                if (player.getUuid().equals(uuid))
+                    return player;
+        return null;
+    }
+
+    /**
+     * @deprecated This method is deprecated. Use {@link FKPlayer#setTeam(FKTeam)}  instead.
+     */
+    @Deprecated
+    public void addPlayer(FKPlayer player) {
+        player.setTeam(this);
+    }
+
+    /**
+     * @deprecated This method is deprecated. Use {@link FKPlayer#leaveTeam()} instead.
+     */
+    @Deprecated
+    public void removePlayer(FKPlayer player) {
+        player.leaveTeam();
+    }
+
     public Team getScoreboardTeam() {
         return scoreboardTeam;
     }
 
+    /**
+     * @deprecated You may not use this method.
+     */
+    @Deprecated
     public void setScoreboardTeam(Team scoreboardTeam) {
         this.scoreboardTeam = scoreboardTeam;
     }

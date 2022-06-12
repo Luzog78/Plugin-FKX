@@ -4,13 +4,9 @@ import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.utils.Crafting;
 import fr.luzog.pl.fkx.utils.CustomNBT;
-import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Loots;
-import javafx.util.Pair;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,8 +18,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.ShapedRecipe;
-import org.bukkit.inventory.ShapelessRecipe;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +41,7 @@ public class Events implements Listener {
         add(new BlockPlaceHandler());
         add(new BlockBreakHandler());
         add(new PlayerMoveHandler());
+        add(new BucketHandler());
     }};
 
     public static final String canInteractTag = "canInteract";
@@ -59,7 +54,7 @@ public class Events implements Listener {
             Material.SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS, Material.CARROT, Material.CARROT_ITEM,
             Material.POTATO, Material.POTATO_ITEM, Material.FIRE, Material.FLINT_AND_STEEL, Material.BUCKET,
             Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET, Material.WORKBENCH,
-            Material.FURNACE, Material.ENCHANTMENT_TABLE);
+            Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE);
     public static List<Material> unbreakableMat = Arrays.asList(Material.MOB_SPAWNER, Material.WOOL);
     public static List<Material> unplaceableMat = Arrays.asList(Material.WOOL);
 

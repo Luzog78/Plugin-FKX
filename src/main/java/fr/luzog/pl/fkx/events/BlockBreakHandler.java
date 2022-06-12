@@ -31,7 +31,7 @@ public class BlockBreakHandler implements Listener {
     @EventHandler
     public static void onBreakBlock(BlockBreakEvent e) {
         FKPlayer fp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
-        if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBlock().getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, e.getBlock().getLocation())) {
+        if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBlock().getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
             e.setCancelled(true);
             return;
         }

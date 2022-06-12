@@ -151,16 +151,31 @@ public class Utils {
     }
 
     /**
-     * It takes a location, rounds the x, y, and z values to the nearest .5, and returns the new location
+     * It takes a location, and returns a location that is the center of the block that the original location is in
+     * (Y position included)
      *
      * @param loc The location to normalize
-     * @return A Location object.
+     * @return A Location object
      */
     public static Location normalize(Location loc) {
+        return normalize(loc, true);
+    }
+
+    /**
+     * It takes a location, and returns a location that is the center of the block that the original location is in
+     *
+     * @param loc The location to normalize
+     * @param y If true, the y-coordinate will be normalized. If false, it will not.
+     * @return A Location object
+     */
+    public static Location normalize(Location loc, boolean y) {
         Location l = loc.clone();
-        l.setX(Double.parseDouble(((int) l.getX()) + ".5"));
-        l.setX(Double.parseDouble(((int) l.getY()) + ".5"));
-        l.setX(Double.parseDouble(((int) l.getZ()) + ".5"));
+        l.setX(((int) l.getX()) + 0.5);
+        if(y)
+            l.setY(((int) l.getY()) + 0.5);
+        l.setZ(((int) l.getZ()) + 0.5);
+        l.setYaw(0);
+        l.setPitch(0);
         return l;
     }
 

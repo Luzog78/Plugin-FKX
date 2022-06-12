@@ -77,22 +77,22 @@ public class Main extends JavaPlugin implements Listener {
                         new FKZone("Lobby", FKZone.Type.LOBBY,
                                 new Location(Main.world, 51, 225, -26),
                                 new Location(Main.world, 56, 224, -25),
-                                new Location(Main.world, 47, 226, -27),
+                                new Location(Main.world, 46, 226, -27),
                                 new FKAuth(FKAuth.Definition.OFF)
                         ),
                         new FKZone("Spawn", FKZone.Type.SPAWN,
                                 new Location(Main.world, 51, 225, -31),
                                 new Location(Main.world, 56, 224, -30),
-                                new Location(Main.world, 47, 226, -32),
+                                new Location(Main.world, 46, 226, -32),
                                 new FKAuth(FKAuth.Definition.DEFAULT,
                                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                                         new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))
                         ),
                         new ArrayList<>(),
-                        new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                        new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§l[§rR§l]", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                                new FKTeam("blue", "§l[§rBleue§l]", "§l[§rB§l]", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
+                        new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.ON), null),
+                        new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.OFF), null),
+                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§l[§rR§l] ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
+                                new FKTeam("blue", "§l[§rBleue§l]", "§l[§rB§l] ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
                         new FKAuth(FKAuth.Definition.OFF,
                                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
                                 new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
@@ -110,8 +110,16 @@ public class Main extends JavaPlugin implements Listener {
                 man.register();
                 man.getListener().scheduleTask();
 
-                new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", "[Lulu]", new PlayerStats(), null)
-                        .register(FKManager.getCurrentGame().getTeam("blue"));
+                try {
+                    new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", "[Lulu]", new PlayerStats(), null)
+                            .setTeam(FKManager.getCurrentGame().getTeam("blue"));
+                } catch (NullPointerException ignored) {
+                }
+                try {
+                    new FKPlayer(Bukkit.getPlayer("Jigoku_san").getUniqueId(), "Jigoku_san", null, new PlayerStats(), null)
+                            .setTeam(FKManager.getCurrentGame().getTeam("red"));
+                } catch (NullPointerException ignored) {
+                }
             }
         }.runTaskLater(this, 20);
     }

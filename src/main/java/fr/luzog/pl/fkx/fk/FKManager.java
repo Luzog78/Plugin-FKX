@@ -62,11 +62,11 @@ public class FKManager {
                 new Location(Main.world, 0, 0, 0),
                 new Location(Main.world, 0, 0, 0),
                 new FKAuth(FKAuth.Definition.DEFAULT,
-                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
+                        new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
+                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
         setZones(new ArrayList<>());
-        setGods(new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null));
-        setSpecs(new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.DEFAULT), null));
+        setGods(new FKTeam("gods", "Dieux", "D", ChatColor.DARK_RED, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.ON), null));
+        setSpecs(new FKTeam("specs", "Specs", "S", ChatColor.GRAY, new Location(Main.world, 0, 0, 0), 0, new FKAuth(FKAuth.Definition.OFF), null));
         setTeams(new ArrayList<>());
         setGlobals(new FKAuth(FKAuth.Definition.OFF,
                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
@@ -214,23 +214,47 @@ public class FKManager {
     }
 
     public FKTeam getTeam(String id) {
-        for (FKTeam team : teams)
-            if (team.getId().equalsIgnoreCase(id))
-                return team;
+        if (teams != null)
+            for (FKTeam team : teams)
+                if (team.getId().equalsIgnoreCase(id))
+                    return team;
+        if (gods != null)
+            if (gods.getId().equalsIgnoreCase(id))
+                return gods;
+        if (specs != null)
+            if (specs.getId().equalsIgnoreCase(id))
+                return specs;
         return null;
     }
 
+    /**
+     * @deprecated This method is deprecated. Use {@link FKTeam#setManager(FKManager)} instead.
+     */
+    @Deprecated
     public void addTeam(FKTeam team) {
-        teams.add(team);
+        team.setManager(this);
     }
 
+    /**
+     * @deprecated This method is deprecated. Use {@link FKTeam#leaveManager()} instead.
+     */
+    @Deprecated
     public void removeTeam(FKTeam team) {
-        teams.add(team);
+        team.leaveManager();
     }
 
     public FKPlayer getPlayer(UUID uuid) {
-        for (FKTeam team : teams)
-            for (FKPlayer player : team.getPlayers())
+        if (teams != null)
+            for (FKTeam team : teams)
+                for (FKPlayer player : team.getPlayers())
+                    if (player.getUuid().equals(uuid))
+                        return player;
+        if (gods != null)
+            for (FKPlayer player : gods.getPlayers())
+                if (player.getUuid().equals(uuid))
+                    return player;
+        if (specs != null)
+            for (FKPlayer player : specs.getPlayers())
                 if (player.getUuid().equals(uuid))
                     return player;
         return null;
@@ -281,13 +305,13 @@ public class FKManager {
 
     public void setTime(int time) {
         this.time = time;
-        if(isLinkedToSun())
+        if (isLinkedToSun())
             Main.world.setTime(this.time);
     }
 
     public void increaseTime(int time) {
         this.time += time;
-        if(isLinkedToSun())
+        if (isLinkedToSun())
             Main.world.setTime(this.time);
     }
 
@@ -357,8 +381,8 @@ public class FKManager {
     }
 
     public void setGods(FKTeam gods) {
-        gods.setManager(this);
         this.gods = gods;
+        gods.setManager(this, false);
     }
 
     public FKTeam getSpecs() {
@@ -366,8 +390,8 @@ public class FKManager {
     }
 
     public void setSpecs(FKTeam specs) {
-        specs.setManager(this);
         this.specs = specs;
+        specs.setManager(this, false);
     }
 
     public List<FKTeam> getTeams() {
@@ -375,8 +399,8 @@ public class FKManager {
     }
 
     public void setTeams(List<FKTeam> teams) {
-        teams.forEach(t -> t.setManager(this));
         this.teams = teams;
+        teams.forEach(t -> t.setManager(this));
     }
 
     public FKAuth getGlobals() {

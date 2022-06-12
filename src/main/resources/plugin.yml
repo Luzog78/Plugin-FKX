@@ -17,7 +17,7 @@ website: https://discord.io/Luzog78
 # Dev Infos
 main: fr.luzog.pl.fkx.Main
 prefix: FKX
-load: STARTUP # STARTUP / POSTWORLD
+load: POSTWORLD # STARTUP / POSTWORLD
 depend: [ ]
 
 

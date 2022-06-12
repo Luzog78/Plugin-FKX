@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,26 +19,13 @@ public class FKPlayer {
 
     private FKAuth personalAuthorizations;
 
-    public FKPlayer(UUID uuid, String name, String customName, PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
+    public FKPlayer(UUID uuid, String name, String customName, @Nullable PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
         this.uuid = uuid;
         this.name = name;
         this.customName = customName;
 
-        this.stats = stats;
-
-        if (personalAuthorizations != null)
-            this.personalAuthorizations = personalAuthorizations;
-        else
-            this.personalAuthorizations = new FKAuth(FKAuth.Definition.DEFAULT);
-    }
-
-    public void register(FKTeam team) {
-        this.team = team;
-        this.team.addPlayer(this);
-    }
-
-    public void leave() {
-        team.removePlayer(this);
+        this.stats = stats == null ? new PlayerStats() : stats;
+        this.personalAuthorizations = personalAuthorizations == null ? new FKAuth(FKAuth.Definition.DEFAULT) : personalAuthorizations;
     }
 
     public boolean hasAuthorization(FKAuth.Type authorizationType, Location loc) {
@@ -114,13 +102,30 @@ public class FKPlayer {
     }
 
     public void setTeam(FKTeam team) {
+        if (team == null) {
+            leaveTeam();
+            return;
+        }
         this.team = team;
+        if (team.getPlayer(uuid) == null)
+            team.getPlayers().add(this);
+        team.updatePlayers();
+    }
+
+    public void leaveTeam() {
+        if (team != null)
+            team.getPlayers().remove(this);
+        team = null;
     }
 
     public UUID getUuid() {
         return uuid;
     }
 
+    /**
+     * @deprecated You may not use this method.
+     */
+    @Deprecated
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
@@ -139,6 +144,13 @@ public class FKPlayer {
 
     public void setCustomName(String customName) {
         this.customName = customName;
+    }
+
+    public String getDisplayName() {
+        return (Vanish.vanished.contains(uuid) && Vanish.isPrefix ? Vanish.pre_suf_ix : "")
+                + (team != null ? team.getPrefix() : "")
+                + (customName != null && !customName.isEmpty() ? customName : name)
+                + (Vanish.vanished.contains(uuid) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "") + "§r";
     }
 
     public PlayerStats getStats() {

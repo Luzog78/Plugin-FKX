@@ -20,6 +20,14 @@ public class FKAuth {
             this.definition = definition;
         }
 
+        @Override
+        public String toString() {
+            return "Item{" +
+                    "type=" + type +
+                    ", definition=" + definition +
+                    '}';
+        }
+
         public Type getType() {
             return type;
         }
@@ -38,6 +46,7 @@ public class FKAuth {
     }
 
     private Map<Type, Definition> authorizations;
+
     public FKAuth(Definition defaultDefinition, Item... authorizations) {
         this.authorizations = new HashMap<Type, Definition>() {{
             for (Item a : authorizations)
@@ -48,6 +57,13 @@ public class FKAuth {
             for (Type value : Type.values())
                 putIfAbsent(value, defaultDefinition);
         }};
+    }
+
+    @Override
+    public String toString() {
+        return "FKAuth{" +
+                "authorizations=" + authorizations +
+                '}';
     }
 
     public Map<Type, Definition> getAuthorizations() {

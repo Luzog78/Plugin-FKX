@@ -3,9 +3,7 @@ package fr.luzog.pl.fkx.fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.Broadcast;
-import net.minecraft.server.v1_8_R3.ChatComponentText;
-import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
-import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
+import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
@@ -64,13 +62,26 @@ public class FKListener {
                 // TODO -> refreshScoreName();
                 // TODO -> objective.setDisplayName(scoreName);
 
-                manager.increaseTime(4); // 4 per 4 ticks due to period of 5 ticks (20 ticks = 1 sec)
+                manager.increaseTime(5);
 
-                if(manager.getTime() >= 100) {
+                if (manager.getTime() >= 24000) {
                     manager.increaseDay();
                     manager.setTime(0);
                     Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
-                }
+                } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
+                    Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
+                else if (manager.getTime() == 24000 - 200)
+                    Broadcast.log("Nouvelle journée dans !10 !secondes§r...");
+                else if (manager.getTime() == 24000 - 400)
+                    Broadcast.log("Nouvelle journée dans !20 !secondes§r...");
+                else if (manager.getTime() == 24000 - 600)
+                    Broadcast.log("Nouvelle journée dans !30 !secondes§r...");
+                else if (manager.getTime() == 24000 - 1200)
+                    Broadcast.log("Nouvelle journée dans !1 !minute§r...");
+                else if (manager.getTime() == 24000 - 1200 * 2)
+                    Broadcast.log("Nouvelle journée dans !2 !minutes§r...");
+                else if (manager.getTime() == 24000 - 1200 * 3)
+                    Broadcast.log("Nouvelle journée dans !3 !minutes§r...");
 
                 setScoreLines();
                 updateScoreLines();
@@ -87,10 +98,14 @@ public class FKListener {
                             displayName = Vanish.pre_suf_ix + displayName;
                         else
                             displayName += Vanish.pre_suf_ix;
-                    if (!p.getDisplayName().equals(displayName)) {
-                        p.setDisplayName(displayName);
-                        p.setPlayerListName(displayName);
-                    }
+//                  TODO ->
+//                    if (!p.getDisplayName().equals(displayName)) {
+//                        p.setDisplayName(displayName);
+//                        p.setCustomName(displayName);
+//                        p.setCustomNameVisible(true);
+//                        p.setPlayerListName(displayName);
+//                    }
+
                     if (!p.getScoreboard().equals(manager.getMainScoreboard()))
                         p.setScoreboard(manager.getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTablistHeaderAndFooter(p));
@@ -270,7 +285,9 @@ public class FKListener {
      * @param fromZ Position Z of Object A (Player position)
      * @param toX   Position X of Object B (Targeted Object position)
      * @param toZ   Position Z of Object B (Targeted Object position)
+     *
      * @return Indication Arrow
+     *
      * @luzog Copyrights
      */
     public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ) {
@@ -300,6 +317,7 @@ public class FKListener {
      * <br>
      *
      * @param yaw Yaw orientation in degrees (yaw ∈ [-360 ; 360])
+     *
      * @return Indication Arrow
      */
     public static String getCompass(double yaw) {
