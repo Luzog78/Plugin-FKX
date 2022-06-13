@@ -2,17 +2,21 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
+import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Crafting;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Loots;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -43,7 +47,10 @@ public class Events implements Listener {
         add(new PlayerMoveHandler());
         add(new BucketHandler());
         add(new PlayerChatHandler());
+        add(new InventoryClickHandler());
     }};
+
+    public static final double STILL_Y_VEL_CONSTANT = -0.0784000015258789;
 
     public static final String canInteractTag = "canInteract";
     public static final String canClickOnTag = "canClickOn";
@@ -553,10 +560,16 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onDropItem(PlayerDropItemEvent e) {
+        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
+        if (fkp != null)
+            fkp.getStats().increaseDroppedItems();
     }
 
     @EventHandler
     public static void onPickupItem(PlayerPickupItemEvent e) {
+        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
+        if (fkp != null)
+            fkp.getStats().increasePickedItems();
     }
 
     @EventHandler
@@ -580,11 +593,14 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public static void onPortal(EntityCreatePortalEvent e) {
+    public static void onCreatePortal(EntityCreatePortalEvent e) {
     }
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
+        FKPlayer p = FKManager.getGlobalPlayer(e.getEntity().getUniqueId());
+        if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
+            p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
     }
 
     @EventHandler
@@ -596,13 +612,27 @@ public class Events implements Listener {
     public static void onInteractAtBlock(PlayerInteractEvent e) {
     }
 
-    public static boolean isInside(Location loc, Location loc1, Location loc2) {
-        return loc1.getWorld().getUID()
-                == loc.getWorld().getUID() && loc.getWorld().getUID()
-                == loc2.getWorld().getUID()
-                && Math.max(loc1.getX(), loc2.getX()) >= loc.getX() && loc.getX() >= Math.min(loc1.getX(), loc2.getX())
-                && Math.max(loc1.getY(), loc2.getY()) >= loc.getY() && loc.getY() >= Math.min(loc1.getY(), loc2.getY())
-                && Math.max(loc1.getZ(), loc2.getZ()) >= loc.getZ() && loc.getZ() >= Math.min(loc1.getZ(), loc2.getZ());
+    @EventHandler
+    public static void onShoot(EntityShootBowEvent e) {
+        if (e.getEntity() instanceof Player) {
+            FKPlayer p = FKManager.getGlobalPlayer(e.getEntity().getUniqueId());
+            if (p != null)
+                p.getStats().increaseArrowsShot();
+        }
+    }
+
+    @EventHandler
+    public static void onEnchant(EnchantItemEvent e) {
+        FKPlayer p = FKManager.getGlobalPlayer(e.getEnchanter().getUniqueId());
+        if (p != null)
+            p.getStats().increaseEnchantedItems();
+    }
+
+    @EventHandler
+    public static void onOpenInventory(InventoryOpenEvent e) {
+        FKPlayer p = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
+        if (p != null)
+            p.getStats().increaseInventoriesOpened();
     }
 
 }

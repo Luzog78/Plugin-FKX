@@ -22,12 +22,13 @@ public class BlockPlaceHandler implements Listener {
             return;
         }
 
-
         if (Events.unplaceableMat.contains(e.getBlock().getType())) {
             e.setCancelled(true);
             e.getPlayer().sendMessage(Main.PREFIX + "§cBlock Imposable.");
             return;
         }
+
+        fp.getStats().increaseBlocksPlaced();
     }
 
 }

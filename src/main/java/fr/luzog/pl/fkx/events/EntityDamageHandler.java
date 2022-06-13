@@ -1,9 +1,14 @@
 package fr.luzog.pl.fkx.events;
 
+import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.utils.Broadcast;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +19,8 @@ public class EntityDamageHandler implements Listener {
 
     @EventHandler
     public static void onDamage(EntityDamageEvent e) {
+        System.out.println("onDamage " + e.getEntityType() + " " + e.getCause() + " " + e.getEntity().getLocation());
+
         if (!(e.getEntity() instanceof LivingEntity))
             return;
 
@@ -37,6 +44,26 @@ public class EntityDamageHandler implements Listener {
                         loot.getLoots().lootsInclusive(chanceLvl, silkTouch).forEach(is -> loc.getWorld().dropItemNaturally(loc, is));
                 }
             });
+
+        if(e.getEntity() instanceof Player) {
+            Player p = (Player) e.getEntity();
+            FKPlayer fp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
+
+            if(fp == null)
+                return;
+
+            fp.getStats().increaseDamageTaken(e.getDamage());
+
+            if(entity.getHealth() - e.getFinalDamage() <= 0) {
+                fp.getStats().increaseDeaths();
+                Broadcast.mess(fp.getDisplayName() + "§c est mort.");
+                e.setCancelled(true);
+                p.setHealth(p.getMaxHealth());
+                p.setFoodLevel(20);
+                p.setSaturation(20f);
+                p.teleport(p.getBedSpawnLocation() == null ? fp.getTeam().getSpawn() : p.getBedSpawnLocation());
+            }
+        }
     }
 
 }

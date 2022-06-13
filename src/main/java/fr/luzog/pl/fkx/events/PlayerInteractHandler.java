@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
+import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -19,6 +21,10 @@ public class PlayerInteractHandler implements Listener {
     public static void onInteract(PlayerInteractEvent event) {
         Action a = event.getAction();
         Player p = event.getPlayer();
+
+        FKPlayer fkp = FKManager.getGlobalPlayer(p.getUniqueId());
+        if(fkp != null)
+            fkp.getStats().increaseInteractions();
 
         if (Freeze.frozen.contains(p.getUniqueId()))
             return;

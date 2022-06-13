@@ -70,8 +70,8 @@ public class FKListener {
                 if (manager.getTime() >= 24000) {
                     manager.increaseDay();
                     manager.setTime(0);
-                    manager.checkActivations(false);
                     Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
+                    manager.checkActivations(false);
                 } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
                     Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
                 else if (manager.getTime() == 24000 - 200)

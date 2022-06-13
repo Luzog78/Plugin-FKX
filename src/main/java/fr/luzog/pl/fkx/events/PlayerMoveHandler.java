@@ -14,10 +14,16 @@ public class PlayerMoveHandler implements Listener {
         FKPlayer p = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
         if (p == null)
             return;
-        FKManager manager = p.getManager();
+
+        if (!e.isCancelled()) {
+            p.getStats().increaseTraveledDistance(e.getTo().distance(e.getFrom()));
+            if(e.getFrom().getY() + 0.419 < e.getTo().getY())
+                p.getStats().increaseJumps();
+        }
 
         FKZone from = p.getZone(e.getFrom()), to = p.getZone(e.getTo());
-        if ((from == null && to != null) || (from != null && to == null) || (from != null && to != null && !from.getId().equals(to.getId())))
+        if ((from == null && to != null) || (from != null && to == null) ||
+                (from != null && to != null && !from.getId().equals(to.getId())))
             e.getPlayer().sendMessage("§aVous entrez dans §f" + (to == null ? "null" : to.getId()) + "§a !");
     }
 

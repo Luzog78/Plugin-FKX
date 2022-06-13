@@ -146,8 +146,7 @@ public class Broadcast {
     }
 
     private static String form(String mess, ChatColor base, ChatColor bold) {
-        return Strings.join(new ArrayList<String>(){{
-            add("§r");
+        return ("§r" + Strings.join(new ArrayList<String>(){{
             for (String part : mess.replace("&", "§").replace("§§", "&").split(" ")) {
                 if (part.equals("!!") || part.equals("!"))
                     add("!");
@@ -158,7 +157,7 @@ public class Broadcast {
                 else
                     add(part);
             }
-        }}, " ").replace("§r", "§" + base.getChar());
+        }}, " ")).replace("§r", "§" + base.getChar());
     }
 
 }

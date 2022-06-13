@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -41,6 +42,12 @@ public class BlockBreakHandler implements Listener {
             e.getPlayer().sendMessage(Main.PREFIX + "§cBlock Incassable.");
             return;
         }
+
+        fp.getStats().increaseBlocksBroken();
+        if (Arrays.asList(Material.COAL_ORE, Material.IRON_ORE, Material.GOLD_ORE, Material.REDSTONE_ORE,
+                Material.LAPIS_ORE, Material.DIAMOND_ORE, Material.EMERALD_ORE, Material.QUARTZ_ORE,
+                Material.GLOWING_REDSTONE_ORE).contains(e.getBlock().getType()))
+            fp.getStats().increaseOresBroken();
 
         if (e.getPlayer().getGameMode() == GameMode.CREATIVE || e.getPlayer().getGameMode() == GameMode.SPECTATOR)
             return;

@@ -3,8 +3,8 @@ package fr.luzog.pl.fkx.utils;
 public class PlayerStats {
 
     private int kills, deaths, blocksBroken, blocksPlaced, oresBroken, arrowsShot, arrowsHit, pickedItems, droppedItems,
-            enchantedItems, jumps, chats, inventoriesOpened, clickOnInventory;
-    private double damageDealt, damageTaken, regainedHealth, regainedFood;
+            enchantedItems, jumps, chats, inventoriesOpened, clicksOnInventory, interactions;
+    private double damageDealt, damageTaken, traveledDistance, regainedFood;
 
     public PlayerStats() {
         this.kills = 0;
@@ -20,17 +20,18 @@ public class PlayerStats {
         this.jumps = 0;
         this.chats = 0;
         this.inventoriesOpened = 0;
-        this.clickOnInventory = 0;
+        this.clicksOnInventory = 0;
+        this.interactions = 0;
         this.damageDealt = 0;
         this.damageTaken = 0;
-        this.regainedHealth = 0;
+        this.traveledDistance = 0;
         this.regainedFood = 0;
     }
 
     public PlayerStats(int kills, int deaths, int blocksBroken, int blocksPlaced, int oresBroken,
                        int arrowsShot, int arrowsHit, int pickedItems, int droppedItems, int enchantedItems, int jumps,
-                       int chats, int inventoriesOpened, int clickOnInventory, double damageDealt, double damageTaken,
-                       double regainedHealth, double regainedFood) {
+                       int chats, int inventoriesOpened, int clicksOnInventory, int interactions, double damageDealt,
+                       double damageTaken, double traveledDistance, double regainedFood) {
         this.kills = kills;
         this.deaths = deaths;
         this.blocksBroken = blocksBroken;
@@ -44,10 +45,11 @@ public class PlayerStats {
         this.jumps = jumps;
         this.chats = chats;
         this.inventoriesOpened = inventoriesOpened;
-        this.clickOnInventory = clickOnInventory;
+        this.clicksOnInventory = clicksOnInventory;
+        this.interactions = interactions;
         this.damageDealt = damageDealt;
         this.damageTaken = damageTaken;
-        this.regainedHealth = regainedHealth;
+        this.traveledDistance = traveledDistance;
         this.regainedFood = regainedFood;
     }
 
@@ -207,16 +209,28 @@ public class PlayerStats {
         this.inventoriesOpened++;
     }
 
-    public int getClickOnInventory() {
-        return clickOnInventory;
+    public int getClicksOnInventory() {
+        return clicksOnInventory;
     }
 
-    public void setClickOnInventory(int clickOnInventory) {
-        this.clickOnInventory = clickOnInventory;
+    public void setClicksOnInventory(int clicksOnInventory) {
+        this.clicksOnInventory = clicksOnInventory;
     }
 
-    public void increaseClickOnInventory() {
-        this.clickOnInventory++;
+    public void increaseClicksOnInventory() {
+        this.clicksOnInventory++;
+    }
+
+    public int getInteractions() {
+        return interactions;
+    }
+
+    public void setInteractions(int interactions) {
+        this.interactions = interactions;
+    }
+
+    public void increaseInteractions() {
+        this.interactions++;
     }
 
     public double getDamageDealt() {
@@ -243,16 +257,16 @@ public class PlayerStats {
         this.damageTaken += damageTaken;
     }
 
-    public double getRegainedHealth() {
-        return regainedHealth;
+    public double getTraveledDistance() {
+        return traveledDistance;
     }
 
-    public void setRegainedHealth(double regainedHealth) {
-        this.regainedHealth = regainedHealth;
+    public void setTraveledDistance(double traveledDistance) {
+        this.traveledDistance = traveledDistance;
     }
 
-    public void increaseRegainedHealth(double regainedHealth) {
-        this.regainedHealth += regainedHealth;
+    public void increaseTraveledDistance(double traveledDistance) {
+        this.traveledDistance += traveledDistance;
     }
 
     public double getRegainedFood() {
