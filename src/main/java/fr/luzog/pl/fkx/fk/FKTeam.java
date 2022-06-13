@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +167,14 @@ public class FKTeam {
         if (players != null)
             for (FKPlayer player : players)
                 if (player.getUuid().equals(uuid))
+                    return player;
+        return null;
+    }
+
+    public FKPlayer getPlayer(@Nonnull String name) {
+        if (players != null)
+            for (FKPlayer player : players)
+                if (name.equalsIgnoreCase(player.getName()))
                     return player;
         return null;
     }

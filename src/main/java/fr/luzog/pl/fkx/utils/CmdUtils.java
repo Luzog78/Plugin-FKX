@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 
 public class CmdUtils {
 
+    public static final String err_unknown = "Un problème est survenu.";
     public static final String err_syntaxe = "Syntaxe :";
     public static final String err_not_player = "Vous n'êtes pas un joueur.";
     public static final String err_player_not_found = "Joueur introuvable.";

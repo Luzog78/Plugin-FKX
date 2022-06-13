@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.scoreboard.Scoreboard;
 
+import javax.annotation.Nonnull;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -140,19 +141,54 @@ public class FKManager {
     }
 
     public static FKPlayer getGlobalPlayer(UUID uuid) {
-        for (FKManager game : registered)
-            for (FKTeam team : game.getTeams())
-                for (FKPlayer player : team.getPlayers())
+        for (FKManager game : registered) {
+            if (game.getTeams() != null)
+                for (FKTeam team : game.getTeams())
+                    for (FKPlayer player : team.getPlayers())
+                        if (player.getUuid().equals(uuid))
+                            return player;
+            if (game.getGods() != null)
+                for (FKPlayer player : game.getGods().getPlayers())
                     if (player.getUuid().equals(uuid))
                         return player;
+            if (game.getSpecs() != null)
+                for (FKPlayer player : game.getSpecs().getPlayers())
+                    if (player.getUuid().equals(uuid))
+                        return player;
+        }
+        return null;
+    }
+
+    public static FKPlayer getGlobalPlayer(@Nonnull String name) {
+        for (FKManager game : registered) {
+            if (game.getTeams() != null)
+                for (FKTeam team : game.getTeams())
+                    for (FKPlayer player : team.getPlayers())
+                        if (name.equalsIgnoreCase(player.getName()))
+                            return player;
+            if (game.getGods() != null)
+                for (FKPlayer player : game.getGods().getPlayers())
+                    if (name.equalsIgnoreCase(player.getName()))
+                        return player;
+            if (game.getSpecs() != null)
+                for (FKPlayer player : game.getSpecs().getPlayers())
+                    if (name.equalsIgnoreCase(player.getName()))
+                        return player;
+        }
         return null;
     }
 
     public static List<FKPlayer> getGlobalPlayers() {
         return new ArrayList<>(new HashSet<FKPlayer>() {{
-            for (FKManager game : registered)
-                for (FKTeam team : game.getTeams())
-                    this.addAll(team.getPlayers());
+            for (FKManager game : registered) {
+                if (game.getTeams() != null)
+                    for (FKTeam team : game.getTeams())
+                        addAll(team.getPlayers());
+                if (game.getGods() != null)
+                    addAll(game.getGods().getPlayers());
+                if (game.getSpecs() != null)
+                    addAll(game.getSpecs().getPlayers());
+            }
         }});
     }
 
@@ -260,9 +296,28 @@ public class FKManager {
         return null;
     }
 
+    public FKPlayer getPlayer(@Nonnull String name) {
+        if (teams != null)
+            for (FKTeam team : teams)
+                for (FKPlayer player : team.getPlayers())
+                    if (name.equalsIgnoreCase(player.getName()))
+                        return player;
+        if (gods != null)
+            for (FKPlayer player : gods.getPlayers())
+                if (name.equalsIgnoreCase(player.getName()))
+                    return player;
+        if (specs != null)
+            for (FKPlayer player : specs.getPlayers())
+                if (name.equalsIgnoreCase(player.getName()))
+                    return player;
+        return null;
+    }
+
     public List<FKPlayer> getPlayers() {
         return new ArrayList<>(new HashSet<FKPlayer>() {{
             teams.forEach(t -> this.addAll(t.getPlayers()));
+            addAll(gods.getPlayers());
+            addAll(specs.getPlayers());
         }});
     }
 

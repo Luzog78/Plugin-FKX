@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCActivations {
-    public static final String syntaxe = "/fk activations (list | check | <act> get | <act> set (on | off | <day>))";
+    public static final String syntaxe = "/fk activations (help | list | check | <act> [get | <act> set (on | off | <day>)])";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -21,6 +21,9 @@ public class FKCActivations {
 
         if (args.length == 1)
             u.succ("TODO -> Activations GUIs");
+
+        else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
+            u.synt();
 
         else if (args[1].equalsIgnoreCase("list")) {
             u.succ("Activations :");
