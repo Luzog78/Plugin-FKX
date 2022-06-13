@@ -7,10 +7,7 @@ import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Crafting;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import fr.luzog.pl.fkx.utils.SpecialChars;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -75,6 +72,11 @@ public class Main extends JavaPlugin implements Listener {
                                 new FKOptions.FKOption("End", 6, true)
                         ),
                         new FKListener("FALLEN KINGDOM X"),
+                        new FKDimension("Nether",
+                                null, new Location(world, 52, 226, -28), new Location(world, 51, 228, -28),
+                                Bukkit.getWorld("world_nether").getSpawnLocation(), null, null,
+                                Material.PORTAL, Material.AIR, (byte) 0, 60L, false),
+                        new FKDimension("End", null, null, null, null, null, null, Material.ENDER_PORTAL, Material.AIR, (byte) 0, 200L, false),
                         new FKZone("Lobby", FKZone.Type.LOBBY,
                                 new Location(Main.world, 51, 225, -26),
                                 new Location(Main.world, 56, 224, -25),

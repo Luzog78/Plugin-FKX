@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -17,13 +18,18 @@ public class Utils {
 
     /**
      * If the location is within the bounds of the two locations, return true
+     * <br>
+     * (If the locations are not in the same world or just null, return false)
      *
-     * @param loc The location you want to check if it's inside the cuboid.
+     * @param loc  The location you want to check if it's inside the cuboid.
      * @param loc1 The first location
      * @param loc2 The location of the second corner of the cuboid.
+     *
      * @return A boolean value.
      */
     public static boolean isInside(Location loc, Location loc1, Location loc2) {
+        if (loc == null || loc1 == null || loc2 == null || !loc.getWorld().getUID().equals(loc1.getWorld().getUID()) || !loc.getWorld().getUID().equals(loc2.getWorld().getUID()))
+            return false;
         double maxX = Math.max(loc1.getX(), loc2.getX()), maxY = Math.max(loc1.getY(), loc2.getY()), maxZ = Math.max(loc1.getZ(), loc2.getZ()),
                 minX = Math.min(loc1.getX(), loc2.getX()), minY = Math.min(loc1.getY(), loc2.getY()), minZ = Math.min(loc1.getZ(), loc2.getZ());
         return loc.getX() <= maxX && loc.getX() >= minX && loc.getY() <= maxY && loc.getY() >= minY && loc.getZ() <= maxZ && loc.getZ() >= minZ
@@ -31,10 +37,34 @@ public class Utils {
     }
 
     /**
+     * It returns a list of all the blocks in the cuboid defined by the two locations
+     * <br>
+     * (If the locations are not in the same world or just null, the method will return an empty list)
+     *
+     * @param loc1 The first location
+     * @param loc2 The second location
+     *
+     * @return A list of blocks
+     */
+    public static List<Block> getBlocksIn(Location loc1, Location loc2) {
+        if (loc1 == null || loc2 == null || !loc1.getWorld().getUID().equals(loc2.getWorld().getUID()))
+            return new ArrayList<>();
+        int maxX = Math.max(loc1.getBlockX(), loc2.getBlockX()), maxY = Math.max(loc1.getBlockY(), loc2.getBlockY()), maxZ = Math.max(loc1.getBlockZ(), loc2.getBlockZ()),
+                minX = Math.min(loc1.getBlockX(), loc2.getBlockX()), minY = Math.min(loc1.getBlockY(), loc2.getBlockY()), minZ = Math.min(loc1.getBlockZ(), loc2.getBlockZ());
+        List<Block> blocks = new ArrayList<>();
+        for (int x = minX; x <= maxX; x++)
+            for (int y = minY; y <= maxY; y++)
+                for (int z = minZ; z <= maxZ; z++)
+                    blocks.add(loc1.getWorld().getBlockAt(x, y, z));
+        return blocks;
+    }
+
+    /**
      * Given a column and row, return the position of the cell in the inventory.
      *
      * @param col The column of the cell.
      * @param row The row of the cell you want to get the position of.
+     *
      * @return The position of the cell in the array.
      */
     public static int posOf(int col, int row) {
@@ -45,6 +75,7 @@ public class Utils {
      * Given a position, return the column and row of that position.
      *
      * @param position The position of the cell in the inventory.
+     *
      * @return A pair of integers.
      */
     public static Pair<Integer, Integer> colAndRowOf(int position) {
@@ -61,6 +92,7 @@ public class Utils {
      * @param pos1 The first position.
      * @param pos2 The position of the second point.
      * @param wall If true, the zone will be a filled zone, if false, it will be an empty zone.
+     *
      * @return A list of integers.
      */
     public static List<Integer> zoneOf(int pos1, int pos2, boolean wall) {
@@ -90,10 +122,10 @@ public class Utils {
     /**
      * It fills an inventory with an itemstack from position 1 to position 2
      *
-     * @param inv The inventory you want to fill
+     * @param inv  The inventory you want to fill
      * @param pos1 The first position to start filling from.
      * @param pos2 The position to stop filling at.
-     * @param is The itemstack you want to fill the inventory with
+     * @param is   The itemstack you want to fill the inventory with
      */
     public static void fill(Inventory inv, int pos1, int pos2, ItemStack is) {
         fill(inv, pos1, pos2, false, is);
@@ -102,11 +134,11 @@ public class Utils {
     /**
      * Fills the inventory with the given item stack from the given positions.
      *
-     * @param inv The inventory to fill
+     * @param inv  The inventory to fill
      * @param pos1 The first position of the zone.
      * @param pos2 The second position of the zone.
      * @param wall If true, the zone will be a filled zone, if false, it will be an empty zone.
-     * @param is The item to fill the inventory with
+     * @param is   The item to fill the inventory with
      */
     public static void fill(Inventory inv, int pos1, int pos2, boolean wall, ItemStack is) {
         zoneOf(pos1, pos2, wall).forEach(p -> inv.setItem(p, is));
@@ -156,6 +188,7 @@ public class Utils {
      * (Y position included)
      *
      * @param loc The location to normalize
+     *
      * @return A Location object
      */
     public static Location normalize(Location loc) {
@@ -166,13 +199,14 @@ public class Utils {
      * It takes a location, and returns a location that is the center of the block that the original location is in
      *
      * @param loc The location to normalize
-     * @param y If true, the y-coordinate will be normalized. If false, it will not.
+     * @param y   If true, the y-coordinate will be normalized. If false, it will not.
+     *
      * @return A Location object
      */
     public static Location normalize(Location loc, boolean y) {
         Location l = loc.clone();
         l.setX(((int) l.getX()) + 0.5);
-        if(y)
+        if (y)
             l.setY(((int) l.getY()) + 0.5);
         l.setZ(((int) l.getZ()) + 0.5);
         l.setYaw(0);

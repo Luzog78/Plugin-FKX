@@ -211,16 +211,20 @@ public class FKListener {
         DecimalFormat df = new DecimalFormat("0.0");
         f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId()) == null ? no_team
                 : manager.getPlayer(p.getUniqueId()).getTeam().getName() + "§7 - §6"
-                + df.format(p.getLocation().distance(manager.getPlayer(p.getUniqueId()).getTeam().getSpawn()))
+                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getWorld().getUID()) ?
+                "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
+                : df.format(p.getLocation().distance(manager.getPlayer(p.getUniqueId()).getTeam().getSpawn()))
                 + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getX(), manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getZ())));
+                manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getX(), manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getZ()))));
         f.add(" ");
         f.add("§8§l§nAutres équipes :§r");
         f.add(" ");
         manager.getTeams().forEach(t -> {
             if (manager.getPlayer(p.getUniqueId()) == null || !manager.getPlayer(p.getUniqueId()).getTeam().equals(t))
-                f.add(t.getName() + "§7 - §6" + df.format(p.getLocation().distance(t.getSpawn())) + "§e "
-                        + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), t.getSpawn().getX(), t.getSpawn().getZ()));
+                f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
+                        "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
+                        : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),
+                        p.getLocation().getZ(), t.getSpawn().getX(), t.getSpawn().getZ())));
         });
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"

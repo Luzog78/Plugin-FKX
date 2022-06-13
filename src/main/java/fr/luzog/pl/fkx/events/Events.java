@@ -17,10 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -594,6 +591,18 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onCreatePortal(EntityCreatePortalEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public static void onEntityPortal(EntityPortalEvent e) {
+        e.setCancelled(true);
+    }
+
+    @EventHandler
+    public static void onTeleport(PlayerTeleportEvent e) {
+        if(e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL)
+            e.setCancelled(true);
     }
 
     @EventHandler

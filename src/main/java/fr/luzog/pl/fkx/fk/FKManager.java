@@ -30,6 +30,8 @@ public class FKManager {
     private FKListener listener;
     private Scoreboard mainScoreboard;
 
+    private FKDimension nether, end;
+
     private FKZone lobby;
     private FKZone spawn;
     private List<FKZone> zones;
@@ -53,15 +55,15 @@ public class FKManager {
         setLinkedToSun(true);
         setOptions(FKOptions.getDefaultOptions());
         setListener(new FKListener("FALLEN KINGDOM X"));
+        setNether(null);
+        setEnd(null);
         setLobby(new FKZone(null, FKZone.Type.LOBBY,
                 new Location(Main.world, 0, 0, 0),
-                new Location(Main.world, 0, 0, 0),
-                new Location(Main.world, 0, 0, 0),
+                null, null,
                 new FKAuth(FKAuth.Definition.OFF)));
         setSpawn(new FKZone(null, FKZone.Type.SPAWN,
                 new Location(Main.world, 0, 0, 0),
-                new Location(Main.world, 0, 0, 0),
-                new Location(Main.world, 0, 0, 0),
+                null, null,
                 new FKAuth(FKAuth.Definition.DEFAULT,
                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                         new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
@@ -86,8 +88,8 @@ public class FKManager {
 
 
     public FKManager(String id, int day, int weather, int time, boolean linkedToSun, FKOptions options, FKListener listener,
-                     FKZone lobby, FKZone spawn, List<FKZone> zones, FKTeam gods, FKTeam specs, List<FKTeam> teams,
-                     FKAuth globals, FKAuth neutral, FKAuth friendly, FKAuth hostile) {
+                     FKDimension nether, FKDimension end, FKZone lobby, FKZone spawn, List<FKZone> zones, FKTeam gods,
+                     FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral, FKAuth friendly, FKAuth hostile) {
         this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.id = id;
         setDay(day);
@@ -96,6 +98,8 @@ public class FKManager {
         setLinkedToSun(linkedToSun);
         setOptions(options);
         setListener(listener);
+        setNether(nether);
+        setEnd(end);
         setLobby(lobby);
         setSpawn(spawn);
         setZones(zones);
@@ -414,6 +418,26 @@ public class FKManager {
 
     public void setMainScoreboard(Scoreboard mainScoreboard) {
         this.mainScoreboard = mainScoreboard;
+    }
+
+    public FKDimension getNether() {
+        return nether;
+    }
+
+    public void setNether(FKDimension nether) {
+        if (nether != null)
+            nether.close();
+        this.nether = nether;
+    }
+
+    public FKDimension getEnd() {
+        return end;
+    }
+
+    public void setEnd(FKDimension end) {
+        if (end != null)
+            end.close();
+        this.end = end;
     }
 
     public FKZone getLobby() {

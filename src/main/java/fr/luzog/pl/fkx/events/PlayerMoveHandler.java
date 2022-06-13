@@ -25,6 +25,11 @@ public class PlayerMoveHandler implements Listener {
         if ((from == null && to != null) || (from != null && to == null) ||
                 (from != null && to != null && !from.getId().equals(to.getId())))
             e.getPlayer().sendMessage("§aVous entrez dans §f" + (to == null ? "null" : to.getId()) + "§a !");
+
+        if(!e.isCancelled()) {
+            p.getManager().getNether().tryToTeleport(e.getPlayer());
+            p.getManager().getEnd().tryToTeleport(e.getPlayer());
+        }
     }
 
 }
