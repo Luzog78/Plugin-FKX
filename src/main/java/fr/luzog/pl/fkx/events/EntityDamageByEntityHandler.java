@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
 public class EntityDamageByEntityHandler implements Listener {
@@ -20,22 +19,32 @@ public class EntityDamageByEntityHandler implements Listener {
             Player p = (Player) event.getDamager();
             FKPlayer fp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
 
-            if (!(event.getEntity() instanceof Player)) {
+            if (fp == null) {
+                event.setCancelled(true);
+                return;
+            }
+
+
+            if (event.getEntity() instanceof Player) {
+                Player e = (Player) event.getEntity();
+                FKPlayer fe = FKManager.getCurrentGame().getPlayer(e.getUniqueId());
+
+                if (!fp.hasAuthorization(fp.getTeam().getPlayers().contains(fe) ? FKAuth.Type.FRIENDLY_FIRE : FKAuth.Type.PVP, e.getLocation())) {
+                    event.setCancelled(true);
+                    return;
+                }
+            } else {
+                if (!fp.hasAuthorization(FKAuth.Type.MOBS, event.getEntity().getLocation())) {
+                    event.setCancelled(true);
+                    return;
+                }
+
                 event.getEntity().setMetadata(Events.lastDamageLootingLevelTag,
                         new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS)));
                 event.getEntity().setMetadata(Events.lastDamageSilkTouchTag,
                         new FixedMetadataValue(Main.instance, p.getItemInHand().getEnchantmentLevel(Enchantment.SILK_TOUCH) > 0));
-            } else if (fp != null) {
-                Player e = (Player) event.getEntity();
-                FKPlayer fe = FKManager.getCurrentGame().getPlayer(e.getUniqueId());
-
-                event.setCancelled(!fp.hasAuthorization(fp.getTeam().getPlayers().contains(fe) ? FKAuth.Type.FRIENDLY_FIRE : FKAuth.Type.PVP, e.getLocation()));
-            } else
-                event.setCancelled(true);
+            }
         }
-
-        if (event.isCancelled())
-            return;
 
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();

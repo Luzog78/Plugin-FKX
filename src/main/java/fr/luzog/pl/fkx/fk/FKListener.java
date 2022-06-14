@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.SpecialChars;
+import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
@@ -15,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -63,32 +63,38 @@ public class FKListener {
                 // TODO -> refreshScoreName();
                 // TODO -> objective.setDisplayName(scoreName);
 
-                manager.increaseTime(5);
+                if (manager.getState() == FKManager.State.RUNNING) {
+                    manager.increaseTime(5);
 
-                if (manager.getTime() >= 24000) {
-                    manager.increaseDay();
-                    manager.setTime(0);
-                    Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
-                    manager.checkActivations(false);
-                } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
-                    Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
-                else if (manager.getTime() == 24000 - 200)
-                    Broadcast.log("Nouvelle journée dans !10 !secondes§r...");
-                else if (manager.getTime() == 24000 - 400)
-                    Broadcast.log("Nouvelle journée dans !20 !secondes§r...");
-                else if (manager.getTime() == 24000 - 600)
-                    Broadcast.log("Nouvelle journée dans !30 !secondes§r...");
-                else if (manager.getTime() == 24000 - 1200)
-                    Broadcast.log("Nouvelle journée dans !1 !minute§r...");
-                else if (manager.getTime() == 24000 - 1200 * 2)
-                    Broadcast.log("Nouvelle journée dans !2 !minutes§r...");
-                else if (manager.getTime() == 24000 - 1200 * 3)
-                    Broadcast.log("Nouvelle journée dans !3 !minutes§r...");
+                    if (manager.getTime() >= 24000) {
+                        manager.increaseDay();
+                        manager.setTime(0);
+                        Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
+                        manager.checkActivations(false);
+                    } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
+                        Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
+                    else if (manager.getTime() == 24000 - 200)
+                        Broadcast.log("Nouvelle journée dans !10 !secondes§r...");
+                    else if (manager.getTime() == 24000 - 400)
+                        Broadcast.log("Nouvelle journée dans !20 !secondes§r...");
+                    else if (manager.getTime() == 24000 - 600)
+                        Broadcast.log("Nouvelle journée dans !30 !secondes§r...");
+                    else if (manager.getTime() == 24000 - 1200)
+                        Broadcast.log("Nouvelle journée dans !1 !minute§r...");
+                    else if (manager.getTime() == 24000 - 1200 * 2)
+                        Broadcast.log("Nouvelle journée dans !2 !minutes§r...");
+                    else if (manager.getTime() == 24000 - 1200 * 3)
+                        Broadcast.log("Nouvelle journée dans !3 !minutes§r...");
+                }
 
                 setScoreLines();
                 updateScoreLines();
 
-                Bukkit.getOnlinePlayers().forEach(p -> {
+                manager.getPlayers().forEach(fkp -> {
+                    Player p = fkp.getPlayer();
+                    if (p == null)
+                        return;
+
                     String displayName = manager.getPlayer(p.getUniqueId()) != null ? manager.getPlayer(p.getUniqueId()).getDisplayName() : p.getName();
 
                     p.setDisplayName(displayName);
@@ -103,8 +109,15 @@ public class FKListener {
 
                     if (!p.getScoreboard().equals(manager.getMainScoreboard()))
                         p.setScoreboard(manager.getMainScoreboard());
-                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTablistHeaderAndFooter(p));
+                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTHF(p));
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getActionBar(p));
+                });
+
+                new ArrayList<Player>(Bukkit.getOnlinePlayers()) {{
+                    removeIf(p -> FKManager.getGlobalPlayer(p.getUniqueId()) != null);
+                }}.forEach(p -> {
+                    p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
                 });
             }
 
@@ -169,28 +182,14 @@ public class FKListener {
         l.keySet().forEach(s -> al.put(l.get(s), s));
     }
 
-    public PacketPlayOutPlayerListHeaderFooter getTablistHeaderAndFooter(Player p) {
-        PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter();
-        Field a, b;
-
-        try {
-            a = packet.getClass().getDeclaredField("a");
-            a.setAccessible(true);
-            b = packet.getClass().getDeclaredField("b");
-            b.setAccessible(true);
-        } catch (NoSuchFieldException | SecurityException e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        List<String> h = new ArrayList<>();
-        List<String> f = new ArrayList<>();
-        h.add("§c========§6[ §9§lFallen Kingdom X§r§6 ]§c========");
+    public PacketPlayOutPlayerListHeaderFooter getTHF(Player p) {
+        List<String> h = new ArrayList<>(), f = new ArrayList<>();
+        h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
         h.add("§9Organisateur : §f" + "Mathis_Bruel");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
-        h.add("§3Bienvenue à toi cher §9" + p.getDisplayName() + "§3,");
+        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getUniqueId()) == null ? p.getDisplayName() : manager.getPlayer(p.getUniqueId()).getDisplayName()) + "§3,");
         h.add("§3l'équipe souhaite une bonne aventure !");
         h.add("§3N'oublie pas §5§l§o§n[§2§l§o§n/ad§5§l§o§n]§3 si tu as un besoin...");
         h.add("§3Les " + manager.getGods().getColor() + manager.getGods().getName() + "§3 seront là pour aider ^^");
@@ -229,41 +228,33 @@ public class FKListener {
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
         f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
                 + (Bukkit.getServer().getIp().equals("") ? "localhost" : Bukkit.getServer().getIp()));
-        f.add("§c==============================");
-        /*
-         *
-         * ^^^ DEF ^^^ -------------- ||| UPDATE |||
-         *
-         */
-        String header = "";
-        String footer = "";
-        if (h.isEmpty())
-            try {
-                a.set(packet, new ChatComponentText(""));
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        else
-            for (String hd : h)
-                header += hd + "\n";
-        if (f.isEmpty())
-            try {
-                b.set(packet, new ChatComponentText(""));
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        else
-            for (String ft : f)
-                footer += ft + "\n";
-        try {
-            a.set(packet, new ChatComponentText(header.substring(0, header.length() - 1)));
-            b.set(packet, new ChatComponentText(footer.substring(0, footer.length() - 1)));
-        } catch (StringIndexOutOfBoundsException ignore) {
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        f.add("§c====================================");
+        return Utils.getTabHeaderAndFooter(h, f);
+    }
 
-        return packet;
+    public PacketPlayOutPlayerListHeaderFooter getDefaultTHF(Player p) {
+        List<String> h = new ArrayList<>(), f = new ArrayList<>();
+        h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
+        h.add(" ");
+        h.add("§9Organisateur : §f" + "Mathis_Bruel");
+        h.add("§9Developpeur : §f" + "Luzog78");
+        h.add(" ");
+        h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
+        h.add("§cMalheureusement, tu n'es actuellement");
+        h.add("§cpas un participant à §6Fallen Kingdom §lX§c.");
+        h.add("§cDemande à un §4Administrateur");
+        h.add("§cde t'ajouter dans une partie.");
+        h.add(" ");
+        h.add(" ");
+        h.add("§7Joueurs en ligne :");
+        h.add("§7---");
+        f.add("§7---");
+        f.add(" ");
+        f.add(" ");
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
+                + (Bukkit.getServer().getIp().equals("") ? "localhost" : Bukkit.getServer().getIp()));
+        f.add("§c====================================");
+        return Utils.getTabHeaderAndFooter(h, f);
     }
 
     public PacketPlayOutChat getActionBar(Player p) {

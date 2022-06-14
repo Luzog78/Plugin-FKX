@@ -3,10 +3,7 @@ package fr.luzog.pl.fkx;
 import fr.luzog.pl.fkx.commands.CommandManager;
 import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.fk.*;
-import fr.luzog.pl.fkx.utils.Config;
-import fr.luzog.pl.fkx.utils.Crafting;
-import fr.luzog.pl.fkx.utils.PlayerStats;
-import fr.luzog.pl.fkx.utils.SpecialChars;
+import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
@@ -64,7 +61,7 @@ public class Main extends JavaPlugin implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                FKManager man = new FKManager("null", FKManager.FKState.RUNNING, 1, 0, 0, true,
+                FKManager man = new FKManager("null", FKManager.State.WAITING, 1, 0, 0, true,
                         new FKOptions(
                                 new FKOptions.FKOption("PvP", 2, false),
                                 new FKOptions.FKOption("Nether", 4, false),
@@ -72,11 +69,11 @@ public class Main extends JavaPlugin implements Listener {
                                 new FKOptions.FKOption("End", 6, true)
                         ),
                         new FKListener("FALLEN KINGDOM X"),
-                        new FKDimension("Nether",
+                        new Portal("Nether",
                                 null, new Location(world, 52, 226, -28), new Location(world, 51, 228, -28),
                                 Bukkit.getWorld("world_nether").getSpawnLocation(), null, null,
                                 Material.PORTAL, Material.AIR, (byte) 0, 60L, false),
-                        new FKDimension("End", null, null, null, null, null, null, Material.ENDER_PORTAL, Material.AIR, (byte) 0, 200L, false),
+                        new Portal("End", null, null, null, null, null, null, Material.ENDER_PORTAL, Material.AIR, (byte) 0, 200L, false),
                         new FKZone("Lobby", FKZone.Type.LOBBY,
                                 new Location(Main.world, 51, 225, -26),
                                 new Location(Main.world, 56, 224, -25),
@@ -89,17 +86,30 @@ public class Main extends JavaPlugin implements Listener {
                                 new Location(Main.world, 46, 226, -32),
                                 new FKAuth(FKAuth.Definition.DEFAULT,
                                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-                                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))
+                                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF),
+                                        new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.OFF))
                         ),
-                        new ArrayList<>(),
-                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu || ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null),
-                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec || ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null),
-                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r || ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r || ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
+                        new ArrayList<FKZone>() {{
+                            add(new FKZone("nether", FKZone.Type.ZONE,
+                                    Bukkit.getWorld("world_nether").getSpawnLocation(),
+                                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                                    new FKAuth(FKAuth.Definition.ON)));
+                            add(new FKZone("end", FKZone.Type.ZONE,
+                                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
+                                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                                    new FKAuth(FKAuth.Definition.ON)));
+                        }},
+                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null),
+                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null),
+                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r ||  ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
+                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r ||  ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
                         new FKAuth(FKAuth.Definition.OFF,
                                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
                                 new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
-                                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON)),
+                                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON),
+                                new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.ON)),
                         new FKAuth(FKAuth.Definition.DEFAULT,
                                 new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
                                 new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)),
@@ -108,14 +118,15 @@ public class Main extends JavaPlugin implements Listener {
                                 new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.ON)),
                         new FKAuth(FKAuth.Definition.DEFAULT,
                                 new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))
+                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)),
+                        new FKAuth(FKAuth.Definition.OFF)
                 );
                 man.register();
                 man.getListener().scheduleTask();
 
                 try {
                     new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", new PlayerStats(), null)
-                            .setTeam(FKManager.getCurrentGame().getTeam("red"));
+                            .setTeam(FKManager.getCurrentGame().getTeam("gods"));
                 } catch (NullPointerException ignored) {
                 }
                 try {

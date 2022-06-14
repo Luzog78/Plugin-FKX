@@ -1,7 +1,6 @@
-package fr.luzog.pl.fkx.fk;
+package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,7 +9,7 @@ import org.bukkit.entity.Entity;
 
 import java.util.*;
 
-public class FKDimension {
+public class Portal {
 
     private String name;
     private boolean opened;
@@ -23,9 +22,9 @@ public class FKDimension {
 
     private Map<UUID, Integer> inTeleportation;
 
-    public FKDimension(String name, Location overSpawn, Location overPortal1, Location overPortal2,
-                       Location dimSpawn, Location dimPortal1, Location dimPortal2, Material openedMat,
-                       Material closedMat, byte data, long coolDown, boolean opened) {
+    public Portal(String name, Location overSpawn, Location overPortal1, Location overPortal2,
+                  Location dimSpawn, Location dimPortal1, Location dimPortal2, Material openedMat,
+                  Material closedMat, byte data, long coolDown, boolean opened) {
         this.name = name;
         this.coolDown = coolDown;
         this.overSpawn = overSpawn;

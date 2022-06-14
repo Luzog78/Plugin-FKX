@@ -2,17 +2,20 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
+import fr.luzog.pl.fkx.fk.FKAuth;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Crafting;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Loots;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
@@ -560,6 +563,9 @@ public class Events implements Listener {
         FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
         if (fkp != null)
             fkp.getStats().increaseDroppedItems();
+
+        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            e.setCancelled(true);
     }
 
     @EventHandler
@@ -567,6 +573,17 @@ public class Events implements Listener {
         FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
         if (fkp != null)
             fkp.getStats().increasePickedItems();
+
+        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public static void onBedEnter(PlayerBedEnterEvent e) {
+        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
+
+        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            e.setCancelled(true);
     }
 
     @EventHandler
@@ -582,7 +599,17 @@ public class Events implements Listener {
     }
 
     @EventHandler
-    public static void onExplode(ExplosionPrimeEvent e) {
+    public static void onPrime(ExplosionPrimeEvent e) {
+    }
+
+    @EventHandler
+    public static void onBlockExplode(BlockExplodeEvent e) {
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasAuthorization(specialMat.contains(b.getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(b.getLocation())));
+    }
+
+    @EventHandler
+    public static void onEntityExplode(EntityExplodeEvent e) {
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasAuthorization(specialMat.contains(b.getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(b.getLocation())));
     }
 
     @EventHandler
@@ -601,7 +628,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onTeleport(PlayerTeleportEvent e) {
-        if(e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL)
+        if (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL)
             e.setCancelled(true);
     }
 

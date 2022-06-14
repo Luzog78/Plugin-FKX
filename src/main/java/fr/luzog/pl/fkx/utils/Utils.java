@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
 import javafx.util.Pair;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -11,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,36 +149,46 @@ public class Utils {
 
     /**
      * @param p    <strong style="color: #ff0000">null</strong> to Broadcast
+     * @param sec  &nbsp; <code style="color: #00ff00"><0</code> &nbsp; to do instantly &nbsp;
+     *             | &nbsp; <code style="color: #00ff00">0</code> &nbsp; to do instantly WITH last msg &nbsp;
+     *             | &nbsp; <code style="color: #00ff00">>0</code> &nbsp; normal
      * @param text Use variable <strong style="color: #ffffff">%i%</strong> and use <strong style="color: #ffffff">§r</strong> to default color
      */
-    public static void countDown(@Nullable Player p, int sec, boolean ascendant, boolean title, boolean chat, String text,
-                                 String defaultColor, String warningColor, String criticalColor, String lastColor, Runnable r) {
+    public static void countDown(@Nullable Player p, int sec, boolean ascendant, boolean title, boolean chat, String text, @Nullable String end,
+                                 String defaultColor, String warningColor, String criticalColor, String lastColor, String endColor, @Nullable Runnable r) {
+        if (sec < 0) {
+            if (r != null)
+                r.run();
+            return;
+        }
         new BukkitRunnable() {
             int i = sec;
 
             @Override
             public void run() {
+                String ii = (ascendant ? sec - i : i) + "";
+                String s = ("§r" + (i == 0 ? end == null ? "" : end : text).replace("%i%", ii).replace("%I%", ii)).replace("\n", "\n§r")
+                        .replace("§r", i == 5 || i == 4 ? warningColor : i == 3 || i == 2 ? criticalColor : i == 1 ? lastColor : i == 0 ? endColor : defaultColor);
+
+                if (i != 0 || end != null)
+                    if (p == null) {
+                        if (chat)
+                            Broadcast.log(s.contains("\n") ? s.split("\n", 2)[0] : s);
+                        if (title)
+                            Bukkit.getOnlinePlayers().forEach(pl ->
+                                    pl.sendTitle(s.contains("\n") ? s.split("\n", 2)[0] : s, s.contains("\n") ? s.split("\n", 2)[1] : ""));
+                    } else {
+                        if (title)
+                            p.sendTitle(s.contains("\n") ? s.split("\n", 2)[0] : s, s.contains("\n") ? s.split("\n", 2)[1] : "");
+                        if (chat)
+                            p.sendMessage(Main.PREFIX + (s.contains("\n") ? s.split("\n", 2)[0] : s));
+                    }
+
                 if (i == 0) {
                     this.cancel();
-                    r.run();
+                    if (r != null)
+                        r.run();
                     return;
-                }
-
-                String ii = (ascendant ? sec - i : i) + "";
-                String s = ("§r" + text.replace("%i%", ii).replace("%I%", ii)).replace("\n", "\n§r")
-                        .replace("§r", i == 3 ? warningColor : i == 2 ? criticalColor : i == 1 ? lastColor : defaultColor);
-
-                if (p == null) {
-                    if (chat)
-                        Bukkit.broadcastMessage(s);
-                    if (title)
-                        Bukkit.getOnlinePlayers().forEach(pl ->
-                                pl.sendTitle(s.contains("\n") ? s.split("\n", 2)[0] : s, s.contains("\n") ? s.split("\n", 2)[1] : ""));
-                } else {
-                    if (title)
-                        p.sendTitle(s.contains("\n") ? s.split("\n", 2)[0] : s, s.contains("\n") ? s.split("\n", 2)[1] : "");
-                    if (chat)
-                        p.sendMessage(s);
                 }
 
                 i--;
@@ -212,6 +225,58 @@ public class Utils {
         l.setYaw(0);
         l.setPitch(0);
         return l;
+    }
+
+    /**
+     * It takes a list of strings and returns a packet that will set the header and footer of the tab list
+     *
+     * @param header The header of the tab list.
+     * @param footer The footer of the tab list.
+     *
+     * @return A PacketPlayOutPlayerListHeaderFooter object.
+     */
+    public static PacketPlayOutPlayerListHeaderFooter getTabHeaderAndFooter(List<String> header, List<String> footer) {
+        PacketPlayOutPlayerListHeaderFooter packet = new PacketPlayOutPlayerListHeaderFooter();
+        Field a, b;
+        try {
+            a = packet.getClass().getDeclaredField("a");
+            a.setAccessible(true);
+            b = packet.getClass().getDeclaredField("b");
+            b.setAccessible(true);
+        } catch (NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        String h = "";
+        String f = "";
+        if (header.isEmpty())
+            try {
+                a.set(packet, new ChatComponentText(""));
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        else
+            for (String hd : header)
+                h += hd + "\n";
+        if (footer.isEmpty())
+            try {
+                b.set(packet, new ChatComponentText(""));
+            } catch (IllegalArgumentException | IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        else
+            for (String ft : footer)
+                f += ft + "\n";
+        try {
+            a.set(packet, new ChatComponentText(h.substring(0, h.length() - 1)));
+            b.set(packet, new ChatComponentText(f.substring(0, f.length() - 1)));
+        } catch (StringIndexOutOfBoundsException ignore) {
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return packet;
     }
 
 }

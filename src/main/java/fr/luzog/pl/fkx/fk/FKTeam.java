@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public class FKTeam {
 
+    public static final String GODS_ID = "gods", SPECS_ID = "specs";
+
     private FKManager manager;
 
     private String id, name, prefix;
@@ -64,6 +66,8 @@ public class FKTeam {
     }
 
     public void setManager(FKManager manager, boolean registerToTeamList) {
+        if (manager.getTeam(getId()) != null && !manager.getTeam(getId()).equals(this))
+            throw new FKException.DuplicateTeamIdException(id, this.manager == null ? null : this.manager.getId(), manager.getId());
         if (this.manager != null) {
             leaveManager();
             return;
@@ -103,6 +107,9 @@ public class FKTeam {
     }
 
     public void setId(String id) {
+        if (manager != null)
+            if (manager.getTeam(id) != null && !manager.getTeam(id).equals(this))
+                throw new FKException.DuplicateTeamIdException(id, manager.getId(), manager.getId());
         this.id = id;
     }
 
@@ -116,7 +123,7 @@ public class FKTeam {
 
     public String getPrefix() {
         String p = color + prefix.replace("§r", color.toString());
-        if(prefix.contains("§"))
+        if (prefix.contains("§"))
             for (String s : prefix.toLowerCase().split("§"))
                 if (!s.startsWith("r") && !s.startsWith((color.getChar() + "").toLowerCase())) {
                     p += color;

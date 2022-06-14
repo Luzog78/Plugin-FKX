@@ -14,8 +14,9 @@ public class BucketHandler implements Listener {
     @EventHandler
     public static void onEmpty(PlayerBucketEmptyEvent e) {
         FKPlayer fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getUniqueId());
-        if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.PLACESPE :
-                FKAuth.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation()))) {
+        if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.PLACESPE :
+                FKAuth.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
             e.setCancelled(true);
             return;
         }
@@ -24,8 +25,9 @@ public class BucketHandler implements Listener {
     @EventHandler
     public static void onFill(PlayerBucketFillEvent e) {
         FKPlayer fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getUniqueId());
-        if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.BREAKSPE :
-                FKAuth.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation()))) {
+        if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.BREAKSPE :
+                FKAuth.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
             e.setCancelled(true);
             return;
         }

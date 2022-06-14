@@ -1,7 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
@@ -26,8 +25,10 @@ public class PlayerInteractHandler implements Listener {
         if(fkp != null)
             fkp.getStats().increaseInteractions();
 
-        if (Freeze.frozen.contains(p.getUniqueId()))
+        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId())) {
+            event.setCancelled(true);
             return;
+        }
 
         ItemStack is = event.getItem();
         if(is == null)

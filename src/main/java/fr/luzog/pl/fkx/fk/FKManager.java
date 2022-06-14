@@ -1,6 +1,9 @@
 package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.utils.Portal;
+import fr.luzog.pl.fkx.utils.SpecialChars;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -13,13 +16,13 @@ import java.util.*;
 
 public class FKManager {
 
-    public static enum FKState {WAITING, RUNNING, PAUSE, END}
+    public static enum State {WAITING, RUNNING, PAUSED, ENDED}
 
     public static List<FKManager> registered = new ArrayList<>();
     public static String currentGameId = null;
 
     private String id;
-    private FKState state;
+    private State state;
 
     private int day, weather; // 0 >> Clear ; 1 >> Raining ; 2 >> Thundering
     private long time;
@@ -29,7 +32,7 @@ public class FKManager {
     private FKListener listener;
     private Scoreboard mainScoreboard;
 
-    private FKDimension nether, end;
+    private Portal nether, end;
 
     private FKZone lobby;
     private FKZone spawn;
@@ -43,6 +46,7 @@ public class FKManager {
     private FKAuth neutral;
     private FKAuth friendly;
     private FKAuth hostile;
+    private FKAuth priority;
 
 
     public FKManager(String id) {
@@ -65,15 +69,28 @@ public class FKManager {
                 null, null,
                 new FKAuth(FKAuth.Definition.DEFAULT,
                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF))));
-        setZones(new ArrayList<>());
-        setGods(new FKTeam("gods", "Dieux", "§lD§r ||", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null));
-        setSpecs(new FKTeam("specs", "Specs", "§lS§r ||", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null));
+                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF),
+                        new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.OFF))));
+        setZones(new ArrayList<FKZone>() {{
+            add(new FKZone("nether", FKZone.Type.ZONE,
+                    Bukkit.getWorld("world_nether").getSpawnLocation(),
+                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    new FKAuth(FKAuth.Definition.ON)));
+            add(new FKZone("end", FKZone.Type.ZONE,
+                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
+                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    new FKAuth(FKAuth.Definition.ON)));
+        }});
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null));
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null));
         setTeams(new ArrayList<>());
         setGlobals(new FKAuth(FKAuth.Definition.OFF,
                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
                 new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
-                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON)));
+                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON),
+                new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.ON)));
         setNeutral(new FKAuth(FKAuth.Definition.DEFAULT,
                 new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
                 new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)));
@@ -83,21 +100,22 @@ public class FKManager {
         setHostile(new FKAuth(FKAuth.Definition.DEFAULT,
                 new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                 new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)));
+        setPriority(new FKAuth(FKAuth.Definition.OFF));
 
-        setState(FKState.WAITING);
+        setState(State.WAITING);
     }
 
 
-    public FKManager(String id, FKState state, int day, int weather, long time, boolean linkedToSun, FKOptions options,
-                     FKListener listener, FKDimension nether, FKDimension end, FKZone lobby, FKZone spawn,
-                     List<FKZone> zones, FKTeam gods, FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral,
-                     FKAuth friendly, FKAuth hostile) {
+    public FKManager(String id, State state, int day, int weather, long time, boolean linkedToSun, FKOptions options,
+                     FKListener listener, Portal nether, Portal end, FKZone lobby, FKZone spawn, List<FKZone> zones,
+                     FKTeam gods, FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral, FKAuth friendly,
+                     FKAuth hostile, FKAuth priority) {
         this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.id = id;
         setState(state);
         setDay(day);
         this.weather = Main.world == null ? 0 : Main.world.isThundering() ? 2 : Main.world.hasStorm() ? 1 : 0;
-        if(weather != this.weather)
+        if (weather != this.weather)
             setWeather(weather, null);
         setTime(time);
         setLinkedToSun(linkedToSun);
@@ -115,6 +133,7 @@ public class FKManager {
         setNeutral(neutral);
         setFriendly(friendly);
         setHostile(hostile);
+        setPriority(priority);
     }
 
     public void register() {
@@ -201,61 +220,53 @@ public class FKManager {
         }});
     }
 
-    public void refresh() {
-// TODO -> refresh all
-//        final int dayDuration = 1200;
-//        if (time + 1 >= dayDuration) {
-//            day += (int) ((time + 1) / dayDuration);
-//            time -= (int) (((time + 1) / dayDuration)) * dayDuration;
-//            Broadcast.log("Passage au Jour !" + day + " !");
-//        } else
-//            time++;
-
-//        dayExactVerif();
-//
-//        switch (getTime()) {
-//            case dayDuration - 60:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !1 minute !");
-//                break;
-//            case dayDuration - 30:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !30 secondes !");
-//                break;
-//            case dayDuration - 10:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !10 secondes !");
-//                break;
-//            case dayDuration - 5:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !5 secondes !");
-//                break;
-//            case dayDuration - 3:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !3 secondes !");
-//                break;
-//            case dayDuration - 2:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !2 secondes !");
-//                break;
-//            case dayDuration - 1:
-//                Broadcast.log("Jour !" + (day + 1) + " dans !1 seconde !");
-//                break;
-//            default:
-//                break;
-//        }
-
-//        refreshEntries();
-    }
-
     public void start() {
-        // TODO -> start game
+        Utils.countDown(null, 20, false, true, true,
+                "La partie commence dans §c%i%§rs...\n§7Préparez-vous à démarrer votre aventure !",
+                "Bonne chance à tous !\n§7Prêt ?  Partez !", "§a", "§6", "§c§l",
+                "§4§l", "§2§l", new Runnable() {
+                    @Override
+                    public void run() {
+                        getPlayers().forEach(p -> {
+                            if (p.getPlayer() != null)
+                                p.getPlayer().teleport(p.getTeam().getSpawn());
+                        });
+                        setPriority(new FKAuth(FKAuth.Definition.DEFAULT));
+                        setState(State.RUNNING);
+                    }
+                });
     }
 
-    public void pause() {
-        // TODO -> pause game
+    public void pause(int countDown) {
+        Utils.countDown(null, countDown, false, true, true, "Le jeu se suspend dans §c%i%§r secondes !\n§7Vous serez momentanément bloqués.", "Le jeu est en pause.\n§7Excusez-nous pour la gêne occasionnée...", "§e", "§6", "§c", "§4", "§4§l", new Runnable() {
+            @Override
+            public void run() {
+                setState(State.PAUSED);
+            }
+        });
     }
 
-    public void resume() {
-        // TODO -> resume game
+    public void resume(int countDown) {
+        Utils.countDown(null, countDown, false, true, true, "Le jeu reprend dans §c%i%§r secondes !\n§7Et la compétition continue.", "Et c'est reparti !\n§7Amusez-vous !", "§e", "§6", "§c", "§4", "§2§l", new Runnable() {
+            @Override
+            public void run() {
+                setState(State.RUNNING);
+            }
+        });
     }
 
     public void end() {
-        // TODO -> end game
+        String m1 = "§4§lFin de la partie", m2 = "§7RDV dans qq minutes pour les résultats !";
+        getPlayers().forEach(p -> {
+            if (p.getPlayer() != null) {
+                p.getPlayer().sendTitle(m1, m2);
+                p.getPlayer().sendMessage(Main.PREFIX + m1);
+                p.getPlayer().sendMessage(Main.PREFIX + m2);
+                p.getPlayer().teleport(getLobby().getSpawn());
+            }
+        });
+        setPriority(new FKAuth(FKAuth.Definition.OFF));
+        setState(State.ENDED);
     }
 
     public FKTeam getTeam(String id) {
@@ -347,6 +358,61 @@ public class FKManager {
                 opt.activate();
     }
 
+    public FKZone getZone(Location loc) {
+        if (lobby.isInside(loc))
+            return lobby;
+        if (spawn.isInside(loc))
+            return spawn;
+        for (FKTeam team : teams)
+            if (team.isInside(loc))
+                return team.getZone(false);
+        for (FKZone zone : zones)
+            if (zone.isInside(loc))
+                return zone;
+        return null;
+    }
+
+    public boolean hasAuthorization(FKAuth.Type authorizationType, Location loc) {
+        if (priority.getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+            return priority.getAuthorization(authorizationType) == FKAuth.Definition.ON;
+        if (getZone(loc) != null)
+            switch (getZone(loc).getType()) {
+                case LOBBY:
+                    if (lobby.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return lobby.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case SPAWN:
+                    if (spawn.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return spawn.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case ZONE:
+                    for (FKZone zone : zones)
+                        if (zone.isInside(loc))
+                            if (zone.getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+                                return zone.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                    break;
+
+                case FRIENDLY:
+                    if (friendly.getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return friendly.getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case HOSTILE:
+                    if (hostile.getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                        break;
+                    return hostile.getAuthorization(authorizationType) == FKAuth.Definition.ON;
+
+                case NEUTRAL:
+                default:
+                    break;
+            }
+        if (neutral.getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+            return neutral.getAuthorization(authorizationType) == FKAuth.Definition.ON;
+        return globals.getAuthorization(authorizationType) == FKAuth.Definition.ON;
+    }
+
     public String getId() {
         return id;
     }
@@ -355,11 +421,11 @@ public class FKManager {
         this.id = id;
     }
 
-    public FKState getState() {
+    public State getState() {
         return state;
     }
 
-    public void setState(FKState state) {
+    public void setState(State state) {
         this.state = state;
     }
 
@@ -437,21 +503,21 @@ public class FKManager {
         this.mainScoreboard = mainScoreboard;
     }
 
-    public FKDimension getNether() {
+    public Portal getNether() {
         return nether;
     }
 
-    public void setNether(FKDimension nether) {
+    public void setNether(Portal nether) {
         if (nether != null)
             nether.close();
         this.nether = nether;
     }
 
-    public FKDimension getEnd() {
+    public Portal getEnd() {
         return end;
     }
 
-    public void setEnd(FKDimension end) {
+    public void setEnd(Portal end) {
         if (end != null)
             end.close();
         this.end = end;
@@ -462,8 +528,10 @@ public class FKManager {
     }
 
     public void setLobby(FKZone lobby) {
-        lobby.setManager(this);
+        if (this.lobby != null)
+            this.lobby.setManager(null);
         this.lobby = lobby;
+        this.lobby.setManager(this);
     }
 
     public FKZone getSpawn() {
@@ -471,8 +539,10 @@ public class FKManager {
     }
 
     public void setSpawn(FKZone spawn) {
-        spawn.setManager(this);
+        if (this.spawn != null)
+            this.spawn.setManager(null);
         this.spawn = spawn;
+        this.spawn.setManager(this);
     }
 
     public List<FKZone> getZones() {
@@ -480,8 +550,10 @@ public class FKManager {
     }
 
     public void setZones(List<FKZone> zones) {
-        zones.forEach(z -> z.setManager(this));
+        if(this.zones != null)
+            this.zones.forEach(zone -> zone.setManager(null));
         this.zones = zones;
+        this.zones.forEach(z -> z.setManager(this));
     }
 
     public FKTeam getGods() {
@@ -489,8 +561,11 @@ public class FKManager {
     }
 
     public void setGods(FKTeam gods) {
+        if (this.gods != null)
+            this.gods.leaveManager();
         this.gods = gods;
-        gods.setManager(this, false);
+        this.gods.setManager(this, false);
+        this.gods.setId(FKTeam.GODS_ID);
     }
 
     public FKTeam getSpecs() {
@@ -498,8 +573,11 @@ public class FKManager {
     }
 
     public void setSpecs(FKTeam specs) {
+        if (this.specs != null)
+            this.specs.leaveManager();
         this.specs = specs;
-        specs.setManager(this, false);
+        this.specs.setManager(this, false);
+        this.specs.setId(FKTeam.SPECS_ID);
     }
 
     public List<FKTeam> getTeams() {
@@ -507,8 +585,10 @@ public class FKManager {
     }
 
     public void setTeams(List<FKTeam> teams) {
+        if(this.teams != null)
+            this.teams.forEach(FKTeam::leaveManager);
         this.teams = teams;
-        teams.forEach(t -> t.setManager(this));
+        this.teams.forEach(t -> t.setManager(this));
     }
 
     public FKAuth getGlobals() {
@@ -541,5 +621,13 @@ public class FKManager {
 
     public void setHostile(FKAuth hostile) {
         this.hostile = hostile;
+    }
+
+    public FKAuth getPriority() {
+        return priority;
+    }
+
+    public void setPriority(FKAuth priority) {
+        this.priority = priority;
     }
 }

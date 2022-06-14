@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -27,11 +28,17 @@ public class FKPlayer {
         this.personalAuthorizations = personalAuthorizations == null ? new FKAuth(FKAuth.Definition.DEFAULT) : personalAuthorizations;
     }
 
+    public Player getPlayer() {
+        return Bukkit.getPlayer(uuid);
+    }
+
     public boolean hasAuthorization(FKAuth.Type authorizationType, Location loc) {
         if (personalAuthorizations.getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
             return personalAuthorizations.getAuthorization(authorizationType) == FKAuth.Definition.ON;
         if (team.getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
             return team.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+        if(getManager().getPriority().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
+            return getManager().getPriority().getAuthorization(authorizationType) == FKAuth.Definition.ON;
         if (getZone(loc) != null)
             switch (getZone(loc).getType()) {
                 case LOBBY:
@@ -40,7 +47,7 @@ public class FKPlayer {
                     return getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
 
                 case SPAWN:
-                    if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                    if (getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
                         break;
                     return getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
 
@@ -81,14 +88,14 @@ public class FKPlayer {
             return getManager().getLobby();
         if (getManager().getSpawn().isInside(loc))
             return getManager().getSpawn();
-        for (FKZone zone : getManager().getZones())
-            if (zone.isInside(loc))
-                return zone;
         if (team.isInside(loc))
             return team.getZone(true);
         for (FKTeam team : getManager().getTeams())
             if (team.isInside(loc))
                 return team.getZone(false);
+        for (FKZone zone : getManager().getZones())
+            if (zone.isInside(loc))
+                return zone;
         return null;
     }
 
