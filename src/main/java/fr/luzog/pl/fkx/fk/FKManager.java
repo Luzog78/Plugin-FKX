@@ -7,23 +7,22 @@ import org.bukkit.Location;
 import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class FKManager {
 
-    public static List<FKManager> registered = new ArrayList<FKManager>() {{
-    }};
+    public static enum FKState {WAITING, RUNNING, PAUSE, END}
+
+    public static List<FKManager> registered = new ArrayList<>();
     public static String currentGameId = null;
 
     private String id;
+    private FKState state;
 
-    private int day;
-    private int weather; // 0 >> Clear ; 1 >> Raining ; 2 >> Thundering
-    private int time;
+    private int day, weather; // 0 >> Clear ; 1 >> Raining ; 2 >> Thundering
+    private long time;
     private boolean linkedToSun;
 
     private FKOptions options;
@@ -50,7 +49,7 @@ public class FKManager {
         this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.id = id;
         setDay(1);
-        setWeather(0);
+        this.weather = Main.world == null ? 0 : Main.world.isThundering() ? 2 : Main.world.hasStorm() ? 1 : 0;
         setTime(0);
         setLinkedToSun(true);
         setOptions(FKOptions.getDefaultOptions());
@@ -84,16 +83,22 @@ public class FKManager {
         setHostile(new FKAuth(FKAuth.Definition.DEFAULT,
                 new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                 new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)));
+
+        setState(FKState.WAITING);
     }
 
 
-    public FKManager(String id, int day, int weather, int time, boolean linkedToSun, FKOptions options, FKListener listener,
-                     FKDimension nether, FKDimension end, FKZone lobby, FKZone spawn, List<FKZone> zones, FKTeam gods,
-                     FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral, FKAuth friendly, FKAuth hostile) {
+    public FKManager(String id, FKState state, int day, int weather, long time, boolean linkedToSun, FKOptions options,
+                     FKListener listener, FKDimension nether, FKDimension end, FKZone lobby, FKZone spawn,
+                     List<FKZone> zones, FKTeam gods, FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral,
+                     FKAuth friendly, FKAuth hostile) {
         this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.id = id;
+        setState(state);
         setDay(day);
-        setWeather(weather);
+        this.weather = Main.world == null ? 0 : Main.world.isThundering() ? 2 : Main.world.hasStorm() ? 1 : 0;
+        if(weather != this.weather)
+            setWeather(weather, null);
         setTime(time);
         setLinkedToSun(linkedToSun);
         setOptions(options);
@@ -350,6 +355,14 @@ public class FKManager {
         this.id = id;
     }
 
+    public FKState getState() {
+        return state;
+    }
+
+    public void setState(FKState state) {
+        this.state = state;
+    }
+
     public int getDay() {
         return day;
     }
@@ -366,21 +379,25 @@ public class FKManager {
         return weather;
     }
 
-    public void setWeather(int weather) {
+    public void setWeather(int weather, @Nullable Integer timeout) {
         this.weather = weather;
+        Main.world.setStorm(weather != 0);
+        Main.world.setThundering(weather == 2);
+        Main.world.setWeatherDuration(timeout == null ? 12000 + new Random().nextInt(weather == 0 ? 167999 : 11999) : timeout);
+        Main.world.setThunderDuration(timeout == null ? (weather == 0 ? 12000 : 3600) + new Random().nextInt(weather == 0 ? 167999 : 12399) : timeout);
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(int time) {
+    public void setTime(long time) {
         this.time = time;
         if (isLinkedToSun())
             Main.world.setTime(this.time);
     }
 
-    public void increaseTime(int time) {
+    public void increaseTime(long time) {
         this.time += time;
         if (isLinkedToSun())
             Main.world.setTime(this.time);

@@ -175,9 +175,11 @@ public class FKCStats {
                 add("increase");
                 add("decrease");
                 add("reset");
-            } else if (args.length == 4 && FKManager.getGlobalPlayer(args[1]) != null)
+            } else if (args.length == 4 && FKManager.getGlobalPlayer(args[1]) != null) {
+                add("all");
                 for (Field field : PlayerStats.class.getDeclaredFields())
                     add(field.getName());
+            }
         }};
     }
 }

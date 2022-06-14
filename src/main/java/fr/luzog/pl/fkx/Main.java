@@ -64,7 +64,7 @@ public class Main extends JavaPlugin implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                FKManager man = new FKManager("null", 1, 0, 0, true,
+                FKManager man = new FKManager("null", FKManager.FKState.RUNNING, 1, 0, 0, true,
                         new FKOptions(
                                 new FKOptions.FKOption("PvP", 2, false),
                                 new FKOptions.FKOption("Nether", 4, false),

@@ -13,52 +13,64 @@ public class FKOptions {
     public FKOptions(FKOption pvp, FKOption nether, FKOption assauts, FKOption end) {
         this.pvp = pvp.getOptionListener() != null ? pvp : pvp.setOptionListener(new FKOptionListener() {
             @Override
-            public void onActivate() {
-                Broadcast.announcement("Le !PVP est activé.");
+            public void onActivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.announcement("Le !PVP est activé.");
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PVP, FKAuth.Definition.ON);
             }
 
             @Override
-            public void onDeactivate() {
-                Broadcast.warn("Le !PVP est désactivé.");
+            public void onDeactivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.warn("Le !PVP est désactivé.");
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PVP, FKAuth.Definition.OFF);
             }
         });
         this.nether = nether.getOptionListener() != null ? nether : nether.setOptionListener(new FKOptionListener() {
             @Override
-            public void onActivate() {
-
+            public void onActivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.announcement("Le !" + FKManager.getCurrentGame().getNether().getName() + " est activé.");
+                FKManager.getCurrentGame().getNether().open();
             }
 
             @Override
-            public void onDeactivate() {
-
+            public void onDeactivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.warn("Le !" + FKManager.getCurrentGame().getNether().getName() + " est désactivé.");
+                FKManager.getCurrentGame().getNether().close();
             }
         });
         this.assauts = assauts.getOptionListener() != null ? assauts : assauts.setOptionListener(new FKOptionListener() {
             @Override
-            public void onActivate() {
-                Broadcast.announcement("Les !Assauts sont activés.");
+            public void onActivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.announcement("Les !Assauts sont activés.");
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PLACESPE, FKAuth.Definition.ON);
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON);
             }
 
             @Override
-            public void onDeactivate() {
-                Broadcast.warn("Les !Assauts sont désactivés.");
+            public void onDeactivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.warn("Les !Assauts sont désactivés.");
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.PLACESPE, FKAuth.Definition.OFF);
                 FKManager.getCurrentGame().getGlobals().setAuthorization(FKAuth.Type.BREAKSPE, FKAuth.Definition.OFF);
             }
         });
         this.end = end.getOptionListener() != null ? end : end.setOptionListener(new FKOptionListener() {
             @Override
-            public void onActivate() {
-
+            public void onActivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.announcement("Le !" + FKManager.getCurrentGame().getEnd().getName() + " est activé.");
+                FKManager.getCurrentGame().getEnd().open();
             }
 
             @Override
-            public void onDeactivate() {
-
+            public void onDeactivate(boolean broadcast) {
+                if (broadcast)
+                    Broadcast.warn("Le !" + FKManager.getCurrentGame().getEnd().getName() + " est désactivé.");
+                FKManager.getCurrentGame().getEnd().close();
             }
         });
     }
@@ -68,9 +80,9 @@ public class FKOptions {
     }
 
     public static interface FKOptionListener {
-        void onActivate();
+        void onActivate(boolean broadcast);
 
-        void onDeactivate();
+        void onDeactivate(boolean broadcast);
     }
 
     public static class FKOption {
@@ -129,15 +141,23 @@ public class FKOptions {
         }
 
         public void activate() {
+            activate(true);
+        }
+
+        public void activate(boolean broadcast) {
             this.activated = true;
             if (optionListener != null)
-                optionListener.onActivate();
+                optionListener.onActivate(broadcast);
         }
 
         public void deactivate() {
+            deactivate(true);
+        }
+
+        public void deactivate(boolean broadcast) {
             this.activated = false;
             if (optionListener != null)
-                optionListener.onDeactivate();
+                optionListener.onDeactivate(broadcast);
         }
 
         public FKOptionListener getOptionListener() {

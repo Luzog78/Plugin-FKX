@@ -21,8 +21,6 @@ import java.util.*;
 
 public class FKListener {
 
-    public static enum FKState {WAITING, RUNNING, PAUSE, END;}
-
     public static final String y = "§2" + SpecialChars.YES;
     public static final String n = "§4" + SpecialChars.NO;
     public static final String[] a = new String[]{"⬆", "⬈", "➡", "⬊", "⬇", "⬋", "⬅", "⬉", "⬌", "⬍", "§d۞§r"};
