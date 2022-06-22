@@ -8,7 +8,6 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,20 +16,28 @@ public class FKTeam {
 
     public static final String GODS_ID = "gods", SPECS_ID = "specs";
 
-    private FKManager manager;
-
     private String id, name, prefix;
     private ChatColor color;
     private Location spawn;
     private double radius;
 
-    private List<FKPlayer> players;
-
     private Team scoreboardTeam;
 
     private FKAuth authorizations;
 
-    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKAuth authorizations, @Nullable List<FKPlayer> players) {
+    public FKTeam(String id) {
+        this.id = id;
+        this.name = id;
+        this.prefix = id + " ";
+        this.color = ChatColor.WHITE;
+        this.spawn = null;
+        this.radius = 0;
+        this.authorizations = new FKAuth(FKAuth.Definition.DEFAULT);
+        scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
+        updateParams();
+    }
+
+    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKAuth authorizations) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
@@ -38,11 +45,8 @@ public class FKTeam {
         this.spawn = spawn;
         this.radius = radius;
         this.authorizations = authorizations;
-        if (players == null)
-            this.players = new ArrayList<>();
-        else
-            this.players = players;
-        this.players.forEach(p -> p.setTeam(this));
+        scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
+        updateParams();
     }
 
     public boolean isInside(Location loc) {
@@ -58,31 +62,20 @@ public class FKTeam {
     }
 
     public FKManager getManager() {
-        return manager;
-    }
-
-    public void setManager(FKManager manager) {
-        setManager(manager, true);
-    }
-
-    public void setManager(FKManager manager, boolean registerToTeamList) {
-        if (manager.getTeam(getId()) != null && !manager.getTeam(getId()).equals(this))
-            throw new FKException.DuplicateTeamIdException(id, this.manager == null ? null : this.manager.getId(), manager.getId());
-        if (this.manager != null) {
-            leaveManager();
-            return;
-        }
-        this.manager = manager;
-        if (registerToTeamList && manager.getTeam(getId()) == null)
-            manager.getTeams().add(this);
-        scoreboardTeam = this.manager.getMainScoreboard().registerNewTeam(id);
-        updateParams();
-        updatePlayers();
+        for (FKManager manager : FKManager.registered)
+            for (FKTeam team : manager.getTeams())
+                if (team.equals(this))
+                    return manager;
+        return null;
     }
 
     public void updatePlayers() {
         scoreboardTeam.getPlayers().forEach(p -> scoreboardTeam.removePlayer(p));
-        players.forEach(p -> scoreboardTeam.addPlayer(Bukkit.getOfflinePlayer(p.getUuid())));
+        scoreboardTeam.getEntries().forEach(e -> scoreboardTeam.addEntry(e));
+        getPlayers().forEach(p -> {
+            if (p.getName() != null)
+                scoreboardTeam.addPlayer(Bukkit.getOfflinePlayer(p.getName()));
+        });
     }
 
     public void updateParams() {
@@ -93,23 +86,14 @@ public class FKTeam {
         scoreboardTeam.setAllowFriendlyFire(true);
     }
 
-    public void leaveManager() {
-        if (scoreboardTeam != null)
-            scoreboardTeam.unregister();
-        if (this.manager != null)
-            manager.getTeams().remove(this);
-        this.manager = null;
-        this.scoreboardTeam = null;
-    }
-
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
-        if (manager != null)
-            if (manager.getTeam(id) != null && !manager.getTeam(id).equals(this))
-                throw new FKException.DuplicateTeamIdException(id, manager.getId(), manager.getId());
+        if (getManager() != null)
+            if (getManager().getTeam(id) != null && !getManager().getTeam(id).equals(this))
+                throw new FKException.DuplicateTeamIdException(id, getManager().getId(), getManager().getId());
         this.id = id;
     }
 
@@ -119,6 +103,7 @@ public class FKTeam {
 
     public void setName(String name) {
         this.name = name;
+        updateParams();
     }
 
     public String getPrefix() {
@@ -136,6 +121,7 @@ public class FKTeam {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+        updateParams();
     }
 
     public ChatColor getColor() {
@@ -144,10 +130,11 @@ public class FKTeam {
 
     public void setColor(ChatColor color) {
         this.color = color;
+        updateParams();
     }
 
     public Location getSpawn() {
-        return spawn == null ? manager == null ? null : manager.getSpawn().getSpawn() : spawn;
+        return spawn == null ? getManager() == null ? null : getManager().getSpawn().getSpawn() : spawn;
     }
 
     public void setSpawn(Location spawn) {
@@ -162,44 +149,50 @@ public class FKTeam {
         this.radius = radius;
     }
 
-    public List<FKPlayer> getPlayers() {
-        return players;
-    }
-
-    public void setPlayers(List<FKPlayer> players) {
-        this.players = players;
+    public ArrayList<FKPlayer> getPlayers() {
+        ArrayList<FKPlayer> ps = new ArrayList<>();
+        //if(getManager() != null)
+        ps.addAll(getManager().getPlayers());
+        ps.removeIf(p -> p.getTeam() == null || !p.getTeamId().equals(id));
+        return ps;
     }
 
     public FKPlayer getPlayer(UUID uuid) {
-        if (players != null)
-            for (FKPlayer player : players)
-                if (player.getUuid().equals(uuid))
-                    return player;
+        for (FKPlayer player : getPlayers())
+            if (player.getUuid().equals(uuid))
+                return player;
         return null;
     }
 
     public FKPlayer getPlayer(@Nonnull String name) {
-        if (players != null)
-            for (FKPlayer player : players)
-                if (name.equalsIgnoreCase(player.getName()))
-                    return player;
+        for (FKPlayer player : getPlayers())
+            if (name.equalsIgnoreCase(player.getName()))
+                return player;
         return null;
     }
 
     /**
-     * @deprecated This method is deprecated. Use {@link FKPlayer#setTeam(FKTeam)}  instead.
+     * @throws FKException.PlayerAlreadyInTeamException
+     * @deprecated This method is deprecated. Use {@link FKPlayer#setTeam(String)} instead.
      */
     @Deprecated
     public void addPlayer(FKPlayer player) {
-        player.setTeam(this);
+        if (player.getTeam() == null)
+            player.setTeam(id);
+        else
+            throw new FKException.PlayerAlreadyInTeamException(id, player.getUuid(), player.getName());
     }
 
     /**
+     * @throws FKException.PlayerNotInTeamException
      * @deprecated This method is deprecated. Use {@link FKPlayer#leaveTeam()} instead.
      */
     @Deprecated
     public void removePlayer(FKPlayer player) {
-        player.leaveTeam();
+        if (player.getTeam() == this)
+            player.leaveTeam();
+        else
+            throw new FKException.PlayerNotInTeamException(id, player.getUuid(), player.getName());
     }
 
     public Team getScoreboardTeam() {

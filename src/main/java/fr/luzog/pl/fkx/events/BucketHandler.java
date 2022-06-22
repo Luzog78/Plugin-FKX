@@ -9,27 +9,43 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
 
+import java.util.List;
+
 public class BucketHandler implements Listener {
 
     @EventHandler
     public static void onEmpty(PlayerBucketEmptyEvent e) {
-        FKPlayer fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getUniqueId());
-        if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
-                || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.PLACESPE :
-                FKAuth.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        if (fps.isEmpty()) {
             e.setCancelled(true);
             return;
+        }
+
+        for (FKPlayer fp : fps) {
+            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                    || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.PLACESPE :
+                    FKAuth.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+                e.setCancelled(true);
+                return;
+            }
         }
     }
 
     @EventHandler
     public static void onFill(PlayerBucketFillEvent e) {
-        FKPlayer fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getUniqueId());
-        if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
-                || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.BREAKSPE :
-                FKAuth.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        if (fps.isEmpty()) {
             e.setCancelled(true);
             return;
+        }
+
+        for (FKPlayer fp : fps) {
+            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                    || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.BREAKSPE :
+                    FKAuth.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+                e.setCancelled(true);
+                return;
+            }
         }
     }
 

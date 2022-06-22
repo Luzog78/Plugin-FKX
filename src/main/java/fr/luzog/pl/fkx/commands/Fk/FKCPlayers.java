@@ -40,10 +40,10 @@ public class FKCPlayers {
                 if (args[2].equalsIgnoreCase("info")) {
                     Player p = Bukkit.getPlayer(args[1]);
                     DecimalFormat df = new DecimalFormat("0.00");
-                    FKPlayer fkp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
+                    FKPlayer fkp = FKManager.getCurrentGame().getPlayer(p.getUniqueId(), false);
                     u.succ("Joueur :");
                     u.succ(" - Nom : §f" + p.getName());
-                    if (fkp != null)
+                    if (fkp != null && fkp.getTeam() != null)
                         u.succ(" - Team : §f" + fkp.getTeam().getName());
                     u.succ(" - Nom d'Affichage : §f" + (fkp == null ? p.getDisplayName() : fkp.getDisplayName()));
                     u.succ(" - Vie : §c" + df.format(p.getHealth()) + "§7 /" + p.getMaxHealth());

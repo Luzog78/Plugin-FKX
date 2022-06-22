@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 
 public class Main extends JavaPlugin implements Listener {
@@ -101,10 +102,11 @@ public class Main extends JavaPlugin implements Listener {
                                     new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                                     new FKAuth(FKAuth.Definition.ON)));
                         }},
-                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null),
-                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null),
-                        Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r ||  ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null),
-                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r ||  ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT), null)),
+                        new ArrayList<>(),
+                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON)),
+                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF)),
+                        new ArrayList<>(Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r ||  ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT)),
+                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r ||  ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT)))),
                         new FKAuth(FKAuth.Definition.OFF,
                                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
                                 new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
@@ -125,13 +127,12 @@ public class Main extends JavaPlugin implements Listener {
                 man.getListener().scheduleTask();
 
                 try {
-                    new FKPlayer(Bukkit.getPlayer("Luzog78").getUniqueId(), "Luzog78", new PlayerStats(), null)
-                            .setTeam(FKManager.getCurrentGame().getTeam("gods"));
+                    man.getPlayer("Luzog78", true).setTeam("specs");
                 } catch (NullPointerException ignored) {
                 }
                 try {
                     new FKPlayer(Bukkit.getPlayer("Jigoku_san").getUniqueId(), "Jigoku_san", new PlayerStats(), null)
-                            .setTeam(FKManager.getCurrentGame().getTeam("blue"));
+                            .setTeam("blue");
                 } catch (NullPointerException ignored) {
                 }
             }
@@ -140,6 +141,14 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        Bukkit.getScoreboardManager().getMainScoreboard().getTeams().forEach(t -> {
+            if (t.getName().startsWith("fkt"))
+                t.unregister();
+        });
+        Bukkit.getScoreboardManager().getMainScoreboard().getObjectives().forEach(o -> {
+            if (o.getName().startsWith("fko"))
+                o.unregister();
+        });
     }
 
     public static void clearLag(boolean soft) {

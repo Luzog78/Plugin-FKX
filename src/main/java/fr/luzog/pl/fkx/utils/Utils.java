@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.utils;
 
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import fr.luzog.pl.fkx.Main;
 import javafx.util.Pair;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
@@ -11,11 +12,24 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import javax.annotation.Nullable;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Utils {
 
@@ -279,4 +293,206 @@ public class Utils {
         return packet;
     }
 
+    public static String locToString(Location loc, boolean decimal, boolean ywPi, boolean world) {
+        DecimalFormat df = new DecimalFormat(decimal ? "0.00" : "#");
+        return df.format(loc.getX()) + "  " + df.format(loc.getY()) + "  " + df.format(loc.getZ())
+                + (ywPi ? "  (" + df.format(loc.getYaw()) + "  " + df.format(loc.getPitch()) + ")" : "")
+                + (world ? "  " + (loc.getWorld().getName().equalsIgnoreCase("world") ? "§aOverWorld"
+                : loc.getWorld().getName().equalsIgnoreCase("world_nether") ? "§dNether"
+                : loc.getWorld().getName().equalsIgnoreCase("world_the_end") ? "§5End"
+                : loc.getWorld().getName().equalsIgnoreCase("world")) : "") + "§r";
+    }
+
+    public static UUID parseUUID(String uuid) {
+        try {
+            if (uuid.length() == 32)
+                return UUID.fromString(uuid.substring(0, 8) + "-" + uuid.substring(8, 12) + "-" + uuid.substring(12, 16) + "-" + uuid.substring(16, 20) + "-" + uuid.substring(20, 32));
+        } catch (IllegalArgumentException ignored) {
+        }
+        return null;
+    }
+
+    public static String sendGETRequest(String url) {
+        try {
+            URL u = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) u.openConnection();
+            con.setRequestMethod("GET");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null)
+                sb.append(line).append("\n");
+            return sb.toString();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String getRandomQuoteFromAPI() {
+        try {
+            JSONObject obj = (JSONObject) new JSONParser().parse(sendGETRequest("https://api.quotable.io/random")); // Or https://zenquotes.io/api/random
+            return obj.get("content") + "\n  - " + obj.get("author");
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Pair<String, UUID> getNameAndUUIDFromAPI(String username) {
+        try {
+            JSONObject obj = (JSONObject) new JSONParser().parse(sendGETRequest("https://api.mojang.com/users/profiles/minecraft/" + username));
+            return new Pair<>(obj.get("name").toString(), parseUUID(obj.get("id").toString()));
+        } catch (ParseException | RuntimeException e) {
+            // Case of the username not existing ->> GET response is null                        ->> ParseException
+            // Case of the username is invalid   ->> GET response code: 400 and contains "error" ->> RuntimeException
+            return null;
+        }
+    }
+
+    public static MojangProfile getMojangProfileFromAPI(UUID uuid) {
+        try {
+            JSONObject obj = (JSONObject) new JSONParser().parse(sendGETRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + (uuid + "").replace("-", "") + "?unsigned=false"));
+            JSONObject prop = (JSONObject) ((JSONArray) obj.get("properties")).get(0);
+            return new MojangProfile(parseUUID(obj.get("id").toString()), obj.get("name").toString(), prop.get("value").toString(), prop.get("signature").toString());
+        } catch (ParseException | RuntimeException e) {
+            // Case of the uuid not existing ->> GET response is null                        ->> ParseException
+            // Case of the uuid is invalid   ->> GET response code: 400 and contains "error" ->> RuntimeException
+            return null;
+        }
+    }
+
+    public static class MojangProfile {
+        private UUID uuid;
+        private String name;
+        private String rawTextures;
+        private String rawSignature;
+        private long timestamp;
+        private String profileId;
+        private String profileName;
+        private String skinURL;
+        private String capeURL;
+
+        public MojangProfile(UUID uuid, String name, String rawTextures, String rawSignature) {
+            this.uuid = uuid;
+            this.name = name;
+            this.rawTextures = rawTextures;
+            this.rawSignature = rawSignature;
+
+            timestamp = 0;
+            profileId = null;
+            profileName = null;
+            skinURL = null;
+            capeURL = null;
+
+            try {
+                JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.decode(this.rawTextures)));
+                if(obj.containsKey("timestamp"))
+                    timestamp = Long.parseLong(obj.get("timestamp").toString());
+                if(obj.containsKey("profileId"))
+                    profileId = obj.get("profileId").toString();
+                if(obj.containsKey("profileName"))
+                    profileName = obj.get("profileName").toString();
+                if(obj.containsKey("textures")) {
+                    JSONObject textures = (JSONObject) obj.get("textures");
+                    if(textures.containsKey("SKIN")) {
+                        JSONObject skin = (JSONObject) textures.get("SKIN");
+                        if(skin.containsKey("url"))
+                            skinURL = skin.get("url").toString();
+                    }
+                    if(textures.containsKey("CAPE")) {
+                        JSONObject cape = (JSONObject) textures.get("CAPE");
+                        if(cape.containsKey("url"))
+                            capeURL = cape.get("url").toString();
+                    }
+                }
+            } catch (ParseException ignored) {
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "MojangProfile{" +
+                    "uuid=" + uuid +
+                    ", name='" + name + '\'' +
+                    ", rawTextures='" + rawTextures + '\'' +
+                    ", rawSignature='" + rawSignature + '\'' +
+                    ", timestamp=" + timestamp +
+                    ", profileId='" + profileId + '\'' +
+                    ", profileName='" + profileName + '\'' +
+                    ", skinURL='" + skinURL + '\'' +
+                    ", capeURL='" + capeURL + '\'' +
+                    '}';
+        }
+
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getRawTextures() {
+            return rawTextures;
+        }
+
+        public void setRawTextures(String rawTextures) {
+            this.rawTextures = rawTextures;
+        }
+
+        public String getRawSignature() {
+            return rawSignature;
+        }
+
+        public void setRawSignature(String rawSignature) {
+            this.rawSignature = rawSignature;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getProfileId() {
+            return profileId;
+        }
+
+        public void setProfileId(String profileId) {
+            this.profileId = profileId;
+        }
+
+        public String getProfileName() {
+            return profileName;
+        }
+
+        public void setProfileName(String profileName) {
+            this.profileName = profileName;
+        }
+
+        public String getSkinURL() {
+            return skinURL;
+        }
+
+        public void setSkinURL(String skinURL) {
+            this.skinURL = skinURL;
+        }
+
+        public String getCapeURL() {
+            return capeURL;
+        }
+
+        public void setCapeURL(String capeURL) {
+            this.capeURL = capeURL;
+        }
+    }
 }

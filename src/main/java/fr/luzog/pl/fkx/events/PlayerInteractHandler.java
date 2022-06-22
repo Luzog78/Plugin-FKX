@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
+import java.util.List;
 
 public class PlayerInteractHandler implements Listener {
 
@@ -21,22 +22,26 @@ public class PlayerInteractHandler implements Listener {
         Action a = event.getAction();
         Player p = event.getPlayer();
 
-        FKPlayer fkp = FKManager.getGlobalPlayer(p.getUniqueId());
-        if(fkp != null)
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+
+        for (FKPlayer fkp : fkps) {
+            if (fkp == null)
+                continue;
             fkp.getStats().increaseInteractions();
 
-        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId())) {
-            event.setCancelled(true);
-            return;
+            if (fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId())) {
+                event.setCancelled(true);
+                return;
+            }
         }
 
         ItemStack is = event.getItem();
-        if(is == null)
+        if (is == null)
             return;
 
         CustomNBT nbt = new CustomNBT(is);
 
-        if(nbt.hasKey(Events.canInteractTag) && !nbt.getBoolean(Events.canInteractTag)){
+        if (nbt.hasKey(Events.canInteractTag) && !nbt.getBoolean(Events.canInteractTag)) {
             event.setCancelled(true);
             p.sendMessage(Main.PREFIX + "§cImpossible d'interagir avec l'item.");
             return;

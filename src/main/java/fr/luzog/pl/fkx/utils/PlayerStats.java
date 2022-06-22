@@ -3,7 +3,7 @@ package fr.luzog.pl.fkx.utils;
 public class PlayerStats {
 
     private int kills, deaths, blocksBroken, blocksPlaced, oresBroken, arrowsShot, arrowsHit, pickedItems, droppedItems,
-            enchantedItems, jumps, chats, inventoriesOpened, clicksOnInventory, interactions;
+            enchantedItems, jumps, chats, inventoriesOpened, clicksOnInventory, interactions, connections;
     private double damageDealt, damageTaken, traveledDistance, regainedFood;
 
     public PlayerStats() {
@@ -22,6 +22,7 @@ public class PlayerStats {
         this.inventoriesOpened = 0;
         this.clicksOnInventory = 0;
         this.interactions = 0;
+        this.connections = 0;
         this.damageDealt = 0;
         this.damageTaken = 0;
         this.traveledDistance = 0;
@@ -30,8 +31,8 @@ public class PlayerStats {
 
     public PlayerStats(int kills, int deaths, int blocksBroken, int blocksPlaced, int oresBroken,
                        int arrowsShot, int arrowsHit, int pickedItems, int droppedItems, int enchantedItems, int jumps,
-                       int chats, int inventoriesOpened, int clicksOnInventory, int interactions, double damageDealt,
-                       double damageTaken, double traveledDistance, double regainedFood) {
+                       int chats, int inventoriesOpened, int clicksOnInventory, int interactions, int connections,
+                       double damageDealt, double damageTaken, double traveledDistance, double regainedFood) {
         this.kills = kills;
         this.deaths = deaths;
         this.blocksBroken = blocksBroken;
@@ -47,6 +48,7 @@ public class PlayerStats {
         this.inventoriesOpened = inventoriesOpened;
         this.clicksOnInventory = clicksOnInventory;
         this.interactions = interactions;
+        this.connections = connections;
         this.damageDealt = damageDealt;
         this.damageTaken = damageTaken;
         this.traveledDistance = traveledDistance;
@@ -231,6 +233,18 @@ public class PlayerStats {
 
     public void increaseInteractions() {
         this.interactions++;
+    }
+
+    public int getConnections() {
+        return connections;
+    }
+
+    public void setConnections(int connections) {
+        this.connections = connections;
+    }
+
+    public void increaseConnections() {
+        this.connections++;
     }
 
     public double getDamageDealt() {

@@ -7,7 +7,7 @@ public class FKZone {
 
     public static enum Type {NEUTRAL, FRIENDLY, HOSTILE, LOBBY, SPAWN, ZONE}
 
-    private FKManager manager;
+    public static final String LOBBY_ID = "lobby", SPAWN_ID = "spawn";
 
     private String id;
     private Type type;
@@ -27,25 +27,17 @@ public class FKZone {
     @Override
     public String toString() {
         return "FKZone{" +
-                "id='" + id + '\'' +
+                "id='" + id + "'" +
                 ", type=" + type +
                 ", spawn=" + spawn +
                 ", pos1=" + pos1 +
                 ", pos2=" + pos2 +
                 ", authorizations=" + authorizations +
-                '}';
+                "}";
     }
 
     public boolean isInside(Location loc){
         return Utils.isInside(loc, pos1, pos2);
-    }
-
-    public FKManager getManager() {
-        return manager;
-    }
-
-    public void setManager(FKManager manager) {
-        this.manager = manager;
     }
 
     public String getId() {

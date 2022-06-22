@@ -4,21 +4,24 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
+import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.scoreboard.Scoreboard;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class FKManager {
 
     public static enum State {WAITING, RUNNING, PAUSED, ENDED}
 
-    public static List<FKManager> registered = new ArrayList<>();
+    public static ArrayList<FKManager> registered = new ArrayList<>();
     public static String currentGameId = null;
 
     private String id;
@@ -30,17 +33,18 @@ public class FKManager {
 
     private FKOptions options;
     private FKListener listener;
-    private Scoreboard mainScoreboard;
 
     private Portal nether, end;
 
     private FKZone lobby;
     private FKZone spawn;
-    private List<FKZone> zones;
+    private ArrayList<FKZone> zones;
+
+    private ArrayList<FKPlayer> players;
 
     private FKTeam gods;
     private FKTeam specs;
-    private List<FKTeam> teams;
+    private ArrayList<FKTeam> teams;
 
     private FKAuth globals;
     private FKAuth neutral;
@@ -50,7 +54,6 @@ public class FKManager {
 
 
     public FKManager(String id) {
-        this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         this.id = id;
         setDay(1);
         this.weather = Main.world == null ? 0 : Main.world.isThundering() ? 2 : Main.world.hasStorm() ? 1 : 0;
@@ -71,7 +74,7 @@ public class FKManager {
                         new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
                         new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF),
                         new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.OFF))));
-        setZones(new ArrayList<FKZone>() {{
+        setNormalZones(new ArrayList<FKZone>() {{
             add(new FKZone("nether", FKZone.Type.ZONE,
                     Bukkit.getWorld("world_nether").getSpawnLocation(),
                     new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
@@ -83,9 +86,10 @@ public class FKManager {
                     new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                     new FKAuth(FKAuth.Definition.ON)));
         }});
-        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON), null));
-        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF), null));
-        setTeams(new ArrayList<>());
+        setPlayers(new ArrayList<FKPlayer>());
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON)));
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF)));
+        setParticipantsTeams(new ArrayList<>());
         setGlobals(new FKAuth(FKAuth.Definition.OFF,
                 new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
                 new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
@@ -107,10 +111,9 @@ public class FKManager {
 
 
     public FKManager(String id, State state, int day, int weather, long time, boolean linkedToSun, FKOptions options,
-                     FKListener listener, Portal nether, Portal end, FKZone lobby, FKZone spawn, List<FKZone> zones,
-                     FKTeam gods, FKTeam specs, List<FKTeam> teams, FKAuth globals, FKAuth neutral, FKAuth friendly,
-                     FKAuth hostile, FKAuth priority) {
-        this.mainScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+                     FKListener listener, Portal nether, Portal end, FKZone lobby, FKZone spawn, ArrayList<FKZone> zones,
+                     ArrayList<FKPlayer> players, FKTeam gods, FKTeam specs, ArrayList<FKTeam> teams, FKAuth globals,
+                     FKAuth neutral, FKAuth friendly, FKAuth hostile, FKAuth priority) {
         this.id = id;
         setState(state);
         setDay(day);
@@ -125,10 +128,11 @@ public class FKManager {
         setEnd(end);
         setLobby(lobby);
         setSpawn(spawn);
-        setZones(zones);
+        setNormalZones(zones);
+        setPlayers(players);
         setGods(gods);
         setSpecs(specs);
-        setTeams(teams);
+        setParticipantsTeams(teams);
         setGlobals(globals);
         setNeutral(neutral);
         setFriendly(friendly);
@@ -139,6 +143,7 @@ public class FKManager {
     public void register() {
         registered.add(this);
         currentGameId = id;
+        getTeams().forEach(FKTeam::updatePlayers);
     }
 
     public void unregister() {
@@ -168,56 +173,35 @@ public class FKManager {
         return null;
     }
 
-    public static FKPlayer getGlobalPlayer(UUID uuid) {
-        for (FKManager game : registered) {
-            if (game.getTeams() != null)
-                for (FKTeam team : game.getTeams())
-                    for (FKPlayer player : team.getPlayers())
-                        if (player.getUuid().equals(uuid))
-                            return player;
-            if (game.getGods() != null)
-                for (FKPlayer player : game.getGods().getPlayers())
-                    if (player.getUuid().equals(uuid))
-                        return player;
-            if (game.getSpecs() != null)
-                for (FKPlayer player : game.getSpecs().getPlayers())
-                    if (player.getUuid().equals(uuid))
-                        return player;
-        }
-        return null;
+    public static ArrayList<FKPlayer> getGlobalPlayers() {
+        return new ArrayList<FKPlayer>() {{
+            for (FKManager g : registered)
+                addAll(g.getPlayers());
+        }};
     }
 
-    public static FKPlayer getGlobalPlayer(@Nonnull String name) {
-        for (FKManager game : registered) {
-            if (game.getTeams() != null)
-                for (FKTeam team : game.getTeams())
-                    for (FKPlayer player : team.getPlayers())
-                        if (name.equalsIgnoreCase(player.getName()))
-                            return player;
-            if (game.getGods() != null)
-                for (FKPlayer player : game.getGods().getPlayers())
-                    if (name.equalsIgnoreCase(player.getName()))
-                        return player;
-            if (game.getSpecs() != null)
-                for (FKPlayer player : game.getSpecs().getPlayers())
-                    if (name.equalsIgnoreCase(player.getName()))
-                        return player;
-        }
-        return null;
+    public static ArrayList<FKPlayer> getGlobalPlayer(UUID uuid) {
+        return new ArrayList<FKPlayer>() {{
+            for (FKPlayer player : getGlobalPlayers())
+                if (player.getUuid().equals(uuid))
+                    add(player);
+        }};
     }
 
-    public static List<FKPlayer> getGlobalPlayers() {
-        return new ArrayList<>(new HashSet<FKPlayer>() {{
-            for (FKManager game : registered) {
-                if (game.getTeams() != null)
-                    for (FKTeam team : game.getTeams())
-                        addAll(team.getPlayers());
-                if (game.getGods() != null)
-                    addAll(game.getGods().getPlayers());
-                if (game.getSpecs() != null)
-                    addAll(game.getSpecs().getPlayers());
-            }
-        }});
+    public static ArrayList<FKPlayer> getGlobalPlayer(@Nonnull String name) {
+        return new ArrayList<FKPlayer>() {{
+            for (FKPlayer player : getGlobalPlayers())
+                if (name.equalsIgnoreCase(player.getName()))
+                    add(player);
+        }};
+    }
+
+    public static ArrayList<FKPlayer> getGlobalPlayer(@Nonnull UUID uuid, @Nonnull String name) {
+        return new ArrayList<FKPlayer>() {{
+            for (FKPlayer player : getGlobalPlayers())
+                if (uuid.equals(player.getUuid()) || name.equalsIgnoreCase(player.getName()))
+                    add(player);
+        }};
     }
 
     public void start() {
@@ -267,83 +251,6 @@ public class FKManager {
         });
         setPriority(new FKAuth(FKAuth.Definition.OFF));
         setState(State.ENDED);
-    }
-
-    public FKTeam getTeam(String id) {
-        if (teams != null)
-            for (FKTeam team : teams)
-                if (team.getId().equalsIgnoreCase(id))
-                    return team;
-        if (gods != null)
-            if (gods.getId().equalsIgnoreCase(id))
-                return gods;
-        if (specs != null)
-            if (specs.getId().equalsIgnoreCase(id))
-                return specs;
-        return null;
-    }
-
-    /**
-     * @deprecated This method is deprecated. Use {@link FKTeam#setManager(FKManager)} instead.
-     */
-    @Deprecated
-    public void addTeam(FKTeam team) {
-        team.setManager(this);
-    }
-
-    /**
-     * @deprecated This method is deprecated. Use {@link FKTeam#leaveManager()} instead.
-     */
-    @Deprecated
-    public void removeTeam(FKTeam team) {
-        team.leaveManager();
-    }
-
-    public FKPlayer getPlayer(UUID uuid) {
-        if (teams != null)
-            for (FKTeam team : teams)
-                for (FKPlayer player : team.getPlayers())
-                    if (player.getUuid().equals(uuid))
-                        return player;
-        if (gods != null)
-            for (FKPlayer player : gods.getPlayers())
-                if (player.getUuid().equals(uuid))
-                    return player;
-        if (specs != null)
-            for (FKPlayer player : specs.getPlayers())
-                if (player.getUuid().equals(uuid))
-                    return player;
-        return null;
-    }
-
-    public FKPlayer getPlayer(@Nonnull String name) {
-        if (teams != null)
-            for (FKTeam team : teams)
-                for (FKPlayer player : team.getPlayers())
-                    if (name.equalsIgnoreCase(player.getName()))
-                        return player;
-        if (gods != null)
-            for (FKPlayer player : gods.getPlayers())
-                if (name.equalsIgnoreCase(player.getName()))
-                    return player;
-        if (specs != null)
-            for (FKPlayer player : specs.getPlayers())
-                if (name.equalsIgnoreCase(player.getName()))
-                    return player;
-        return null;
-    }
-
-    public List<FKPlayer> getPlayers() {
-        return new ArrayList<>(new HashSet<FKPlayer>() {{
-            teams.forEach(t -> this.addAll(t.getPlayers()));
-            addAll(gods.getPlayers());
-            addAll(specs.getPlayers());
-        }});
-    }
-
-    public String getFormattedTime() {
-        DecimalFormat df = new DecimalFormat("00");
-        return df.format((int) (getTime() / 1200)) + ":" + df.format((int) ((getTime() % 1200) / 20));
     }
 
     public void checkActivations(boolean force) {
@@ -457,6 +364,11 @@ public class FKManager {
         return time;
     }
 
+    public String getFormattedTime() {
+        DecimalFormat df = new DecimalFormat("00");
+        return df.format((int) (getTime() / 1200)) + ":" + df.format((int) ((getTime() % 1200) / 20));
+    }
+
     public void setTime(long time) {
         this.time = time;
         if (isLinkedToSun())
@@ -495,14 +407,6 @@ public class FKManager {
         this.listener = listener;
     }
 
-    public Scoreboard getMainScoreboard() {
-        return mainScoreboard;
-    }
-
-    public void setMainScoreboard(Scoreboard mainScoreboard) {
-        this.mainScoreboard = mainScoreboard;
-    }
-
     public Portal getNether() {
         return nether;
     }
@@ -528,10 +432,8 @@ public class FKManager {
     }
 
     public void setLobby(FKZone lobby) {
-        if (this.lobby != null)
-            this.lobby.setManager(null);
         this.lobby = lobby;
-        this.lobby.setManager(this);
+        this.lobby.setId(FKZone.LOBBY_ID);
     }
 
     public FKZone getSpawn() {
@@ -539,21 +441,93 @@ public class FKManager {
     }
 
     public void setSpawn(FKZone spawn) {
-        if (this.spawn != null)
-            this.spawn.setManager(null);
         this.spawn = spawn;
-        this.spawn.setManager(this);
+        this.spawn.setId(FKZone.SPAWN_ID);
     }
 
-    public List<FKZone> getZones() {
+    public ArrayList<FKZone> getNormalZones() {
         return zones;
     }
 
-    public void setZones(List<FKZone> zones) {
-        if(this.zones != null)
-            this.zones.forEach(zone -> zone.setManager(null));
+    public void setNormalZones(ArrayList<FKZone> zones) {
         this.zones = zones;
-        this.zones.forEach(z -> z.setManager(this));
+    }
+
+    public ArrayList<FKZone> getZones() {
+        return new ArrayList<FKZone>() {{
+            if (lobby != null)
+                add(lobby);
+            if (spawn != null)
+                add(spawn);
+            if (zones != null)
+                addAll(zones);
+        }};
+    }
+
+    public FKZone getZone(String id) {
+        for (FKZone zone : getZones())
+            if (zone.getId().equals(id))
+                return zone;
+        return null;
+    }
+
+    public ArrayList<FKPlayer> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(ArrayList<FKPlayer> players) {
+        this.players = players;
+    }
+
+    public FKPlayer getPlayer(@Nonnull UUID uuid, boolean create) {
+        for (FKPlayer player : players)
+            if (player.getUuid() != null && player.getUuid().equals(uuid))
+                return player;
+        if (create) {
+            Utils.MojangProfile profile = Utils.getMojangProfileFromAPI(uuid);
+            if (profile == null)
+                throw new FKException.PlayerDoesNotExistException(uuid);
+            FKPlayer player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
+            players.add(player);
+            return player;
+        }
+        return null;
+    }
+
+    public FKPlayer getPlayer(@Nonnull String name, boolean create) {
+        for (FKPlayer player : players)
+            if (player.getName() != null && player.getName().equals(name))
+                return player;
+        if (create) {
+            Pair<String, UUID> i = Utils.getNameAndUUIDFromAPI(name);
+            if(i == null)
+                throw new FKException.PlayerDoesNotExistException(name);
+            FKPlayer player = new FKPlayer(i.getValue(), i.getKey(), null, null);
+            players.add(player);
+            return player;
+        }
+        return null;
+    }
+
+    public FKPlayer getPlayer(@Nonnull UUID uuid, @Nonnull String name, boolean create) {
+        for (FKPlayer player : players)
+            if ((player.getUuid() != null && player.getUuid().equals(uuid)) || (player.getName() != null && player.getName().equals(name)))
+                return player;
+        if (create) {
+            FKPlayer player = null;
+            Utils.MojangProfile profile = Utils.getMojangProfileFromAPI(uuid);
+            if (profile != null){
+                player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
+            } else {
+                Pair<String, UUID> i = Utils.getNameAndUUIDFromAPI(name);
+                if(i == null)
+                    throw new FKException.PlayerDoesNotExistException(uuid, name);
+                player = new FKPlayer(uuid, Bukkit.getOfflinePlayer(uuid).getName(), null, null);
+            }
+            players.add(player);
+            return player;
+        }
+        return null;
     }
 
     public FKTeam getGods() {
@@ -561,10 +535,7 @@ public class FKManager {
     }
 
     public void setGods(FKTeam gods) {
-        if (this.gods != null)
-            this.gods.leaveManager();
         this.gods = gods;
-        this.gods.setManager(this, false);
         this.gods.setId(FKTeam.GODS_ID);
     }
 
@@ -573,22 +544,47 @@ public class FKManager {
     }
 
     public void setSpecs(FKTeam specs) {
-        if (this.specs != null)
-            this.specs.leaveManager();
         this.specs = specs;
-        this.specs.setManager(this, false);
         this.specs.setId(FKTeam.SPECS_ID);
     }
 
-    public List<FKTeam> getTeams() {
+    public ArrayList<FKTeam> getParticipantsTeams() {
         return teams;
     }
 
-    public void setTeams(List<FKTeam> teams) {
-        if(this.teams != null)
-            this.teams.forEach(FKTeam::leaveManager);
+    public void setParticipantsTeams(ArrayList<FKTeam> teams) {
         this.teams = teams;
-        this.teams.forEach(t -> t.setManager(this));
+    }
+
+    public ArrayList<FKTeam> getTeams() {
+        return new ArrayList<FKTeam>() {{
+            if (gods != null)
+                add(gods);
+            if (specs != null)
+                add(specs);
+            if (teams != null)
+                addAll(teams);
+        }};
+    }
+
+    public FKTeam getTeam(String id) {
+        for (FKTeam team : getTeams())
+            if (team.getId().equalsIgnoreCase(id))
+                return team;
+        return null;
+    }
+
+    public void addTeam(FKTeam team) {
+        teams.add(team);
+    }
+
+
+    public void removeTeam(FKTeam team) {
+        teams.remove(team);
+    }
+
+    public void removeTeam(String id) {
+        removeTeam(getTeam(id));
     }
 
     public FKAuth getGlobals() {

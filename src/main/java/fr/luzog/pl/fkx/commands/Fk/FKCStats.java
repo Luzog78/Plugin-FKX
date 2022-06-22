@@ -28,7 +28,7 @@ public class FKCStats {
             u.synt();
 
         else {
-            FKPlayer p = FKManager.getCurrentGame().getPlayer(args[1]);
+            FKPlayer p = FKManager.getCurrentGame().getPlayer(args[1], false);
             if (p == null) {
                 u.err(CmdUtils.err_player_not_found);
                 return false;

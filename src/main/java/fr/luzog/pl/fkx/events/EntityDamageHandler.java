@@ -15,6 +15,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
+
 public class EntityDamageHandler implements Listener {
 
     @EventHandler
@@ -28,26 +30,33 @@ public class EntityDamageHandler implements Listener {
 
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            FKPlayer fp = FKManager.getCurrentGame().getPlayer(p.getUniqueId());
-
-            if (fp != null) {
-                if(fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
-                    e.setCancelled(true);
-                    return;
-                }
-                fp.getStats().increaseDamageTaken(e.getDamage());
+            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getUniqueId(), p.getName());
+            if (fps.isEmpty()) {
+                e.setCancelled(true);
+                return;
             }
 
-            if (entity.getHealth() - e.getFinalDamage() <= 0) {
-                if (fp != null)
-                    fp.getStats().increaseDeaths();
-                Broadcast.mess((fp != null ? fp.getDisplayName() : p.getDisplayName()) + "§c est mort.");
-                e.setCancelled(true);
-                p.setHealth(p.getMaxHealth());
-                p.setFoodLevel(20);
-                p.setSaturation(20f);
-                p.teleport(p.getBedSpawnLocation() == null ? fp == null ? FKManager.getCurrentGame().getLobby().getSpawn() == null ?
-                        Main.world.getSpawnLocation() : FKManager.getCurrentGame().getLobby().getSpawn() : fp.getTeam().getSpawn() : p.getBedSpawnLocation());
+            for (FKPlayer fp : fps) {
+
+                if (fp != null) {
+                    if (fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
+                        e.setCancelled(true);
+                        return;
+                    }
+                    fp.getStats().increaseDamageTaken(e.getDamage());
+                }
+
+                if (entity.getHealth() - e.getFinalDamage() <= 0) {
+                    if (fp != null)
+                        fp.getStats().increaseDeaths();
+                    Broadcast.mess((fp != null ? fp.getDisplayName() : p.getDisplayName()) + "§c est mort.");
+                    e.setCancelled(true);
+                    p.setHealth(p.getMaxHealth());
+                    p.setFoodLevel(20);
+                    p.setSaturation(20f);
+                    p.teleport(p.getBedSpawnLocation() == null ? fp == null ? FKManager.getCurrentGame().getLobby().getSpawn() == null ?
+                            Main.world.getSpawnLocation() : FKManager.getCurrentGame().getLobby().getSpawn() : fp.getTeam().getSpawn() : p.getBedSpawnLocation());
+                }
             }
         } else if (entity.getHealth() - e.getFinalDamage() <= 0)
             Events.killMobLoots.forEach(loot -> {

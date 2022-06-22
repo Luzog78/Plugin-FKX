@@ -95,7 +95,7 @@ public class FKListener {
                     if (p == null)
                         return;
 
-                    String displayName = manager.getPlayer(p.getUniqueId()) != null ? manager.getPlayer(p.getUniqueId()).getDisplayName() : p.getName();
+                    String displayName = fkp.getDisplayName();
 
                     p.setDisplayName(displayName);
 
@@ -107,14 +107,14 @@ public class FKListener {
 
                     p.setPlayerListName(displayName);
 
-                    if (!p.getScoreboard().equals(manager.getMainScoreboard()))
-                        p.setScoreboard(manager.getMainScoreboard());
+                    if (!p.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard()))
+                        p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTHF(p));
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getActionBar(p));
                 });
 
                 new ArrayList<Player>(Bukkit.getOnlinePlayers()) {{
-                    removeIf(p -> FKManager.getGlobalPlayer(p.getUniqueId()) != null);
+                    removeIf(p -> !FKManager.getGlobalPlayer(p.getUniqueId(), p.getName()).isEmpty());
                 }}.forEach(p -> {
                     p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
@@ -189,7 +189,7 @@ public class FKListener {
         h.add("§9Organisateur : §f" + "Mathis_Bruel");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
-        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getUniqueId()) == null ? p.getDisplayName() : manager.getPlayer(p.getUniqueId()).getDisplayName()) + "§3,");
+        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getUniqueId(), false) == null ? p.getDisplayName() : manager.getPlayer(p.getUniqueId(), false).getDisplayName()) + "§3,");
         h.add("§3l'équipe souhaite une bonne aventure !");
         h.add("§3N'oublie pas §5§l§o§n[§2§l§o§n/ad§5§l§o§n]§3 si tu as un besoin...");
         h.add("§3Les " + manager.getGods().getColor() + manager.getGods().getName() + "§3 seront là pour aider ^^");
@@ -206,18 +206,18 @@ public class FKListener {
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
         DecimalFormat df = new DecimalFormat("0.0");
-        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId()) == null ? no_team
-                : manager.getPlayer(p.getUniqueId()).getTeam().getName() + "§7 - §6"
-                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getWorld().getUID()) ?
+        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId(), false) == null ? no_team
+                : manager.getPlayer(p.getUniqueId(), false).getTeam().getName() + "§7 - §6"
+                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getWorld().getUID()) ?
                 "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
-                : df.format(p.getLocation().distance(manager.getPlayer(p.getUniqueId()).getTeam().getSpawn()))
+                : df.format(p.getLocation().distance(manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn()))
                 + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getX(), manager.getPlayer(p.getUniqueId()).getTeam().getSpawn().getZ()))));
+                manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getZ()))));
         f.add(" ");
         f.add("§8§l§nAutres équipes :§r");
         f.add(" ");
-        manager.getTeams().forEach(t -> {
-            if (manager.getPlayer(p.getUniqueId()) == null || !manager.getPlayer(p.getUniqueId()).getTeam().equals(t))
+        manager.getParticipantsTeams().forEach(t -> {
+            if (manager.getPlayer(p.getUniqueId(), false) == null || !manager.getPlayer(p.getUniqueId(), false).getTeam().equals(t))
                 f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
                         "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
                         : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),
@@ -341,7 +341,7 @@ public class FKListener {
 
     public void setManager(FKManager manager) {
         this.manager = manager;
-        objective = manager.getMainScoreboard().registerNewObjective(objectiveId, "dummy");
+        objective = Bukkit.getScoreboardManager().getMainScoreboard().registerNewObjective("fko" + UUID.randomUUID().toString().substring(0, 4) + ":" + objectiveId, "dummy");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 

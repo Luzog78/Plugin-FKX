@@ -48,6 +48,7 @@ public class Events implements Listener {
         add(new BucketHandler());
         add(new PlayerChatHandler());
         add(new InventoryClickHandler());
+        add(new PlayerJoinQuitHandler());
     }};
 
     public static final double STILL_Y_VEL_CONSTANT = -0.0784000015258789;
@@ -544,11 +545,7 @@ public class Events implements Listener {
         }
     }
 
-    public static enum EntityData {
-        CREEPER_NORMAL, CREEPER_SUPERCHARGED,
-        SKELETON_NORMAL, SKELETON_WITHER,
-        WHATEVER;
-    }
+    public static enum EntityData {CREEPER_NORMAL, CREEPER_SUPERCHARGED, SKELETON_NORMAL, SKELETON_WITHER, WHATEVER;}
 
     @EventHandler
     public static void onBreakBlock(BlockBreakEvent e) {
@@ -560,30 +557,49 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onDropItem(PlayerDropItemEvent e) {
-        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
-        if (fkp != null)
-            fkp.getStats().increaseDroppedItems();
-
-        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        if (fkps.isEmpty()) {
             e.setCancelled(true);
+            return;
+        }
+
+        for (FKPlayer fkp : fkps) {
+            if (fkp != null)
+                fkp.getStats().increaseDroppedItems();
+
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public static void onPickupItem(PlayerPickupItemEvent e) {
-        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
-        if (fkp != null)
-            fkp.getStats().increasePickedItems();
-
-        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        if (fkps.isEmpty()) {
             e.setCancelled(true);
+            return;
+        }
+
+        for (FKPlayer fkp : fkps) {
+            if (fkp != null)
+                fkp.getStats().increasePickedItems();
+
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler
     public static void onBedEnter(PlayerBedEnterEvent e) {
-        FKPlayer fkp = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
-
-        if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        if (fkps.isEmpty()) {
             e.setCancelled(true);
+            return;
+        }
+
+        for (FKPlayer fkp : fkps)
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+                e.setCancelled(true);
     }
 
     @EventHandler
@@ -634,9 +650,15 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
-        FKPlayer p = FKManager.getGlobalPlayer(e.getEntity().getUniqueId());
-        if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
-            p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getUniqueId(), e.getEntity().getName());
+        if (fkps.isEmpty()) {
+            e.setCancelled(true);
+            return;
+        }
+
+        for (FKPlayer p : fkps)
+            if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
+                p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
     }
 
     @EventHandler
@@ -651,24 +673,38 @@ public class Events implements Listener {
     @EventHandler
     public static void onShoot(EntityShootBowEvent e) {
         if (e.getEntity() instanceof Player) {
-            FKPlayer p = FKManager.getGlobalPlayer(e.getEntity().getUniqueId());
-            if (p != null)
-                p.getStats().increaseArrowsShot();
+            List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getUniqueId(), e.getEntity().getName());
+            if (fkps.isEmpty()) {
+                e.setCancelled(true);
+                return;
+            }
+
+            for (FKPlayer p : fkps)
+                if (p != null)
+                    p.getStats().increaseArrowsShot();
         }
     }
 
     @EventHandler
     public static void onEnchant(EnchantItemEvent e) {
-        FKPlayer p = FKManager.getGlobalPlayer(e.getEnchanter().getUniqueId());
-        if (p != null)
-            p.getStats().increaseEnchantedItems();
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEnchanter().getUniqueId(), e.getEnchanter().getName());
+        if (fkps.isEmpty()) {
+            e.setCancelled(true);
+            return;
+        }
+
+        for (FKPlayer p : fkps)
+            if (p != null)
+                p.getStats().increaseEnchantedItems();
     }
 
     @EventHandler
     public static void onOpenInventory(InventoryOpenEvent e) {
-        FKPlayer p = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId());
-        if (p != null)
-            p.getStats().increaseInventoriesOpened();
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+
+        for (FKPlayer p : fkps)
+            if (p != null)
+                p.getStats().increaseInventoriesOpened();
     }
 
 }

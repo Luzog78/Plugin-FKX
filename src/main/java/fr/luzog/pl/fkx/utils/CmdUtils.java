@@ -11,20 +11,26 @@ import java.util.LinkedHashSet;
 
 public class CmdUtils {
 
-    public static final String err_unknown = "Un problème est survenu.";
-    public static final String err_syntaxe = "Syntaxe :";
-    public static final String err_not_player = "Vous n'êtes pas un joueur.";
-    public static final String err_player_not_found = "Joueur introuvable.";
-    public static final String err_number_format = "Nombre attendu incorrect.";
-    public static final String err_no_item_hold = "Aucun item équipé.";
-    public static final String err_no_item_hold_on = "Aucun item équipé sur %PLAYER%§r.";
-    public static final String err_too_items_hold = "Trop d'items (en main ET sur la tête).\nEssayez de vider un slot.";
-    public static final String err_too_items_hold_on = "Trop d'items équipés sur %PLAYER%§r.";
-    public static final String err_arg = "Argument ou Joueur '%ARG%' inconnu.";
-    public static final String err_unknown_enchant = "Enchantement inconnu.";
-    public static final String err_inventory_full = "Inventaire plein.";
-    public static final String err_not_enough_args = "Pas assez d'arguments, vérifiez la syntaxe";
-    public static final String err_no_gui_for_this_instance = "Pas de GUI pour cette instance.\nTapez /%CMD% help pour plus d'informations.";
+    public static final String err_unknown = "Un problème est survenu.",
+            err_syntaxe = "Syntaxe :",
+            err_not_player = "Vous n'êtes pas un joueur.",
+            err_player_not_found = "Joueur introuvable.",
+            err_number_format = "Nombre attendu incorrect.",
+            err_no_item_hold = "Aucun item équipé.",
+            err_no_item_hold_on = "Aucun item équipé sur %PLAYER%§r.",
+            err_too_items_hold = "Trop d'items (en main ET sur la tête).\nEssayez de vider un slot.",
+            err_too_items_hold_on = "Trop d'items équipés sur %PLAYER%§r.",
+            err_arg = "Argument '%ARG%' inconnu.",
+            err_missing_arg = "Argument '%ARG%' introuvable.",
+            err_unknown_enchant = "Enchantement inconnu.",
+            err_inventory_full = "Inventaire plein.",
+            err_not_enough_args = "Pas assez d'arguments, vérifiez la syntaxe",
+            err_no_gui_for_this_instance = "Pas de GUI pour cette instance.\nTapez /%CMD% help pour plus d'informations.",
+            err_team_not_found = "Aucune équipe trouvée.",
+            err_player_has_no_team = "Le joueur n'est dans aucune équipe.",
+            err_player_not_in_the_team = "Le joueur n'est pas dans l'équipe.",
+            err_player_already_in_team = "Le joueur est déjà dans une équipe.",
+            err_player_does_not_exist = "Le joueur n'existe pas.";
 
     private CommandSender sender;
     private Command cmd;
