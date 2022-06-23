@@ -3,200 +3,407 @@ package fr.luzog.pl.fkx.utils;
 import fr.luzog.pl.fkx.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
+import java.text.DateFormat;
+import java.util.*;
 
 public class Config {
 
-    private static File file = null;
-    private static final String fileName = "FKX - Config.yml";
-    private static FileConfiguration config = null;
+    public static class Globals extends Config {
+        public static final String VERSION = "version", LANG = "lang", OVERWORLD = "worlds.over",
+                NETHER = "worlds.nether", END = "worlds.end", LAST_GAME = "last-game",
+                VANISH_PRE_SUF_IX = "vanish.pre-suf-ix", VANISH_IS_PREFIX = "vanish.is-prefix",
+                VANISH_PLAYERS = "vanish.players";
 
-    public static enum Path {
-        VANISH("users.states.vanish"),
-        FREEZE("users.states.freeze"),
-        GOD("users.states.god"),
-        ;
-
-        private String path;
-
-        Path(String path) {
-            this.path = path;
+        public Globals(@Nonnull String path) {
+            super(path, true);
         }
 
-        public String getPath() {
-            return path;
+        @Override
+        public Globals load() {
+            super.load();
+            return this;
         }
 
-        public void setPath(String path) {
-            this.path = path;
+        @Override
+        public Globals save() {
+            super.save();
+            return this;
+        }
+
+        public String getVersion() {
+            return super.getStr(VERSION);
+        }
+
+        public String getLang() {
+            return super.getStr(LANG);
+        }
+
+        public World getOverworld() {
+            try {
+                return Bukkit.getWorld(UUID.fromString(super.getStr(OVERWORLD)));
+            } catch (IllegalArgumentException e) {
+                return Bukkit.getWorld(super.getStr(OVERWORLD));
+            }
+        }
+
+        public World getNether() {
+            try {
+                return Bukkit.getWorld(UUID.fromString(super.getStr(NETHER)));
+            } catch (IllegalArgumentException e) {
+                return Bukkit.getWorld(super.getStr(NETHER));
+            }
+        }
+
+        public World getEnd() {
+            try {
+                return Bukkit.getWorld(UUID.fromString(super.getStr(END)));
+            } catch (IllegalArgumentException e) {
+                return Bukkit.getWorld(super.getStr(END));
+            }
+        }
+
+        public String getLastGame() {
+            return super.getStr(LAST_GAME);
+        }
+
+        public String getVanishPreSufIx() {
+            return super.getStr(VANISH_PRE_SUF_IX);
+        }
+
+        public boolean getVanishIsPrefix() {
+            return super.getBool(VANISH_IS_PREFIX);
+        }
+
+        public List<UUID> getVanishPlayers() {
+            return super.getUUIDList(VANISH_PLAYERS);
+        }
+
+        public Globals setVersion(Object version) {
+            super.set(VERSION, version);
+            return this;
+        }
+
+        public Globals forceVersion(Object version) {
+            super.force(VERSION, version);
+            return this;
+        }
+
+        public Globals setLang(String lang) {
+            super.set(LANG, lang);
+            return this;
+        }
+
+        public Globals forceLang(String lang) {
+            super.force(LANG, lang);
+            return this;
+        }
+
+        public Globals setWorlds(String overworld, String nether, String end) {
+            super.set(OVERWORLD, overworld);
+            super.set(NETHER, nether);
+            super.set(END, end);
+            return this;
+        }
+
+        public Globals forceWorlds(String overworld, String nether, String end) {
+            super.force(OVERWORLD, overworld);
+            super.force(NETHER, nether);
+            super.force(END, end);
+            return this;
+        }
+
+        public Globals setLastGame(String lastGame) {
+            super.set(LAST_GAME, lastGame);
+            return this;
+        }
+
+        public Globals forceLastGame(String lastGame) {
+            super.force(LAST_GAME, lastGame);
+            return this;
+        }
+
+        public Globals setVanish(String preSufIx, boolean isPrefix, List<UUID> players) {
+            super.set(VANISH_PRE_SUF_IX, preSufIx);
+            super.set(VANISH_IS_PREFIX, isPrefix);
+            super.set(VANISH_PLAYERS, players);
+            return this;
+        }
+
+        public Globals forceVanish(String preSufIx, boolean isPrefix, List<UUID> players) {
+            super.force(VANISH_PRE_SUF_IX, preSufIx);
+            super.force(VANISH_IS_PREFIX, isPrefix);
+            super.force(VANISH_PLAYERS, players);
+            return this;
         }
     }
 
-    public static void saveDefaultConfig() {
-        if (file == null)
-            file = new File(Main.instance.getDataFolder(), fileName);
+    public static final String LAST_SAVE = "last-save";
 
-        if (!file.exists())
-            Main.instance.saveResource(fileName, false);
+    private File file;
+    private FileConfiguration config;
+    private boolean dated;
+
+    public Config(@Nonnull String path, boolean dated) {
+        config = null;
+        setFile(path);
+        setDated(dated);
     }
 
-    public static void reloadConfig() {
-        if (file == null)
-            file = new File(Main.instance.getDataFolder(), fileName);
-
-        config = YamlConfiguration.loadConfiguration(file);
-
-        InputStream defaultStream = Main.instance.getResource(fileName);
-        if (defaultStream != null) {
-            YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
-            config.setDefaults(defaultConfig);
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    public static void saveConfig() {
-        if (config == null || file == null)
-            return;
-        try {
-            Date d = new Date();
-            DecimalFormat df = new DecimalFormat("00");
-            d.setYear(2022);
-            getConfig().set("IMPORTANT.last-save",
-                    df.format(d.getMonth()) + "." + df.format(d.getDay()) + "." + d.getYear() + ".."
-                            + df.format(d.getHours()) + "." + df.format(d.getMinutes()) + "."
-                            + df.format(d.getSeconds()));
-            getConfig().save(file);
-        } catch (IOException e) {
-            Main.instance.getLogger().log(Level.SEVERE, "Couldn't save config to " + file, e);
-        }
-    }
-
-    public static void saveAndReload() {
-        saveConfig();
-        reloadConfig();
-    }
-
-    public static File getFile() {
-        if (file == null)
-            reloadConfig();
+    public File getFile() {
         return file;
     }
 
-    public static void destroy() {
-        file.delete();
+    /**
+     * Need an extra {@link Config#load()} call to get the actual config.
+     */
+    public Config setFile(@Nonnull String abstractPath) {
+        this.file = new File(Main.instance.getDataFolder().getPath() + "/" + abstractPath);
+        return this;
+    }
+
+    public void delete() {
+        if (file.exists())
+            file.delete();
         file = null;
         config = null;
     }
 
-    public static FileConfiguration getConfig() {
-        if (config == null)
-            reloadConfig();
+    public FileConfiguration getConfig() {
         return config;
     }
 
-    public static Object getObj(String root) {
-        return getConfig().get(root);
+    public Config load() {
+        if (!file.exists())
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        config = YamlConfiguration.loadConfiguration(file);
+        if (dated)
+            date();
+        return this;
     }
 
-    public static String getRawStr(String root) {
-        return getObj(root) == null ? null : getConfig().getString(root);
+    /*
+     * public void reloadConfig() {
+     *     if (file == null)
+     *         file = new File(Main.instance.getDataFolder(), fileName);
+     *
+     *     config = YamlConfiguration.loadConfiguration(file);
+     *
+     *     InputStream defaultStream = Main.instance.getResource(fileName);
+     *     if (defaultStream != null) {
+     *         YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultStream));
+     *         config.setDefaults(defaultConfig);
+     *     }
+     * }
+     */
+
+    public Config save() {
+        if (loaded())
+            try {
+                if (dated)
+                    date();
+                config.save(file);
+            } catch (IOException e) {
+//                Main.instance.getLogger().log(Level.SEVERE, "Couldn't save config to " + file, e);
+                throw new RuntimeException(e);
+            }
+        return this;
     }
 
-    public static String getStr(String root) {
-        return getConfig().getString(root) == null ? null : getConfig().getString(root).contains("&") ? (getObj(root) + "").replace("&", "§") : (getObj(root) + "");
+    public boolean isDated() {
+        return dated;
     }
 
-    public static int getInt(String root) {
-        return getConfig().getInt(root);
+    public Config setDated(boolean dated) {
+        this.dated = dated;
+        return this;
     }
 
-    public static double getDouble(String root) {
-        return getConfig().getDouble(root);
+    public Config date() {
+        config.set(LAST_SAVE, DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.FULL,
+                Locale.ENGLISH).format(new Date()));
+        return this;
     }
 
-    public static float getFloat(String root) {
-        return Float.parseFloat(getObj(root) + "");
+    public boolean exists() {
+        return file.exists();
     }
 
-    public static boolean getBoolean(String root) {
-        return getConfig().getBoolean(root);
+    public boolean loaded() {
+        return file != null && config != null;
     }
 
-    public static List<String> getStrList(String root) {
-        return getObj(root) == null ? null : getConfig().getStringList(root);
+    public boolean contains(String path) {
+        return config.contains(path);
     }
 
-    public static Set<String> getKeys(String root, boolean keys) {
-        return getConfig().getConfigurationSection(root).getKeys(keys);
+    public Object getObj(String path) {
+        return config.get(path);
     }
 
-    public static void force(String root, Object o) {
-        getConfig().set(root, o);
+    public String getStr(String path) {
+        return config.getString(path);
     }
 
-    public static void set(String root, Object o) {
-        if (getObj(root) == null || getObj(root).equals(""))
-            force(root, o);
+    public boolean getBool(String path) {
+        return config.getBoolean(path);
     }
 
-    public static void forceWithSave(String root, Object o) {
-        force(root, o);
-        saveConfig();
+    public byte getByte(String path) {
+        return Byte.parseByte(config.get(path) + "");
     }
 
-    public static void setWithSave(String root, Object o) {
-        set(root, o);
-        saveConfig();
+    public short getShort(String path) {
+        return Short.parseShort(config.get(path) + "");
     }
 
-    public static Location getLoc(String root) {
-        return getObj(root) == null ? null : new Location(Bukkit.getWorld(getStr(root + ".world")), getDouble(root + ".x"), getDouble(root + ".y"),
-                getDouble(root + ".z"), getFloat(root + ".yaw"), getFloat(root + ".pitch"));
+    public char getChar(String path) {
+        if ((config.get(path) + "").length() != 1)
+            throw new RuntimeException("Invalid char");
+        return (config.get(path) + "").charAt(0);
     }
 
-    public static void forceLoc(String root, Location loc) {
-        force(root + ".x", loc.getX());
-        force(root + ".y", loc.getY());
-        force(root + ".z", loc.getZ());
-        force(root + ".yaw", loc.getYaw());
-        force(root + ".pitch", loc.getPitch());
-        force(root + ".world", loc.getWorld().getName());
+    public int getInt(String path) {
+        return config.getInt(path);
     }
 
-    public static void setLoc(String root, Location loc) {
-        if (getObj(root) == null || getObj(root).equals(""))
-            forceLoc(root, loc);
+    public long getLong(String path) {
+        return config.getLong(path);
     }
 
-    public static void forceLocWithSave(String root, Location loc) {
-        forceLoc(root, loc);
-        saveConfig();
+    public double getDouble(String path) {
+        return config.getDouble(path);
     }
 
-    public static void setLocWithSave(String root, Location loc) {
-        setLoc(root, loc);
-        saveConfig();
+    public float getFloat(String path) {
+        return Float.parseFloat(config.get(path) + "");
     }
 
-    public static List<String> getHomes(Player p) {
-        List<String> l = new ArrayList<>();
-        for (String s : getConfig().getConfigurationSection("loc.home." + p.getUniqueId()).getKeys(false))
-            if (!s.equals("del"))
-                l.add(s);
-        return l;
+    public List<Boolean> getBoolList(String path) {
+        return config.getBooleanList(path);
+    }
+
+    public List<Byte> getByteList(String path) {
+        return config.getByteList(path);
+    }
+
+    public List<Short> getShortList(String path) {
+        return config.getShortList(path);
+    }
+
+    public List<Character> getCharacterList(String path) {
+        return config.getCharacterList(path);
+    }
+
+    public List<Integer> getIntList(String path) {
+        return config.getIntegerList(path);
+    }
+
+    public List<Long> getLongList(String path) {
+        return config.getLongList(path);
+    }
+
+    public List<Double> getDoubleList(String path) {
+        return config.getDoubleList(path);
+    }
+
+    public List<Float> getFloatList(String path) {
+        return config.getFloatList(path);
+    }
+
+    public List<String> getStrList(String path) {
+        return config.getStringList(path);
+    }
+
+    public List<?> getList(String path) {
+        return config.getList(path);
+    }
+
+    public List<Map<?, ?>> getMap(String path) {
+        return config.getMapList(path);
+    }
+
+    public Set<String> getKeys(String path, boolean keys) {
+        return config.getConfigurationSection(path).getKeys(keys);
+    }
+
+    public Config force(String path, Object o) {
+        config.set(path, o);
+        return this;
+    }
+
+    public Config set(String path, Object o) {
+        if (config.get(path) == null || config.get(path).equals(""))
+            force(path, o);
+        return this;
+    }
+
+    public <T extends Config> T parse(Class<T> type) {
+        return type.cast(this);
+    }
+
+    /*
+     * ######################
+     * ### Custom methods ###
+     * ######################
+     */
+
+    public Location getLoc(String path) {
+        return new Location(Bukkit.getWorld(getStr(path + ".world")), getDouble(path + ".x"), getDouble(path + ".y"),
+                getDouble(path + ".z"), getFloat(path + ".yaw"), getFloat(path + ".pitch"));
+    }
+
+    public Config forceLoc(String path, Location loc) {
+        force(path + ".x", loc.getX())
+                .force(path + ".y", loc.getY())
+                .force(path + ".z", loc.getZ())
+                .force(path + ".yaw", loc.getYaw())
+                .force(path + ".pitch", loc.getPitch())
+                .force(path + ".world", loc.getWorld().getName());
+        return this;
+    }
+
+    public Config setLoc(String path, Location loc) {
+        if (config.get(path) == null || config.get(path).equals(""))
+            forceLoc(path, loc);
+        return this;
+    }
+
+    public <T extends Enum<T>> T match(String path, Iterable<T> values) {
+        for (T value : values)
+            if ((config.get(path) + "").equalsIgnoreCase(value.name()))
+                return value;
+        return null;
+    }
+
+    public <T extends Enum<T>> ArrayList<T> matchList(String path, Iterable<T> values) {
+        return new ArrayList<T>() {{
+            for (String s : getStrList(path))
+                for (T value : values)
+                    if ((s + "").equalsIgnoreCase(value.name()))
+                        add(value);
+        }};
+    }
+
+    public List<UUID> getUUIDList(String path) {
+        return new ArrayList<UUID>() {{
+            for (String s : getStrList(path))
+                try {
+                    add(UUID.fromString(s));
+                } catch (IllegalArgumentException ignored) {
+                }
+        }};
     }
 
 }

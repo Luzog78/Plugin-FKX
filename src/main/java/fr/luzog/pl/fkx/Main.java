@@ -1,9 +1,12 @@
 package fr.luzog.pl.fkx;
 
+import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.CommandManager;
 import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.*;
+import fr.luzog.pl.fkx.utils.Color;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
@@ -19,13 +22,17 @@ import java.util.stream.Collectors;
 
 public class Main extends JavaPlugin implements Listener {
 
+    public static final Object VERSION = "1.0.0";
+
     public static final String SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
     public static final String PREFIX = "§8§l[§6FKX§8§l] >> §7";
-    public static final String HEADER = "§9-------------- §8§l[ §6FKX §8§l] §9--------------§r";
-    public static final String FOOTER = "§9----------------------------------------§r";
+    public static final String HEADER = "§9------------------- §8§l[ §6FKX §8§l] §9-------------------§r";
+    public static final String FOOTER = "§9--------------------------------------------------§r";
     public static final String REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\nReconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
     public static Main instance = null;
-    public static World world = null;
+    public static World world = null, nether = null, end = null;
+
+    public static Config.Globals globalConfig;
 
     public static boolean dontSave = false;
 
@@ -36,28 +43,46 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        System.out.println();
+        Color.sout("§9--------------------------- §8[ §6FKX §8] §9---------------------------");
+        souf("         §fInitialisation des differentes composantes");
+        souf("           §fdu plugin de §bFallen Kingdom X§f...");
+        souf("");
+        souf("");
+
+        soufInstruction("§6Initialisation du module : §eConfigurations§6...");
+        globalConfig = new Config.Globals("Globals.yml").load()
+                .forceVersion(VERSION)
+                .setLang("fr-FR")
+                .setWorlds("world", "world_nether", "world_the_end")
+                .save();
+
+        FKManager.setCurrentGame(globalConfig.getLastGame());
+
         new BukkitRunnable() {
             @Override
             public void run() {
-                world = Bukkit.getWorld("world");
+                world = globalConfig.getOverworld();
+                nether = globalConfig.getNether();
+                end = globalConfig.getEnd();
             }
         }.runTaskLaterAsynchronously(this, 1);
 
-        Bukkit.getLogger().log(Level.INFO, PREFIX + "Initialisation des Configurations");
-        Config.saveDefaultConfig();
-        Config.saveConfig();
+        soufInstruction("§6Initialisation du module : §eVanish§6...");
+        Vanish.initFromConfig();
 
-        Bukkit.getLogger().log(Level.INFO, PREFIX + "Initialisation des Listeners.");
+        soufInstruction("§6Initialisation du module : §eListeners§6...");
         getServer().getPluginManager().registerEvents(this, this);
         Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, this));
 
-        Bukkit.getLogger().log(Level.INFO, PREFIX + "Initialisation des commandes.");
+        soufInstruction("§6Initialisation du module : §eCommandes§6...");
         CommandManager.init();
 
-        Bukkit.getLogger().log(Level.INFO, PREFIX + "Initialisation des crafts.");
+        soufInstruction("§6Initialisation du module : §eCrafts§6...");
         Crafting.initCrafts();
 
-        Bukkit.getLogger().log(Level.INFO, PREFIX + "Plugin Actif !");
+        souf("");
+        soufInstruction("§aInitialisations terminees !");
 
         new BukkitRunnable() {
             @Override
@@ -137,18 +162,63 @@ public class Main extends JavaPlugin implements Listener {
                 }
             }
         }.runTaskLater(this, 20);
+
+        souf("");
+        souf("");
+        souf("       §fTous les modules ont etes initialise, le plugin");
+        souf("         §fest maintenant pret. §aBon jeu a §2tous §a!");
+        Color.sout("§9---------------------------------------------------------------");
+        System.out.println();
+    }
+
+    public static void souf(String msg) {
+        System.out.println(String.format(Color.convert("§9|%-" + (61 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
+    }
+
+    public static void soufInstruction(String msg) {
+        souf("   " + PREFIX + " " + msg);
     }
 
     @Override
     public void onDisable() {
+        System.out.println();
+        Color.sout("§9--------------------------- §8[ §6FKX §8] §9---------------------------");
+        souf("    §4Sauvegarde des donnees des joueurs ainsi que celles ");
+        souf("       §4des parties en cours... Et arret du plugin.");
+        souf("");
+        souf("");
+
+        soufInstruction("§6Nettoyage du §eScoreboard §6principal :");
+        soufInstruction("  > §6Suppression des teams temporaires...");
         Bukkit.getScoreboardManager().getMainScoreboard().getTeams().forEach(t -> {
             if (t.getName().startsWith("fkt"))
                 t.unregister();
         });
+        soufInstruction("  > §6Suppression des objectifs caches...");
         Bukkit.getScoreboardManager().getMainScoreboard().getObjectives().forEach(o -> {
             if (o.getName().startsWith("fko"))
                 o.unregister();
         });
+
+        soufInstruction("§6Sauvegarde des donnees de : §eGlobalsConfig§6...");
+        globalConfig.load()
+                .forceVersion(VERSION)
+                .forceWorlds(world.getUID().toString(), nether.getUID().toString(), end.getUID().toString())
+                .forceLastGame(FKManager.currentGameId)
+                .save();
+
+        soufInstruction("§6Sauvegarde des donnees de : §eVanish§6...");
+        Vanish.saveToConfig();
+
+        souf("");
+        soufInstruction("§cFin du processus de cloture.");
+
+        souf("");
+        souf("");
+        souf("            §4Donnees sauvegardees avec succes.");
+        souf("                §4Le plugin peut s'arreter.");
+        Color.sout("§9---------------------------------------------------------------");
+        System.out.println();
     }
 
     public static void clearLag(boolean soft) {

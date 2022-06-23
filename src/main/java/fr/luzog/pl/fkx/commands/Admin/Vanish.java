@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.commands.Admin;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -18,10 +19,21 @@ import java.util.UUID;
 
 public class Vanish implements CommandExecutor, TabCompleter, Listener {
     public static final String syntaxe = "/vanish [(on | off)] [<players...>]";
-    public static final String pre_suf_ix = "§7[VANISH§7] §r";
-    public static final boolean isPrefix = true;
+    public static String pre_suf_ix;
+    public static boolean isPrefix;
 
     public static List<UUID> vanished = new ArrayList<>();
+
+    public static void initFromConfig() {
+        Main.globalConfig.setVanish("§7[VANISH§7] §r", true, new ArrayList<>());
+        pre_suf_ix = Main.globalConfig.getVanishPreSufIx();
+        isPrefix = Main.globalConfig.getVanishIsPrefix();
+        vanished = Main.globalConfig.getVanishPlayers();
+    }
+
+    public static void saveToConfig() {
+        Main.globalConfig.forceVanish(pre_suf_ix, isPrefix, vanished);
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {

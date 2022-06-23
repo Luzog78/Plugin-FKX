@@ -9,7 +9,6 @@ import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class FKTeam {
@@ -151,8 +150,8 @@ public class FKTeam {
 
     public ArrayList<FKPlayer> getPlayers() {
         ArrayList<FKPlayer> ps = new ArrayList<>();
-        //if(getManager() != null)
-        ps.addAll(getManager().getPlayers());
+        if(getManager() != null)
+            ps.addAll(getManager().getPlayers());
         ps.removeIf(p -> p.getTeam() == null || !p.getTeamId().equals(id));
         return ps;
     }

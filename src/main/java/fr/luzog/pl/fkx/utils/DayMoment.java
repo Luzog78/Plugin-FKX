@@ -1,10 +1,5 @@
 package fr.luzog.pl.fkx.utils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
-
 public enum DayMoment {
 
     SUNRISE(0), MORNING(3000), MIDDAY(6000), AFTERNOON(9000), SUNSET(12000), EVENING(15000), MIDNIGHT(18000), NIGHT(21000);
