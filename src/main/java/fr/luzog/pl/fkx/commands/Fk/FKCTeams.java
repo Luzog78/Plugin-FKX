@@ -2,7 +2,6 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.*;
-import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -12,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -80,9 +78,9 @@ public class FKCTeams {
                 u.succ("    > Rayon : §f" + t.getRadius());
                 u.succ("    > Spawn : §f" + Utils.locToString(t.getSpawn(), true, false, true));
                 u.succ(" - Autorisations :");
-                t.getAuthorizations().getAuthorizations().keySet().stream().sorted(Comparator.comparingInt(o -> o.name().length())).forEach(k ->
-                        u.succ("    > §6" + k.name() + "§r : §f" + (t.getAuthorizations().getAuthorizations().get(k) == FKAuth.Definition.ON ? "§2§l" + SpecialChars.YES + " ON"
-                                : t.getAuthorizations().getAuthorizations().get(k) == FKAuth.Definition.OFF ? "§4§l" + SpecialChars.NO + " OFF" : "§7" + SpecialChars.WARNING + " DEFAULT")));
+                t.getPermissions().getPermissions().keySet().stream().sorted(Comparator.comparingInt(o -> o.name().length())).forEach(k ->
+                        u.succ("    > §6" + k.name() + "§r : §f" + (t.getPermissions().getPermissions().get(k) == FKPermissions.Definition.ON ? "§2§l" + SpecialChars.YES + " ON"
+                                : t.getPermissions().getPermissions().get(k) == FKPermissions.Definition.OFF ? "§4§l" + SpecialChars.NO + " OFF" : "§7" + SpecialChars.WARNING + " DEFAULT")));
             } else if (args[2].equalsIgnoreCase("list")) {
                 u.succ("Joueurs de §f" + t.getColor() + t.getName() + "§r :");
                 if (t.getPlayers().isEmpty())

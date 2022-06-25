@@ -13,15 +13,15 @@ public class FKZone {
     private Type type;
     private Location spawn, pos1, pos2;
 
-    private FKAuth authorizations;
+    private FKPermissions permissions;
 
-    public FKZone(String id, Type type, Location spawn, Location pos1, Location pos2, FKAuth authorizations) {
+    public FKZone(String id, Type type, Location spawn, Location pos1, Location pos2, FKPermissions permissions) {
         this.id = id;
         this.type = type;
         this.spawn = spawn;
         this.pos1 = pos1;
         this.pos2 = pos2;
-        this.authorizations = authorizations;
+        this.permissions = permissions;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class FKZone {
                 ", spawn=" + spawn +
                 ", pos1=" + pos1 +
                 ", pos2=" + pos2 +
-                ", authorizations=" + authorizations +
+                ", permissions=" + permissions +
                 "}";
     }
 
@@ -80,11 +80,11 @@ public class FKZone {
         this.pos2 = pos2;
     }
 
-    public FKAuth getAuthorizations() {
-        return authorizations;
+    public FKPermissions getPermissions() {
+        return permissions;
     }
 
-    public void setAuthorizations(FKAuth authorizations) {
-        this.authorizations = authorizations;
+    public void setPermissions(FKPermissions permissions) {
+        this.permissions = permissions;
     }
 }

@@ -1,7 +1,7 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKAuth;
+import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import org.bukkit.enchantments.Enchantment;
@@ -41,12 +41,12 @@ public class EntityDamageByEntityHandler implements Listener {
                     }
 
                     for (FKPlayer fe : fes)
-                        if (fe == null || !fp.hasAuthorization(fp.getTeam().getPlayers().contains(fe) ? FKAuth.Type.FRIENDLY_FIRE : FKAuth.Type.PVP, e.getLocation())) {
+                        if (fe == null || !fp.hasPermission(fp.getTeam().getPlayers().contains(fe) ? FKPermissions.Type.FRIENDLY_FIRE : FKPermissions.Type.PVP, e.getLocation())) {
                             event.setCancelled(true);
                             return;
                         }
                 } else {
-                    if (!fp.hasAuthorization(FKAuth.Type.MOBS, event.getEntity().getLocation())) {
+                    if (!fp.hasPermission(FKPermissions.Type.MOBS, event.getEntity().getLocation())) {
                         event.setCancelled(true);
                         return;
                     }

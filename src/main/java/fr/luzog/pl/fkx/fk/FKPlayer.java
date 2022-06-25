@@ -18,63 +18,63 @@ public class FKPlayer {
 
     private PlayerStats stats;
 
-    private FKAuth personalAuthorizations;
+    private FKPermissions personalPermissions;
 
-    public FKPlayer(@Nullable UUID uuid, @Nullable String name, @Nullable PlayerStats stats, @Nullable FKAuth personalAuthorizations) {
+    public FKPlayer(@Nullable UUID uuid, @Nullable String name, @Nullable PlayerStats stats, @Nullable FKPermissions personalPermissions) {
         this.uuid = uuid;
         this.name = name;
 
         this.stats = stats == null ? new PlayerStats() : stats;
-        this.personalAuthorizations = personalAuthorizations == null ? new FKAuth(FKAuth.Definition.DEFAULT) : personalAuthorizations;
+        this.personalPermissions = personalPermissions == null ? new FKPermissions(FKPermissions.Definition.DEFAULT) : personalPermissions;
     }
 
     public Player getPlayer() {
         return Bukkit.getPlayer(uuid) == null ? Bukkit.getPlayerExact(name) : Bukkit.getPlayer(uuid);
     }
 
-    public boolean hasAuthorization(FKAuth.Type authorizationType, Location loc) {
-        if (personalAuthorizations.getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
-            return personalAuthorizations.getAuthorization(authorizationType) == FKAuth.Definition.ON;
-        if (getTeam().getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
-            return getTeam().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-        if (getManager().getPriority().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
-            return getManager().getPriority().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+    public boolean hasPermission(FKPermissions.Type permissionType, Location loc) {
+        if (personalPermissions.getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return personalPermissions.getPermission(permissionType) == FKPermissions.Definition.ON;
+        if (getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return getTeam().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
+        if (getManager().getPriority().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return getManager().getPriority().getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getZone(loc) != null)
             switch (getZone(loc).getType()) {
                 case LOBBY:
-                    if (getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                    if (getManager().getLobby().getPermissions().getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
-                    return getManager().getLobby().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                    return getManager().getLobby().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
 
                 case SPAWN:
-                    if (getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                    if (getManager().getSpawn().getPermissions().getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
-                    return getManager().getSpawn().getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                    return getManager().getSpawn().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
 
                 case ZONE:
                     for (FKZone zone : getManager().getNormalZones())
                         if (zone.isInside(loc))
-                            if (zone.getAuthorizations().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
-                                return zone.getAuthorizations().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                            if (zone.getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+                                return zone.getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
                     break;
 
                 case FRIENDLY:
-                    if (getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                    if (getManager().getFriendly().getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
-                    return getManager().getFriendly().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                    return getManager().getFriendly().getPermission(permissionType) == FKPermissions.Definition.ON;
 
                 case HOSTILE:
-                    if (getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.DEFAULT)
+                    if (getManager().getHostile().getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
-                    return getManager().getHostile().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+                    return getManager().getHostile().getPermission(permissionType) == FKPermissions.Definition.ON;
 
                 case NEUTRAL:
                 default:
                     break;
             }
-        if (getManager().getNeutral().getAuthorization(authorizationType) != FKAuth.Definition.DEFAULT)
-            return getManager().getNeutral().getAuthorization(authorizationType) == FKAuth.Definition.ON;
-        return getManager().getGlobals().getAuthorization(authorizationType) == FKAuth.Definition.ON;
+        if (getManager().getNeutral().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return getManager().getNeutral().getPermission(permissionType) == FKPermissions.Definition.ON;
+        return getManager().getGlobal().getPermission(permissionType) == FKPermissions.Definition.ON;
     }
 
     public FKZone getZone() {
@@ -165,11 +165,11 @@ public class FKPlayer {
         this.stats = stats;
     }
 
-    public FKAuth getPersonalAuthorizations() {
-        return personalAuthorizations;
+    public FKPermissions getPersonalPermissions() {
+        return personalPermissions;
     }
 
-    public void setPersonalAuthorizations(FKAuth personalAuthorizations) {
-        this.personalAuthorizations = personalAuthorizations;
+    public void setPersonalPermissions(FKPermissions personalPermissions) {
+        this.personalPermissions = personalPermissions;
     }
 }

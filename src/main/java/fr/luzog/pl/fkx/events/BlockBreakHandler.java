@@ -1,7 +1,7 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKAuth;
+import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -39,7 +39,7 @@ public class BlockBreakHandler implements Listener {
         }
 
         for (FKPlayer fp : fps) {
-            if (fp == null || !fp.hasAuthorization(Events.specialMat.contains(e.getBlock().getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
+            if (fp == null || !fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
                 e.setCancelled(true);
                 return;
             }

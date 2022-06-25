@@ -37,7 +37,7 @@ public class FKCActivations {
                 u.succ(" - " + format(opt));
         } else {
             FKOptions.FKOption opt = args[1].equalsIgnoreCase("pvp") ? FKManager.getCurrentGame().getOptions().getPvp()
-                    : args[1].equalsIgnoreCase("assauts") ? FKManager.getCurrentGame().getOptions().getAssauts()
+                    : args[1].equalsIgnoreCase("assauts") ? FKManager.getCurrentGame().getOptions().getAssaults()
                     : args[1].equalsIgnoreCase("nether") ? FKManager.getCurrentGame().getOptions().getNether()
                     : args[1].equalsIgnoreCase("end") ? FKManager.getCurrentGame().getOptions().getEnd() : null;
             if (opt == null) {

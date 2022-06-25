@@ -26,22 +26,25 @@ public class FKListener {
     public static final String[] a = new String[]{"⬆", "⬈", "➡", "⬊", "⬇", "⬋", "⬅", "⬉", "⬌", "⬍", "§d۞§r"};
     public static final String deactivated = "§c§oDesactivé";
     public static final String no_team = "§4§lAucune équipe";
-    public static final String objectiveId = "fkx-sb";
 
     private FKManager manager;
 
     private int taskID;
-    private int savingTime;
+    private long savingTimeOut;
+    private long savingCoolDown;
+    private final String objectiveId;
 
     private Objective objective;
     private Map<String, Integer> l; // ScoreBoard List
     private Map<Integer, String> al; // Ancian ScoreBoard List -> to up to date
     private String scoreName /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
 
-    public FKListener(String scoreName) {
+    public FKListener(String objectiveId, String scoreName, long savingTimeOut) {
         this.scoreName = scoreName;
+        this.objectiveId = objectiveId;
 
-        savingTime = 60 * 5; // 5 min in sec
+        this.savingTimeOut = savingTimeOut; // 60 * 5; // 5 min in sec
+        savingCoolDown = savingTimeOut;
         l = new HashMap<>();
         al = new HashMap<>();
     }
@@ -49,16 +52,16 @@ public class FKListener {
     public void scheduleTask() {
         taskID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(Main.instance, new BukkitRunnable() {
 
-            final long originalSaveDelay = savingTime * 4L; // Each at 1/4 sec so : original = time / (1/4) == time * 4
-            long delayer = originalSaveDelay;
+            final long delayer = 4L; // Each at 1/4 sec so : original = time / (1/4) == time * 4
+            long countDown = savingTimeOut * delayer;
 
             @Override
             public void run() {
-                if (delayer - 1 == 0) {
+                if (countDown - 1 == 0) {
                     // TODO -> Save.save();
-                    delayer = originalSaveDelay;
+                    countDown = savingTimeOut * delayer;
                 } else
-                    delayer--;
+                    countDown--;
 
                 // TODO -> refreshScoreName();
                 // TODO -> objective.setDisplayName(scoreName);
@@ -160,7 +163,7 @@ public class FKListener {
         l.put("§c----------", /* ............................................................................................. */ 9);
         for (int i = 0; i < 4; i++) {
             FKOptions.FKOption o = new FKOptions.FKOption[]{manager.getOptions().getPvp(), manager.getOptions().getNether(),
-                    manager.getOptions().getAssauts(), manager.getOptions().getEnd()}[i];
+                    manager.getOptions().getAssaults(), manager.getOptions().getEnd()}[i];
             l.put("§a" + o.getName() + "§a : " + (o.isActivated() ? y : n + "§7§O (J" + o.getActivationDay() + ")"), /* . */ -i + 8);
         }
         l.put("§c---------- ", /* ............................................................................................ */ 4);
@@ -353,12 +356,25 @@ public class FKListener {
         this.taskID = taskID;
     }
 
-    public int getSavingTime() {
-        return savingTime;
+    public long getSavingTimeOut() {
+        return savingTimeOut;
     }
 
-    public void setSavingTime(int savingTime) {
-        this.savingTime = savingTime;
+    public void setSavingTimeOut(long savingTimeOut) {
+        this.savingTimeOut = savingTimeOut;
+        savingCoolDown = savingTimeOut;
+    }
+
+    public long getSavingCoolDown() {
+        return savingCoolDown;
+    }
+
+    public void setSavingCoolDown(long savingCoolDown) {
+        this.savingCoolDown = savingCoolDown;
+    }
+
+    public String getObjectiveId() {
+        return objectiveId;
     }
 
     public Objective getObjective() {

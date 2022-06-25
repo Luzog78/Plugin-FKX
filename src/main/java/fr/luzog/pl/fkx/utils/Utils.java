@@ -493,4 +493,22 @@ public class Utils {
             this.capeURL = capeURL;
         }
     }
+
+    /**
+     * Try to run the given runnable, and return true if it succeeded, or false if it failed.
+     *
+     * @param r The runnable to run.
+     * @return A boolean value.
+     */
+    public static boolean tryTo(Runnable r) {
+        try {
+            r.run();
+            return true;
+        } catch (Exception e) {
+            System.out.println(Color.RED);
+            e.printStackTrace();
+            System.out.println(Color.RESET);
+            return false;
+        }
+    }
 }

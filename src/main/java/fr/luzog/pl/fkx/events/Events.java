@@ -2,7 +2,7 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
-import fr.luzog.pl.fkx.fk.FKAuth;
+import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Crafting;
@@ -620,12 +620,12 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onBlockExplode(BlockExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasAuthorization(specialMat.contains(b.getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
     }
 
     @EventHandler
     public static void onEntityExplode(EntityExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasAuthorization(specialMat.contains(b.getType()) ? FKAuth.Type.BREAKSPE : FKAuth.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
     }
 
     @EventHandler

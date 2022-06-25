@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FKAuth {
+public class FKPermissions {
 
     public static enum Type {PVP, FRIENDLY_FIRE, MOBS, BREAK, BREAKSPE, PLACE, PLACESPE;}
 
@@ -45,11 +45,11 @@ public class FKAuth {
         }
     }
 
-    private Map<Type, Definition> authorizations;
+    private Map<Type, Definition> permissions;
 
-    public FKAuth(Definition defaultDefinition, Item... authorizations) {
-        this.authorizations = new HashMap<Type, Definition>() {{
-            for (Item a : authorizations)
+    public FKPermissions(Definition defaultDefinition, Item... permissions) {
+        this.permissions = new HashMap<Type, Definition>() {{
+            for (Item a : permissions)
                 if (containsKey(a.getType()))
                     replace(a.getType(), a.getDefinition());
                 else
@@ -61,41 +61,41 @@ public class FKAuth {
 
     @Override
     public String toString() {
-        return "FKAuth{" +
-                "authorizations=" + authorizations +
+        return "FKPermissions{" +
+                "permissions=" + permissions +
                 '}';
     }
 
-    public Map<Type, Definition> getAuthorizations() {
-        return authorizations;
+    public Map<Type, Definition> getPermissions() {
+        return permissions;
     }
 
-    public void setAuthorizations(Map<Type, Definition> authorizations) {
-        this.authorizations = authorizations;
+    public void setPermissions(Map<Type, Definition> permissions) {
+        this.permissions = permissions;
     }
 
-    public Definition getAuthorization(Type type) {
-        return authorizations.getOrDefault(type, null);
+    public Definition getPermission(Type type) {
+        return permissions.getOrDefault(type, null);
     }
 
-    public void setAuthorization(Type type, Definition definition) {
-        if (authorizations.containsKey(type))
-            authorizations.replace(type, definition);
+    public void setPermission(Type type, Definition definition) {
+        if (permissions.containsKey(type))
+            permissions.replace(type, definition);
         else
-            authorizations.put(type, definition);
+            permissions.put(type, definition);
     }
 
     public Item getItem(Type type) {
-        return authorizations.containsKey(type) ? new Item(type, authorizations.get(type)) : null;
+        return permissions.containsKey(type) ? new Item(type, permissions.get(type)) : null;
     }
 
     public void setItem(Item item) {
-        setAuthorization(item.getType(), item.getDefinition());
+        setPermission(item.getType(), item.getDefinition());
     }
 
     public List<Item> getItems() {
         return new ArrayList<Item>() {{
-            authorizations.forEach((t, d) -> add(new Item(t, d)));
+            permissions.forEach((t, d) -> add(new Item(t, d)));
         }};
     }
 }

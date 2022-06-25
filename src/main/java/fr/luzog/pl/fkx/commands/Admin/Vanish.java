@@ -25,14 +25,14 @@ public class Vanish implements CommandExecutor, TabCompleter, Listener {
     public static List<UUID> vanished = new ArrayList<>();
 
     public static void initFromConfig() {
-        Main.globalConfig.setVanish("§7[VANISH§7] §r", true, new ArrayList<>());
+        Main.globalConfig.setVanish("§7[VANISH§7] §r", true, new ArrayList<>(), false);
         pre_suf_ix = Main.globalConfig.getVanishPreSufIx();
         isPrefix = Main.globalConfig.getVanishIsPrefix();
         vanished = Main.globalConfig.getVanishPlayers();
     }
 
     public static void saveToConfig() {
-        Main.globalConfig.forceVanish(pre_suf_ix, isPrefix, vanished);
+        Main.globalConfig.setVanish(pre_suf_ix, isPrefix, vanished, true);
     }
 
     @Override

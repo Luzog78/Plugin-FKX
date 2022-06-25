@@ -33,7 +33,8 @@ public class FKCDate {
             u.succ("Date :");
             u.succ(" - Jour §f: " + FKManager.getCurrentGame().getDay());
             u.succ(" - Heure §f: " + FKManager.getCurrentGame().getFormattedTime());
-            u.succ(" - Météo §f: " + (FKManager.getCurrentGame().getWeather() == 0 ? "§eEnsoleillé" : FKManager.getCurrentGame().getWeather() == 1 ? "§9Pluvieux" : "§7Tempête"));
+            u.succ(" - Météo §f: " + (FKManager.getCurrentGame().getWeather() == FKManager.Weather.CLEAR ? "§eEnsoleillé"
+                    : FKManager.getCurrentGame().getWeather() == FKManager.Weather.RAIN ? "§9Pluvieux" : "§7Tempête"));
         } else if (args[1].equalsIgnoreCase("day")) {
             u.setSyntaxe(syntaxe_day);
             if (args.length == 2)
@@ -80,18 +81,19 @@ public class FKCDate {
             if (args.length == 2)
                 u.succ("TODO -> Weather GUI");
             else if (args[2].equalsIgnoreCase("get"))
-                u.succ("Date :\n - Météo : §f" + (FKManager.getCurrentGame().getWeather() == 0 ? "§eEnsoleillé" : FKManager.getCurrentGame().getWeather() == 1 ? "§9Pluvieux" : "§7Tempête"));
+                u.succ("Date :\n - Météo : §f" + (FKManager.getCurrentGame().getWeather() == FKManager.Weather.CLEAR ? "§eEnsoleillé"
+                        : FKManager.getCurrentGame().getWeather() == FKManager.Weather.RAIN ? "§9Pluvieux" : "§7Tempête"));
             else if (args[2].equalsIgnoreCase("set") && args.length >= 4)
                 try {
                     Integer timeout = args.length >= 5 ? Integer.parseInt(args[4]) : null;
                     if (args[3].equalsIgnoreCase("sun")) {
-                        FKManager.getCurrentGame().setWeather(0, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.CLEAR, timeout);
                         u.succ(update_success);
                     } else if (args[3].equalsIgnoreCase("rain")) {
-                        FKManager.getCurrentGame().setWeather(1, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.RAIN, timeout);
                         u.succ(update_success);
                     } else if (args[3].equalsIgnoreCase("thunder")) {
-                        FKManager.getCurrentGame().setWeather(2, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.THUNDER, timeout);
                         u.succ(update_success);
                     } else
                         u.synt();

@@ -1,6 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
-import fr.luzog.pl.fkx.fk.FKAuth;
+import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -23,8 +23,8 @@ public class BucketHandler implements Listener {
 
         for (FKPlayer fp : fps) {
             if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
-                    || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.PLACESPE :
-                    FKAuth.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+                    || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? FKPermissions.Type.PLACESPE :
+                    FKPermissions.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
                 e.setCancelled(true);
                 return;
             }
@@ -41,8 +41,8 @@ public class BucketHandler implements Listener {
 
         for (FKPlayer fp : fps) {
             if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
-                    || !fp.hasAuthorization(Events.specialMat.contains(e.getBucket()) ? FKAuth.Type.BREAKSPE :
-                    FKAuth.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
+                    || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? FKPermissions.Type.BREAKSPE :
+                    FKPermissions.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
                 e.setCancelled(true);
                 return;
             }

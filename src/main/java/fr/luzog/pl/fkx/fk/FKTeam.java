@@ -22,7 +22,7 @@ public class FKTeam {
 
     private Team scoreboardTeam;
 
-    private FKAuth authorizations;
+    private FKPermissions permissions;
 
     public FKTeam(String id) {
         this.id = id;
@@ -31,19 +31,19 @@ public class FKTeam {
         this.color = ChatColor.WHITE;
         this.spawn = null;
         this.radius = 0;
-        this.authorizations = new FKAuth(FKAuth.Definition.DEFAULT);
+        this.permissions = new FKPermissions(FKPermissions.Definition.DEFAULT);
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
     }
 
-    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKAuth authorizations) {
+    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKPermissions permissions) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
         this.color = color;
         this.spawn = spawn;
         this.radius = radius;
-        this.authorizations = authorizations;
+        this.permissions = permissions;
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
     }
@@ -57,7 +57,7 @@ public class FKTeam {
 
     public FKZone getZone(boolean friendly) {
         return new FKZone(getId(), friendly ? FKZone.Type.FRIENDLY : FKZone.Type.HOSTILE, getSpawn().clone(),
-                getSpawn().clone().subtract(radius, radius, radius), getSpawn().clone().add(radius, radius, radius), getAuthorizations());
+                getSpawn().clone().subtract(radius, radius, radius), getSpawn().clone().add(radius, radius, radius), getPermissions());
     }
 
     public FKManager getManager() {
@@ -206,11 +206,11 @@ public class FKTeam {
         this.scoreboardTeam = scoreboardTeam;
     }
 
-    public FKAuth getAuthorizations() {
-        return authorizations;
+    public FKPermissions getPermissions() {
+        return permissions;
     }
 
-    public void setAuthorizations(FKAuth authorizations) {
-        this.authorizations = authorizations;
+    public void setPermissions(FKPermissions permissions) {
+        this.permissions = permissions;
     }
 }
