@@ -67,11 +67,11 @@ public class FKListener {
                 // TODO -> objective.setDisplayName(scoreName);
 
                 if (manager.getState() == FKManager.State.RUNNING) {
-                    manager.increaseTime(5);
+                    manager.increaseTime(5, false);
 
                     if (manager.getTime() >= 24000) {
-                        manager.increaseDay();
-                        manager.setTime(0);
+                        manager.increaseDay(true);
+                        manager.setTime(0, false);
                         Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
                         manager.checkActivations(false);
                     } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)

@@ -8,12 +8,13 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.UUID;
 
 public class FKPlayer {
 
     public void saveToConfig(String gameId, boolean soft) {
-        new Config.Player("game-" + gameId + "/players/" + (uuid == null ? "null-" + UUID.randomUUID().toString().substring(0, 8) + ".yml" : uuid + ".yml"))
+        getConfig(gameId)
                 .load()
 
                 .setName(name, !soft)
@@ -22,6 +23,10 @@ public class FKPlayer {
                 .setPermissions(personalPermissions, !soft)
 
                 .save();
+    }
+
+    public Config.Player getConfig(String gameId) {
+        return new Config.Player("game-" + Objects.requireNonNull(gameId) + "/players/" + (uuid == null ? "null-" + name + ".yml" : uuid + ".yml"));
     }
 
     private UUID uuid;
@@ -127,19 +132,31 @@ public class FKPlayer {
         return getManager() == null ? null : getManager().getTeam(teamId);
     }
 
-    public void setTeam(String teamId) {
+    public void setTeam(String teamId, boolean save) {
+        if (this.teamId == null && teamId == null)
+            return;
         if (getTeam() != null) {
-            leaveTeam();
+            leaveTeam(false);
             return;
         }
         this.teamId = teamId;
         getTeam().updatePlayers();
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setTeam(teamId, true).save();
+        }
     }
 
-    public void leaveTeam() {
+    public void leaveTeam(boolean save) {
         FKTeam tempTeam = getTeam();
         teamId = null;
         tempTeam.updatePlayers();
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setTeam(null, true).save();
+        }
     }
 
     public UUID getUuid() {
@@ -154,8 +171,13 @@ public class FKPlayer {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(String name, boolean save) {
         this.name = name;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setName(name, true).save();
+        }
     }
 
     public String getDisplayName() {
@@ -170,15 +192,35 @@ public class FKPlayer {
         return stats;
     }
 
-    public void setStats(PlayerStats stats) {
+    public void setStats(PlayerStats stats, boolean save) {
         this.stats = stats;
+        if (save)
+            saveStats();
+    }
+
+    public void saveStats() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setStats(stats, true).save();
+        }
     }
 
     public FKPermissions getPersonalPermissions() {
         return personalPermissions;
     }
 
-    public void setPersonalPermissions(FKPermissions personalPermissions) {
+    public void setPersonalPermissions(FKPermissions personalPermissions, boolean save) {
         this.personalPermissions = personalPermissions;
+        if(save)
+            savePersonalPermissions();
+    }
+
+    public void savePersonalPermissions() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPermissions(personalPermissions, true).save();
+        }
     }
 }

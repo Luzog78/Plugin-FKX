@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKOptions;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKZone;
 import org.bukkit.*;
@@ -228,6 +229,67 @@ public class Config {
             super.set(String.format(OPTION_ACTIVATED, option), activated, force);
             return this;
         }
+
+//        public FKOptions.FKOption getOption(String option) {
+//            try {
+//                return option == null ? null : new FKOptions.FKOption(getOptionName(option), getOptionActivation(option), isOptionActivated(option));
+//            } catch (Exception e) {
+//                return null;
+//            }
+//        }
+//
+//        public Manager setOption(String option, FKOptions.FKOption fkOption, boolean force) {
+//            if (fkOption == null) {
+//                super.set(String.format(OPTION_NAME, option), null, force);
+//                super.set(String.format(OPTION_ACTIVATION, option), null, force);
+//                super.set(String.format(OPTION_ACTIVATED, option), null, force);
+//            } else {
+//                super.set(String.format(OPTION_NAME, option), fkOption.getName(), force);
+//                super.set(String.format(OPTION_ACTIVATION, option), fkOption.getActivationDay(), force);
+//                super.set(String.format(OPTION_ACTIVATED, option), fkOption.isActivated(), force);
+//            }
+//            return this;
+//        }
+//
+//        public FKOptions getOptions(String path) {
+//            if (path == null || isNull(path) || super.getKeys(path, false) == null)
+//                return null;
+//            FKOptions options = new FKOptions(
+//                    new FKOptions.FKOption("öµñàù", -1, false),
+//                    new FKOptions.FKOption("àöñùµ", -1, false),
+//                    new FKOptions.FKOption("ñöàµù", -1, false),
+//                    new FKOptions.FKOption("ùàµöñ", -1, false)
+//            );
+//            boolean isOK = false;
+//            for (String option : super.getKeys(path, false))
+//                if (getOption(path + "." + option) != null)
+//                    if (option.equalsIgnoreCase("pvp")) {
+//                        options.setPvp(getOption(option));
+//                        isOK = true;
+//                    } else if (option.equalsIgnoreCase("nether")) {
+//                        options.setNether(getOption(option));
+//                        isOK = true;
+//                    } else if (option.equalsIgnoreCase("assaults")) {
+//                        options.setAssaults(getOption(option));
+//                        isOK = true;
+//                    } else if (option.equalsIgnoreCase("end")) {
+//                        options.setEnd(getOption(option));
+//                        isOK = true;
+//                    }
+//            return isOK ? options : null;
+//        }
+//
+//        public Manager setOptions(FKOptions options, boolean force) {
+//            if (options == null) {
+//                super.set(OPTIONS, new HashMap<>(), force);
+//                return this;
+//            }
+//            setOption(OPTIONS + ".pvp", options.getPvp(), force);
+//            setOption(OPTIONS + ".nether", options.getNether(), force);
+//            setOption(OPTIONS + ".assaults", options.getAssaults(), force);
+//            setOption(OPTIONS + ".end", options.getEnd(), force);
+//            return this;
+//        }
 
         public String getListenerName() {
             return super.getStr(LISTENER_NAME);
@@ -715,6 +777,10 @@ public class Config {
         return config.contains(path);
     }
 
+    public boolean isNull(String path) {
+        return config.get(path) == null || (config.isConfigurationSection(path) && (getKeys(path, false) == null || getKeys(path, false).isEmpty()));
+    }
+
     public Object getObj(String path) {
         return config.get(path);
     }
@@ -807,7 +873,7 @@ public class Config {
 
     public Config set(String path, Object o, boolean force) {
         try {
-            if (force || config.get(path) == null || (config.isConfigurationSection(path) && (getKeys(path, false) == null || getKeys(path, false).isEmpty())))
+            if (force || isNull(path))
                 config.set(path, o);
         } catch (Exception e) {
             System.out.println(Color.RED);

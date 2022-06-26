@@ -41,7 +41,7 @@ public class FKCGame {
         else if (args[1].equalsIgnoreCase("new"))
             if (args.length >= 3) {
                 String old = FKManager.getCurrentGame().getId();
-                new FKManager(args[2]).register();
+                new FKManager(args[2]).register(true);
                 u.succ("Partie actuelle : §f" + args[2] + " §7§o(ancienne : " + old + ")");
             } else
                 u.synt();
@@ -49,7 +49,7 @@ public class FKCGame {
         else if (args[1].equalsIgnoreCase("switch"))
             if (args.length >= 3)
                 if (FKManager.getGame(args[2]) != null)
-                    u.succ("Partie actuelle : §f" + FKManager.setCurrentGame(args[2]).getId());
+                    u.succ("Partie actuelle : §f" + FKManager.setCurrentGame(args[2], true).getId());
                 else
                     u.err("Aucune partie trouvée.");
             else

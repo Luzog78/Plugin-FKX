@@ -9,6 +9,7 @@ import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class FKTeam {
             SPECS_ID = "specs", SPECS_FILE = "Specs.yml";
 
     public void saveToConfig(String gameId, boolean soft) {
-        new Config.Team("game-" + gameId + "/teams/" + (id.equalsIgnoreCase(GODS_ID) ? GODS_FILE : id.equalsIgnoreCase(SPECS_ID) ? SPECS_FILE : id + ".yml"))
+        getConfig(gameId)
                 .load()
 
                 .setName(name, !soft)
@@ -29,6 +30,10 @@ public class FKTeam {
                 .setPermissions(permissions, !soft)
 
                 .save();
+    }
+
+    public Config.Team getConfig(String gameId) {
+        return new Config.Team("game-" + gameId + "/teams/" + (id.equalsIgnoreCase(GODS_ID) ? GODS_FILE : id.equalsIgnoreCase(SPECS_ID) ? SPECS_FILE : id + ".yml"));
     }
 
     private String id, name, prefix;
@@ -105,20 +110,33 @@ public class FKTeam {
         return id;
     }
 
-    public void setId(String id) {
-        if (getManager() != null)
+    public void setId(@Nonnull String id, boolean save) {
+        if (getManager() != null) {
             if (getManager().getTeam(id) != null && !getManager().getTeam(id).equals(this))
-                throw new FKException.DuplicateTeamIdException(id, getManager().getId(), getManager().getId());
+                throw new FKException.DuplicateTeamIdException(id, getManager().getId());
+            if (this.id.equalsIgnoreCase(GODS_ID) || this.id.equalsIgnoreCase(SPECS_ID))
+                throw new FKException.CannotChangeTeamIdException(this.id, getManager().getId());
+        }
         this.id = id;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" + id + ".yml"));
+        }
     }
 
     public String getName() {
         return color + name.replace("§r", color.toString()) + color + "§r";
     }
 
-    public void setName(String name) {
+    public void setName(String name, boolean save) {
         this.name = name;
         updateParams();
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setName(name, true).save();
+        }
     }
 
     public String getPrefix() {
@@ -134,39 +152,59 @@ public class FKTeam {
         return p;
     }
 
-    public void setPrefix(String prefix) {
+    public void setPrefix(String prefix, boolean save) {
         this.prefix = prefix;
         updateParams();
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPrefix(prefix, true).save();
+        }
     }
 
     public ChatColor getColor() {
         return color;
     }
 
-    public void setColor(ChatColor color) {
+    public void setColor(ChatColor color, boolean save) {
         this.color = color;
         updateParams();
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setColor(color.name(), true).save();
+        }
     }
 
     public Location getSpawn() {
         return spawn == null ? getManager() == null ? null : getManager().getSpawn().getSpawn() : spawn;
     }
 
-    public void setSpawn(Location spawn) {
+    public void setSpawn(Location spawn, boolean save) {
         this.spawn = spawn;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setSpawn(spawn, true).save();
+        }
     }
 
     public double getRadius() {
         return radius;
     }
 
-    public void setRadius(double radius) {
+    public void setRadius(double radius, boolean save) {
         this.radius = radius;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setRadius(radius, true).save();
+        }
     }
 
     public ArrayList<FKPlayer> getPlayers() {
         ArrayList<FKPlayer> ps = new ArrayList<>();
-        if(getManager() != null)
+        if (getManager() != null)
             ps.addAll(getManager().getPlayers());
         ps.removeIf(p -> p.getTeam() == null || !p.getTeamId().equals(id));
         return ps;
@@ -188,24 +226,24 @@ public class FKTeam {
 
     /**
      * @throws FKException.PlayerAlreadyInTeamException
-     * @deprecated This method is deprecated. Use {@link FKPlayer#setTeam(String)} instead.
+     * @deprecated This method is deprecated. Use {@link FKPlayer#setTeam(String, boolean)} instead.
      */
     @Deprecated
     public void addPlayer(FKPlayer player) {
         if (player.getTeam() == null)
-            player.setTeam(id);
+            player.setTeam(id, true);
         else
             throw new FKException.PlayerAlreadyInTeamException(id, player.getUuid(), player.getName());
     }
 
     /**
      * @throws FKException.PlayerNotInTeamException
-     * @deprecated This method is deprecated. Use {@link FKPlayer#leaveTeam()} instead.
+     * @deprecated This method is deprecated. Use {@link FKPlayer#leaveTeam(boolean)} instead.
      */
     @Deprecated
     public void removePlayer(FKPlayer player) {
         if (player.getTeam() == this)
-            player.leaveTeam();
+            player.leaveTeam(true);
         else
             throw new FKException.PlayerNotInTeamException(id, player.getUuid(), player.getName());
     }
@@ -226,7 +264,17 @@ public class FKTeam {
         return permissions;
     }
 
-    public void setPermissions(FKPermissions permissions) {
+    public void setPermissions(FKPermissions permissions, boolean save) {
         this.permissions = permissions;
+        if(save)
+            savePermissions();
+    }
+
+    public void savePermissions() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPermissions(permissions, true).save();
+        }
     }
 }

@@ -29,8 +29,20 @@ public class FKException extends RuntimeException {
     }
 
     public static class DuplicateTeamIdException extends TeamException {
-        public DuplicateTeamIdException(String id, String fromManager, String toManager) {
-            super("Duplicate team id: '" + id + "' on managers from: '" + fromManager + "' to: '" + toManager + "'");
+        public DuplicateTeamIdException(String id, String manager) {
+            super("Duplicate team id: '" + id + "' on manager: '" + manager);
+        }
+    }
+
+    public static class IllegalTeamIdException extends TeamException {
+        public IllegalTeamIdException(String id, String manager) {
+            super("Cannot set teamId to: '" + id + "' on manager: '" + manager);
+        }
+    }
+
+    public static class CannotChangeTeamIdException extends TeamException {
+        public CannotChangeTeamIdException(String teamId, String manager) {
+            super("Cannot change id of team: '" + teamId + "' on manager: '" + manager);
         }
     }
 

@@ -30,7 +30,7 @@ public class PlayerJoinQuitHandler implements Listener {
         for(FKPlayer fkp : fkps) {
             fkp.getStats().increaseConnections();
             if(!fkp.getName().equals(e.getPlayer().getName()))
-                fkp.setName(e.getPlayer().getName());
+                fkp.setName(e.getPlayer().getName(), true);
             if(fkp.getTeam() != null)
                 fkp.getTeam().updatePlayers();
         }
@@ -57,7 +57,7 @@ public class PlayerJoinQuitHandler implements Listener {
             public void run() {
                 for(FKPlayer fkp : fkps) {
                     if(!fkp.getName().equals(e.getPlayer().getName()))
-                        fkp.setName(e.getPlayer().getName());
+                        fkp.setName(e.getPlayer().getName(), true);
                     if(fkp.getTeam() != null)
                         fkp.getTeam().updatePlayers();
                 }

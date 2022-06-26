@@ -37,11 +37,11 @@ public class FKManager {
             if (f.isDirectory() && f.getName().startsWith("game-")) {
                 Config.Manager config = new Config.Manager(String.format(CONFIG_FILE, f.getName())).load();
                 FKManager manager = new FKManager(f.getName().replaceFirst("game-", ""));
-                Utils.tryTo(printStackTrace, () -> manager.setState(Objects.requireNonNull(config.getState())));
-                Utils.tryTo(printStackTrace, () -> manager.setDay(config.getDay()));
-                Utils.tryTo(printStackTrace, () -> manager.setWeather(Objects.requireNonNull(config.getCurrentWeather()), null));
-                Utils.tryTo(printStackTrace, () -> manager.setLinkedToSun(config.isLinkedToSun()));
-                Utils.tryTo(printStackTrace, () -> manager.setTime(config.getTime()));
+                Utils.tryTo(printStackTrace, () -> manager.setState(Objects.requireNonNull(config.getState()), false));
+                Utils.tryTo(printStackTrace, () -> manager.setDay(config.getDay(), false));
+                Utils.tryTo(printStackTrace, () -> manager.setWeather(Objects.requireNonNull(config.getCurrentWeather()), null, false));
+                Utils.tryTo(printStackTrace, () -> manager.setLinkedToSun(config.isLinkedToSun(), false));
+                Utils.tryTo(printStackTrace, () -> manager.setTime(config.getTime(), false));
                 Utils.tryTo(printStackTrace, () -> {
                     for (String o : config.getOptions())
                         if (o != null) {
@@ -86,16 +86,16 @@ public class FKManager {
                             }.runTaskLater(Main.instance, 1);
 
                             if (p.equalsIgnoreCase("nether")) {
-                                manager.setNether(portal);
+                                manager.setNether(portal, false);
                             } else if (p.equalsIgnoreCase("end"))
-                                manager.setEnd(portal);
+                                manager.setEnd(portal, false);
                         }
                 });
-                Utils.tryTo(printStackTrace, () -> manager.setGlobal(Objects.requireNonNull(config.getGlobalPermissions())));
-                Utils.tryTo(printStackTrace, () -> manager.setNeutral(Objects.requireNonNull(config.getNeutralPermissions())));
-                Utils.tryTo(printStackTrace, () -> manager.setFriendly(Objects.requireNonNull(config.getFriendlyPermissions())));
-                Utils.tryTo(printStackTrace, () -> manager.setHostile(Objects.requireNonNull(config.getHostilePermissions())));
-                Utils.tryTo(printStackTrace, () -> manager.setPriority(Objects.requireNonNull(config.getPriorityPermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setGlobal(Objects.requireNonNull(config.getGlobalPermissions()), false));
+                Utils.tryTo(printStackTrace, () -> manager.setNeutral(Objects.requireNonNull(config.getNeutralPermissions()), false));
+                Utils.tryTo(printStackTrace, () -> manager.setFriendly(Objects.requireNonNull(config.getFriendlyPermissions()), false));
+                Utils.tryTo(printStackTrace, () -> manager.setHostile(Objects.requireNonNull(config.getHostilePermissions()), false));
+                Utils.tryTo(printStackTrace, () -> manager.setPriority(Objects.requireNonNull(config.getPriorityPermissions()), false));
 
 
                 for (File ff : Objects.requireNonNull(f.listFiles()))
@@ -106,16 +106,16 @@ public class FKManager {
                                     Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
                                     FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null, null, null, null, null);
 
-                                    Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType())));
-                                    Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn())));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1())));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2())));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions())));
+                                    Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType()), false));
+                                    Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn()), false));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1()), false));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2()), false));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions()), false));
 
                                     if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE))
-                                        manager.setLobby(zone);
+                                        manager.setLobby(zone, false);
                                     else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
-                                        manager.setSpawn(zone);
+                                        manager.setSpawn(zone, false);
                                     else
                                         manager.getZones().add(zone);
                                 }
@@ -125,17 +125,17 @@ public class FKManager {
                                     Config.Team tc = new Config.Team(String.format("%s/teams/%s", f.getName(), fff.getName())).load();
                                     FKTeam team = new FKTeam(fff.getName().substring(0, fff.getName().length() - 4));
 
-                                    Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName())));
-                                    Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor())));
-                                    Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix())));
-                                    Utils.tryTo(printStackTrace, () -> team.setRadius(Objects.requireNonNull(tc.getRadius())));
-                                    Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn())));
-                                    Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions())));
+                                    Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName()), false));
+                                    Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
+                                    Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
+                                    Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
+                                    Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
+                                    Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
 
                                     if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
-                                        manager.setGods(team);
+                                        manager.setGods(team, false);
                                     else if (fff.getName().equalsIgnoreCase(FKTeam.SPECS_FILE))
-                                        manager.setSpecs(team);
+                                        manager.setSpecs(team, false);
                                     else
                                         manager.addTeam(team);
                                 }
@@ -147,10 +147,10 @@ public class FKManager {
                                         FKPlayer player = new FKPlayer(fff.getName().toLowerCase().startsWith("null") ? null
                                                 : UUID.fromString(fff.getName().substring(0, fff.getName().length() - 4)), null, null, null);
 
-                                        Utils.tryTo(printStackTrace, () -> player.setName(Objects.requireNonNull(pc.getName())));
-                                        Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam())));
-                                        Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats())));
-                                        Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions())));
+                                        Utils.tryTo(printStackTrace, () -> player.setName(Objects.requireNonNull(pc.getName()), false));
+                                        Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam()), false));
+                                        Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats()), false));
+                                        Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions()), false));
 
                                         if (player.getUuid() != null || player.getName() != null)
                                             manager.getPlayers().add(player);
@@ -158,7 +158,7 @@ public class FKManager {
                                     }
                         }
 
-                manager.register();
+                manager.register(false);
                 manager.getListener().scheduleTask();
             }
     }
@@ -169,7 +169,7 @@ public class FKManager {
     }
 
     public void save(boolean soft) {
-        new Config.Manager(String.format(CONFIG_FILE, "game-" + id))
+        getConfig()
                 .load()
                 .setState(state, !soft)
                 .setDay(day, !soft)
@@ -243,6 +243,10 @@ public class FKManager {
             p.saveToConfig(id, soft);
     }
 
+    public Config.Manager getConfig() {
+        return new Config.Manager(String.format(CONFIG_FILE, "game-" + id));
+    }
+
     private String id;
     private State state;
 
@@ -275,25 +279,25 @@ public class FKManager {
 
     public FKManager(String id) {
         this.id = id;
-        setDay(1);
+        setDay(1, false);
         this.weather = Main.world == null ? Weather.CLEAR : Main.world.isThundering() ? Weather.THUNDER : Main.world.hasStorm() ? Weather.RAIN : Weather.CLEAR;
-        setTime(0);
-        setLinkedToSun(true);
-        setOptions(FKOptions.getDefaultOptions());
-        setListener(new FKListener("fko-sb", "FALLEN KINGDOM X", 60 * 5));
-        setNether(null);
-        setEnd(null);
+        setTime(0, false);
+        setLinkedToSun(true, false);
+        setOptions(FKOptions.getDefaultOptions(), false);
+        setListener(new FKListener("fko-sb", "FALLEN KINGDOM X", 60 * 5), false);
+        setNether(null, false);
+        setEnd(null, false);
         setLobby(new FKZone(null, FKZone.Type.LOBBY,
                 new Location(Main.world, 0, 0, 0),
                 null, null,
-                new FKPermissions(FKPermissions.Definition.OFF)));
+                new FKPermissions(FKPermissions.Definition.OFF)), false);
         setSpawn(new FKZone(null, FKZone.Type.SPAWN,
                 new Location(Main.world, 0, 0, 0),
                 null, null,
                 new FKPermissions(FKPermissions.Definition.DEFAULT,
                         new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
                         new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF),
-                        new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.OFF))));
+                        new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.OFF))), false);
         setNormalZones(new ArrayList<FKZone>() {{
             add(new FKZone("nether", FKZone.Type.ZONE,
                     Bukkit.getWorld("world_nether").getSpawnLocation(),
@@ -305,28 +309,28 @@ public class FKManager {
                     new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
                     new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                     new FKPermissions(FKPermissions.Definition.ON)));
-        }});
-        setPlayers(new ArrayList<FKPlayer>());
-        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKPermissions(FKPermissions.Definition.ON)));
-        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKPermissions(FKPermissions.Definition.OFF)));
-        setParticipantsTeams(new ArrayList<>());
+        }}, false);
+        setPlayers(new ArrayList<FKPlayer>(), false);
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+        setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
                 new FKPermissions.Item(FKPermissions.Type.PLACESPE, FKPermissions.Definition.ON),
                 new FKPermissions.Item(FKPermissions.Type.PVP, FKPermissions.Definition.ON),
-                new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.ON)));
+                new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.ON)), false);
         setNeutral(new FKPermissions(FKPermissions.Definition.DEFAULT,
                 new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.ON),
-                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)));
+                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)), false);
         setFriendly(new FKPermissions(FKPermissions.Definition.DEFAULT,
                 new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.ON),
-                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.ON)));
+                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.ON)), false);
         setHostile(new FKPermissions(FKPermissions.Definition.DEFAULT,
                 new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
-                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)));
-        setPriority(new FKPermissions(FKPermissions.Definition.OFF));
+                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)), false);
+        setPriority(new FKPermissions(FKPermissions.Definition.OFF), false);
 
-        setState(State.WAITING);
+        setState(State.WAITING, false);
     }
 
 
@@ -335,40 +339,47 @@ public class FKManager {
                      ArrayList<FKPlayer> players, FKTeam gods, FKTeam specs, ArrayList<FKTeam> teams, FKPermissions global,
                      FKPermissions neutral, FKPermissions friendly, FKPermissions hostile, FKPermissions priority) {
         this.id = id;
-        setState(state);
-        setDay(day);
+        setState(state, false);
+        setDay(day, false);
         this.weather = Main.world == null ? Weather.CLEAR : Main.world.isThundering() ? Weather.THUNDER : Main.world.hasStorm() ? Weather.RAIN : Weather.CLEAR;
         if (weather != this.weather)
-            setWeather(weather, null);
-        setTime(time);
-        setLinkedToSun(linkedToSun);
-        setOptions(options);
-        setListener(listener);
-        setNether(nether);
-        setEnd(end);
-        setLobby(lobby);
-        setSpawn(spawn);
-        setNormalZones(zones);
-        setPlayers(players);
-        setGods(gods);
-        setSpecs(specs);
-        setParticipantsTeams(teams);
-        setGlobal(global);
-        setNeutral(neutral);
-        setFriendly(friendly);
-        setHostile(hostile);
-        setPriority(priority);
+            setWeather(weather, null, false);
+        setTime(time, false);
+        setLinkedToSun(linkedToSun, false);
+        setOptions(options, false);
+        setListener(listener, false);
+        setNether(nether, false);
+        setEnd(end, false);
+        setLobby(lobby, false);
+        setSpawn(spawn, false);
+        setNormalZones(zones, false);
+        setPlayers(players, false);
+        setGods(gods, false);
+        setSpecs(specs, false);
+        setParticipantsTeams(teams, false);
+        setGlobal(global, false);
+        setNeutral(neutral, false);
+        setFriendly(friendly, false);
+        setHostile(hostile, false);
+        setPriority(priority, false);
     }
 
-    public void register() {
+    public void register(boolean save) {
         registered.add(this);
         currentGameId = id;
         getTeams().forEach(FKTeam::updatePlayers);
+        if (save)
+            save(false);
     }
 
-    public void unregister() {
+    public void unregister(boolean delete) {
         registered.remove(this);
         currentGameId = registered.isEmpty() ? null : registered.get(0).getId();
+        if (delete) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().getFile().getParentFile().renameTo(new File(getConfig().getFile().getParentFile().getParentFile().getPath() + "/old-" + id));
+        }
     }
 
     public static FKManager getCurrentGame() {
@@ -378,11 +389,13 @@ public class FKManager {
         return getGame(currentGameId);
     }
 
-    public static FKManager setCurrentGame(String id) {
+    public static FKManager setCurrentGame(String id, boolean save) {
         currentGameId = id;
 // TODO -> Check if currentGameId is null
 //        Main.getInstance().getConfig().set("current-game", id);
 //        Main.getInstance().saveConfig();
+        if (save)
+            Main.globalConfig.load().setLastGame(id, true).save();
         return getGame(id);
     }
 
@@ -435,8 +448,8 @@ public class FKManager {
                             if (p.getPlayer() != null)
                                 p.getPlayer().teleport(p.getTeam().getSpawn());
                         });
-                        setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT));
-                        setState(State.RUNNING);
+                        setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
+                        setState(State.RUNNING, true);
                     }
                 });
     }
@@ -445,7 +458,7 @@ public class FKManager {
         Utils.countDown(null, countDown, false, true, true, "Le jeu se suspend dans §c%i%§r secondes !\n§7Vous serez momentanément bloqués.", "Le jeu est en pause.\n§7Excusez-nous pour la gêne occasionnée...", "§e", "§6", "§c", "§4", "§4§l", new Runnable() {
             @Override
             public void run() {
-                setState(State.PAUSED);
+                setState(State.PAUSED, true);
             }
         });
     }
@@ -454,7 +467,7 @@ public class FKManager {
         Utils.countDown(null, countDown, false, true, true, "Le jeu reprend dans §c%i%§r secondes !\n§7Et la compétition continue.", "Et c'est reparti !\n§7Amusez-vous !", "§e", "§6", "§c", "§4", "§2§l", new Runnable() {
             @Override
             public void run() {
-                setState(State.RUNNING);
+                setState(State.RUNNING, true);
             }
         });
     }
@@ -469,8 +482,8 @@ public class FKManager {
                 p.getPlayer().teleport(getLobby().getSpawn());
             }
         });
-        setPriority(new FKPermissions(FKPermissions.Definition.OFF));
-        setState(State.ENDED);
+        setPriority(new FKPermissions(FKPermissions.Definition.OFF), true);
+        setState(State.ENDED, true);
     }
 
     public void checkActivations(boolean force) {
@@ -552,27 +565,37 @@ public class FKManager {
         return state;
     }
 
-    public void setState(@Nonnull State state) {
+    public void setState(@Nonnull State state, boolean save) {
         this.state = state;
+        if (save) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().load().setState(state, true).save();
+        }
     }
 
     public int getDay() {
         return day;
     }
 
-    public void setDay(int day) {
+    public void setDay(int day, boolean save) {
         this.day = day;
+        if (save) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().load().setDay(day, true).save();
+        }
     }
 
-    public void increaseDay() {
-        day++;
+    public void increaseDay(boolean save) {
+        setDay(day + 1, save);
     }
 
     public Weather getWeather() {
         return weather;
     }
 
-    public void setWeather(Weather weather, @Nullable Integer timeout) {
+    public void setWeather(Weather weather, @Nullable Integer timeout, boolean save) {
         this.weather = weather;
         new BukkitRunnable() {
             @Override
@@ -583,6 +606,11 @@ public class FKManager {
                 Main.world.setThunderDuration(timeout == null ? (weather == Weather.CLEAR ? 12000 : 3600) + new Random().nextInt(weather == Weather.CLEAR ? 167999 : 12399) : timeout);
             }
         }.runTask(Main.instance);
+        if (save) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().load().setCurrentWeather(weather, true).save();
+        }
     }
 
     public long getTime() {
@@ -594,100 +622,182 @@ public class FKManager {
         return df.format((int) (getTime() / 1200)) + ":" + df.format((int) ((getTime() % 1200) / 20));
     }
 
-    public void setTime(long time) {
+    public void setTime(long time, boolean save) {
         this.time = time;
-        long tempTime = this.time;
         new BukkitRunnable() {
             @Override
             public void run() {
                 if (isLinkedToSun())
-                    Main.world.setTime(tempTime);
+                    Main.world.setTime(time);
             }
         }.runTask(Main.instance);
+        if (save) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().load().setTime(time, true).save();
+        }
     }
 
-    public void increaseTime(long time) {
-        this.time += time;
-        long tempTime = this.time;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (isLinkedToSun())
-                    Main.world.setTime(tempTime);
-            }
-        }.runTask(Main.instance);
+    public void increaseTime(long time, boolean save) {
+        setTime(this.time + time, save);
     }
 
     public boolean isLinkedToSun() {
         return linkedToSun;
     }
 
-    public void setLinkedToSun(boolean linkedToSun) {
+    public void setLinkedToSun(boolean linkedToSun, boolean save) {
         this.linkedToSun = linkedToSun;
+        if (save) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().load().setLinkedToSun(linkedToSun, true).save();
+        }
     }
 
     public FKOptions getOptions() {
         return options;
     }
 
-    public void setOptions(FKOptions options) {
+    public void setOptions(FKOptions options, boolean save) {
         options.setManager(this);
         this.options = options;
+        if (save)
+            saveOptions();
+    }
+
+    public void saveOptions() {
+        if (!getConfig().exists())
+            save(true);
+        getConfig()
+                .load()
+
+                .setOptionName("pvp", options.getPvp().getName(), true)
+                .setOptionActivation("pvp", options.getPvp().getActivationDay(), true)
+                .setOptionActivated("pvp", options.getPvp().isActivated(), true)
+                .setOptionName("nether", options.getNether().getName(), true)
+                .setOptionActivation("nether", options.getNether().getActivationDay(), true)
+                .setOptionActivated("nether", options.getNether().isActivated(), true)
+                .setOptionName("assaults", options.getAssaults().getName(), true)
+                .setOptionActivation("assaults", options.getAssaults().getActivationDay(), true)
+                .setOptionActivated("assaults", options.getAssaults().isActivated(), true)
+                .setOptionName("end", options.getEnd().getName(), true)
+                .setOptionActivation("end", options.getEnd().getActivationDay(), true)
+                .setOptionActivated("end", options.getEnd().isActivated(), true)
+
+                .save();
     }
 
     public FKListener getListener() {
         return listener;
     }
 
-    public void setListener(FKListener listener) {
+    public void setListener(FKListener listener, boolean save) {
         listener.setManager(this);
         this.listener = listener;
+        if (save)
+            saveListener();
+    }
+
+    public void saveListener() {
+        if (!getConfig().exists())
+            save(true);
+        getConfig()
+                .load()
+
+                .setListenerName(listener.getScoreName(), true)
+                .setListenerSavingTimeout(listener.getSavingTimeOut(), true)
+
+                .save();
+    }
+
+    public void savePortal(String id, Portal portal) {
+        if (!getConfig().exists())
+            save(true);
+        getConfig()
+                .load()
+
+                .setPortalName(id, portal.getName(), true)
+                .setPortalOpened(id, portal.isOpened(), true)
+                .setPortalCooldown(id, portal.getCoolDown(), true)
+                .setPortalOpenedMaterial(id, portal.getOpenedMat(), true)
+                .setPortalClosedMaterial(id, portal.getClosedMat(), true)
+                .setPortalClosedMaterial(id, portal.getClosedMat(), true)
+                .setPortalMaterialData(id, portal.getData(), true)
+                .setPortalSpawnOverLocation(id, portal.getOverSpawn(), true)
+                .setPortalPos1OverLocation(id, portal.getOverPortal1(), true)
+                .setPortalPos2OverLocation(id, portal.getOverPortal2(), true)
+                .setPortalSpawnDimLocation(id, portal.getDimSpawn(), true)
+                .setPortalPos1DimLocation(id, portal.getDimPortal1(), true)
+                .setPortalPos2DimLocation(id, portal.getDimPortal2(), true)
+                .setPortalTeleporting(id, portal.getInTeleportation(), true)
+
+                .save();
     }
 
     public Portal getNether() {
         return nether;
     }
 
-    public void setNether(Portal nether) {
+    public void setNether(Portal nether, boolean save) {
         if (nether != null)
             nether.close();
         this.nether = nether;
+        if (save)
+            saveNether();
+    }
+
+    public void saveNether() {
+        savePortal("nether", nether);
     }
 
     public Portal getEnd() {
         return end;
     }
 
-    public void setEnd(Portal end) {
+    public void setEnd(Portal end, boolean save) {
         if (end != null)
             end.close();
         this.end = end;
+        if (save)
+            saveEnd();
+    }
+
+    public void saveEnd() {
+        savePortal("end", end);
     }
 
     public FKZone getLobby() {
         return lobby;
     }
 
-    public void setLobby(FKZone lobby) {
+    public void setLobby(FKZone lobby, boolean save) {
         this.lobby = lobby;
-        this.lobby.setId(FKZone.LOBBY_ID);
+        this.lobby.setId(FKZone.LOBBY_ID, false);
+        if (save)
+            this.lobby.saveToConfig(id, false);
     }
 
     public FKZone getSpawn() {
         return spawn;
     }
 
-    public void setSpawn(FKZone spawn) {
+    public void setSpawn(FKZone spawn, boolean save) {
         this.spawn = spawn;
-        this.spawn.setId(FKZone.SPAWN_ID);
+        this.spawn.setId(FKZone.SPAWN_ID, false);
+        if (save)
+            this.spawn.saveToConfig(id, false);
     }
 
     public ArrayList<FKZone> getNormalZones() {
         return zones;
     }
 
-    public void setNormalZones(ArrayList<FKZone> zones) {
+    public void setNormalZones(ArrayList<FKZone> zones, boolean save) {
         this.zones = zones;
+        if (save)
+            for (FKZone zone : zones)
+                zone.saveToConfig(id, false);
     }
 
     public ArrayList<FKZone> getZones() {
@@ -712,8 +822,11 @@ public class FKManager {
         return players;
     }
 
-    public void setPlayers(ArrayList<FKPlayer> players) {
+    public void setPlayers(ArrayList<FKPlayer> players, boolean save) {
         this.players = players;
+        if (save)
+            for (FKPlayer player : this.players)
+                player.saveToConfig(id, false);
     }
 
     public FKPlayer getPlayer(@Nonnull UUID uuid, boolean create) {
@@ -771,26 +884,33 @@ public class FKManager {
         return gods;
     }
 
-    public void setGods(FKTeam gods) {
+    public void setGods(FKTeam gods, boolean save) {
         this.gods = gods;
-        this.gods.setId(FKTeam.GODS_ID);
+        this.gods.setId(FKTeam.GODS_ID, false);
+        if (save)
+            this.gods.saveToConfig(id, false);
     }
 
     public FKTeam getSpecs() {
         return specs;
     }
 
-    public void setSpecs(FKTeam specs) {
+    public void setSpecs(FKTeam specs, boolean save) {
         this.specs = specs;
-        this.specs.setId(FKTeam.SPECS_ID);
+        this.specs.setId(FKTeam.SPECS_ID, false);
+        if (save)
+            this.specs.saveToConfig(id, false);
     }
 
     public ArrayList<FKTeam> getParticipantsTeams() {
         return teams;
     }
 
-    public void setParticipantsTeams(ArrayList<FKTeam> teams) {
+    public void setParticipantsTeams(ArrayList<FKTeam> teams, boolean save) {
         this.teams = teams;
+        if (save)
+            for (FKTeam team : teams)
+                team.saveToConfig(id, false);
     }
 
     public ArrayList<FKTeam> getTeams() {
@@ -828,39 +948,49 @@ public class FKManager {
         return global;
     }
 
-    public void setGlobal(FKPermissions global) {
+    public void setGlobal(FKPermissions global, boolean save) {
         this.global = global;
+        if (save)
+            getConfig().load().setGlobalPermissions(global, true).save();
     }
 
     public FKPermissions getNeutral() {
         return neutral;
     }
 
-    public void setNeutral(FKPermissions neutral) {
+    public void setNeutral(FKPermissions neutral, boolean save) {
         this.neutral = neutral;
+        if (save)
+            getConfig().load().setNeutralPermissions(neutral, true).save();
     }
 
     public FKPermissions getFriendly() {
         return friendly;
     }
 
-    public void setFriendly(FKPermissions friendly) {
+    public void setFriendly(FKPermissions friendly, boolean save) {
         this.friendly = friendly;
+        if (save)
+            getConfig().load().setFriendlyPermissions(friendly, true).save();
     }
 
     public FKPermissions getHostile() {
         return hostile;
     }
 
-    public void setHostile(FKPermissions hostile) {
+    public void setHostile(FKPermissions hostile, boolean save) {
         this.hostile = hostile;
+        if (save)
+            getConfig().load().setHostilePermissions(hostile, true).save();
     }
 
     public FKPermissions getPriority() {
         return priority;
     }
 
-    public void setPriority(FKPermissions priority) {
+    public void setPriority(FKPermissions priority, boolean save) {
         this.priority = priority;
+        if (save)
+            getConfig().load().setPriorityPermissions(priority, true).save();
     }
 }

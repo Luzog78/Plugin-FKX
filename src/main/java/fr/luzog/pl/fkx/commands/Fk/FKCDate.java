@@ -43,7 +43,7 @@ public class FKCDate {
                 u.succ("Date :\n - Jour : §f" + FKManager.getCurrentGame().getDay());
             else if (args[2].equalsIgnoreCase("set") && args.length >= 4)
                 try {
-                    FKManager.getCurrentGame().setDay(Integer.parseInt(args[3]));
+                    FKManager.getCurrentGame().setDay(Integer.parseInt(args[3]), true);
                     u.succ(update_success);
                 } catch (NumberFormatException e) {
                     u.err(CmdUtils.err_number_format);
@@ -59,17 +59,17 @@ public class FKCDate {
             else if (args[2].equalsIgnoreCase("set") && args.length >= 4)
                 if (args[3].contains(":"))
                     try {
-                        FKManager.getCurrentGame().setTime(Long.parseLong(args[3].split(":")[0]) * 1200 + Long.parseLong(args[3].split(":")[1]) * 20);
+                        FKManager.getCurrentGame().setTime(Long.parseLong(args[3].split(":")[0]) * 1200 + Long.parseLong(args[3].split(":")[1]) * 20, true);
                         u.succ(update_success);
                     } catch (NumberFormatException e) {
                         u.err(CmdUtils.err_number_format + " (for numbers : '" + args[3].split(":")[0] + "' and '" + args[3].split(":")[1] + "')");
                     }
                 else if (DayMoment.match(args[3]) != null) {
-                    FKManager.getCurrentGame().setTime(DayMoment.match(args[3]).getHour());
+                    FKManager.getCurrentGame().setTime(DayMoment.match(args[3]).getHour(), true);
                     u.succ(update_success);
                 } else
                     try {
-                        FKManager.getCurrentGame().setTime(Long.parseLong(args[3]));
+                        FKManager.getCurrentGame().setTime(Long.parseLong(args[3]), true);
                         u.succ(update_success);
                     } catch (NumberFormatException e) {
                         u.err(CmdUtils.err_arg.replace("%ARG%", args[3]));
@@ -87,13 +87,13 @@ public class FKCDate {
                 try {
                     Integer timeout = args.length >= 5 ? Integer.parseInt(args[4]) : null;
                     if (args[3].equalsIgnoreCase("sun")) {
-                        FKManager.getCurrentGame().setWeather(FKManager.Weather.CLEAR, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.CLEAR, timeout, true);
                         u.succ(update_success);
                     } else if (args[3].equalsIgnoreCase("rain")) {
-                        FKManager.getCurrentGame().setWeather(FKManager.Weather.RAIN, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.RAIN, timeout, true);
                         u.succ(update_success);
                     } else if (args[3].equalsIgnoreCase("thunder")) {
-                        FKManager.getCurrentGame().setWeather(FKManager.Weather.THUNDER, timeout);
+                        FKManager.getCurrentGame().setWeather(FKManager.Weather.THUNDER, timeout, true);
                         u.succ(update_success);
                     } else
                         u.synt();

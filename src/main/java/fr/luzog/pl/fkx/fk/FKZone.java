@@ -4,6 +4,8 @@ import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
 
+import java.io.File;
+
 public class FKZone {
 
     public static enum Type {NEUTRAL, FRIENDLY, HOSTILE, LOBBY, SPAWN, ZONE}
@@ -12,7 +14,7 @@ public class FKZone {
             SPAWN_ID = "spawn", SPAWN_FILE = "Spawn.yml";
 
     public void saveToConfig(String gameId, boolean soft) {
-        new Config.Zone("game-" + gameId + "/zones/" + (id.equalsIgnoreCase(LOBBY_ID) ? LOBBY_FILE : id.equalsIgnoreCase(SPAWN_ID) ? SPAWN_FILE : id + ".yml"))
+        getConfig(gameId)
                 .load()
 
                 .setType(type == null ? null : type.name(), !soft)
@@ -22,6 +24,10 @@ public class FKZone {
                 .setPermissions(permissions, !soft)
 
                 .save();
+    }
+
+    public Config.Zone getConfig(String gameId) {
+        return new Config.Zone("game-" + gameId + "/zones/" + (id.equalsIgnoreCase(LOBBY_ID) ? LOBBY_FILE : id.equalsIgnoreCase(SPAWN_ID) ? SPAWN_FILE : id + ".yml"));
     }
 
     private String id;
@@ -51,7 +57,15 @@ public class FKZone {
                 "}";
     }
 
-    public boolean isInside(Location loc){
+    public FKManager getManager() {
+        for (FKManager manager : FKManager.registered)
+            for (FKZone zone : manager.getZones())
+                if (zone.equals(this))
+                    return manager;
+        return null;
+    }
+
+    public boolean isInside(Location loc) {
         return Utils.isInside(loc, pos1, pos2);
     }
 
@@ -59,47 +73,82 @@ public class FKZone {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id, boolean save) {
         this.id = id;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" + id + ".yml"));
+        }
     }
 
     public Type getType() {
         return type;
     }
 
-    public void setType(Type type) {
+    public void setType(Type type, boolean save) {
         this.type = type;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setType(type.name(), true).save();
+        }
     }
 
     public Location getSpawn() {
         return spawn;
     }
 
-    public void setSpawn(Location spawn) {
+    public void setSpawn(Location spawn, boolean save) {
         this.spawn = spawn;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setSpawn(spawn, true).save();
+        }
     }
 
     public Location getPos1() {
         return pos1;
     }
 
-    public void setPos1(Location pos1) {
+    public void setPos1(Location pos1, boolean save) {
         this.pos1 = pos1;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPos1(pos1, true).save();
+        }
     }
 
     public Location getPos2() {
         return pos2;
     }
 
-    public void setPos2(Location pos2) {
+    public void setPos2(Location pos2, boolean save) {
         this.pos2 = pos2;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPos2(pos2, true).save();
+        }
     }
 
     public FKPermissions getPermissions() {
         return permissions;
     }
 
-    public void setPermissions(FKPermissions permissions) {
+    public void setPermissions(FKPermissions permissions, boolean save) {
         this.permissions = permissions;
+        if (save)
+            savePermissions();
+    }
+
+    public void savePermissions() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setPermissions(permissions, true).save();
+        }
     }
 }

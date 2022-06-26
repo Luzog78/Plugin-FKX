@@ -169,7 +169,7 @@ public class FKCTeams {
                 else if (handleString(arg, 2).length() > 32)
                     u.err(" - Le Nom ne doit pas dépasser 32 caractères.");
                 else {
-                    t.setName(handleString(arg, 2));
+                    t.setName(handleString(arg, 2), true);
                     u.succ(" - Nom : §f" + t.getColor() + t.getName());
                 }
             } else if (arg.toLowerCase().equals("p") || arg.toLowerCase().startsWith("p ")) {
@@ -178,7 +178,7 @@ public class FKCTeams {
                 else if (handleString(arg, 2).length() > 32)
                     u.err(" - Le Préfixe ne doit pas dépasser 32 caractères.");
                 else {
-                    t.setPrefix(handleString(arg, 2));
+                    t.setPrefix(handleString(arg, 2), true);
                     u.succ(" - Préfixe : §7'§f" + t.getColor() + t.getPrefix() + "§7'");
                 }
             } else if (arg.toLowerCase().equals("c") || arg.toLowerCase().startsWith("c ")) {
@@ -186,7 +186,7 @@ public class FKCTeams {
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "color"));
                 else {
                     try {
-                        t.setColor(ChatColor.valueOf(handleString(arg, 2).toUpperCase()));
+                        t.setColor(ChatColor.valueOf(handleString(arg, 2).toUpperCase()), true);
                         u.succ(" - Couleur : §f" + handleString(arg, 2).toUpperCase());
                     } catch (IllegalArgumentException e) {
                         u.err(" - Couleur '" + handleString(arg, 2) + "' inconnue.");
@@ -197,7 +197,7 @@ public class FKCTeams {
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "radius"));
                 else {
                     try {
-                        t.setRadius(Integer.parseInt(handleString(arg, 2)));
+                        t.setRadius(Integer.parseInt(handleString(arg, 2)), true);
                         u.succ(" - Rayon : §f" + t.getRadius());
                     } catch (NumberFormatException e) {
                         u.err(" - Rayon '" + handleString(arg, 2) + "' invalide.");
@@ -260,7 +260,7 @@ public class FKCTeams {
                         u.err(" - Erreur avec le(s) paramètre(s) : " + String.join(", ", err) + ".");
                     } else {
                         Location loc = orientation ? new Location(w, x, y, z, yw, pi) : new Location(w, x, y, z);
-                        t.setSpawn(loc);
+                        t.setSpawn(loc, true);
                         u.succ(" - Spawn : §f" + Utils.locToString(loc, true, orientation, true));
                     }
                 }

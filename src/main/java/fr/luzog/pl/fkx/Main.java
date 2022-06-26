@@ -6,7 +6,6 @@ import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.*;
 import fr.luzog.pl.fkx.utils.Color;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
@@ -15,8 +14,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.text.DateFormat;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 
 public class Main extends JavaPlugin implements Listener {
