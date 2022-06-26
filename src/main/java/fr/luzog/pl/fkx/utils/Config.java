@@ -807,7 +807,7 @@ public class Config {
 
     public Config set(String path, Object o, boolean force) {
         try {
-            if (force || config.get(path) == null || config.get(path).equals("") || getKeys(path, false) == null || getKeys(path, false).isEmpty())
+            if (force || config.get(path) == null || (config.isConfigurationSection(path) && (getKeys(path, false) == null || getKeys(path, false).isEmpty())))
                 config.set(path, o);
         } catch (Exception e) {
             System.out.println(Color.RED);
