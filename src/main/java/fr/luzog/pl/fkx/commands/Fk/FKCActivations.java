@@ -62,6 +62,7 @@ public class FKCActivations {
                         return false;
                     }
                 u.succ("Activation :\n§r - " + format(opt));
+                FKManager.getCurrentGame().saveOptions();
             } else
                 u.synt();
         }
@@ -74,8 +75,8 @@ public class FKCActivations {
     }
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
-        return new ArrayList<String>(){{
-            if(args.length == 2) {
+        return new ArrayList<String>() {{
+            if (args.length == 2) {
                 add("list");
                 add("pvp");
                 add("assauts");
@@ -87,7 +88,7 @@ public class FKCActivations {
             } else if (args.length == 4 && (args[2].equalsIgnoreCase("get") || args[2].equalsIgnoreCase("set"))) {
                 add("on");
                 add("off");
-                for(int i = 0; i <= 6; i++)
+                for (int i = 0; i <= 6; i++)
                     add((i + FKManager.getCurrentGame().getDay()) + "");
             }
         }};

@@ -79,8 +79,7 @@ public class FKCTeams {
                 u.succ("    > Spawn : §f" + Utils.locToString(t.getSpawn(), true, false, true));
                 u.succ(" - Autorisations :");
                 t.getPermissions().getPermissions().keySet().stream().sorted(Comparator.comparingInt(o -> o.name().length())).forEach(k ->
-                        u.succ("    > §6" + k.name() + "§r : §f" + (t.getPermissions().getPermissions().get(k) == FKPermissions.Definition.ON ? "§2§l" + SpecialChars.YES + " ON"
-                                : t.getPermissions().getPermissions().get(k) == FKPermissions.Definition.OFF ? "§4§l" + SpecialChars.NO + " OFF" : "§7" + SpecialChars.WARNING + " DEFAULT")));
+                        u.succ("    > §6" + k.name() + "§r : §f" + t.getPermissions().getPermission(k).toFormattedString()));
             } else if (args[2].equalsIgnoreCase("list")) {
                 u.succ("Joueurs de §f" + t.getColor() + t.getName() + "§r :");
                 if (t.getPlayers().isEmpty())

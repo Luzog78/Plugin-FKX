@@ -53,7 +53,7 @@ public class FKPlayer {
     public boolean hasPermission(FKPermissions.Type permissionType, Location loc) {
         if (personalPermissions.getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return personalPermissions.getPermission(permissionType) == FKPermissions.Definition.ON;
-        if (getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+        if (getTeam() != null && getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return getTeam().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getManager().getPriority().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return getManager().getPriority().getPermission(permissionType) == FKPermissions.Definition.ON;
@@ -106,7 +106,7 @@ public class FKPlayer {
             return getManager().getLobby();
         if (getManager().getSpawn().isInside(loc))
             return getManager().getSpawn();
-        if (getTeam().isInside(loc))
+        if (getTeam() != null && getTeam().isInside(loc))
             return getTeam().getZone(true);
         for (FKTeam team : getManager().getTeams())
             if (team.isInside(loc))
@@ -151,7 +151,8 @@ public class FKPlayer {
     public void leaveTeam(boolean save) {
         FKTeam tempTeam = getTeam();
         teamId = null;
-        tempTeam.updatePlayers();
+        if (tempTeam != null)
+            tempTeam.updatePlayers();
         if (save && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
@@ -212,7 +213,7 @@ public class FKPlayer {
 
     public void setPersonalPermissions(FKPermissions personalPermissions, boolean save) {
         this.personalPermissions = personalPermissions;
-        if(save)
+        if (save)
             savePersonalPermissions();
     }
 

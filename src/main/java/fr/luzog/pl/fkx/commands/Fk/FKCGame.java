@@ -81,6 +81,9 @@ public class FKCGame {
         else if (args[1].equalsIgnoreCase("end"))
                 FKManager.getCurrentGame().end();
 
+        else
+            u.synt();
+
         return false;
     }
 

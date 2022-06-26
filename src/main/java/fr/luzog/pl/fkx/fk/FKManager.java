@@ -857,9 +857,25 @@ public class FKManager {
         return null;
     }
 
+    /**
+     * "Get a player by name, or create one if it doesn't exist."<br>
+     * <br>
+     * The first thing you'll notice is the `@Nonnull` annotation. This is a Java annotation that tells the compiler that
+     * the parameter will never be null. This is important because the function will throw an exception if the parameter is
+     * null.<br>
+     * <br>
+     * It's important too to note that the function will throw an error if the player doesn't exist.
+     *
+     * @param name   The name of the player to get.
+     * @param create If true, the player will be created if it doesn't exist.
+     *
+     * @return A {@link FKPlayer} object
+     *
+     * @throws FKException.PlayerDoesNotExistException
+     */
     public FKPlayer getPlayer(@Nonnull String name, boolean create) {
         for (FKPlayer player : players)
-            if (player.getName() != null && player.getName().equals(name))
+            if (player.getName() != null && player.getName().equalsIgnoreCase(name))
                 return player;
         if (create) {
             Pair<String, UUID> i = Utils.getNameAndUUIDFromAPI(name);
@@ -874,7 +890,7 @@ public class FKManager {
 
     public FKPlayer getPlayer(@Nonnull UUID uuid, @Nonnull String name, boolean create) {
         for (FKPlayer player : players)
-            if ((player.getUuid() != null && player.getUuid().equals(uuid)) || (player.getName() != null && player.getName().equals(name)))
+            if ((player.getUuid() != null && player.getUuid().equals(uuid)) || (player.getName() != null && player.getName().equalsIgnoreCase(name)))
                 return player;
         if (create) {
             FKPlayer player = null;

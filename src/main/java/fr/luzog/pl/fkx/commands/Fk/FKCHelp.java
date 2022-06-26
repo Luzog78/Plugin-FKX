@@ -14,7 +14,7 @@ public class FKCHelp {
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
 
-        u.send("", Main.HEADER);
+        u.send("", Main.HEADER.replace("--", "-"));
         u.send("", "§a > §6/fk help §7- §eAffiche l'aide");
         u.send("", "§a > §6/fk activations §7- §eAffiche l'aide");
         u.send("", "§a > §6/fk authorisations §7- §eAffiche l'aide");
@@ -27,7 +27,7 @@ public class FKCHelp {
         u.send("", "§a > §6/fk teams §7- §eAffiche l'aide");
         u.send("", "§a > §6/fk title §7- §eAffiche l'aide");
         u.send("", "§a > §6/fk warp §7- §eAffiche l'aide");
-        u.send("", Main.FOOTER);
+        u.send("", Main.FOOTER.replace("--", "-"));
 
         return false;
     }

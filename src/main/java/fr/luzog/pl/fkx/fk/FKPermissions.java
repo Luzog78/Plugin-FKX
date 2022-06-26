@@ -1,5 +1,7 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.utils.SpecialChars;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,16 @@ public class FKPermissions {
 
     public static enum Type {PVP, FRIENDLY_FIRE, MOBS, BREAK, BREAKSPE, PLACE, PLACESPE;}
 
-    public static enum Definition {ON, OFF, DEFAULT;}
+    public static enum Definition {
+        ON, OFF, DEFAULT;
+
+        public String toFormattedString() {
+            return (this == FKPermissions.Definition.ON ? "§2§l" + SpecialChars.YES + " ON"
+                    : this == FKPermissions.Definition.OFF ? "§4§l" + SpecialChars.NO + " OFF"
+                    : this == FKPermissions.Definition.DEFAULT ?"§7" + SpecialChars.WARNING + " DEFAULT"
+                    : "§cnull") + "§r";
+        }
+    }
 
     public static class Item {
         private Type type;
