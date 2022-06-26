@@ -16,29 +16,33 @@ public class FKOptions {
             public void onActivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.announcement("Le !PVP est activé.");
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.PVP, FKPermissions.Definition.ON);
+                manager.getGlobal().setPermission(FKPermissions.Type.PVP, FKPermissions.Definition.ON);
+                manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
 
             @Override
             public void onDeactivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.warn("Le !PVP est désactivé.");
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.PVP, FKPermissions.Definition.OFF);
+                manager.getGlobal().setPermission(FKPermissions.Type.PVP, FKPermissions.Definition.OFF);
+                manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
         });
         this.nether = nether.getOptionListener() != null ? nether : nether.setOptionListener(new FKOptionListener() {
             @Override
             public void onActivate(boolean broadcast) {
                 if (broadcast)
-                    Broadcast.announcement("Le !" + FKManager.getCurrentGame().getNether().getName() + " est activé.");
-                FKManager.getCurrentGame().getNether().open();
+                    Broadcast.announcement("Le !" + manager.getNether().getName() + " est activé.");
+                manager.getNether().open();
+                manager.saveNether();
             }
 
             @Override
             public void onDeactivate(boolean broadcast) {
                 if (broadcast)
-                    Broadcast.warn("Le !" + FKManager.getCurrentGame().getNether().getName() + " est désactivé.");
-                FKManager.getCurrentGame().getNether().close();
+                    Broadcast.warn("Le !" + manager.getNether().getName() + " est désactivé.");
+                manager.getNether().close();
+                manager.saveNether();
             }
         });
         this.assaults = assaults.getOptionListener() != null ? assaults : assaults.setOptionListener(new FKOptionListener() {
@@ -46,31 +50,35 @@ public class FKOptions {
             public void onActivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.announcement("Les !Assauts sont activés.");
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.ON);
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON);
+                manager.getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.ON);
+                manager.getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON);
+                manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
 
             @Override
             public void onDeactivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.warn("Les !Assauts sont désactivés.");
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.OFF);
-                FKManager.getCurrentGame().getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.OFF);
+                manager.getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.OFF);
+                manager.getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.OFF);
+                manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
         });
         this.end = end.getOptionListener() != null ? end : end.setOptionListener(new FKOptionListener() {
             @Override
             public void onActivate(boolean broadcast) {
                 if (broadcast)
-                    Broadcast.announcement("Le !" + FKManager.getCurrentGame().getEnd().getName() + " est activé.");
-                FKManager.getCurrentGame().getEnd().open();
+                    Broadcast.announcement("Le !" + manager.getEnd().getName() + " est activé.");
+                manager.getEnd().open();
+                manager.saveEnd();
             }
 
             @Override
             public void onDeactivate(boolean broadcast) {
                 if (broadcast)
-                    Broadcast.warn("Le !" + FKManager.getCurrentGame().getEnd().getName() + " est désactivé.");
-                FKManager.getCurrentGame().getEnd().close();
+                    Broadcast.warn("Le !" + manager.getEnd().getName() + " est désactivé.");
+                manager.getEnd().close();
+                manager.saveEnd();
             }
         });
     }

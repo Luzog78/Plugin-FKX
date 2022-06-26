@@ -38,8 +38,8 @@ public class PlayerMoveHandler implements Listener {
 //            e.getPlayer().sendMessage("§aVous entrez dans §f" + (to == null ? "null" : to.getId()) + "§a !");
 
             if (!e.isCancelled()) {
-                p.getManager().getNether().tryToTeleport(e.getPlayer());
-                p.getManager().getEnd().tryToTeleport(e.getPlayer());
+                p.getManager().getNether().tryToTeleport(e.getPlayer(), p.getManager(), true);
+                p.getManager().getEnd().tryToTeleport(e.getPlayer(), p.getManager(), true);
             }
         }
     }

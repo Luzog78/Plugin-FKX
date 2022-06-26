@@ -11,6 +11,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nonnull;
@@ -81,7 +83,7 @@ public class FKManager {
                                             for (World w : Bukkit.getWorlds())
                                                 for (Entity e : w.getEntities())
                                                     if (e.getUniqueId().equals(uuid))
-                                                        portal.tryToTeleport(e);
+                                                        portal.tryToTeleport(e, manager, false);
                                 }
                             }.runTaskLater(Main.instance, 1);
 
@@ -445,8 +447,19 @@ public class FKManager {
                     @Override
                     public void run() {
                         getPlayers().forEach(p -> {
-                            if (p.getPlayer() != null)
+                            if (p.getPlayer() != null) {
+                                p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+                                p.getPlayer().setFoodLevel(20);
+                                p.getPlayer().setSaturation(20);
+                                p.getPlayer().setFireTicks(0);
+                                p.getPlayer().getInventory().clear();
+                                p.getPlayer().getInventory().setArmorContents(null);
+                                p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));
+                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 120, 255, false, false), true);
+                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 120, 255, false, false), true);
+                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false), true);
                                 p.getPlayer().teleport(p.getTeam().getSpawn());
+                            }
                         });
                         setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
                         setState(State.RUNNING, true);

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.fk.FKManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -44,7 +45,7 @@ public class Portal {
 
     public void open() {
         opened = true;
-        if(openedMat == null)
+        if (openedMat == null)
             return;
         Utils.getBlocksIn(overPortal1, overPortal2).forEach(block -> block.setTypeIdAndData(openedMat.getId(), data, false));
         Utils.getBlocksIn(dimPortal1, dimPortal2).forEach(block -> block.setTypeIdAndData(openedMat.getId(), data, false));
@@ -52,7 +53,7 @@ public class Portal {
 
     public void close() {
         opened = false;
-        if(openedMat == null)
+        if (openedMat == null)
             return;
         Utils.getBlocksIn(overPortal1, overPortal2).forEach(block -> block.setTypeIdAndData(closedMat.getId(), data, false));
         Utils.getBlocksIn(dimPortal1, dimPortal2).forEach(block -> block.setTypeIdAndData(closedMat.getId(), data, false));
@@ -61,25 +62,30 @@ public class Portal {
     public Location nextSpawn(Location loc) {
         if (loc == null)
             return null;
-        if(overPortal1 != null && overPortal2 != null && loc.getWorld().getUID().equals(overPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(overPortal2.getWorld().getUID()))
-            for(Block b : Utils.getBlocksIn(overPortal1, overPortal2))
-                if(loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
+        if (overPortal1 != null && overPortal2 != null && loc.getWorld().getUID().equals(overPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(overPortal2.getWorld().getUID()))
+            for (Block b : Utils.getBlocksIn(overPortal1, overPortal2))
+                if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return dimSpawn;
-        if(dimPortal1 != null && dimPortal2 != null && loc.getWorld().getUID().equals(dimPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(dimPortal2.getWorld().getUID()))
-            for(Block b : Utils.getBlocksIn(dimPortal1, dimPortal2))
-                if(loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
+        if (dimPortal1 != null && dimPortal2 != null && loc.getWorld().getUID().equals(dimPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(dimPortal2.getWorld().getUID()))
+            for (Block b : Utils.getBlocksIn(dimPortal1, dimPortal2))
+                if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return overSpawn;
         return null;
     }
 
-    public boolean tryToTeleport(Entity e) {
-        if(!isOpened() || nextSpawn(e.getLocation()) == null || isInTeleportation(e))
+    public boolean tryToTeleport(Entity e, FKManager manager, boolean save) {
+        if (!isOpened() || nextSpawn(e.getLocation()) == null || isInTeleportation(e))
             return false;
         inTeleportation.put(e.getUniqueId(), Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
             if (nextSpawn(e.getLocation()) != null)
                 e.teleport(nextSpawn(e.getLocation()));
             inTeleportation.remove(e.getUniqueId());
         }, coolDown));
+        if (save && manager != null)
+            if (this.equals(manager.getNether()))
+                manager.saveNether();
+            else if (this.equals(manager.getEnd()))
+                manager.saveEnd();
         return true;
     }
 
@@ -91,9 +97,14 @@ public class Portal {
         return inTeleportation.containsKey(entity.getUniqueId());
     }
 
-    public void resetTeleportation() {
+    public void resetTeleportation(FKManager manager, boolean save) {
         inTeleportation.forEach((uuid, taskID) -> Bukkit.getScheduler().cancelTask(taskID));
         inTeleportation.clear();
+        if (save && manager != null)
+            if (this.equals(manager.getNether()))
+                manager.saveNether();
+            else if (this.equals(manager.getEnd()))
+                manager.saveEnd();
     }
 
     public String getName() {
@@ -109,9 +120,9 @@ public class Portal {
     }
 
     public void setOpened(boolean opened) {
-        if(opened && !this.opened)
+        if (opened && !this.opened)
             open();
-        else if(!opened && this.opened)
+        else if (!opened && this.opened)
             close();
     }
 
