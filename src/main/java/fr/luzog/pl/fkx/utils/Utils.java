@@ -383,22 +383,22 @@ public class Utils {
 
             try {
                 JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.decode(this.rawTextures)));
-                if(obj.containsKey("timestamp"))
+                if (obj.containsKey("timestamp"))
                     timestamp = Long.parseLong(obj.get("timestamp").toString());
-                if(obj.containsKey("profileId"))
+                if (obj.containsKey("profileId"))
                     profileId = obj.get("profileId").toString();
-                if(obj.containsKey("profileName"))
+                if (obj.containsKey("profileName"))
                     profileName = obj.get("profileName").toString();
-                if(obj.containsKey("textures")) {
+                if (obj.containsKey("textures")) {
                     JSONObject textures = (JSONObject) obj.get("textures");
-                    if(textures.containsKey("SKIN")) {
+                    if (textures.containsKey("SKIN")) {
                         JSONObject skin = (JSONObject) textures.get("SKIN");
-                        if(skin.containsKey("url"))
+                        if (skin.containsKey("url"))
                             skinURL = skin.get("url").toString();
                     }
-                    if(textures.containsKey("CAPE")) {
+                    if (textures.containsKey("CAPE")) {
                         JSONObject cape = (JSONObject) textures.get("CAPE");
-                        if(cape.containsKey("url"))
+                        if (cape.containsKey("url"))
                             capeURL = cape.get("url").toString();
                     }
                 }
@@ -497,17 +497,21 @@ public class Utils {
     /**
      * Try to run the given runnable, and return true if it succeeded, or false if it failed.
      *
-     * @param r The runnable to run.
+     * @param printStackTrace If true, print in console errors.
+     * @param r               The runnable to run.
+     *
      * @return A boolean value.
      */
-    public static boolean tryTo(Runnable r) {
+    public static boolean tryTo(boolean printStackTrace, Runnable r) {
         try {
             r.run();
             return true;
         } catch (Exception e) {
-            System.out.println(Color.RED);
-            e.printStackTrace();
-            System.out.println(Color.RESET);
+            if (printStackTrace) {
+                System.out.println(Color.RED);
+                e.printStackTrace();
+                System.out.println(Color.RESET);
+            }
             return false;
         }
     }

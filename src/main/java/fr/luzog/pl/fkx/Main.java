@@ -72,7 +72,7 @@ public class Main extends JavaPlugin implements Listener {
         CommandManager.init();
 
         soufInstruction("§6Initialisation du module : §eFKManager§6...");
-        FKManager.initFromConfig();
+        FKManager.initFromConfig(false);
 
         soufInstruction("§6Initialisation du module : §eListeners§6...");
         getServer().getPluginManager().registerEvents(this, this);
@@ -108,49 +108,49 @@ public class Main extends JavaPlugin implements Listener {
 //                                new Location(Main.world, 51, 225, -26),
 //                                new Location(Main.world, 56, 224, -25),
 //                                new Location(Main.world, 46, 226, -27),
-//                                new FKAuth(FKAuth.Definition.OFF)
+//                                new FKPermissions(FKPermissions.Definition.OFF)
 //                        ),
 //                        new FKZone("Spawn", FKZone.Type.SPAWN,
 //                                new Location(Main.world, 51, 225, -31),
 //                                new Location(Main.world, 56, 224, -30),
 //                                new Location(Main.world, 46, 226, -32),
-//                                new FKAuth(FKAuth.Definition.DEFAULT,
-//                                        new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-//                                        new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF),
-//                                        new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.OFF))
+//                                new FKPermissions(FKPermissions.Definition.DEFAULT,
+//                                        new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
+//                                        new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF),
+//                                        new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.OFF))
 //                        ),
 //                        new ArrayList<FKZone>() {{
 //                            add(new FKZone("nether", FKZone.Type.ZONE,
 //                                    Bukkit.getWorld("world_nether").getSpawnLocation(),
 //                                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
 //                                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-//                                    new FKAuth(FKAuth.Definition.ON)));
+//                                    new FKPermissions(FKPermissions.Definition.ON)));
 //                            add(new FKZone("end", FKZone.Type.ZONE,
 //                                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
 //                                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
 //                                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-//                                    new FKAuth(FKAuth.Definition.ON)));
+//                                    new FKPermissions(FKPermissions.Definition.ON)));
 //                        }},
 //                        new ArrayList<>(),
-//                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKAuth(FKAuth.Definition.ON)),
-//                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKAuth(FKAuth.Definition.OFF)),
-//                        new ArrayList<>(Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r ||  ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT)),
-//                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r ||  ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKAuth(FKAuth.Definition.DEFAULT)))),
-//                        new FKAuth(FKAuth.Definition.OFF,
-//                                new FKAuth.Item(FKAuth.Type.BREAKSPE, FKAuth.Definition.ON),
-//                                new FKAuth.Item(FKAuth.Type.PLACESPE, FKAuth.Definition.ON),
-//                                new FKAuth.Item(FKAuth.Type.PVP, FKAuth.Definition.ON),
-//                                new FKAuth.Item(FKAuth.Type.MOBS, FKAuth.Definition.ON)),
-//                        new FKAuth(FKAuth.Definition.DEFAULT,
-//                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
-//                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)),
-//                        new FKAuth(FKAuth.Definition.DEFAULT,
-//                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.ON),
-//                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.ON)),
-//                        new FKAuth(FKAuth.Definition.DEFAULT,
-//                                new FKAuth.Item(FKAuth.Type.BREAK, FKAuth.Definition.OFF),
-//                                new FKAuth.Item(FKAuth.Type.PLACE, FKAuth.Definition.OFF)),
-//                        new FKAuth(FKAuth.Definition.OFF)
+//                        new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKPermissions(FKPermissions.Definition.ON)),
+//                        new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKPermissions(FKPermissions.Definition.OFF)),
+//                        new ArrayList<>(Arrays.asList(new FKTeam("red", "§l[§rRouge§l]", "§lR§r ||  ", ChatColor.RED, new Location(Main.world, 52.5, 225, -28.5), 1.5, new FKPermissions(FKPermissions.Definition.DEFAULT)),
+//                                new FKTeam("blue", "§l[§rBleue§l]", "§lB§r ||  ", ChatColor.BLUE, new Location(Main.world, 49.5, 225, -28.5), 1.5, new FKPermissions(FKPermissions.Definition.DEFAULT)))),
+//                        new FKPermissions(FKPermissions.Definition.OFF,
+//                                new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
+//                                new FKPermissions.Item(FKPermissions.Type.PLACESPE, FKPermissions.Definition.ON),
+//                                new FKPermissions.Item(FKPermissions.Type.PVP, FKPermissions.Definition.ON),
+//                                new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.ON)),
+//                        new FKPermissions(FKPermissions.Definition.DEFAULT,
+//                                new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.ON),
+//                                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)),
+//                        new FKPermissions(FKPermissions.Definition.DEFAULT,
+//                                new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.ON),
+//                                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.ON)),
+//                        new FKPermissions(FKPermissions.Definition.DEFAULT,
+//                                new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
+//                                new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)),
+//                        new FKPermissions(FKPermissions.Definition.OFF)
 //                );
 //                man.register();
 //                man.getListener().scheduleTask();

@@ -1,58 +1,91 @@
 package fr.luzog.pl.fkx.utils;
 
+import java.lang.reflect.Field;
+
 public class PlayerStats {
 
-    private int kills, deaths, blocksBroken, blocksPlaced, oresBroken, arrowsShot, arrowsHit, pickedItems, droppedItems,
-            enchantedItems, jumps, chats, inventoriesOpened, clicksOnInventory, interactions, connections;
-    private double damageDealt, damageTaken, traveledDistance, regainedFood;
+    private int kills, deaths, blocks_broken, blocks_placed, ores_broken, arrows_shot, arrows_hit, picked_items,
+            dropped_items, enchanted_items, jumps, chats, inventories_opened, clicks_on_inventory, interactions, connections;
+    private double damage_dealt, damage_taken, traveled_distance, regained_food;
 
     public PlayerStats() {
         this.kills = 0;
         this.deaths = 0;
-        this.blocksBroken = 0;
-        this.blocksPlaced = 0;
-        this.oresBroken = 0;
-        this.arrowsShot = 0;
-        this.arrowsHit = 0;
-        this.pickedItems = 0;
-        this.droppedItems = 0;
-        this.enchantedItems = 0;
+        this.blocks_broken = 0;
+        this.blocks_placed = 0;
+        this.ores_broken = 0;
+        this.arrows_shot = 0;
+        this.arrows_hit = 0;
+        this.picked_items = 0;
+        this.dropped_items = 0;
+        this.enchanted_items = 0;
         this.jumps = 0;
         this.chats = 0;
-        this.inventoriesOpened = 0;
-        this.clicksOnInventory = 0;
+        this.inventories_opened = 0;
+        this.clicks_on_inventory = 0;
         this.interactions = 0;
         this.connections = 0;
-        this.damageDealt = 0;
-        this.damageTaken = 0;
-        this.traveledDistance = 0;
-        this.regainedFood = 0;
+        this.damage_dealt = 0;
+        this.damage_taken = 0;
+        this.traveled_distance = 0;
+        this.regained_food = 0;
     }
 
-    public PlayerStats(int kills, int deaths, int blocksBroken, int blocksPlaced, int oresBroken,
-                       int arrowsShot, int arrowsHit, int pickedItems, int droppedItems, int enchantedItems, int jumps,
-                       int chats, int inventoriesOpened, int clicksOnInventory, int interactions, int connections,
-                       double damageDealt, double damageTaken, double traveledDistance, double regainedFood) {
+    public PlayerStats(int kills, int deaths, int blocks_broken, int blocks_placed, int ores_broken, int arrows_shot,
+                       int arrows_hit, int picked_items, int dropped_items, int enchanted_items, int jumps, int chats,
+                       int inventories_opened, int clicks_on_inventory, int interactions, int connections,
+                       double damage_dealt, double damage_taken, double traveled_distance, double regained_food) {
         this.kills = kills;
         this.deaths = deaths;
-        this.blocksBroken = blocksBroken;
-        this.blocksPlaced = blocksPlaced;
-        this.oresBroken = oresBroken;
-        this.arrowsShot = arrowsShot;
-        this.arrowsHit = arrowsHit;
-        this.pickedItems = pickedItems;
-        this.droppedItems = droppedItems;
-        this.enchantedItems = enchantedItems;
+        this.blocks_broken = blocks_broken;
+        this.blocks_placed = blocks_placed;
+        this.ores_broken = ores_broken;
+        this.arrows_shot = arrows_shot;
+        this.arrows_hit = arrows_hit;
+        this.picked_items = picked_items;
+        this.dropped_items = dropped_items;
+        this.enchanted_items = enchanted_items;
         this.jumps = jumps;
         this.chats = chats;
-        this.inventoriesOpened = inventoriesOpened;
-        this.clicksOnInventory = clicksOnInventory;
+        this.inventories_opened = inventories_opened;
+        this.clicks_on_inventory = clicks_on_inventory;
         this.interactions = interactions;
         this.connections = connections;
-        this.damageDealt = damageDealt;
-        this.damageTaken = damageTaken;
-        this.traveledDistance = traveledDistance;
-        this.regainedFood = regainedFood;
+        this.damage_dealt = damage_dealt;
+        this.damage_taken = damage_taken;
+        this.traveled_distance = traveled_distance;
+        this.regained_food = regained_food;
+    }
+
+    public <T> Object get(String namespace, Class<T> clazz) {
+        return clazz.cast(get(namespace));
+    }
+
+    public Object get(String namespace) {
+        if(namespace == null)
+            return null;
+        for (Field f : this.getClass().getDeclaredFields())
+            if (f.isAccessible() && f.getName().equalsIgnoreCase(namespace.replace(" ", "")
+                    .replace("_", "").replace("-", "").replace(".", "_")))
+                try {
+                    return f.get(this);
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+        return null;
+    }
+
+    public void set(String namespace, Object value) {
+        if(namespace == null)
+            return;
+        for (Field f : this.getClass().getDeclaredFields())
+            if (f.isAccessible() && f.getName().equalsIgnoreCase(namespace.replace(" ", "")
+                    .replace("_", "").replace("-", "").replace(".", "_")))
+                try {
+                    f.set(this, f.getClass().cast(value));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
     }
 
     public int getKills() {
@@ -80,99 +113,99 @@ public class PlayerStats {
     }
 
     public int getBlocksBroken() {
-        return blocksBroken;
+        return blocks_broken;
     }
 
-    public void setBlocksBroken(int blocksBroken) {
-        this.blocksBroken = blocksBroken;
+    public void setBlocksBroken(int blocks_broken) {
+        this.blocks_broken = blocks_broken;
     }
 
     public void increaseBlocksBroken() {
-        this.blocksBroken++;
+        this.blocks_broken++;
     }
 
     public int getBlocksPlaced() {
-        return blocksPlaced;
+        return blocks_placed;
     }
 
-    public void setBlocksPlaced(int blocksPlaced) {
-        this.blocksPlaced = blocksPlaced;
+    public void setBlocksPlaced(int blocks_placed) {
+        this.blocks_placed = blocks_placed;
     }
 
     public void increaseBlocksPlaced() {
-        this.blocksPlaced++;
+        this.blocks_placed++;
     }
 
-    public int getOresBroken() {
-        return oresBroken;
+    public int getOres_broken() {
+        return ores_broken;
     }
 
     public void setOresBroken(int oresBroken) {
-        this.oresBroken = oresBroken;
+        this.ores_broken = oresBroken;
     }
 
     public void increaseOresBroken() {
-        this.oresBroken++;
+        this.ores_broken++;
     }
 
     public int getArrowsShot() {
-        return arrowsShot;
+        return arrows_shot;
     }
 
-    public void setArrowsShot(int arrowsShot) {
-        this.arrowsShot = arrowsShot;
+    public void setArrowsShot(int arrows_shot) {
+        this.arrows_shot = arrows_shot;
     }
 
     public void increaseArrowsShot() {
-        this.arrowsShot++;
+        this.arrows_shot++;
     }
 
     public int getArrowsHit() {
-        return arrowsHit;
+        return arrows_hit;
     }
 
-    public void setArrowsHit(int arrowsHit) {
-        this.arrowsHit = arrowsHit;
+    public void setArrowsHit(int arrows_hit) {
+        this.arrows_hit = arrows_hit;
     }
 
     public void increaseArrowsHit() {
-        this.arrowsHit++;
+        this.arrows_hit++;
     }
 
-    public int getPickedItems() {
-        return pickedItems;
+    public int getPicked_items() {
+        return picked_items;
     }
 
     public void setPickedItems(int pickedItems) {
-        this.pickedItems = pickedItems;
+        this.picked_items = pickedItems;
     }
 
     public void increasePickedItems() {
-        this.pickedItems++;
+        this.picked_items++;
     }
 
     public int getDroppedItems() {
-        return droppedItems;
+        return dropped_items;
     }
 
-    public void setDroppedItems(int droppedItems) {
-        this.droppedItems = droppedItems;
+    public void setDroppedItems(int dropped_items) {
+        this.dropped_items = dropped_items;
     }
 
     public void increaseDroppedItems() {
-        this.droppedItems++;
+        this.dropped_items++;
     }
 
     public int getEnchantedItems() {
-        return enchantedItems;
+        return enchanted_items;
     }
 
-    public void setEnchantedItems(int enchantedItems) {
-        this.enchantedItems = enchantedItems;
+    public void setEnchantedItems(int enchanted_items) {
+        this.enchanted_items = enchanted_items;
     }
 
     public void increaseEnchantedItems() {
-        this.enchantedItems++;
+        this.enchanted_items++;
     }
 
     public int getJumps() {
@@ -199,28 +232,28 @@ public class PlayerStats {
         this.chats++;
     }
 
-    public int getInventoriesOpened() {
-        return inventoriesOpened;
+    public int getInventories_opened() {
+        return inventories_opened;
     }
 
     public void setInventoriesOpened(int inventoriesOpened) {
-        this.inventoriesOpened = inventoriesOpened;
+        this.inventories_opened = inventoriesOpened;
     }
 
     public void increaseInventoriesOpened() {
-        this.inventoriesOpened++;
+        this.inventories_opened++;
     }
 
     public int getClicksOnInventory() {
-        return clicksOnInventory;
+        return clicks_on_inventory;
     }
 
-    public void setClicksOnInventory(int clicksOnInventory) {
-        this.clicksOnInventory = clicksOnInventory;
+    public void setClicksOnInventory(int clicks_on_inventory) {
+        this.clicks_on_inventory = clicks_on_inventory;
     }
 
     public void increaseClicksOnInventory() {
-        this.clicksOnInventory++;
+        this.clicks_on_inventory++;
     }
 
     public int getInteractions() {
@@ -248,51 +281,51 @@ public class PlayerStats {
     }
 
     public double getDamageDealt() {
-        return damageDealt;
+        return damage_dealt;
     }
 
-    public void setDamageDealt(double damageDealt) {
-        this.damageDealt = damageDealt;
+    public void setDamageDealt(double damage_dealt) {
+        this.damage_dealt = damage_dealt;
     }
 
     public void increaseDamageDealt(double damageDealt) {
-        this.damageDealt += damageDealt;
+        this.damage_dealt += damageDealt;
     }
 
     public double getDamageTaken() {
-        return damageTaken;
+        return damage_taken;
     }
 
-    public void setDamageTaken(double damageTaken) {
-        this.damageTaken = damageTaken;
+    public void setDamageTaken(double damage_taken) {
+        this.damage_taken = damage_taken;
     }
 
     public void increaseDamageTaken(double damageTaken) {
-        this.damageTaken += damageTaken;
+        this.damage_taken += damageTaken;
     }
 
-    public double getTraveledDistance() {
-        return traveledDistance;
+    public double getTraveled_distance() {
+        return traveled_distance;
     }
 
     public void setTraveledDistance(double traveledDistance) {
-        this.traveledDistance = traveledDistance;
+        this.traveled_distance = traveledDistance;
     }
 
     public void increaseTraveledDistance(double traveledDistance) {
-        this.traveledDistance += traveledDistance;
+        this.traveled_distance += traveledDistance;
     }
 
-    public double getRegainedFood() {
-        return regainedFood;
+    public double getRegained_food() {
+        return regained_food;
     }
 
     public void setRegainedFood(double regainedFood) {
-        this.regainedFood = regainedFood;
+        this.regained_food = regainedFood;
     }
 
     public void increaseRegainedFood(double regainedFood) {
-        this.regainedFood += regainedFood;
+        this.regained_food += regainedFood;
     }
 
 }

@@ -32,33 +32,33 @@ public class FKManager {
     public static ArrayList<FKManager> registered = new ArrayList<>();
     public static String currentGameId = null;
 
-    public static void initFromConfig() {
-        for (File f : Main.instance.getDataFolder().listFiles())
+    public static void initFromConfig(boolean printStackTrace) {
+        for (File f : Objects.requireNonNull(Main.instance.getDataFolder().listFiles()))
             if (f.isDirectory() && f.getName().startsWith("game-")) {
                 Config.Manager config = new Config.Manager(String.format(CONFIG_FILE, f.getName())).load();
                 FKManager manager = new FKManager(f.getName().replaceFirst("game-", ""));
-                Utils.tryTo(() -> manager.setState(Objects.requireNonNull(config.getState())));
-                Utils.tryTo(() -> manager.setDay(config.getDay()));
-                Utils.tryTo(() -> manager.setWeather(Objects.requireNonNull(config.getCurrentWeather()), null));
-                Utils.tryTo(() -> manager.setLinkedToSun(config.isLinkedToSun()));
-                Utils.tryTo(() -> manager.setTime(config.getTime()));
-                Utils.tryTo(() -> {
+                Utils.tryTo(printStackTrace, () -> manager.setState(Objects.requireNonNull(config.getState())));
+                Utils.tryTo(printStackTrace, () -> manager.setDay(config.getDay()));
+                Utils.tryTo(printStackTrace, () -> manager.setWeather(Objects.requireNonNull(config.getCurrentWeather()), null));
+                Utils.tryTo(printStackTrace, () -> manager.setLinkedToSun(config.isLinkedToSun()));
+                Utils.tryTo(printStackTrace, () -> manager.setTime(config.getTime()));
+                Utils.tryTo(printStackTrace, () -> {
                     for (String o : config.getOptions())
                         if (o != null) {
                             FKOptions.FKOption option = new FKOptions.FKOption(config.getOptionName(o), config.getOptionActivation(o), config.isOptionActivated(o));
                             if (o.equalsIgnoreCase("pvp"))
-                                Utils.tryTo(() -> manager.getOptions().setPvp(option));
+                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setPvp(option));
                             else if (o.equalsIgnoreCase("nether"))
-                                Utils.tryTo(() -> manager.getOptions().setNether(option));
+                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setNether(option));
                             else if (o.equalsIgnoreCase("assaults"))
-                                Utils.tryTo(() -> manager.getOptions().setAssaults(option));
+                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setAssaults(option));
                             else if (o.equalsIgnoreCase("end"))
-                                Utils.tryTo(() -> manager.getOptions().setEnd(option));
+                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setEnd(option));
                         }
                 });
-                Utils.tryTo(() -> manager.getListener().setScoreName(Objects.requireNonNull(config.getListenerName())));
-                Utils.tryTo(() -> manager.getListener().setSavingTimeOut(config.getListenerSavingTimeout()));
-                Utils.tryTo(() -> {
+                Utils.tryTo(printStackTrace, () -> manager.getListener().setScoreName(Objects.requireNonNull(config.getListenerName())));
+                Utils.tryTo(printStackTrace, () -> manager.getListener().setSavingTimeOut(config.getListenerSavingTimeout()));
+                Utils.tryTo(printStackTrace, () -> {
                     for (String p : config.getPortals())
                         if (p != null) {
                             Portal portal = new Portal(config.getPortalName(p),
@@ -87,15 +87,76 @@ public class FKManager {
 
                             if (p.equalsIgnoreCase("nether")) {
                                 manager.setNether(portal);
-                            }else if (p.equalsIgnoreCase("end"))
+                            } else if (p.equalsIgnoreCase("end"))
                                 manager.setEnd(portal);
                         }
                 });
-                Utils.tryTo(() -> manager.setGlobal(Objects.requireNonNull(config.getGlobalPermissions())));
-                Utils.tryTo(() -> manager.setNeutral(Objects.requireNonNull(config.getNeutralPermissions())));
-                Utils.tryTo(() -> manager.setFriendly(Objects.requireNonNull(config.getFriendlyPermissions())));
-                Utils.tryTo(() -> manager.setHostile(Objects.requireNonNull(config.getHostilePermissions())));
-                Utils.tryTo(() -> manager.setPriority(Objects.requireNonNull(config.getPriorityPermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setGlobal(Objects.requireNonNull(config.getGlobalPermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setNeutral(Objects.requireNonNull(config.getNeutralPermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setFriendly(Objects.requireNonNull(config.getFriendlyPermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setHostile(Objects.requireNonNull(config.getHostilePermissions())));
+                Utils.tryTo(printStackTrace, () -> manager.setPriority(Objects.requireNonNull(config.getPriorityPermissions())));
+
+
+                for (File ff : Objects.requireNonNull(f.listFiles()))
+                    if (ff.isDirectory())
+                        if (ff.getName().equalsIgnoreCase("zones")) {
+                            for (File fff : Objects.requireNonNull(ff.listFiles()))
+                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
+                                    Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
+                                    FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null, null, null, null, null);
+
+                                    Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType())));
+                                    Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn())));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1())));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2())));
+                                    Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions())));
+
+                                    if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE))
+                                        manager.setLobby(zone);
+                                    else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
+                                        manager.setSpawn(zone);
+                                    else
+                                        manager.getZones().add(zone);
+                                }
+                        } else if (ff.getName().equalsIgnoreCase("teams")) {
+                            for (File fff : Objects.requireNonNull(ff.listFiles()))
+                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
+                                    Config.Team tc = new Config.Team(String.format("%s/teams/%s", f.getName(), fff.getName())).load();
+                                    FKTeam team = new FKTeam(fff.getName().substring(0, fff.getName().length() - 4));
+
+                                    Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName())));
+                                    Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor())));
+                                    Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix())));
+                                    Utils.tryTo(printStackTrace, () -> team.setRadius(Objects.requireNonNull(tc.getRadius())));
+                                    Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn())));
+                                    Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions())));
+
+                                    if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
+                                        manager.setGods(team);
+                                    else if (fff.getName().equalsIgnoreCase(FKTeam.SPECS_FILE))
+                                        manager.setSpecs(team);
+                                    else
+                                        manager.addTeam(team);
+                                }
+                        } else if (ff.getName().equalsIgnoreCase("players")) {
+                            for (File fff : Objects.requireNonNull(ff.listFiles()))
+                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml"))
+                                    try {
+                                        Config.Player pc = new Config.Player(String.format("%s/players/%s", f.getName(), fff.getName())).load();
+                                        FKPlayer player = new FKPlayer(fff.getName().toLowerCase().startsWith("null") ? null
+                                                : UUID.fromString(fff.getName().substring(0, fff.getName().length() - 4)), null, null, null);
+
+                                        Utils.tryTo(printStackTrace, () -> player.setName(Objects.requireNonNull(pc.getName())));
+                                        Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam())));
+                                        Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats())));
+                                        Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions())));
+
+                                        if (player.getUuid() != null || player.getName() != null)
+                                            manager.getPlayers().add(player);
+                                    } catch (IllegalArgumentException ignored) {
+                                    }
+                        }
 
                 manager.register();
                 manager.getListener().scheduleTask();
@@ -167,6 +228,19 @@ public class FKManager {
                 .setPriorityPermissions(priority, !soft)
 
                 .save();
+
+        lobby.saveToConfig(id, soft);
+        spawn.saveToConfig(id, soft);
+        for (FKZone z : zones)
+            z.saveToConfig(id, soft);
+
+        gods.saveToConfig(id, soft);
+        specs.saveToConfig(id, soft);
+        for (FKTeam t : teams)
+            t.saveToConfig(id, soft);
+
+        for (FKPlayer p : players)
+            p.saveToConfig(id, soft);
     }
 
     private String id;

@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
 
@@ -7,7 +8,21 @@ public class FKZone {
 
     public static enum Type {NEUTRAL, FRIENDLY, HOSTILE, LOBBY, SPAWN, ZONE}
 
-    public static final String LOBBY_ID = "lobby", SPAWN_ID = "spawn";
+    public static final String LOBBY_ID = "lobby", LOBBY_FILE = "Lobby.yml",
+            SPAWN_ID = "spawn", SPAWN_FILE = "Spawn.yml";
+
+    public void saveToConfig(String gameId, boolean soft) {
+        new Config.Zone("game-" + gameId + "/zones/" + (id.equalsIgnoreCase(LOBBY_ID) ? LOBBY_FILE : id.equalsIgnoreCase(SPAWN_ID) ? SPAWN_FILE : id + ".yml"))
+                .load()
+
+                .setType(type == null ? null : type.name(), !soft)
+                .setSpawn(spawn, !soft)
+                .setPos1(pos1, !soft)
+                .setPos2(pos2, !soft)
+                .setPermissions(permissions, !soft)
+
+                .save();
+    }
 
     private String id;
     private Type type;

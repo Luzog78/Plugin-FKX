@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -13,7 +14,22 @@ import java.util.UUID;
 
 public class FKTeam {
 
-    public static final String GODS_ID = "gods", SPECS_ID = "specs";
+    public static final String GODS_ID = "gods", GODS_FILE = "Gods.yml",
+            SPECS_ID = "specs", SPECS_FILE = "Specs.yml";
+
+    public void saveToConfig(String gameId, boolean soft) {
+        new Config.Team("game-" + gameId + "/teams/" + (id.equalsIgnoreCase(GODS_ID) ? GODS_FILE : id.equalsIgnoreCase(SPECS_ID) ? SPECS_FILE : id + ".yml"))
+                .load()
+
+                .setName(name, !soft)
+                .setPrefix(prefix, !soft)
+                .setColor(color.name(), !soft)
+                .setRadius(radius, !soft)
+                .setSpawn(spawn, !soft)
+                .setPermissions(permissions, !soft)
+
+                .save();
+    }
 
     private String id, name, prefix;
     private ChatColor color;

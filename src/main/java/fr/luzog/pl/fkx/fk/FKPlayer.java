@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
+import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -10,6 +11,18 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 public class FKPlayer {
+
+    public void saveToConfig(String gameId, boolean soft) {
+        new Config.Player("game-" + gameId + "/players/" + (uuid == null ? "null-" + UUID.randomUUID().toString().substring(0, 8) + ".yml" : uuid + ".yml"))
+                .load()
+
+                .setName(name, !soft)
+                .setTeam(teamId, !soft)
+                .setStats(stats, !soft)
+                .setPermissions(personalPermissions, !soft)
+
+                .save();
+    }
 
     private UUID uuid;
     private String name;
@@ -133,10 +146,6 @@ public class FKPlayer {
         return uuid;
     }
 
-    /**
-     * @deprecated You may not use this method.
-     */
-    @Deprecated
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }

@@ -3,18 +3,15 @@ package fr.luzog.pl.fkx.utils;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPermissions;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import fr.luzog.pl.fkx.fk.FKZone;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.security.Permissions;
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.*;
 
@@ -417,6 +414,203 @@ public class Config {
         }
     }
 
+    public static class Zone extends Config {
+        public static final String TYPE = "type", SPAWN = "locations.spawn", POS1 = "locations.pos1",
+                POS2 = "locations.pos2", PERMISSIONS = "permissions";
+
+        public Zone(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public Zone load() {
+            super.load();
+            return this;
+        }
+
+        @Override
+        public Zone save() {
+            super.save();
+            return this;
+        }
+
+        public FKZone.Type getType() {
+            return super.match(TYPE, FKZone.Type.values());
+        }
+
+        public Zone setType(String type, boolean force) {
+            super.set(TYPE, type, force);
+            return this;
+        }
+
+        public Location getSpawn() {
+            return super.getLoc(SPAWN);
+        }
+
+        public Zone setSpawn(Location spawn, boolean force) {
+            super.setLoc(SPAWN, spawn, force);
+            return this;
+        }
+
+        public Location getPos1() {
+            return super.getLoc(POS1);
+        }
+
+        public Zone setPos1(Location pos1, boolean force) {
+            super.setLoc(POS1, pos1, force);
+            return this;
+        }
+
+        public Location getPos2() {
+            return super.getLoc(POS2);
+        }
+
+        public Zone setPos2(Location pos2, boolean force) {
+            super.setLoc(POS2, pos2, force);
+            return this;
+        }
+
+        public FKPermissions getPermissions() {
+            return super.getPermissions(PERMISSIONS);
+        }
+
+        public Zone setPermissions(FKPermissions perm, boolean force) {
+            super.setPermissions(PERMISSIONS, perm, force);
+            return this;
+        }
+    }
+
+    public static class Team extends Config {
+        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", RADIUS = "radius",
+                SPAWN = "spawn", PERMISSIONS = "permissions";
+
+        public Team(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public Team load() {
+            super.load();
+            return this;
+        }
+
+        @Override
+        public Team save() {
+            super.save();
+            return this;
+        }
+
+        public String getName() {
+            return super.getStr(NAME);
+        }
+
+        public Team setName(String name, boolean force) {
+            super.set(NAME, name, force);
+            return this;
+        }
+
+        public String getPrefix() {
+            return super.getStr(PREFIX);
+        }
+
+        public Team setPrefix(String prefix, boolean force) {
+            super.set(PREFIX, prefix, force);
+            return this;
+        }
+
+        public ChatColor getColor() {
+            return super.match(COLOR, ChatColor.values());
+        }
+
+        public Team setColor(String color, boolean force) {
+            super.set(COLOR, color, force);
+            return this;
+        }
+
+        public double getRadius() {
+            return super.getDouble(RADIUS);
+        }
+
+        public Team setRadius(double radius, boolean force) {
+            super.set(RADIUS, radius, force);
+            return this;
+        }
+
+        public Location getSpawn() {
+            return super.getLoc(SPAWN);
+        }
+
+        public Team setSpawn(Location spawn, boolean force) {
+            super.setLoc(SPAWN, spawn, force);
+            return this;
+        }
+
+        public FKPermissions getPermissions() {
+            return super.getPermissions(PERMISSIONS);
+        }
+
+        public Team setPermissions(FKPermissions perm, boolean force) {
+            super.setPermissions(PERMISSIONS, perm, force);
+            return this;
+        }
+    }
+
+    public static class Player extends Config {
+        public static final String NAME = "name", TEAM = "team", STATS = "stats", PERMISSIONS = "permissions";
+
+        public Player(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public Player load() {
+            super.load();
+            return this;
+        }
+
+        @Override
+        public Player save() {
+            super.save();
+            return this;
+        }
+
+        public String getName() {
+            return super.getStr(NAME);
+        }
+
+        public Player setName(String name, boolean force) {
+            super.set(NAME, name, force);
+            return this;
+        }
+
+        public String getTeam() {
+            return super.getStr(TEAM);
+        }
+
+        public Player setTeam(String team, boolean force) {
+            super.set(TEAM, team, force);
+            return this;
+        }
+
+        public PlayerStats getStats() {
+            return super.getStats(STATS);
+        }
+
+        public Player setStats(PlayerStats stats, boolean force) {
+            super.setStats(STATS, stats, force);
+            return this;
+        }
+
+        public FKPermissions getPermissions() {
+            return super.getPermissions(PERMISSIONS);
+        }
+
+        public Player setPermissions(FKPermissions perm, boolean force) {
+            super.setPermissions(PERMISSIONS, perm, force);
+            return this;
+        }
+    }
+
     public static final String LAST_SAVE = "last-save";
 
     private File file;
@@ -664,7 +858,7 @@ public class Config {
                     .set(path + ".z", loc.getZ(), force)
                     .set(path + ".yw", loc.getYaw(), force)
                     .set(path + ".pi", loc.getPitch(), force)
-                    .set(path + ".w", loc.getWorld().getName(), force);
+                    .set(path + ".w", loc.getWorld() == null ? null : loc.getWorld().getName(), force);
         return this;
     }
 
@@ -722,6 +916,24 @@ public class Config {
             perms.getPermissions().forEach((type, def) ->
                     set(path + "." + type.name().toLowerCase().replace("_", "-"),
                             def == FKPermissions.Definition.ON ? true : def == FKPermissions.Definition.OFF ? false : def.name().toLowerCase(), force));
+        return this;
+    }
+
+    public PlayerStats getStats(String path) {
+        if (config.get(path) == null || getKeys(path, false).isEmpty())
+            return null;
+        PlayerStats stats = new PlayerStats();
+        for (String s : getKeys(path, false))
+            stats.set(s, config.get(path + "." + s));
+        return stats;
+    }
+
+    public Config setStats(String path, PlayerStats stats, boolean force) {
+        if (stats == null)
+            set(path, new HashMap<>(), force);
+        else
+            for (Field f : stats.getClass().getDeclaredFields())
+                set(path + "." + f.getName().toLowerCase().replace("_", "-"), stats.get(f.getName()), force);
         return this;
     }
 
