@@ -14,7 +14,7 @@ public class Broadcast {
      * <strong>Normal BroadCast</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> WHITE
-     * <br><strong>&nbsp; - Base Color :</strong> BOLD
+     * <br><strong>&nbsp; - Strong Color :</strong> BOLD
      * <br><strong>&nbsp; - Line Style :</strong> ###
      */
     public static void mess(String mess) {
@@ -25,7 +25,7 @@ public class Broadcast {
      * <strong>System Success (SYS_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GREEN
-     * <br><strong>&nbsp; - Base Color :</strong> RED
+     * <br><strong>&nbsp; - Strong Color :</strong> RED
      * <br><strong>&nbsp; - Line Style :</strong> ###
      */
     public static void sys_succ(String mess) {
@@ -36,7 +36,7 @@ public class Broadcast {
      * <strong>System Error (SYS_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> RED
-     * <br><strong>&nbsp; - Base Color :</strong> DARK_RED
+     * <br><strong>&nbsp; - Strong Color :</strong> DARK_RED
      * <br><strong>&nbsp; - Line Style :</strong> ###
      */
     public static void sys_err(String mess) {
@@ -47,7 +47,7 @@ public class Broadcast {
      * <strong>Success (FK_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GREEN
-     * <br><strong>&nbsp; - Base Color :</strong> RED
+     * <br><strong>&nbsp; - Strong Color :</strong> RED
      * <br><strong>&nbsp; - Line Style :</strong> ###
      */
     public static void succ(String mess) {
@@ -58,7 +58,7 @@ public class Broadcast {
      * <strong>Error (FK_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> RED
-     * <br><strong>&nbsp; - Base Color :</strong> DARK_RED
+     * <br><strong>&nbsp; - Strong Color :</strong> DARK_RED
      * <br><strong>&nbsp; - Line Style :</strong> ###
      */
     public static void err(String mess) {
@@ -69,7 +69,7 @@ public class Broadcast {
      * <strong>FK Logement (FK_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GOLD
-     * <br><strong>&nbsp; - Base Color :</strong> RED
+     * <br><strong>&nbsp; - Strong Color :</strong> RED
      * <br><strong>&nbsp; - Line Color :</strong> ###
      */
     public static void log(String mess) {
@@ -80,7 +80,7 @@ public class Broadcast {
      * <strong>Infos BroadCast (WITH LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> DARK_PURPLE
-     * <br><strong>&nbsp; - Base Color :</strong> LIGHT_PURPLE
+     * <br><strong>&nbsp; - Strong Color :</strong> LIGHT_PURPLE
      * <br><strong>&nbsp; - Line Color :</strong> RED
      */
     public static void info(String mess) {
@@ -91,7 +91,7 @@ public class Broadcast {
      * <strong>Events BroadCast (WITH LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> BLUE
-     * <br><strong>&nbsp; - Base Color :</strong> DARK_BLUE
+     * <br><strong>&nbsp; - Strong Color :</strong> DARK_BLUE
      * <br><strong>&nbsp; - Line Color :</strong> DARK_PURPLE
      */
     public static void event(String mess) {
@@ -102,7 +102,7 @@ public class Broadcast {
      * <strong>Announcements BroadCast (WITH LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GREEN
-     * <br><strong>&nbsp; - Base Color :</strong> RED
+     * <br><strong>&nbsp; - Strong Color :</strong> RED
      * <br><strong>&nbsp; - Line Color :</strong> DARK_GREEN
      */
     public static void announcement(String mess) {
@@ -113,7 +113,7 @@ public class Broadcast {
      * <strong>Warns BroadCast (WITH LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> RED
-     * <br><strong>&nbsp; - Base Color :</strong> DARK_RED
+     * <br><strong>&nbsp; - Strong Color :</strong> DARK_RED
      * <br><strong>&nbsp; - Line Color :</strong> GOLD
      */
     public static void warn(String mess) {
@@ -125,7 +125,7 @@ public class Broadcast {
      * <strong>Complete Custom BroadCast (WITH OR WITHOUT LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> Custom
-     * <br><strong>&nbsp; - Base Color :</strong> Custom
+     * <br><strong>&nbsp; - Strong Color :</strong> Custom
      * <br><strong>&nbsp; - Line Color :</strong> Custom
      */
     public static void custom(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {
@@ -136,7 +136,7 @@ public class Broadcast {
      * <strong>Raw Custom BroadCast (WITH OR WITHOUT LINES)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> Custom
-     * <br><strong>&nbsp; - Base Color :</strong> Custom
+     * <br><strong>&nbsp; - Strong Color :</strong> Custom
      * <br><strong>&nbsp; - Line Color :</strong> Custom
      */
     public static String bd(String mess, ChatColor base, ChatColor bold, @Nullable ChatColor lines) {

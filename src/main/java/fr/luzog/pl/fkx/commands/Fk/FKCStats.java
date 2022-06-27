@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.PlayerStats;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -168,14 +169,14 @@ public class FKCStats {
         return new ArrayList<String>() {{
             if (args.length == 2) {
                 add("help");
-                addAll(FKManager.getGlobalPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
-            } else if (args.length == 3 && FKManager.getGlobalPlayer(args[1]) != null) {
+                addAll(Utils.getAllPlayers());
+            } else if (args.length == 3 && FKManager.getCurrentGame().getPlayer(args[1], false) != null) {
                 add("get");
                 add("set");
                 add("increase");
                 add("decrease");
                 add("reset");
-            } else if (args.length == 4 && FKManager.getGlobalPlayer(args[1]) != null) {
+            } else if (args.length == 4 && FKManager.getCurrentGame().getPlayer(args[1], false) != null) {
                 add("all");
                 for (Field field : PlayerStats.class.getDeclaredFields())
                     add(field.getName());

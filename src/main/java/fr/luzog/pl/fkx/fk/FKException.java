@@ -8,6 +8,12 @@ public class FKException extends RuntimeException {
         super("[FKX Exception] " + message);
     }
 
+    public static class IllegalGameIdException extends FKException {
+        public IllegalGameIdException(String id) {
+            super("Cannot create game with id: '" + id + "'");
+        }
+    }
+
     public static class TeamException extends FKException {
         public TeamException(String message) {
             super("[Team] " + message);

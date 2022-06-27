@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.utils;
 
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPlayer;
 import javafx.util.Pair;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
@@ -26,8 +28,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class Utils {
 
@@ -514,5 +518,29 @@ public class Utils {
             }
             return false;
         }
+    }
+
+
+    /**
+     * This function returns an ArrayList of all the players in the current game and in the server.
+     *
+     * @return An {@link ArrayList} of {@link String}s
+     */
+    public static ArrayList<String> getAllPlayers() {
+        return getAllPlayers(FKManager.getCurrentGame());
+    }
+
+    /**
+     * It gets all the players in the game and in the server, and returns them as an ArrayList
+     *
+     * @param manager The {@link FKManager} object that you want to get the players from.
+     * @return A list of all players in the game.
+     */
+    public static ArrayList<String> getAllPlayers(FKManager manager) {
+        HashSet<String> players = new HashSet<>();
+        if (manager != null && manager.getPlayers() != null)
+            players.addAll(manager.getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
+        players.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+        return new ArrayList<>(players);
     }
 }

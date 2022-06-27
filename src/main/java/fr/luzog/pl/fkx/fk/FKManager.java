@@ -312,7 +312,7 @@ public class FKManager {
                     new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                     new FKPermissions(FKPermissions.Definition.ON)));
         }}, false);
-        setPlayers(new ArrayList<FKPlayer>(), false);
+        setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
         setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);

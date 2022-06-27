@@ -143,7 +143,7 @@ public class CmdUtils {
     }
 
     public Player getPlayer() {
-        return (Player) sender;
+        return sender instanceof Player ? (Player) sender : null;
     }
 
     public CommandSender getSender() {

@@ -17,9 +17,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Rename implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/rename (name <name...> | lore <line>;...)";
-    public static final String complete_syntaxe = "Syntaxe: /rename name <name...> ou /rename lore <lore...>\n > Avec un objet dans la main.\n"
-            + " > Avec ';' pour séparer les lignes.\n > Avec '&' pour la couleur (&bTEST >> §bTEST§r).";
+    public static final String syntaxe = "/rename (reset | name <name...> | lore <line>;...)";
+    public static final String complete_syntaxe = "Syntaxe: /rename reset ou /rename name <name...> ou /rename lore <lore...>\n"
+            + " > Avec un objet dans la main.\n"
+            + " > Avec ';' pour séparer les lignes.\n"
+            + " > Avec '&' pour la couleur (&bTEST >> §bTEST§r).";
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
@@ -28,30 +30,39 @@ public class Rename implements CommandExecutor, TabCompleter {
         if (args.length >= 1 && (args[0].equals("?") || args[0].equalsIgnoreCase("help")))
             u.err(complete_syntaxe);
         else if (sender instanceof Player)
-            if (args.length >= 2)
-                if (args[0].equalsIgnoreCase("name")) {
+            try {
+                if (args.length >= 1 && args[0].equalsIgnoreCase("reset")) {
                     ItemStack is = u.getPlayer().getItemInHand();
                     ItemMeta meta = is.getItemMeta();
-                    meta.setDisplayName(String.join(" ", Arrays.copyOfRange(args, 1, args.length))
-                            .replace(";", "\n").replace("&", "§")
-                            .replace("§§", "&").replace("§r", "§f§o"));
+                    meta.setDisplayName(null);
+                    meta.setLore(null);
                     is.setItemMeta(meta);
                     u.getPlayer().setItemInHand(is);
-                } else if (args[0].equalsIgnoreCase("lore")) {
-                    ItemStack is = u.getPlayer().getItemInHand();
-                    ItemMeta meta = is.getItemMeta();
-                    List<String> lore = Arrays.stream(String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(";"))
-                            .collect(Collectors.toList());
-                    for(int i = 0; i < lore.size(); i++)
-                        lore.set(i, lore.get(i).replace("&", "§").replace("§§", "&")
-                                .replace("§r", "§5§o"));
-                    meta.setLore(lore);
-                    is.setItemMeta(meta);
-                    u.getPlayer().setItemInHand(is);
-                } else
+                } else if (args.length >= 2)
+                    if (args[0].equalsIgnoreCase("name")) {
+                        ItemStack is = u.getPlayer().getItemInHand();
+                        ItemMeta meta = is.getItemMeta();
+                        meta.setDisplayName(String.join(" ", Arrays.copyOfRange(args, 1, args.length))
+                                .replace(";", "\n").replace("&", "§")
+                                .replace("§§", "&").replace("§r", "§f§o"));
+                        is.setItemMeta(meta);
+                        u.getPlayer().setItemInHand(is);
+                    } else if (args[0].equalsIgnoreCase("lore")) {
+                        ItemStack is = u.getPlayer().getItemInHand();
+                        ItemMeta meta = is.getItemMeta();
+                        List<String> lore = Arrays.stream(String.join(" ", Arrays.copyOfRange(args, 1, args.length)).split(";"))
+                                .collect(Collectors.toList());
+                        lore.replaceAll(s -> s.replace("&", "§").replace("§§", "&").replace("§r", "§5§o"));
+                        meta.setLore(lore);
+                        is.setItemMeta(meta);
+                        u.getPlayer().setItemInHand(is);
+                    } else
+                        u.synt();
+                else
                     u.synt();
-            else
-                u.synt();
+            } catch (Exception e) {
+                u.err("Aucun item dans la main (ou item incorrecte).");
+            }
         else
             u.err(CmdUtils.err_not_player);
 
@@ -63,7 +74,7 @@ public class Rename implements CommandExecutor, TabCompleter {
         ArrayList<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
-            if(args.length == 1){
+            if (args.length == 1) {
                 add("name");
                 add("lore");
             }

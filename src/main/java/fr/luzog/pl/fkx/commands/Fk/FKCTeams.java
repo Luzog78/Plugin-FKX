@@ -5,15 +5,15 @@ import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FKCTeams {
     public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | delete <id> | <id> ...]",
@@ -49,7 +49,7 @@ public class FKCTeams {
                 FKTeam team = new FKTeam(args[2]);
                 FKManager.getCurrentGame().addTeam(team);
                 u.succ("Team §f" + team.getColor() + team.getName() + "§r créée dans §6" + FKManager.getCurrentGame().getId() + "§r.");
-                if(args.length > 3)
+                if (args.length > 3)
                     handleOptions(u, team, args, 3);
             }
         } else if (args[1].equalsIgnoreCase("delete")) {
@@ -270,7 +270,92 @@ public class FKCTeams {
             u.err(" - " + CmdUtils.err_unknown);
     }
 
+    public static ArrayList<String> completeOptions(CommandSender sender, String[] args) {
+        try {
+            if (args[args.length - 2].equalsIgnoreCase("-c"))
+                return Arrays.stream(ChatColor.values()).map(ChatColor::name).collect(Collectors.toCollection(ArrayList::new));
+            else if (args[args.length - 2].equalsIgnoreCase("-r"))
+                return new ArrayList<>(Arrays.asList("5.0", "8.0", "10.0", "12.0", "15.0", "20.0", "25.0"));
+            else if (args[args.length - 2].equalsIgnoreCase("-s") && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockX() + ""));
+            } else if (args[args.length - 3].equalsIgnoreCase("-s") && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockY() + ""));
+            } else if (args[args.length - 4].equalsIgnoreCase("-s") && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockZ() + ""));
+            } else if (args[args.length - 5].equalsIgnoreCase("-s")) {
+                ArrayList<String> list = new ArrayList<>();
+                if (sender instanceof Player) {
+                    Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                    Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                    list.add(loc.getYaw() + "");
+                }
+                list.addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
+                return list;
+            } else if (args[args.length - 6].equalsIgnoreCase("-s") && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getPitch() + ""));
+            } else if (args[args.length - 7].equalsIgnoreCase("-s")) {
+                return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toCollection(ArrayList::new));
+            } else if (args[args.length - 1].startsWith("-") || !args[args.length - 2].startsWith("-"))
+                return new ArrayList<>(Arrays.asList("-d", "-p", "-c", "-r", "-s"));
+            else
+                return new ArrayList<>();
+        } catch (IndexOutOfBoundsException e) {
+            if (args[args.length - 1].startsWith("-") || !args[args.length - 2].startsWith("-"))
+                return new ArrayList<>(Arrays.asList("-d", "-p", "-c", "-r", "-s"));
+            else
+                return new ArrayList<>();
+        }
+    }
+
+//    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | delete <id> | <id> ...]",
+//            syntaxe_create = "/fk teams create <id> [<options>]",
+//            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | options ...]",
+//            syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
+//            syntaxe_opts = "Options:\n  > -d <displayName>\n  > -p <prefix>\n  > -c <color>\n  > -r <radius>\n  > -s <x> <y> <z> [<yw> <pi>] [<world>]";
+
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
-        return null;
+        return new ArrayList<String>() {{
+            if (args.length == 2) {
+                add("help");
+                add("list");
+                add("create");
+                add("delete");
+                addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
+            } else {
+                if (args[1].equalsIgnoreCase("create")) {
+                    if (args.length >= 4)
+                        addAll(completeOptions(sender, args));
+                } else if (args[1].equalsIgnoreCase("delete")) {
+                    if (args.length == 3)
+                        addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
+                } else if (FKManager.getCurrentGame().getTeam(args[1]) != null) {
+                    if (args.length == 3) {
+                        add("help");
+                        add("info");
+                        add("list");
+                        add("add");
+                        add("remove");
+                        add("options");
+                    } else if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
+                        if (args.length == 4)
+                            addAll(Utils.getAllPlayers());
+                    } else if (args[2].equalsIgnoreCase("options")) {
+                        if (args.length == 4) {
+                            add("help");
+                            add("list");
+                        }
+                        addAll(completeOptions(sender, args));
+                    }
+                }
+            }
+        }};
     }
 }

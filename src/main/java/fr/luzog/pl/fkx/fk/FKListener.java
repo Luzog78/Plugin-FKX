@@ -209,7 +209,8 @@ public class FKListener {
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
         DecimalFormat df = new DecimalFormat("0.0");
-        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId(), false) == null ? no_team
+        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId(), false) == null
+                || manager.getPlayer(p.getUniqueId(), false).getTeam() == null ? no_team
                 : manager.getPlayer(p.getUniqueId(), false).getTeam().getName() + "§7 - §6"
                 + (!p.getWorld().getUID().equals(manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getWorld().getUID()) ?
                 "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
@@ -220,7 +221,8 @@ public class FKListener {
         f.add("§8§l§nAutres équipes :§r");
         f.add(" ");
         manager.getParticipantsTeams().forEach(t -> {
-            if (manager.getPlayer(p.getUniqueId(), false) == null || !manager.getPlayer(p.getUniqueId(), false).getTeam().equals(t))
+            if (manager.getPlayer(p.getUniqueId(), false) == null || manager.getPlayer(p.getUniqueId(), false).getTeam() == null
+                    || !manager.getPlayer(p.getUniqueId(), false).getTeam().equals(t))
                 f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
                         "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
                         : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),

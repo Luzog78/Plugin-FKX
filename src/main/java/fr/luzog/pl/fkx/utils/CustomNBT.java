@@ -1,8 +1,11 @@
 package fr.luzog.pl.fkx.utils;
 
+import net.minecraft.server.v1_8_R3.NBTBase;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Map;
 
 public class CustomNBT {
     private ItemStack is;
@@ -13,6 +16,10 @@ public class CustomNBT {
         this.is = is;
         this.cis = is == null ? null : CraftItemStack.asNMSCopy(is);
         this.nbt = this.cis == null || !this.cis.hasTag() ? new NBTTagCompound() : this.cis.getTag();
+    }
+
+    public NBTBase get(String key) {
+        return this.nbt.get(key);
     }
 
     public boolean hasKey(String key) {
@@ -87,6 +94,8 @@ public class CustomNBT {
             nbt.setByteArray(key, (byte[]) value);
         } else if (Boolean.class.equals(aClass) || boolean.class.equals(aClass)) {
             nbt.setBoolean(key, (Boolean) value);
+        } else {
+            nbt.set(key, (NBTBase) value);
         }
         return this;
     }

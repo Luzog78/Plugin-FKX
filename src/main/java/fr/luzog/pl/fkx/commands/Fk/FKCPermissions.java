@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.CmdUtils;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -158,9 +159,6 @@ public class FKCPermissions {
         return false;
     }
 
-    //    public static final String syntaxe = "/fk perm [help | list | team | zone | player | global | neutral | friendly | hostile | priority] [<args...>]",
-//            syntaxe_tzp = "/fk perm (team | zone | player) <teamId/zoneId/playerId> [<permission> [<value>]]",
-//            syntaxe_gnfhp = "/fk perm (global | neutral | friendly | hostile | priority) [<permission> [<value>]]";
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
         return new ArrayList<String>() {{
             if (args.length == 2) {
@@ -192,7 +190,7 @@ public class FKCPermissions {
                         addAll(Arrays.stream(FKPermissions.Definition.values()).map(FKPermissions.Definition::name).collect(Collectors.toList()));
                 } else if (args[1].equalsIgnoreCase("player")) {
                     if (args.length == 3)
-                        addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
+                        addAll(Utils.getAllPlayers());
                     else if (args.length == 4)
                         addAll(Arrays.stream(FKPermissions.Type.values()).map(FKPermissions.Type::name).collect(Collectors.toList()));
                     else if (args.length == 5)

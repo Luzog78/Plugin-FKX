@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.commands.Fun;
 
 import fr.luzog.pl.fkx.utils.CmdUtils;
+import fr.luzog.pl.fkx.utils.Heads;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -12,6 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,10 +33,10 @@ public class Head implements CommandExecutor, TabCompleter {
             if (u.getPlayer().getInventory().firstEmpty() != -1) {
                 ItemStack is = new ItemStack(Material.SKULL_ITEM, 1, (short) 0, (byte) 3);
                 SkullMeta meta = (SkullMeta) is.getItemMeta();
-                meta.setOwner(String.join(" ", args));
+                meta.setOwner(args.length == 0 ? u.getPlayer().getName() : String.join(" ", args));
                 is.setItemMeta(meta);
                 u.getPlayer().getInventory().addItem(is);
-                u.succ("Vous avez récupéré la tête de§6", String.join(" ", args), "§r!");
+                u.succ("Vous avez récupéré la tête de§6", meta.getOwner(), "§r!");
             } else
                 u.err(CmdUtils.err_inventory_full);
 
@@ -44,6 +48,11 @@ public class Head implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
-        return Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList());
+        ArrayList<String> temp = new ArrayList<>(new HashSet<String>() {{
+            addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
+            addAll(Arrays.stream(Heads.values()).map(Heads::getPlayer).collect(Collectors.toList()));
+        }});
+        temp.removeIf(s -> !s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()));
+        return temp;
     }
 }
