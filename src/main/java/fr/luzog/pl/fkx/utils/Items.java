@@ -316,8 +316,11 @@ public class Items {
             return this;
         }
 
-        public Builder setLore(String... lores) {
-            meta.setLore(Arrays.stream(lores).collect(Collectors.toList()));
+        public Builder setLore(String... loreLines) {
+            ArrayList<String> lore = new ArrayList<>();
+            for (String l : loreLines)
+                lore.addAll(Arrays.asList(l.split("\n")));
+            meta.setLore(lore);
             return this;
         }
 
@@ -326,37 +329,41 @@ public class Items {
             return this;
         }
 
-        public Builder addLore(String... lores) {
+        public Builder addLore(String... loreLines) {
             meta.setLore(new ArrayList<String>(meta.getLore()) {{
-                this.addAll(Arrays.asList(lores));
+                for (String l : loreLines)
+                    addAll(Arrays.asList(l.split("\n")));
             }});
             return this;
         }
 
-        public Builder addLore(String lore) {
+        public Builder addLore(String loreLine) {
             meta.setLore(new ArrayList<String>(meta.getLore()) {{
-                add(lore);
+                addAll(Arrays.asList(loreLine.split("\n")));
             }});
             return this;
         }
 
-        public Builder addLore(int index, String lore) {
+        public Builder addLore(int index, String loreLine) {
             meta.setLore(new ArrayList<String>(meta.getLore()) {{
-                add(index, lore);
+                addAll(index, Arrays.asList(loreLine.split("\n")));
             }});
             return this;
         }
 
-        public Builder addLore(int index, String... lores) {
+        public Builder addLore(int index, String... loreLines) {
             meta.setLore(new ArrayList<String>(meta.getLore()) {{
-                this.addAll(index, Arrays.asList(lores));
+                ArrayList<String> lore = new ArrayList<>();
+                for (String l : loreLines)
+                    lore.addAll(Arrays.asList(l.split("\n")));
+                this.addAll(index, lore);
             }});
             return this;
         }
 
-        public Builder remLore(String lore) {
+        public Builder remLore(String loreLine) {
             meta.setLore(new ArrayList<String>(meta.getLore()) {{
-                remove(lore);
+                remove(loreLine);
             }});
             return this;
         }

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.GUIs.GuiFK;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.command.Command;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCGame {
-    public static final String syntaxe = "/fk game [help | list | current | new <id> | switch <id> | start | end | (pause | resume) [<cooldown>]]";
+    public static final String syntaxe = "/fk game [help | list | current | (new | switch | gui) <id> | start | end | (pause | resume) [<cooldown>]]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -24,7 +25,7 @@ public class FKCGame {
 
         if (args.length == 1)
             if (sender instanceof Player)
-                u.err(CmdUtils.err_no_gui_for_this_instance.replace("%CMD%", "game"));
+                u.getPlayer().performCommand("fk game gui " + FKManager.currentGameId);
             else
                 u.synt();
 
@@ -55,8 +56,23 @@ public class FKCGame {
             else
                 u.synt();
 
+        else if (args[1].equalsIgnoreCase("gui"))
+            if (args.length >= 3)
+                if (FKManager.getGame(args[2]) != null)
+                    if (FKManager.getGame(args[2]) != null)
+                        if (sender instanceof Player)
+                            u.getPlayer().openInventory(GuiFK.getInv(FKManager.getGame(args[2]), u.getPlayer()));
+                        else
+                            u.err(CmdUtils.err_not_player);
+                    else
+                        u.err(CmdUtils.err_no_gui_for_this_instance + " (" + args[2] + ")");
+                else
+                    u.err("Aucune partie trouvée.");
+            else
+                u.synt();
+
         else if (args[1].equalsIgnoreCase("start"))
-                FKManager.getCurrentGame().start();
+            FKManager.getCurrentGame().start();
 
         else if (args[1].equalsIgnoreCase("pause"))
             if (args.length >= 3)
@@ -79,7 +95,7 @@ public class FKCGame {
                 FKManager.getCurrentGame().resume(0);
 
         else if (args[1].equalsIgnoreCase("end"))
-                FKManager.getCurrentGame().end();
+            FKManager.getCurrentGame().end();
 
         else
             u.synt();

@@ -94,11 +94,19 @@ public enum Heads {
 	}
 
 	public ItemStack getSkull() {
+		return getSkullOf(player, name);
+	}
+
+	public static ItemStack getSkullOf(String owner) {
+		return getSkullOf(owner, owner);
+	}
+
+	public static ItemStack getSkullOf(String owner, String name) {
 		ItemStack is = new ItemStack(Material.SKULL_ITEM, 1, (short) 0, (byte) 3);
 		SkullMeta isM = (SkullMeta) is.getItemMeta();
-		isM.setOwner(player);
+		isM.setOwner(owner);
 		isM.setDisplayName("§r§e" + name);
-		isM.setLore(Arrays.asList("§8Owner :", "§8 > §7§o" + player));
+		isM.setLore(Arrays.asList("§8Owner :", "§8 > §7§o" + owner));
 		is.setItemMeta(isM);
 		return is;
 	}

@@ -25,7 +25,7 @@ public class CmdUtils {
             err_unknown_enchant = "Enchantement inconnu.",
             err_inventory_full = "Inventaire plein.",
             err_not_enough_args = "Pas assez d'arguments, vérifiez la syntaxe",
-            err_no_gui_for_this_instance = "Pas de GUI pour cette instance.\nTapez /%CMD% help pour plus d'informations.",
+            err_no_gui_for_this_instance = "Pas de GUI pour cette instance.",
             err_team_not_found = "Aucune équipe trouvée.",
             err_player_has_no_team = "Le joueur n'est dans aucune équipe.",
             err_player_not_in_the_team = "Le joueur n'est pas dans l'équipe.",
