@@ -22,7 +22,7 @@ public class PlayerInteractHandler implements Listener {
         Action a = event.getAction();
         Player p = event.getPlayer();
 
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(event.getPlayer().getUniqueId(), event.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(event.getPlayer().getName());
 
         for (FKPlayer fkp : fkps) {
             if (fkp == null)

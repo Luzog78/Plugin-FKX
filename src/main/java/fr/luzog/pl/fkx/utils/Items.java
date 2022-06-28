@@ -202,11 +202,11 @@ public class Items {
     }
 
     public static ItemStack bow() {
-        return builder(Material.TNT).setName("§fArc").build();
+        return builder(Material.BOW).setName("§fArc").build();
     }
 
     public static ItemStack fishing_rod() {
-        return builder(Material.TNT).setName("§fCanne à pêche").build();
+        return builder(Material.FISHING_ROD).setName("§fCanne à pêche").build();
     }
 
     public static ItemStack tnt() {
@@ -258,7 +258,7 @@ public class Items {
         for (Pair<Enchantment, Integer> e : enchants)
             meta.addEnchant(e.getKey(), e.getValue(), true);
         is.setItemMeta(meta);
-        return canClickOn ? new CustomNBT(is).setBoolean(Events.canClickOnTag, true).build() : is;
+        return canClickOn ? new CustomNBT(is).setBoolean(Events.cantClickOnTag, true).build() : is;
     }
 
     public static Builder builder(Material mat) {

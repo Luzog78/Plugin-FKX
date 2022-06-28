@@ -19,7 +19,7 @@ public class EntityDamageByEntityHandler implements Listener {
     public static void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();
-            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getUniqueId(), p.getName());
+            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getName());
             if (fps.isEmpty()) {
                 event.setCancelled(true);
                 return;
@@ -34,7 +34,7 @@ public class EntityDamageByEntityHandler implements Listener {
 
                 if (event.getEntity() instanceof Player) {
                     Player e = (Player) event.getEntity();
-                    List<FKPlayer> fes = FKManager.getGlobalPlayer(e.getUniqueId(), e.getName());
+                    List<FKPlayer> fes = FKManager.getGlobalPlayer(e.getName());
                     if (fes.isEmpty()) {
                         event.setCancelled(true);
                         return;
@@ -61,7 +61,7 @@ public class EntityDamageByEntityHandler implements Listener {
 
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();
-            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getUniqueId(), p.getName());
+            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getName());
             if (fps.isEmpty()) {
                 event.setCancelled(true);
                 return;

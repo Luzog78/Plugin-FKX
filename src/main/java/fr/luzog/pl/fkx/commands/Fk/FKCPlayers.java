@@ -39,38 +39,33 @@ public class FKCPlayers {
                 u.err(" - Aucun jeu en cours");
             else
                 FKManager.getCurrentGame().getPlayers().forEach(fkp ->
-                        u.succ(" - §6" + fkp.getName() + "§r §7" + fkp.getUuid() + " : §f" + (fkp.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
-        } else if (Bukkit.getOfflinePlayer(args[1]).isOnline())
+                        u.succ(" - §6" + fkp.getName() + "§r §7" + fkp.getLastUuid() + " : §f" + (fkp.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
+        } else {
+            FKPlayer fkp = FKManager.getCurrentGame().getPlayer(args[1], false);
+            Player p = fkp == null || fkp.getPlayer() == null ? Bukkit.getPlayerExact(args[1]) : fkp.getPlayer();
             if (args.length >= 3)
                 if (args[2].equalsIgnoreCase("info")) {
-                    Player p = Bukkit.getPlayer(args[1]);
                     DecimalFormat df = new DecimalFormat("0.00");
-                    FKPlayer fkp = FKManager.getCurrentGame().getPlayer(p.getUniqueId(), false);
                     u.succ("Joueur :");
-                    u.succ(" - Nom : §f" + p.getName());
-                    if (fkp != null && fkp.getTeam() != null)
-                        u.succ(" - Team : §f" + fkp.getTeam().getName());
-                    u.succ(" - Nom d'Affichage : §f" + (fkp == null ? p.getDisplayName() : fkp.getDisplayName()));
-                    u.succ(" - Vie : §c" + df.format(p.getHealth()) + "§7 /" + p.getMaxHealth());
-                    u.succ(" - Nourriture : §a" + df.format(p.getFoodLevel()) + "§7 /20.0");
-                    u.succ(" - Saturation : §e" + df.format(p.getSaturation()) + "§7 /20.0");
-                    u.succ(" - Monde : §f" + (p.getWorld().getName().equalsIgnoreCase("world") ? "§2OverWorld"
+                    u.succ(" - Nom : §f" + (p == null ? fkp == null ? "§cnull" : fkp.getName() : p.getName()));
+                    u.succ(" - UUID : §7" + (p == null ? fkp == null ? "§cnull" : fkp.getLastUuid() : p.getUniqueId()));
+                    u.succ(" - Team : §f" + (fkp == null ? "§cHors Jeu" : fkp.getTeam() == null ? "§4§lAucune" : fkp.getTeam().getName()));
+                    u.succ(" - Nom d'Affichage : §f" + (fkp == null ? p == null ? "§cnull" : p.getDisplayName() : fkp.getDisplayName()));
+                    u.succ(" - Vie : §c" + (p == null ? "0.0§7 /0.0" : df.format(p.getHealth()) + "§7 /" + p.getMaxHealth()));
+                    u.succ(" - Nourriture : §a" + (p == null ? "0.0§7 /0.0" : df.format(p.getFoodLevel()) + "§7 /20.0"));
+                    u.succ(" - Saturation : §e" + (p == null ? "0.0§7 /0.0" : df.format(p.getSaturation()) + "§7 /20.0"));
+                    u.succ(" - Localisation : §f" + (p == null ? "§cAucune" : Utils.locToString(p.getLocation(), true, true, false)));
+                    u.succ(" - Monde : §f" + (p == null ? "§cAucun" : (p.getWorld().getName().equalsIgnoreCase("world") ? "§2OverWorld"
                             : p.getWorld().getName().equalsIgnoreCase("world_nether") ? "§dNether"
                             : p.getWorld().getName().equalsIgnoreCase("world_the_end") ? "§5End"
-                            : p.getWorld().getName()));
-                    u.succ(" - Localisation : §f" + df.format(p.getLocation().getBlockX()) + "  "
-                            + df.format(p.getLocation().getBlockY()) + "  " + df.format(p.getLocation().getBlockZ()));
-                    if (fkp != null)
-                        u.succ(" - Zone : §f" + (fkp.getZone() == null ? "Aucune" : fkp.getZone().getId() + "§7 (" + fkp.getZone().getType() + ")"));
-                    else
-                        u.succ(" - Statut : §cHors jeu.");
+                            : p.getWorld().getName())));
+                    u.succ(" - Zone : §f" + (fkp == null ? "§cHors Jeu" : fkp.getZone() == null ? "§cAucune" : fkp.getZone().getId() + "§7 (" + fkp.getZone().getType() + ")"));
                 } else
                     u.synt();
             else
                 u.succ("TODO -> Player GUIs");
 
-        else
-            u.synt();
+        }
 
         return false;
     }

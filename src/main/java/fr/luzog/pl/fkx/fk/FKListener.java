@@ -102,7 +102,7 @@ public class FKListener {
 
                     p.setDisplayName(displayName);
 
-                    if (Vanish.vanished.contains(p.getUniqueId()))
+                    if (Vanish.vanished.contains(p.getName()))
                         if (Vanish.isPrefix)
                             displayName = Vanish.pre_suf_ix + displayName;
                         else
@@ -117,7 +117,7 @@ public class FKListener {
                 });
 
                 new ArrayList<Player>(Bukkit.getOnlinePlayers()) {{
-                    removeIf(p -> !FKManager.getGlobalPlayer(p.getUniqueId(), p.getName()).isEmpty());
+                    removeIf(p -> !FKManager.getGlobalPlayer(p.getName()).isEmpty());
                 }}.forEach(p -> {
                     p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
@@ -192,7 +192,7 @@ public class FKListener {
         h.add("§9Organisateur : §f" + "Mathis_Bruel");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
-        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getUniqueId(), false) == null ? p.getDisplayName() : manager.getPlayer(p.getUniqueId(), false).getDisplayName()) + "§3,");
+        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getName(), false) == null ? p.getDisplayName() : manager.getPlayer(p.getName(), false).getDisplayName()) + "§3,");
         h.add("§3l'équipe souhaite une bonne aventure !");
         h.add("§3N'oublie pas §5§l§o§n[§2§l§o§n/ad§5§l§o§n]§3 si tu as un besoin...");
         h.add("§3Les " + manager.getGods().getColor() + manager.getGods().getName() + "§3 seront là pour aider ^^");
@@ -209,20 +209,20 @@ public class FKListener {
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
         DecimalFormat df = new DecimalFormat("0.0");
-        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getUniqueId(), false) == null
-                || manager.getPlayer(p.getUniqueId(), false).getTeam() == null ? no_team
-                : manager.getPlayer(p.getUniqueId(), false).getTeam().getName() + "§7 - §6"
-                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getWorld().getUID()) ?
+        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getName(), false) == null
+                || manager.getPlayer(p.getName(), false).getTeam() == null ? no_team
+                : manager.getPlayer(p.getName(), false).getTeam().getName() + "§7 - §6"
+                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getName(), false).getTeam().getSpawn().getWorld().getUID()) ?
                 "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
-                : df.format(p.getLocation().distance(manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn()))
+                : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
                 + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getUniqueId(), false).getTeam().getSpawn().getZ()))));
+                manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(), false).getTeam().getSpawn().getZ()))));
         f.add(" ");
         f.add("§8§l§nAutres équipes :§r");
         f.add(" ");
         manager.getParticipantsTeams().forEach(t -> {
-            if (manager.getPlayer(p.getUniqueId(), false) == null || manager.getPlayer(p.getUniqueId(), false).getTeam() == null
-                    || !manager.getPlayer(p.getUniqueId(), false).getTeam().equals(t))
+            if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
+                    || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
                 f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
                         "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
                         : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),

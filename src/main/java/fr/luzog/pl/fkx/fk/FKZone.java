@@ -74,12 +74,12 @@ public class FKZone {
     }
 
     public void setId(String id, boolean save) {
-        this.id = id;
         if (save && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" + id + ".yml"));
         }
+        this.id = id;
     }
 
     public Type getType() {

@@ -14,7 +14,7 @@ public class PlayerMoveHandler implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
 
         for (FKPlayer p : fkps) {
             if (p == null)

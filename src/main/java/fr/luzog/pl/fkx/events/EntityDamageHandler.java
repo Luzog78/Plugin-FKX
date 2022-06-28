@@ -31,7 +31,7 @@ public class EntityDamageHandler implements Listener {
 
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getUniqueId(), p.getName());
+            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getName());
             if (fps.isEmpty()) {
                 e.setCancelled(true);
                 return;

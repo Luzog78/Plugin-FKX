@@ -15,7 +15,7 @@ public class BlockPlaceHandler implements Listener {
 
     @EventHandler
     public static void onPlaceBlock(BlockPlaceEvent e) {
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fps.isEmpty()) {
             e.setCancelled(true);
             return;

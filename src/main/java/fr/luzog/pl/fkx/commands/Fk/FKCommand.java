@@ -1,6 +1,8 @@
 package fr.luzog.pl.fkx.commands.Fk;
 
+import fr.luzog.pl.fkx.fk.GUIs.Guis;
 import fr.luzog.pl.fkx.utils.CmdUtils;
+import fr.luzog.pl.fkx.utils.Items;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,7 +21,8 @@ public class FKCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0)
             if (sender instanceof Player)
-                u.succ("TODO -> Open GUI");
+                u.getPlayer().openInventory(Guis.getInventory(u.getPlayer().getDisplayName(), 9 * 3, "gm", Items.bow(), Items.diamond_axe()));
+//                u.succ("TODO -> Open GUI");
             else
                 u.synt();
 

@@ -28,8 +28,8 @@ public class FKCWarp {
         } else if (args[1].equals("?") || args[1].equalsIgnoreCase("help")) {
             u.synt();
         } else if (args[1].equalsIgnoreCase("list")) {
-            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).isEmpty() ?
-                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).get(0).getManager();
+            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getName()).isEmpty() ?
+                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getName()).get(0).getManager();
             if (fk == null) {
                 u.err("Aucune partie en cours.");
                 return true;
@@ -42,8 +42,8 @@ public class FKCWarp {
             fk.getTeams().forEach(t -> u.succ(" - §6team §f" + t.getId()));
             fk.getZones().forEach(z -> u.succ(" - §6zone §f" + z.getId()));
         } else {
-            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).isEmpty() ?
-                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).get(0).getManager();
+            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getName()).isEmpty() ?
+                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getName()).get(0).getManager();
             if (fk == null) {
                 u.err("Aucune partie en cours.");
                 return true;
@@ -97,8 +97,8 @@ public class FKCWarp {
                 for (Player player : CmdUtils.getPlayersFromArray(args, substring)) {
                     player.teleport(loc);
                     u.succ(String.format("Joueur §6%s§r téléporté.",
-                            fk.getPlayer(player.getUniqueId(), player.getName(), false) != null ?
-                                    fk.getPlayer(player.getUniqueId(), player.getName(), false).getDisplayName() : player.getName()));
+                            fk.getPlayer(player.getName(), false) != null ?
+                                    fk.getPlayer(player.getName(), false).getDisplayName() : player.getName()));
                 }
         }
 
@@ -108,8 +108,8 @@ public class FKCWarp {
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
         return new ArrayList<String>() {{
             CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
-            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).isEmpty() ?
-                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getUniqueId()).get(0).getManager();
+            FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getName()).isEmpty() ?
+                    FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getName()).get(0).getManager();
             if (fk != null)
                 if (args.length == 2) {
                     add("help");

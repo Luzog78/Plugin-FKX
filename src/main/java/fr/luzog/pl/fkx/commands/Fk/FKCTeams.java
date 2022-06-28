@@ -85,18 +85,14 @@ public class FKCTeams {
                 if (t.getPlayers().isEmpty())
                     u.err(" - Aucun joueur");
                 else
-                    t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
+                    t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getLastUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
             } else if (args[2].equalsIgnoreCase("add")) {
                 if (args.length == 3)
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "player"));
                 else
                     try {
                         FKPlayer p;
-                        try {
-                            p = FKManager.getCurrentGame().getPlayer(UUID.fromString(args[3]), true);
-                        } catch (IllegalArgumentException e) {
-                            p = FKManager.getCurrentGame().getPlayer(args[3], true);
-                        }
+                        p = FKManager.getCurrentGame().getPlayer(args[3], true);
 
                         try {
                             t.addPlayer(p);
@@ -112,11 +108,7 @@ public class FKCTeams {
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "player"));
                 else try {
                     FKPlayer p;
-                    try {
-                        p = FKManager.getCurrentGame().getPlayer(UUID.fromString(args[3]), true);
-                    } catch (IllegalArgumentException e) {
-                        p = FKManager.getCurrentGame().getPlayer(args[3], true);
-                    }
+                    p = FKManager.getCurrentGame().getPlayer(args[3], true);
 
                     try {
                         t.removePlayer(p);

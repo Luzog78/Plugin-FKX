@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class FKPlayer {
         getConfig(gameId)
                 .load()
 
-                .setName(name, !soft)
+                .setLastUuid(lastUuid, !soft)
                 .setTeam(teamId, !soft)
                 .setStats(stats, !soft)
                 .setPermissions(personalPermissions, !soft)
@@ -26,11 +27,11 @@ public class FKPlayer {
     }
 
     public Config.Player getConfig(String gameId) {
-        return new Config.Player("game-" + Objects.requireNonNull(gameId) + "/players/" + (uuid == null ? "null-" + name + ".yml" : uuid + ".yml"));
+        return new Config.Player("game-" + Objects.requireNonNull(gameId) + "/players/" + name + ".yml");
     }
 
-    private UUID uuid;
     private String name;
+    private UUID lastUuid;
 
     private String teamId;
 
@@ -38,16 +39,16 @@ public class FKPlayer {
 
     private FKPermissions personalPermissions;
 
-    public FKPlayer(@Nullable UUID uuid, @Nullable String name, @Nullable PlayerStats stats, @Nullable FKPermissions personalPermissions) {
-        this.uuid = uuid;
+    public FKPlayer(@Nullable String name, @Nullable PlayerStats stats, @Nullable FKPermissions personalPermissions) {
         this.name = name;
+        this.lastUuid = null;
 
         this.stats = stats == null ? new PlayerStats() : stats;
         this.personalPermissions = personalPermissions == null ? new FKPermissions(FKPermissions.Definition.DEFAULT) : personalPermissions;
     }
 
     public Player getPlayer() {
-        return Bukkit.getPlayer(uuid) == null ? Bukkit.getPlayerExact(name) : Bukkit.getPlayer(uuid);
+        return Bukkit.getPlayerExact(name);
     }
 
     public boolean hasPermission(FKPermissions.Type permissionType, Location loc) {
@@ -96,9 +97,9 @@ public class FKPlayer {
     }
 
     public FKZone getZone() {
-        if (!Bukkit.getOfflinePlayer(uuid).isOnline())
+        if (!Bukkit.getOfflinePlayer(name).isOnline())
             return null;
-        return getZone(Bukkit.getPlayer(uuid).getLocation());
+        return getZone(Bukkit.getPlayerExact(name).getLocation());
     }
 
     public FKZone getZone(Location loc) {
@@ -160,32 +161,37 @@ public class FKPlayer {
         }
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
     public String getName() {
         return name;
     }
 
-    public void setName(String name, boolean save) {
+    public void setName(String name, boolean renameFile) {
+        if (renameFile && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" +  name + ".yml"));
+        }
         this.name = name;
+    }
+
+    public UUID getLastUuid() {
+        return lastUuid;
+    }
+
+    public void setLastUuid(UUID lastUuid, boolean save) {
+        this.lastUuid = lastUuid;
         if (save && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).load().setName(name, true).save();
+            getConfig(getManager().getId()).load().setLastUuid(lastUuid, true).save();
         }
     }
 
     public String getDisplayName() {
-        return (Vanish.vanished.contains(uuid) && Vanish.isPrefix ? Vanish.pre_suf_ix : "")
+        return (Vanish.isVanished(name) && Vanish.isPrefix ? Vanish.pre_suf_ix : "")
                 + (getTeam() != null ? getTeam().getPrefix() : "")
                 + name
-                + (Vanish.vanished.contains(uuid) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "")
+                + (Vanish.isVanished(name) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "")
                 + "§r";
     }
 

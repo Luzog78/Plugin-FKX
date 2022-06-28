@@ -15,7 +15,7 @@ public class BucketHandler implements Listener {
 
     @EventHandler
     public static void onEmpty(PlayerBucketEmptyEvent e) {
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -33,7 +33,7 @@ public class BucketHandler implements Listener {
 
     @EventHandler
     public static void onFill(PlayerBucketFillEvent e) {
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fps.isEmpty()) {
             e.setCancelled(true);
             return;

@@ -5,7 +5,6 @@ import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
-import javafx.util.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -146,15 +145,14 @@ public class FKManager {
                                 if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml"))
                                     try {
                                         Config.Player pc = new Config.Player(String.format("%s/players/%s", f.getName(), fff.getName())).load();
-                                        FKPlayer player = new FKPlayer(fff.getName().toLowerCase().startsWith("null") ? null
-                                                : UUID.fromString(fff.getName().substring(0, fff.getName().length() - 4)), null, null, null);
+                                        FKPlayer player = new FKPlayer(fff.getName().substring(0, fff.getName().length() - 4), null, null);
 
-                                        Utils.tryTo(printStackTrace, () -> player.setName(Objects.requireNonNull(pc.getName()), false));
+                                        Utils.tryTo(printStackTrace, () -> player.setLastUuid(Objects.requireNonNull(pc.getLastUuid()), false));
                                         Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam()), false));
                                         Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats()), false));
                                         Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions()), false));
 
-                                        if (player.getUuid() != null || player.getName() != null)
+                                        if (!player.getName().equals(""))
                                             manager.getPlayers().add(player);
                                     } catch (IllegalArgumentException ignored) {
                                     }
@@ -415,13 +413,15 @@ public class FKManager {
         }};
     }
 
-    public static ArrayList<FKPlayer> getGlobalPlayer(UUID uuid) {
-        return new ArrayList<FKPlayer>() {{
-            for (FKPlayer player : getGlobalPlayers())
-                if (player.getUuid().equals(uuid))
-                    add(player);
-        }};
-    }
+    /*
+     * public static ArrayList<FKPlayer> getGlobalPlayer(UUID uuid) {
+     *     return new ArrayList<FKPlayer>() {{
+     *         for (FKPlayer player : getGlobalPlayers())
+     *             if (player.getUuid().equals(uuid))
+     *                 add(player);
+     *     }};
+     * }
+     */
 
     public static ArrayList<FKPlayer> getGlobalPlayer(@Nonnull String name) {
         return new ArrayList<FKPlayer>() {{
@@ -431,13 +431,15 @@ public class FKManager {
         }};
     }
 
-    public static ArrayList<FKPlayer> getGlobalPlayer(@Nonnull UUID uuid, @Nonnull String name) {
-        return new ArrayList<FKPlayer>() {{
-            for (FKPlayer player : getGlobalPlayers())
-                if (uuid.equals(player.getUuid()) || name.equalsIgnoreCase(player.getName()))
-                    add(player);
-        }};
-    }
+    /*
+     * public static ArrayList<FKPlayer> getGlobalPlayer(@Nonnull UUID uuid, @Nonnull String name) {
+     *     return new ArrayList<FKPlayer>() {{
+     *         for (FKPlayer player : getGlobalPlayers())
+     *             if (uuid.equals(player.getUuid()) || name.equalsIgnoreCase(player.getName()))
+     *                 add(player);
+     *     }};
+     * }
+     */
 
     public void start() {
         Utils.countDown(null, 20, false, true, true,
@@ -570,8 +572,13 @@ public class FKManager {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(String id, boolean renameFile) {
         this.id = id;
+        if (renameFile && getConfig() != null) {
+            if (!getConfig().exists())
+                save(true);
+            getConfig().getFile().getParentFile().renameTo(new File(getConfig().getFile().getParentFile().getParentFile().getPath(), "/game-" + id + "/Manager.yml"));
+        }
     }
 
     public State getState() {
@@ -842,20 +849,22 @@ public class FKManager {
                 player.saveToConfig(id, false);
     }
 
-    public FKPlayer getPlayer(@Nonnull UUID uuid, boolean create) {
-        for (FKPlayer player : players)
-            if (player.getUuid() != null && player.getUuid().equals(uuid))
-                return player;
-        if (create) {
-            Utils.MojangProfile profile = Utils.getMojangProfileFromAPI(uuid);
-            if (profile == null)
-                throw new FKException.PlayerDoesNotExistException(uuid);
-            FKPlayer player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
-            players.add(player);
-            return player;
-        }
-        return null;
-    }
+    /*
+     * public FKPlayer getPlayer(@Nonnull UUID uuid, boolean create) {
+     *     for (FKPlayer player : players)
+     *         if (player.getUuid() != null && player.getUuid().equals(uuid))
+     *             return player;
+     *     if (create) {
+     *         Utils.MojangProfile profile = Utils.getProfileFromMojangAPI(uuid);
+     *         if (profile == null)
+     *             throw new FKException.PlayerDoesNotExistException(uuid);
+     *         FKPlayer player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
+     *         players.add(player);
+     *         return player;
+     *     }
+     *     return null;
+     * }
+     */
 
     /**
      * "Get a player by name, or create one if it doesn't exist."<br>
@@ -863,51 +872,56 @@ public class FKManager {
      * The first thing you'll notice is the `@Nonnull` annotation. This is a Java annotation that tells the compiler that
      * the parameter will never be null. This is important because the function will throw an exception if the parameter is
      * null.<br>
-     * <br>
-     * It's important too to note that the function will throw an error if the player doesn't exist.
      *
      * @param name   The name of the player to get.
      * @param create If true, the player will be created if it doesn't exist.
      *
      * @return A {@link FKPlayer} object
-     *
-     * @throws FKException.PlayerDoesNotExistException
      */
     public FKPlayer getPlayer(@Nonnull String name, boolean create) {
         for (FKPlayer player : players)
             if (player.getName() != null && player.getName().equalsIgnoreCase(name))
                 return player;
         if (create) {
-            Pair<String, UUID> i = Utils.getNameAndUUIDFromAPI(name);
-            if (i == null)
-                throw new FKException.PlayerDoesNotExistException(name);
-            FKPlayer player = new FKPlayer(i.getValue(), i.getKey(), null, null);
+            /*
+             * Old code:
+             *
+             *     Pair<String, UUID> i = Utils.getNameAndUUIDFromMojangAPI(name);
+             *     if (i == null)
+             *         throw new FKException.PlayerDoesNotExistException(name);
+             */
+            FKPlayer player = new FKPlayer(name, null, null);
+            if (Bukkit.getPlayerExact(name) != null)
+                player.setLastUuid(Bukkit.getPlayerExact(name).getUniqueId(), false);
             players.add(player);
+            player.saveToConfig(id, false);
             return player;
         }
         return null;
     }
 
-    public FKPlayer getPlayer(@Nonnull UUID uuid, @Nonnull String name, boolean create) {
-        for (FKPlayer player : players)
-            if ((player.getUuid() != null && player.getUuid().equals(uuid)) || (player.getName() != null && player.getName().equalsIgnoreCase(name)))
-                return player;
-        if (create) {
-            FKPlayer player = null;
-            Utils.MojangProfile profile = Utils.getMojangProfileFromAPI(uuid);
-            if (profile != null) {
-                player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
-            } else {
-                Pair<String, UUID> i = Utils.getNameAndUUIDFromAPI(name);
-                if (i == null)
-                    throw new FKException.PlayerDoesNotExistException(uuid, name);
-                player = new FKPlayer(uuid, Bukkit.getOfflinePlayer(uuid).getName(), null, null);
-            }
-            players.add(player);
-            return player;
-        }
-        return null;
-    }
+    /*
+     * public FKPlayer getPlayer(@Nonnull UUID uuid, @Nonnull String name, boolean create) {
+     *     for (FKPlayer player : players)
+     *         if ((player.getUuid() != null && player.getUuid().equals(uuid)) || (player.getName() != null && player.getName().equalsIgnoreCase(name)))
+     *             return player;
+     *     if (create) {
+     *         FKPlayer player = null;
+     *         Utils.MojangProfile profile = Utils.getProfileFromMojangAPI(uuid);
+     *         if (profile != null) {
+     *             player = new FKPlayer(profile.getUuid(), profile.getName(), null, null);
+     *         } else {
+     *             Pair<String, UUID> i = Utils.getNameAndUUIDFromMojangAPI(name);
+     *             if (i == null)
+     *                 throw new FKException.PlayerDoesNotExistException(uuid, name);
+     *             player = new FKPlayer(uuid, Bukkit.getOfflinePlayer(uuid).getName(), null, null);
+     *         }
+     *         players.add(player);
+     *         return player;
+     *     }
+     *     return null;
+     * }
+     */
 
     public FKTeam getGods() {
         return gods;

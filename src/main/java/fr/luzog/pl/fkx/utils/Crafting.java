@@ -100,7 +100,7 @@ public class Crafting implements Listener {
                 "§7 Amusez-vous !",
                 " ",
                 "§8------------------------"
-        ).getNBT().setBoolean(Events.canClickOnTag, true).build();
+        ).getNBT().setBoolean(Events.cantClickOnTag, true).build();
     }
 
     public static ItemStack getNone() {
@@ -116,7 +116,7 @@ public class Crafting implements Listener {
                 "§c  l'inventaire.",
                 " ",
                 "§4------------------------"
-        ).getNBT().setBoolean(Events.canClickOnTag, true).build();
+        ).getNBT().setBoolean(Events.cantClickOnTag, true).build();
     }
 
     public static Inventory getInv() {
@@ -490,8 +490,8 @@ public class Crafting implements Listener {
             return;
 
         boolean poursuite = e.getSlot() != -999 && e.getClickedInventory() != null
-                && (e.getCurrentItem() == null || !new CustomNBT(e.getCurrentItem()).hasKey(Events.canClickOnTag)
-                || !new CustomNBT(e.getCurrentItem()).getBoolean(Events.canClickOnTag));
+                && (e.getCurrentItem() == null || !new CustomNBT(e.getCurrentItem()).hasKey(Events.cantClickOnTag)
+                || !new CustomNBT(e.getCurrentItem()).getBoolean(Events.cantClickOnTag));
 
         e.setCancelled(!poursuite);
 

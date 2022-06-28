@@ -14,7 +14,7 @@ public class PlayerChatHandler implements Listener {
     @EventHandler
     public void onPlayerChat(PlayerChatEvent e) {
         e.setCancelled(true);
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fkps.isEmpty()) {
             e.getPlayer().sendMessage("§cVous n'êtes pas dans le jeu.");
             return;
@@ -31,7 +31,7 @@ public class PlayerChatHandler implements Listener {
                 Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(format));
             else
                 Bukkit.getOnlinePlayers().forEach(p -> {
-                    List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getUniqueId(), p.getName());
+                    List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getName());
                     for (FKPlayer fp : fps)
                         if (fp != null && fp.getTeam() != null && (fp.getTeam().getId().equals(fkp.getTeam().getId())
                                 || fp.getTeam().getId().equals(fkp.getManager().getGods().getId())))

@@ -32,7 +32,7 @@ public class BlockBreakHandler implements Listener {
 
     @EventHandler
     public static void onBreakBlock(BlockBreakEvent e) {
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fps.isEmpty()) {
             e.setCancelled(true);
             return;

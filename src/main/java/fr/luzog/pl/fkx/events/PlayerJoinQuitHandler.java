@@ -25,10 +25,12 @@ public class PlayerJoinQuitHandler implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
 
-        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
 
         for(FKPlayer fkp : fkps) {
             fkp.getStats().increaseConnections();
+            if(!fkp.getLastUuid().equals(e.getPlayer().getUniqueId()))
+                fkp.setLastUuid(e.getPlayer().getUniqueId(), true);
             if(!fkp.getName().equals(e.getPlayer().getName()))
                 fkp.setName(e.getPlayer().getName(), true);
             if(fkp.getTeam() != null)
@@ -45,7 +47,7 @@ public class PlayerJoinQuitHandler implements Listener {
     public void onPlayerLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
 
-        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
 
         String displayName = fkps.isEmpty() ? e.getPlayer().getName()
                 : fkps.size() > 1 ? fkps.stream().map(FKPlayer::getDisplayName).collect(Collectors.joining("§r"))

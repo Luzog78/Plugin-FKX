@@ -12,17 +12,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Vanish implements CommandExecutor, TabCompleter, Listener {
     public static final String syntaxe = "/vanish [(on | off)] [<players...>]";
     public static String pre_suf_ix;
     public static boolean isPrefix;
 
-    public static List<UUID> vanished = new ArrayList<>();
+    public static HashSet<String> vanished = new HashSet<>();
 
     public static void initFromConfig() {
         Main.globalConfig.setVanish("§7[VANISH§7] §r", true, new ArrayList<>(), false);
@@ -45,8 +42,8 @@ public class Vanish implements CommandExecutor, TabCompleter, Listener {
 
         if (args.length == 0 || (args.length == 1 && mode != 0))
             if (sender instanceof Player) {
-                boolean vanish = mode == 0 ? !vanished.contains(u.getPlayer().getUniqueId()) : (mode == 1);
-                vanish(u.getPlayer().getUniqueId(), vanish);
+                boolean vanish = mode == 0 ? !isVanished(u.getPlayer().getName()) : (mode == 1);
+                vanish(u.getPlayer().getName(), vanish);
                 u.succ("Vous êtes désormais§e", (vanish ? "Invisible" : "Réapparu"), "§r!");
             } else
                 u.err(CmdUtils.err_not_player);
@@ -56,8 +53,8 @@ public class Vanish implements CommandExecutor, TabCompleter, Listener {
 
         else
             CmdUtils.getPlayersFromArray(args, mode == 0 ? 0 : 1).forEach(player -> {
-                boolean vanish = mode == 1 || (mode == 0 && !vanished.contains(player.getUniqueId()));
-                vanish(player.getUniqueId(), vanish);
+                boolean vanish = mode == 1 || (mode == 0 && !isVanished(player.getName()));
+                vanish(player.getName(), vanish);
                 u.succ("§6" + player.getDisplayName() + "§r est désormais§e",
                         (vanish ? "Invisible" : "Réapparu"), "§r !");
             });
@@ -70,18 +67,25 @@ public class Vanish implements CommandExecutor, TabCompleter, Listener {
         refreshVanished();
     }
 
-    public static void vanish(UUID uuid, boolean vanish) {
-        if (vanish && !vanished.contains(uuid))
-            vanished.add(uuid);
+    public static boolean isVanished(String name) {
+        for (String s : vanished)
+            if (s.equalsIgnoreCase(name))
+                return true;
+        return false;
+    }
+
+    public static void vanish(String name, boolean vanish) {
+        if (vanish && !isVanished(name))
+            vanished.add(name);
         else if (!vanish)
-            vanished.remove(uuid);
+            vanished.removeIf(v -> v.equalsIgnoreCase(name));
         refreshVanished();
     }
 
     public static void refreshVanished() {
         Bukkit.getOnlinePlayers().forEach(seer ->
             Bukkit.getOnlinePlayers().forEach(target -> {
-                if (vanished.contains(seer.getUniqueId()) || !vanished.contains(target.getUniqueId()))
+                if (isVanished(seer.getName()) || !isVanished(target.getName()))
                     seer.showPlayer(target);
                 else
                     seer.hidePlayer(target);

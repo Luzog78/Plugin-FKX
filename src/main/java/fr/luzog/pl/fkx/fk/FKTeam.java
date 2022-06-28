@@ -110,19 +110,19 @@ public class FKTeam {
         return id;
     }
 
-    public void setId(@Nonnull String id, boolean save) {
+    public void setId(@Nonnull String id, boolean renameFile) {
         if (getManager() != null) {
             if (getManager().getTeam(id) != null && !getManager().getTeam(id).equals(this))
                 throw new FKException.DuplicateTeamIdException(id, getManager().getId());
             if (this.id.equalsIgnoreCase(GODS_ID) || this.id.equalsIgnoreCase(SPECS_ID))
                 throw new FKException.CannotChangeTeamIdException(this.id, getManager().getId());
         }
-        this.id = id;
-        if (save && getManager() != null) {
+        if (renameFile && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" + id + ".yml"));
         }
+        this.id = id;
     }
 
     public String getName() {
@@ -210,12 +210,14 @@ public class FKTeam {
         return ps;
     }
 
-    public FKPlayer getPlayer(UUID uuid) {
-        for (FKPlayer player : getPlayers())
-            if (player.getUuid().equals(uuid))
-                return player;
-        return null;
-    }
+    /*
+     * public FKPlayer getPlayer(UUID uuid) {
+     *     for (FKPlayer player : getPlayers())
+     *         if (player.getUuid().equals(uuid))
+     *             return player;
+     *     return null;
+     * }
+     */
 
     public FKPlayer getPlayer(@Nonnull String name) {
         for (FKPlayer player : getPlayers())
@@ -233,7 +235,7 @@ public class FKTeam {
         if (player.getTeam() == null)
             player.setTeam(id, true);
         else
-            throw new FKException.PlayerAlreadyInTeamException(id, player.getUuid(), player.getName());
+            throw new FKException.PlayerAlreadyInTeamException(id, player.getName());
     }
 
     /**
@@ -245,7 +247,7 @@ public class FKTeam {
         if (player.getTeam() == this)
             player.leaveTeam(true);
         else
-            throw new FKException.PlayerNotInTeamException(id, player.getUuid(), player.getName());
+            throw new FKException.PlayerNotInTeamException(id, player.getName());
     }
 
     public Team getScoreboardTeam() {
@@ -266,7 +268,7 @@ public class FKTeam {
 
     public void setPermissions(FKPermissions permissions, boolean save) {
         this.permissions = permissions;
-        if(save)
+        if (save)
             savePermissions();
     }
 

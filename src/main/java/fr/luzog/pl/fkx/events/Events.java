@@ -54,7 +54,9 @@ public class Events implements Listener {
     public static final double STILL_Y_VEL_CONSTANT = -0.0784000015258789;
 
     public static final String canInteractTag = "canInteract";
-    public static final String canClickOnTag = "canClickOn";
+    public static final String cantClickOnTag = "cantClickOn";
+    public static final String closeTag = "closeInventory";
+    public static final String exeTag = "executeCommand";
     public static final String lastDamageLootingLevelTag = "lastDamageLootingLevel";
     public static final String lastDamageSilkTouchTag = "lastDamageSilkTouch";
 
@@ -557,7 +559,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onDropItem(PlayerDropItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fkps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -574,7 +576,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onPickupItem(PlayerPickupItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fkps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -591,7 +593,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onBedEnter(PlayerBedEnterEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
         if (fkps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -650,7 +652,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getUniqueId(), e.getEntity().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getName());
         if (fkps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -673,7 +675,7 @@ public class Events implements Listener {
     @EventHandler
     public static void onShoot(EntityShootBowEvent e) {
         if (e.getEntity() instanceof Player) {
-            List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getUniqueId(), e.getEntity().getName());
+            List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getName());
             if (fkps.isEmpty()) {
                 e.setCancelled(true);
                 return;
@@ -687,7 +689,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEnchant(EnchantItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEnchanter().getUniqueId(), e.getEnchanter().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEnchanter().getName());
         if (fkps.isEmpty()) {
             e.setCancelled(true);
             return;
@@ -700,7 +702,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onOpenInventory(InventoryOpenEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getUniqueId(), e.getPlayer().getName());
+        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
 
         for (FKPlayer p : fkps)
             if (p != null)

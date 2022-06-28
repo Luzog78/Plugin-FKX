@@ -65,10 +65,14 @@ public class PlayerStats {
         if(namespace == null)
             return null;
         for (Field f : this.getClass().getDeclaredFields())
-            if (f.isAccessible() && f.getName().equalsIgnoreCase(namespace.replace(" ", "")
+            if (f.getName().equalsIgnoreCase(namespace.replace(" ", "")
                     .replace("_", "").replace("-", "").replace(".", "_")))
                 try {
-                    return f.get(this);
+                    boolean tempAccessible = f.isAccessible();
+                    f.setAccessible(true);
+                    Object o = f.get(this);
+                    f.setAccessible(tempAccessible);
+                    return o;
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 }

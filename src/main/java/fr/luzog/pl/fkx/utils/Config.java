@@ -84,8 +84,8 @@ public class Config {
             return super.getBool(VANISH_IS_PREFIX);
         }
 
-        public List<UUID> getVanishPlayers() {
-            return super.getUUIDList(VANISH_PLAYERS);
+        public HashSet<String> getVanishPlayers() {
+            return new HashSet<>(super.getStrList(VANISH_PLAYERS));
         }
 
         public Globals setVersion(Object version, boolean force) {
@@ -110,10 +110,10 @@ public class Config {
             return this;
         }
 
-        public Globals setVanish(String preSufIx, boolean isPrefix, List<UUID> players, boolean force) {
+        public Globals setVanish(String preSufIx, boolean isPrefix, Collection<String> players, boolean force) {
             super.set(VANISH_PRE_SUF_IX, preSufIx, force);
             super.set(VANISH_IS_PREFIX, isPrefix, force);
-            super.set(VANISH_PLAYERS, players, force);
+            super.set(VANISH_PLAYERS, new ArrayList<>(players), force);
             return this;
         }
     }
@@ -636,12 +636,16 @@ public class Config {
             return this;
         }
 
-        public String getName() {
-            return super.getStr(NAME);
+        public UUID getLastUuid() {
+            try {
+                return UUID.fromString(super.getStr(NAME));
+            } catch (Exception e) {
+                return null;
+            }
         }
 
-        public Player setName(String name, boolean force) {
-            super.set(NAME, name, force);
+        public Player setLastUuid(UUID lastUuid, boolean force) {
+            super.set(NAME, lastUuid, force);
             return this;
         }
 
@@ -944,6 +948,16 @@ public class Config {
         }};
     }
 
+    /**
+     * This function returns a list of UUIDs from a path in the config.
+     *
+     * @param path The path to the list.
+     *
+     * @return A list of UUIDs
+     *
+     * @deprecated It will be removed in the future. (No UUID supported for offline mode)
+     */
+    @Deprecated
     public List<UUID> getUUIDList(String path) {
         return new ArrayList<UUID>() {{
             for (String s : getStrList(path))
@@ -999,7 +1013,15 @@ public class Config {
             set(path, new HashMap<>(), force);
         else
             for (Field f : stats.getClass().getDeclaredFields())
-                set(path + "." + f.getName().toLowerCase().replace("_", "-"), stats.get(f.getName()), force);
+                try {
+                    boolean tempAccessible = f.isAccessible();
+                    f.setAccessible(true);
+                    Object o = f.get(stats);
+                    f.setAccessible(tempAccessible);
+                    set(path + "." + f.getName().toLowerCase().replace("_", "-"), o, force);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         return this;
     }
 

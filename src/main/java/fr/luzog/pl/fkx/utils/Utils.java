@@ -339,7 +339,7 @@ public class Utils {
         }
     }
 
-    public static Pair<String, UUID> getNameAndUUIDFromAPI(String username) {
+    public static Pair<String, UUID> getNameAndUUIDFromMojangAPI(String username) {
         try {
             JSONObject obj = (JSONObject) new JSONParser().parse(sendGETRequest("https://api.mojang.com/users/profiles/minecraft/" + username));
             return new Pair<>(obj.get("name").toString(), parseUUID(obj.get("id").toString()));
@@ -350,7 +350,7 @@ public class Utils {
         }
     }
 
-    public static MojangProfile getMojangProfileFromAPI(UUID uuid) {
+    public static MojangProfile getProfileFromMojangAPI(UUID uuid) {
         try {
             JSONObject obj = (JSONObject) new JSONParser().parse(sendGETRequest("https://sessionserver.mojang.com/session/minecraft/profile/" + (uuid + "").replace("-", "") + "?unsigned=false"));
             JSONObject prop = (JSONObject) ((JSONArray) obj.get("properties")).get(0);
