@@ -125,14 +125,14 @@ commands:
 #    description: Roll a Dice
   lightning:
     description: Strike a lightning !!
-#  damage:
-#    description: Give damages X_X
+  damage:
+    description: Give damages X_X
   freeze:
     description: Freeze a player -_-
   bounce:
     description: Bounce a player high in the sky ! :)
-#  burn:
-#    description: Set on fire a player xD
+  burn:
+    description: Set on fire a player xD
 #  explode:
 #    description: Create an explosion ;)
   shuffle:

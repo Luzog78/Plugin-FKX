@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.List;
@@ -28,8 +29,26 @@ public class InventoryClickHandler implements Listener {
                     e.getWhoClicked().closeInventory();
                 if (nbt.hasKey(Events.cantClickOnTag) && nbt.getBoolean(Events.cantClickOnTag))
                     e.setCancelled(true);
-                if (nbt.hasKey(Events.exeTag))
-                    ((Player) e.getWhoClicked()).performCommand(nbt.getString(Events.exeTag));
+                if (e.getClick() == ClickType.LEFT && nbt.hasKey(Events.exeLeftTag) && nbt.getString(Events.exeLeftTag) != null)
+                    for (String s : nbt.getString(Events.exeLeftTag).split("\n"))
+                        if (!s.equalsIgnoreCase("null"))
+                            ((Player) e.getWhoClicked()).performCommand(s);
+                if (e.getClick() == ClickType.SHIFT_LEFT && nbt.hasKey(Events.exeShiftLeftTag) && nbt.getString(Events.exeShiftLeftTag) != null)
+                    for (String s : nbt.getString(Events.exeShiftLeftTag).split("\n"))
+                        if (!s.equalsIgnoreCase("null"))
+                            ((Player) e.getWhoClicked()).performCommand(s);
+                if (e.getClick() == ClickType.RIGHT && nbt.hasKey(Events.exeRightTag) && nbt.getString(Events.exeRightTag) != null)
+                    for (String s : nbt.getString(Events.exeRightTag).split("\n"))
+                        if (!s.equalsIgnoreCase("null"))
+                            ((Player) e.getWhoClicked()).performCommand(s);
+                if (e.getClick() == ClickType.SHIFT_RIGHT && nbt.hasKey(Events.exeShiftRightTag) && nbt.getString(Events.exeShiftRightTag) != null)
+                    for (String s : nbt.getString(Events.exeShiftRightTag).split("\n"))
+                        if (!s.equalsIgnoreCase("null"))
+                            ((Player) e.getWhoClicked()).performCommand(s);
+                if (e.getClick() == ClickType.MIDDLE && nbt.hasKey(Events.exeMiddleTag) && nbt.getString(Events.exeMiddleTag) != null)
+                    for (String s : nbt.getString(Events.exeMiddleTag).split("\n"))
+                        if (!s.equalsIgnoreCase("null"))
+                            ((Player) e.getWhoClicked()).performCommand(s);
             }
     }
 

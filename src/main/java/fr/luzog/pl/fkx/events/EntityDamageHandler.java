@@ -39,25 +39,31 @@ public class EntityDamageHandler implements Listener {
 
             for (FKPlayer fp : fps) {
 
-                if (fp != null) {
-                    if (fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
-                        e.setCancelled(true);
-                        return;
-                    }
-                    fp.getStats().increaseDamageTaken(e.getDamage());
+                if (fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
+                    e.setCancelled(true);
+                    return;
                 }
+                fp.getStats().increaseDamageTaken(e.getDamage());
 
                 if (entity.getHealth() - e.getFinalDamage() <= 0) {
-                    if (fp != null)
-                        fp.getStats().increaseDeaths();
-                    Broadcast.mess((fp != null ? fp.getDisplayName() : p.getDisplayName()) + "§c est mort.");
+                    fp.getStats().increaseDeaths();
+                    Broadcast.mess(fp.getDisplayName() + "§c est mort.");
                     e.setCancelled(true);
                     p.setHealth(p.getMaxHealth());
                     p.setFoodLevel(20);
                     p.setSaturation(20f);
-                    p.teleport(p.getBedSpawnLocation() == null ? fp == null ? FKManager.getCurrentGame().getLobby().getSpawn() == null ?
-                            Main.world.getSpawnLocation() : FKManager.getCurrentGame().getLobby().getSpawn() : fp.getTeam().getSpawn() : p.getBedSpawnLocation());
+                    p.teleport(p.getBedSpawnLocation() == null ?
+                            fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
+                                    fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
+                                            fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?
+                                                    Main.world == null ?
+                                                            p.getLocation()
+                                                            : Main.world.getSpawnLocation()
+                                                    : fp.getManager().getLobby().getSpawn() : fp.getManager().getSpawn().getSpawn()
+                                    : fp.getTeam().getSpawn()
+                            : p.getBedSpawnLocation());
                 }
+
             }
         } else if (entity.getHealth() - e.getFinalDamage() <= 0)
             new BukkitRunnable() {

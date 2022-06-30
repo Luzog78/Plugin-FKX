@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.events.Events;
 import javafx.util.Pair;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -211,6 +212,22 @@ public class Items {
 
     public static ItemStack tnt() {
         return builder(Material.TNT).setName("§cSainte TNT").build();
+    }
+
+    public static ItemStack arrow() {
+        return builder(Material.ARROW).setName("§fFlèche").build();
+    }
+
+    public static ItemStack snowball() {
+        return builder(Material.SNOW_BALL).setName("§fBoule de Neige").build();
+    }
+
+    public static ItemStack egg() {
+        return builder(Material.EGG).setName("§fOeuf").build();
+    }
+
+    public static ItemStack getBanner(DyeColor color) {
+        return i(Material.BANNER, 1, (short) (15 - color.getData()), "Bannière : " + color.name() + " " + color.getData());
     }
 
     @SafeVarargs
@@ -424,6 +441,91 @@ public class Items {
 
         public Builder setData(MaterialData data) {
             item.setData(data);
+            return this;
+        }
+
+        public boolean getCantClickOn() {
+            return getNBT().getBoolean(Events.cantClickOnTag);
+        }
+
+        public Builder setCantClickOn(boolean cantClickOn) {
+            item = getNBT().setBoolean(Events.cantClickOnTag, cantClickOn).build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public boolean getCloseOnClick() {
+            return getNBT().getBoolean(Events.closeTag);
+        }
+
+        public Builder setCloseOnClick(boolean closeOnClick) {
+            item = getNBT().setBoolean(Events.closeTag, closeOnClick).build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setGlobalCommandOnClick(String cmd) {
+            item = getNBT()
+                    .setString(Events.exeLeftTag, cmd)
+                    .setString(Events.exeShiftLeftTag, cmd)
+                    .setString(Events.exeRightTag, cmd)
+                    .setString(Events.exeShiftRightTag, cmd)
+                    .setString(Events.exeMiddleTag, cmd)
+                    .build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setMiddleCommandOnClick(String cmd) {
+            item = getNBT()
+                    .setString(Events.exeMiddleTag, cmd)
+                    .build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setShiftCommandOnClick(String cmd, String cmdShift) {
+            item = getNBT()
+                    .setString(Events.exeLeftTag, cmd)
+                    .setString(Events.exeShiftLeftTag, cmdShift)
+                    .setString(Events.exeRightTag, cmd)
+                    .setString(Events.exeShiftRightTag, cmdShift)
+                    .build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setLeftRightCommandOnClick(String cmdLeft, String cmdRight) {
+            item = getNBT()
+                    .setString(Events.exeLeftTag, cmdLeft)
+                    .setString(Events.exeShiftLeftTag, cmdLeft)
+                    .setString(Events.exeRightTag, cmdRight)
+                    .setString(Events.exeShiftRightTag, cmdRight)
+                    .build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setLeftRightShiftCommandOnClick(String cmdLeft, String cmdShiftLeft, String cmdRight, String cmdShiftRight) {
+            item = getNBT()
+                    .setString(Events.exeLeftTag, cmdLeft)
+                    .setString(Events.exeShiftLeftTag, cmdShiftLeft)
+                    .setString(Events.exeRightTag, cmdRight)
+                    .setString(Events.exeShiftRightTag, cmdShiftRight)
+                    .build();
+            meta = item.getItemMeta();
+            return this;
+        }
+
+        public Builder setCompleteCommandOnClick(String cmdLeft, String cmdShiftLeft, String cmdRight, String cmdShiftRight, String cmdMiddle) {
+            item = getNBT()
+                    .setString(Events.exeLeftTag, cmdLeft)
+                    .setString(Events.exeShiftLeftTag, cmdShiftLeft)
+                    .setString(Events.exeRightTag, cmdRight)
+                    .setString(Events.exeShiftRightTag, cmdShiftRight)
+                    .setString(Events.exeMiddleTag, cmdMiddle)
+                    .build();
+            meta = item.getItemMeta();
             return this;
         }
     }

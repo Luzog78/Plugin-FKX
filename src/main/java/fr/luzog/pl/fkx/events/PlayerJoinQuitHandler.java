@@ -29,7 +29,7 @@ public class PlayerJoinQuitHandler implements Listener {
 
         for(FKPlayer fkp : fkps) {
             fkp.getStats().increaseConnections();
-            if(!fkp.getLastUuid().equals(e.getPlayer().getUniqueId()))
+            if(fkp.getLastUuid() == null || !fkp.getLastUuid().equals(e.getPlayer().getUniqueId()))
                 fkp.setLastUuid(e.getPlayer().getUniqueId(), true);
             if(!fkp.getName().equals(e.getPlayer().getName()))
                 fkp.setName(e.getPlayer().getName(), true);

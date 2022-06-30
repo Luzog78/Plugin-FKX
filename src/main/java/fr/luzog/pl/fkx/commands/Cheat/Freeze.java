@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class Freeze implements CommandExecutor, TabCompleter, Listener {
     public static final String syntaxe = "/freeze [(on | off)] <players...>";
 
-    public static List<UUID> frozen = new ArrayList<>();
+    public static List<String> frozen = new ArrayList<>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
@@ -34,18 +34,25 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
             CmdUtils.getPlayersFromArray(args, args[0].equalsIgnoreCase("on")
                     || args[0].equalsIgnoreCase("off") ? 1 : 0).forEach(player -> {
                 boolean f = args[0].equalsIgnoreCase("on") || args[0].equalsIgnoreCase("off") ?
-                        args[0].equalsIgnoreCase("on") : !frozen.contains(player.getUniqueId());
-                freeze(player.getUniqueId(), f);
+                        args[0].equalsIgnoreCase("on") : !isFrozen(player.getName());
+                freeze(player.getName(), f);
                 u.succ("§6" + player.getDisplayName(), "§rest à présent§9", (f ? "gelé" : "décongelé"), "§r!");
             });
 
         return false;
     }
 
-    public static void freeze(UUID uuid, boolean frozen) {
-        Freeze.frozen.remove(uuid);
+    public static boolean isFrozen(String name) {
+        for (String s : frozen)
+            if (s.equalsIgnoreCase(name))
+                return true;
+        return false;
+    }
+
+    public static void freeze(String name, boolean frozen) {
+        Freeze.frozen.removeIf(s -> s.equalsIgnoreCase(name));
         if (frozen)
-            Freeze.frozen.add(uuid);
+            Freeze.frozen.add(name);
     }
 
     public static void frozenWarning(Player player){
@@ -54,7 +61,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onMove(PlayerMoveEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId()) && (e.getFrom().getX() != e.getTo().getX()
+        if (isFrozen(e.getPlayer().getName()) && (e.getFrom().getX() != e.getTo().getX()
                 || e.getFrom().getY() != e.getTo().getY() || e.getFrom().getZ() != e.getFrom().getZ())) {
             frozenWarning(e.getPlayer());
             e.getPlayer().teleport(e.getFrom());
@@ -63,23 +70,23 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onInteract(PlayerInteractEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public static void onInteracEntity(PlayerInteractEntityEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+    public static void onInteractEntity(PlayerInteractEntityEvent e){
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public static void onInteracAtEntity(PlayerInteractAtEntityEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+    public static void onInteractAtEntity(PlayerInteractAtEntityEvent e){
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
@@ -87,7 +94,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onPickup(PlayerPickupItemEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
@@ -95,7 +102,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onDrop(PlayerDropItemEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
@@ -103,7 +110,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onBedEnter(PlayerBedEnterEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
@@ -111,7 +118,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onBucketEmpty(PlayerBucketEmptyEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }
@@ -119,7 +126,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
 
     @EventHandler
     public static void onBucketFill(PlayerBucketFillEvent e){
-        if (frozen.contains(e.getPlayer().getUniqueId())) {
+        if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
         }

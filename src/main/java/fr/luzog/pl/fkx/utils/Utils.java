@@ -8,6 +8,8 @@ import javafx.util.Pair;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -297,12 +299,13 @@ public class Utils {
 
     public static String locToString(Location loc, boolean decimal, boolean ywPi, boolean world) {
         DecimalFormat df = new DecimalFormat(decimal ? "0.00" : "#");
-        return df.format(loc.getX()) + "  " + df.format(loc.getY()) + "  " + df.format(loc.getZ())
+        // Formatting the location of the player to a string.
+        return (df.format(loc.getX()) + "  " + df.format(loc.getY()) + "  " + df.format(loc.getZ())
                 + (ywPi ? "  (" + df.format(loc.getYaw()) + "  " + df.format(loc.getPitch()) + ")" : "")
                 + (world ? "  " + (loc.getWorld().getName().equalsIgnoreCase("world") ? "§aOverWorld"
                 : loc.getWorld().getName().equalsIgnoreCase("world_nether") ? "§dNether"
                 : loc.getWorld().getName().equalsIgnoreCase("world_the_end") ? "§5End"
-                : loc.getWorld().getName().equalsIgnoreCase("world")) : "") + "§r";
+                : loc.getWorld().getName().equalsIgnoreCase("world")) : "") + "§r").replace(",", ".");
     }
 
     public static UUID parseUUID(String uuid) {
@@ -534,6 +537,7 @@ public class Utils {
      * It gets all the players in the game and in the server, and returns them as an ArrayList
      *
      * @param manager The {@link FKManager} object that you want to get the players from.
+     *
      * @return A list of all players in the game.
      */
     public static ArrayList<String> getAllPlayers(FKManager manager) {
@@ -542,5 +546,130 @@ public class Utils {
             players.addAll(manager.getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
         players.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
         return new ArrayList<>(players);
+    }
+
+    public static ChatColor dyeToChatColor(DyeColor color) {
+        return dataToChatColor(color.getData());
+    }
+
+    public static DyeColor chatToDyeColor(ChatColor color) {
+        return dataToDyeColor(chatToDataColor(color));
+    }
+
+    public static ChatColor dataToChatColor(int color) {
+        switch (color) {
+            case 0:
+                return ChatColor.WHITE;
+            case 1:
+                return ChatColor.GOLD;
+            case 2:
+                return ChatColor.LIGHT_PURPLE;
+            case 3:
+                return ChatColor.BLUE;
+            case 4:
+                return ChatColor.YELLOW;
+            case 5:
+                return ChatColor.GREEN;
+            case 6:
+                return ChatColor.AQUA;
+            case 7:
+                return ChatColor.GRAY;
+            case 8:
+                return ChatColor.DARK_GRAY;
+            case 9:
+                return ChatColor.DARK_AQUA;
+            case 10:
+                return ChatColor.DARK_PURPLE;
+            case 11:
+                return ChatColor.DARK_BLUE;
+            case 12:
+                return ChatColor.DARK_RED;
+            case 13:
+                return ChatColor.DARK_GREEN;
+            case 14:
+                return ChatColor.RED;
+            case 15:
+                return ChatColor.BLACK;
+            default:
+                return null;
+        }
+    }
+
+    public static DyeColor dataToDyeColor(int color) {
+        switch (color) {
+            case 0:
+                return DyeColor.WHITE;
+            case 1:
+                return DyeColor.ORANGE;
+            case 2:
+                return DyeColor.MAGENTA;
+            case 3:
+                return DyeColor.LIGHT_BLUE;
+            case 4:
+                return DyeColor.YELLOW;
+            case 5:
+                return DyeColor.LIME;
+            case 6:
+                return DyeColor.PINK;
+            case 7:
+                return DyeColor.GRAY;
+            case 8:
+                return DyeColor.SILVER;
+            case 9:
+                return DyeColor.CYAN;
+            case 10:
+                return DyeColor.PURPLE;
+            case 11:
+                return DyeColor.BLUE;
+            case 12:
+                return DyeColor.BROWN;
+            case 13:
+                return DyeColor.GREEN;
+            case 14:
+                return DyeColor.RED;
+            case 15:
+                return DyeColor.BLACK;
+            default:
+                return null;
+        }
+    }
+
+    public static byte chatToDataColor(ChatColor color) {
+        switch (color) {
+            case WHITE:
+                return 0;
+            case GOLD:
+                return 1;
+            case LIGHT_PURPLE:
+                return 2;
+            case BLUE:
+                return 3;
+            case YELLOW:
+                return 4;
+            case GREEN:
+                return 5;
+            case AQUA:
+                return 6;
+            case GRAY:
+                return 7;
+            case DARK_GRAY:
+                return 8;
+            case DARK_AQUA:
+                return 9;
+            case DARK_PURPLE:
+                return 10;
+            case DARK_BLUE:
+                return 11;
+            case DARK_RED:
+                return 12;
+            case DARK_GREEN:
+                return 13;
+            case RED:
+                return 14;
+            case BLACK:
+                return 15;
+            default:
+                return -1;
+        }
     }
 }

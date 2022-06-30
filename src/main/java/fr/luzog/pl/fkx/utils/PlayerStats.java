@@ -65,8 +65,8 @@ public class PlayerStats {
         if(namespace == null)
             return null;
         for (Field f : this.getClass().getDeclaredFields())
-            if (f.getName().equalsIgnoreCase(namespace.replace(" ", "")
-                    .replace("_", "").replace("-", "").replace(".", "_")))
+            if (f.getName().replace("_", "").replace("-", "").replace(".", "")
+                    .equalsIgnoreCase(namespace.replace(" ", "").replace("_", "").replace("-", "").replace(".", "")))
                 try {
                     boolean tempAccessible = f.isAccessible();
                     f.setAccessible(true);

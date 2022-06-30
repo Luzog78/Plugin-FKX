@@ -645,7 +645,7 @@ public class Config {
         }
 
         public Player setLastUuid(UUID lastUuid, boolean force) {
-            super.set(NAME, lastUuid, force);
+            super.set(NAME, lastUuid == null ? null : lastUuid.toString(), force);
             return this;
         }
 

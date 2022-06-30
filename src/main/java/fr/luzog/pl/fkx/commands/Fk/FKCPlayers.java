@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.fk.GUIs.GuiPlayers;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -62,8 +63,10 @@ public class FKCPlayers {
                     u.succ(" - Zone : §f" + (fkp == null ? "§cHors Jeu" : fkp.getZone() == null ? "§cAucune" : fkp.getZone().getId() + "§7 (" + fkp.getZone().getType() + ")"));
                 } else
                     u.synt();
+            else if (sender instanceof Player)
+                u.getPlayer().openInventory(GuiPlayers.getPlayer(p == null ? Bukkit.getOfflinePlayer(args[1]).getName() : p.getName(), u.getPlayer(), "fk players"));
             else
-                u.succ("TODO -> Player GUIs");
+                u.succ(CmdUtils.err_not_player);
 
         }
 

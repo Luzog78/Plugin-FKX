@@ -2,9 +2,11 @@ package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.scoreboard.NameTagVisibility;
 import org.bukkit.scoreboard.Team;
 
@@ -278,5 +280,19 @@ public class FKTeam {
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setPermissions(permissions, true).save();
         }
+    }
+
+    public ItemStack getBanner() {
+        ItemStack banner = new ItemStack(Material.BANNER, 1, (short) (15 - Utils.chatToDataColor(color)));
+        BannerMeta meta = (BannerMeta) banner.getItemMeta();
+        DyeColor dye = Utils.chatToDyeColor(color), white = DyeColor.WHITE;
+        meta.addPattern(new Pattern(dye, PatternType.CURLY_BORDER));
+        meta.addPattern(new Pattern(white, PatternType.CURLY_BORDER));
+        meta.addPattern(new Pattern(dye, PatternType.STRIPE_CENTER));
+        meta.addPattern(new Pattern(white, PatternType.STRIPE_CENTER));
+        meta.addPattern(new Pattern(dye, PatternType.FLOWER));
+        meta.addPattern(new Pattern(white, PatternType.FLOWER));
+        banner.setItemMeta(meta);
+        return banner;
     }
 }

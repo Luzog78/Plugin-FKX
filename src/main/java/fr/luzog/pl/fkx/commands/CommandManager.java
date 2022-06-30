@@ -49,6 +49,8 @@ public enum CommandManager {
 
     FUN(
             new CommandItem(new Bounce(), "bounce"),
+            new CommandItem(new Burn(), "burn"),
+            new CommandItem(new Damage(), "damage"),
             new CommandItem(new Hat(), "hat"),
             new CommandItem(new Head(), "head"),
             new CommandItem(new Lightning(), "lightning"),

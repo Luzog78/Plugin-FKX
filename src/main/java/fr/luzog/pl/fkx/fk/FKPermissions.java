@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class FKPermissions {
 
-    public static enum Type {PVP, FRIENDLY_FIRE, MOBS, BREAK, BREAKSPE, PLACE, PLACESPE;}
+    public static enum Type {PVP, FRIENDLY_FIRE, BREAK, BREAKSPE, MOBS, PLACE, PLACESPE;}
 
     public static enum Definition {
         ON, OFF, DEFAULT;

@@ -24,7 +24,6 @@ public class FKCommand implements CommandExecutor, TabCompleter {
         if (args.length == 0)
             if (sender instanceof Player)
                 u.getPlayer().openInventory(GuiFK.getInv(FKManager.getCurrentGame(), u.getPlayer()));
-//                u.succ("TODO -> Open GUI");
             else
                 u.synt();
 

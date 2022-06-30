@@ -1,6 +1,5 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
-import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -10,8 +9,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-
-import static fr.luzog.pl.fkx.commands.Utils.Trash.title;
 
 public class Guis {
 
@@ -27,9 +24,8 @@ public class Guis {
         return Items.builder(Material.BARRIER)
                 .setName("§cFermer")
                 .setLore("§8" + loreSeparator, "§7Cliquez pour fermer l'inventaire.")
-                .getNBT()
-                .set(Events.cantClickOnTag, true)
-                .set(Events.closeTag, true)
+                .setCantClickOn(true)
+                .setCloseOnClick(true)
                 .build();
     }
 
@@ -45,9 +41,25 @@ public class Guis {
         return Items.builder(Material.ARROW)
                 .setName("§7Retour")
                 .setLore("§8" + loreSeparator, "§7Cliquez pour retourner à", "§7 l'inventaire précédent.", " ", "§7Commande:", "§7" + command)
-                .getNBT()
-                .set(Events.cantClickOnTag, true)
-                .set(Events.exeTag, command)
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(command)
+                .build();
+    }
+
+    /**
+     * It creates an itemstack with the material of an ender pearl or an eye of ender, depending on the boolean parameter,
+     * with a name and a lore, and when clicked, it executes a command
+     *
+     * @param here Whether the item is a "teleport here" item or a "teleport to" item
+     * @param command The command to execute when the item is clicked.
+     * @return An ItemStack
+     */
+    public static ItemStack tp(boolean here, String command) {
+        return Items.builder(here ? Material.ENDER_PEARL : Material.EYE_OF_ENDER)
+                .setName(here ? "§5Téléporter ici" : "§dSe téléporter")
+                .setLore("§8" + loreSeparator, "§7Cliquez pour " + (here ? "téléporter ici" : "se téléporter"))
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(command)
                 .build();
     }
 
@@ -62,7 +74,7 @@ public class Guis {
      *
      * @return An {@link Inventory}
      */
-    public static Inventory getBaseInventory(String name, int size, @Nullable String back, @Nullable ItemStack main, @Nullable ItemStack second) {
+    public static Inventory getBaseInventory(String name, int size, String back, @Nullable ItemStack main, @Nullable ItemStack second) {
         Inventory inv = Bukkit.createInventory(null, size, name);
         Utils.fill(inv, 0, size - 1, false, Items.gray());
         Utils.fill(inv, 0, size - 1, true, Items.blue());
@@ -77,16 +89,22 @@ public class Guis {
         return inv;
     }
 
-    public static Inventory getErrorInventory(String error, @Nullable String back) {
+    /**
+     * It creates an inventory with a red background, a red title, a red error message, and a red close button
+     *
+     * @param error The error message to display.
+     * @param back The command to execute when the player clicks on the error message.
+     * @return An inventory
+     */
+    public static Inventory getErrorInventory(String error, String back) {
         Inventory inv = Bukkit.createInventory(null, 27, "§cErreur");
         Utils.fill(inv, 0, 26, Items.builder(Material.DEAD_BUSH)
                 .setName("§4§l" + SpecialChars.NO + " Erreur " + SpecialChars.NO)
                 .setLore("§8" + loreSeparator, " ",
                         "§c" + (error == null ? "Erreur non reconnue.\n§cRessayez plus tard." : error),
                         " ", "§8" + loreSeparator, "§7Cliquez pour " + (back == null ? "fermer" : "retourner à\n§7l'inventaire précédent") + ".")
-                .getNBT()
-                .set(Events.cantClickOnTag, true)
-                .set(back == null ? Events.closeTag : Events.exeTag, back == null ? true : back)
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(back)
                 .build());
         inv.setItem(8, close());
         return inv;

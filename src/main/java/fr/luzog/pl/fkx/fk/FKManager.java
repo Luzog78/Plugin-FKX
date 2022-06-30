@@ -5,11 +5,12 @@ import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -380,6 +381,19 @@ public class FKManager {
                 save(true);
             getConfig().getFile().getParentFile().renameTo(new File(getConfig().getFile().getParentFile().getParentFile().getPath() + "/old-" + id));
         }
+    }
+
+    public static ItemStack getBanner() {
+        ItemStack banner = new ItemStack(Material.BANNER);
+        BannerMeta meta = (BannerMeta) banner.getItemMeta();
+        meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS_MIDDLE));
+        meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CURLY_BORDER));
+        meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CIRCLE_MIDDLE));
+        meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CREEPER));
+        meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLE_TOP));
+        meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLES_TOP));
+        banner.setItemMeta(meta);
+        return banner;
     }
 
     public static FKManager getCurrentGame() {

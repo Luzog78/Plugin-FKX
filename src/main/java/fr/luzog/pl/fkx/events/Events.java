@@ -56,7 +56,11 @@ public class Events implements Listener {
     public static final String canInteractTag = "canInteract";
     public static final String cantClickOnTag = "cantClickOn";
     public static final String closeTag = "closeInventory";
-    public static final String exeTag = "executeCommand";
+    public static final String exeLeftTag = "executeLeftCommand";
+    public static final String exeShiftLeftTag = "executeShiftLeftCommand";
+    public static final String exeRightTag = "executeRightCommand";
+    public static final String exeShiftRightTag = "executeShiftRightCommand";
+    public static final String exeMiddleTag = "executeMiddleCommand";
     public static final String lastDamageLootingLevelTag = "lastDamageLootingLevel";
     public static final String lastDamageSilkTouchTag = "lastDamageSilkTouch";
 
