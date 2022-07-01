@@ -119,6 +119,30 @@ public class GuiPlayers {
         inv.setItem(Utils.posOf(6, 3), Guis.tp(false, "tp " + player));
         inv.setItem(Utils.posOf(7, 3), Guis.tp(true, "tp " + player + " " + opener.getName()));
 
+        inv.setItem(Utils.posOf(1, 3), Items.builder(Material.WOOD_PICKAXE)
+                .setName("§cKick / Ban / Ban-IP")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic gauche pour Expulser",
+                        "§7Clic droit pour Bannir",
+                        "§7Clic molette pour Bannir l'IP"
+                )
+                .setCantClickOn(true)
+                .setLeftRightCommandOnClick("kick " + player, "ban " + player)
+                .setMiddleCommandOnClick("ban-ip " + player)
+                .build());
+        inv.setItem(Utils.posOf(2, 3), Items.builder(Material.GHAST_TEAR)
+                .setName("§6Warn")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour donner un",
+                        " §7avertissement au joueur"
+                )
+                .setCantClickOn(true)
+                .setLeftRightCommandOnClick("kick " + player, "ban " + player)
+                .setMiddleCommandOnClick("ban-ip " + player)
+                .build());
+
         inv.setItem(Utils.posOf(1, 4), Items.builder(Material.BED)
                 .setName("§cSpawn")
                 .setLore(

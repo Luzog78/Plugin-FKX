@@ -1,8 +1,17 @@
 package fr.luzog.pl.fkx.utils;
 
+import java.text.DecimalFormat;
+
 public enum DayMoment {
 
-    SUNRISE(0), MORNING(3000), MIDDAY(6000), AFTERNOON(9000), SUNSET(12000), EVENING(15000), MIDNIGHT(18000), NIGHT(21000);
+    SUNRISE(0), SM(1500),
+    MORNING(3000), MM(7500),
+    MIDDAY(6000), MA(8500),
+    AFTERNOON(9000), AS(10500),
+    SUNSET(12000), SE(13500),
+    EVENING(15000), EM(16500),
+    MIDNIGHT(18000), MN(19500),
+    NIGHT(21000), NS(22500);
 
     private int hour;
 
@@ -16,6 +25,15 @@ public enum DayMoment {
 
     private void setHour(int hour) {
         this.hour = hour;
+    }
+
+    public String getFormattedName() {
+        return name().length() == 1 ? name().toUpperCase() : name().toUpperCase().charAt(0) + name().toLowerCase().substring(1);
+    }
+
+    public String getFormattedTime() {
+        DecimalFormat df = new DecimalFormat("00");
+        return df.format((int) (hour / 1200)) + ":" + df.format((int) ((hour % 1200) / 20));
     }
 
     @Override

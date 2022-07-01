@@ -2,10 +2,12 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.GUIs.GuiDate;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.DayMoment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,7 +27,10 @@ public class FKCDate {
             return false;
 
         else if (args.length == 1)
-            u.succ("TODO -> Date GUIs");
+            if (sender instanceof Player)
+                u.getPlayer().openInventory(GuiDate.getMainInventory("fk"));
+            else
+                u.err(CmdUtils.err_not_player);
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
@@ -39,7 +44,10 @@ public class FKCDate {
         } else if (args[1].equalsIgnoreCase("day")) {
             u.setSyntaxe(syntaxe_day);
             if (args.length == 2)
-                u.succ("TODO -> Day GUI");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiDate.getDayInventory("fk date"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("get"))
                 u.succ("Date :\n - Jour : §f" + FKManager.getCurrentGame().getDay());
             else if (args[2].equalsIgnoreCase("set") && args.length >= 4)
@@ -54,7 +62,10 @@ public class FKCDate {
         } else if (args[1].equalsIgnoreCase("time")) {
             u.setSyntaxe(syntaxe_time);
             if (args.length == 2)
-                u.succ("TODO -> Time GUI");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiDate.getHourInventory("fk date"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("get"))
                 u.succ("Date :\n - Heure : §f" + FKManager.getCurrentGame().getFormattedTime());
             else if (args[2].equalsIgnoreCase("set") && args.length >= 4)
@@ -80,7 +91,10 @@ public class FKCDate {
         } else if (args[1].equalsIgnoreCase("weather")) {
             u.setSyntaxe(syntaxe_weather);
             if (args.length == 2)
-                u.succ("TODO -> Weather GUI");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiDate.getWeatherInventory("fk date"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("get"))
                 u.succ("Date :\n - Météo : §f" + (FKManager.getCurrentGame().getWeather() == FKManager.Weather.CLEAR ? "§eEnsoleillé"
                         : FKManager.getCurrentGame().getWeather() == FKManager.Weather.RAIN ? "§9Pluvieux" : "§7Tempête"));
@@ -134,7 +148,7 @@ public class FKCDate {
                     DecimalFormat df = new DecimalFormat("00");
                     for (int i = 0; i < 20; i += 4)
                         add(df.format(i) + ":00");
-                    for (int i = 0; i < 24000; i+=6000)
+                    for (int i = 0; i < 24000; i += 6000)
                         add(i + "");
                 }
             } else if (args[1].equalsIgnoreCase("weather")) {
