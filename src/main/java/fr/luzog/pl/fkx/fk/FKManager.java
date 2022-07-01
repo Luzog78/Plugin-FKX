@@ -456,30 +456,27 @@ public class FKManager {
      */
 
     public void start() {
-        Utils.countDown(null, 20, false, true, true,
+        Utils.countDown(null, 3, false, true, true,
                 "La partie commence dans §c%i%§rs...\n§7Préparez-vous à démarrer votre aventure !",
                 "Bonne chance à tous !\n§7Prêt ?  Partez !", "§a", "§6", "§c§l",
-                "§4§l", "§2§l", new Runnable() {
-                    @Override
-                    public void run() {
-                        getPlayers().forEach(p -> {
-                            if (p.getPlayer() != null) {
-                                p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
-                                p.getPlayer().setFoodLevel(20);
-                                p.getPlayer().setSaturation(20);
-                                p.getPlayer().setFireTicks(0);
-                                p.getPlayer().getInventory().clear();
-                                p.getPlayer().getInventory().setArmorContents(null);
-                                p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));
-                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 120, 255, false, false), true);
-                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 120, 255, false, false), true);
-                                p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 120, 1, false, false), true);
-                                p.getPlayer().teleport(p.getTeam().getSpawn());
-                            }
-                        });
-                        setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
-                        setState(State.RUNNING, true);
-                    }
+                "§4§l", "§2§l", () -> {
+                    getPlayers().forEach(p -> {
+                        if (p.getPlayer() != null) {
+                            p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+                            p.getPlayer().setFoodLevel(20);
+                            p.getPlayer().setSaturation(20);
+                            p.getPlayer().setFireTicks(0);
+                            p.getPlayer().getInventory().clear();
+                            p.getPlayer().getInventory().setArmorContents(null);
+                            p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));
+                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2400, 255, false, false), true);
+                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 2400, 255, false, false), true);
+                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
+                            p.getPlayer().teleport(p.getTeam() == null ? getSpawn().getSpawn() : p.getTeam().getSpawn());
+                        }
+                    });
+                    setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
+                    setState(State.RUNNING, true);
                 });
     }
 
@@ -505,6 +502,9 @@ public class FKManager {
         String m1 = "§4§lFin de la partie", m2 = "§7RDV dans qq minutes pour les résultats !";
         getPlayers().forEach(p -> {
             if (p.getPlayer() != null) {
+                p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+                p.getPlayer().setFoodLevel(20);
+                p.getPlayer().setSaturation(20);
                 p.getPlayer().sendTitle(m1, m2);
                 p.getPlayer().sendMessage(Main.PREFIX + m1);
                 p.getPlayer().sendMessage(Main.PREFIX + m2);
@@ -513,6 +513,29 @@ public class FKManager {
         });
         setPriority(new FKPermissions(FKPermissions.Definition.OFF), true);
         setState(State.ENDED, true);
+    }
+
+    public void reboot() {
+        String m1 = "§8§lRéinitialisation de la partie...", m2 = "§7Patience, le début est proche !";
+        getPlayers().forEach(p -> {
+            if (p.getPlayer() != null) {
+                p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
+                p.getPlayer().setFoodLevel(20);
+                p.getPlayer().setSaturation(20);
+                p.getPlayer().sendTitle(m1, m2);
+                p.getPlayer().sendMessage(Main.PREFIX + m1);
+                p.getPlayer().sendMessage(Main.PREFIX + m2);
+                p.getPlayer().teleport(getLobby().getSpawn());
+            }
+        });
+        setState(State.WAITING, false);
+        setDay(0, false);
+        setTime(0, false);
+        getNether().close();
+        getEnd().close();
+        getOptions().getOptions().forEach(FKOptions.FKOption::deactivate);
+        setPriority(new FKPermissions(FKPermissions.Definition.OFF), false);
+        save(false);
     }
 
     public void checkActivations(boolean force) {

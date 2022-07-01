@@ -392,8 +392,11 @@ public class Items {
             return this;
         }
 
-        public Builder addEnchant(Enchantment type, int lvl) {
-            meta.addEnchant(type, lvl, true);
+        public Builder addEnchant(Enchantment type, @Nullable Integer lvl) {
+            if (lvl == null || meta.hasEnchant(type))
+                meta.removeEnchant(type);
+            else
+                meta.addEnchant(type, lvl, true);
             return this;
         }
 

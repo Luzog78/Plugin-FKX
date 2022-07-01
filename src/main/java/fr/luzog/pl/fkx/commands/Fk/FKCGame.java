@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCGame {
-    public static final String syntaxe = "/fk game [help | list | current | (new | switch | gui) <id> | start | end | (pause | resume) [<cooldown>]]";
+    public static final String syntaxe = "/fk game [help | list | current | (new | switch) <id> | state | start | end | reboot | (pause | resume) [<cooldown>]]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -56,23 +56,20 @@ public class FKCGame {
             else
                 u.synt();
 
-        else if (args[1].equalsIgnoreCase("gui"))
-            if (args.length >= 3)
-                if (FKManager.getGame(args[2]) != null)
-                    if (FKManager.getGame(args[2]) != null)
-                        if (sender instanceof Player)
-                            u.getPlayer().openInventory(GuiFK.getInv(FKManager.getGame(args[2]), u.getPlayer()));
-                        else
-                            u.err(CmdUtils.err_not_player);
-                    else
-                        u.err(CmdUtils.err_no_gui_for_this_instance + " (" + args[2] + ")");
-                else
-                    u.err("Aucune partie trouvée.");
+        else if (args[1].equalsIgnoreCase("state"))
+            if(sender instanceof Player)
+                u.getPlayer().openInventory(GuiFK.getStateInventory(u.getPlayer(), "fk"));
             else
-                u.synt();
+                u.err(CmdUtils.err_not_player);
 
         else if (args[1].equalsIgnoreCase("start"))
             FKManager.getCurrentGame().start();
+
+        else if (args[1].equalsIgnoreCase("end"))
+            FKManager.getCurrentGame().end();
+
+        else if (args[1].equalsIgnoreCase("reboot"))
+            FKManager.getCurrentGame().reboot();
 
         else if (args[1].equalsIgnoreCase("pause"))
             if (args.length >= 3)
@@ -93,9 +90,6 @@ public class FKCGame {
                 }
             else
                 FKManager.getCurrentGame().resume(0);
-
-        else if (args[1].equalsIgnoreCase("end"))
-            FKManager.getCurrentGame().end();
 
         else
             u.synt();

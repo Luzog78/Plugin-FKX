@@ -5,10 +5,7 @@ import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.utils.Crafting;
-import fr.luzog.pl.fkx.utils.CustomNBT;
-import fr.luzog.pl.fkx.utils.Loots;
-import fr.luzog.pl.fkx.utils.Utils;
+import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -21,6 +18,7 @@ import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
+import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -711,6 +709,11 @@ public class Events implements Listener {
         for (FKPlayer p : fkps)
             if (p != null)
                 p.getStats().increaseInventoriesOpened();
+    }
+
+    @EventHandler
+    public static void onWeatherChange(WeatherChangeEvent e) {
+        Broadcast.log("Weather changed to " + e.toWeatherState());
     }
 
 }
