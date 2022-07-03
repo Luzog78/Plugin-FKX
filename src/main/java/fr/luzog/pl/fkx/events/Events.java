@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
+import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
@@ -33,6 +34,7 @@ public class Events implements Listener {
         add(new Vanish());
         add(new Freeze());
         add(new Crafting());
+        add(new Ad());
 
         /* *** - Raw Listeners - *** */
         add(new Events());

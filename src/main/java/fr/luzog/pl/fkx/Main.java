@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx;
 
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.CommandManager;
+import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.*;
@@ -67,6 +68,9 @@ public class Main extends JavaPlugin implements Listener {
 
         soufInstruction("§6Initialisation du module : §eCommandes§6...");
         CommandManager.init();
+
+        soufInstruction("§6Initialisation du module : §eAd§6...");
+        Ad.initFromConfig();
 
         soufInstruction("§6Initialisation du module : §eFKManager§6...");
         FKManager.initFromConfig(false);

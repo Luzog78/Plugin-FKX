@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.commands.Admin.*;
 import fr.luzog.pl.fkx.commands.Cheat.*;
 import fr.luzog.pl.fkx.commands.Fk.FKCommand;
 import fr.luzog.pl.fkx.commands.Fun.*;
+import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Other.Test;
 import fr.luzog.pl.fkx.commands.Server.R;
 import fr.luzog.pl.fkx.commands.Utils.Craft;
@@ -63,6 +64,7 @@ public enum CommandManager {
     ),
 
     OTHER(
+            new CommandItem(new Ad(), "ad"),
             new CommandItem(new Test(), "test"),
             new CommandItem(new FKCommand(), "fk")
     ),
