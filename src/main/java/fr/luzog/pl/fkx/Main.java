@@ -237,6 +237,9 @@ public class Main extends JavaPlugin implements Listener {
         soufInstruction("§6Sauvegarde de §eVanish§6...");
         Vanish.saveToConfig();
 
+        soufInstruction("§6Sauvegarde de §eAd§6...");
+        Ad.saveToConfig();
+
         soufInstruction("§6Sauvegarde de toutes les donnees des §eFKGames§6...");
         FKManager.saveAll(false);
 

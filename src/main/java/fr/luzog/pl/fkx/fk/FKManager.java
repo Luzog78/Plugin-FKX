@@ -1,10 +1,7 @@
 package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.utils.Config;
-import fr.luzog.pl.fkx.utils.Portal;
-import fr.luzog.pl.fkx.utils.SpecialChars;
-import fr.luzog.pl.fkx.utils.Utils;
+import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
@@ -101,7 +98,20 @@ public class FKManager {
 
 
                 for (File ff : Objects.requireNonNull(f.listFiles()))
-                    if (ff.isDirectory())
+                    if (ff.isFile() && ff.getName().toLowerCase().endsWith(".yml")) {
+                        if (ff.getName().substring(0, ff.getName().length() - 4).equals("Limits")) {
+                            Config.Limits c = new Config.Limits(f.getName() + "/" + ff.getName()).load();
+                            Limits lim = new Limits();
+                            Utils.tryTo(printStackTrace, () -> lim.setCraft(c.getCraft()));
+                            Utils.tryTo(printStackTrace, () -> lim.setPotion(c.getPotion()));
+                            Utils.tryTo(printStackTrace, () -> lim.setEnchant(c.getEnchant()));
+                            Utils.tryTo(printStackTrace, () -> lim.setWearingMaxDiamondPieces(c.getWearingMaxDiamondPieces()));
+                            Utils.tryTo(printStackTrace, () -> lim.setWearingMaxGoldPieces(c.getWearingMaxGoldPieces()));
+                            Utils.tryTo(printStackTrace, () -> lim.setWearingMaxIronPieces(c.getWearingMaxIronPieces()));
+                            Utils.tryTo(printStackTrace, () -> lim.setWearingMaxLeatherPieces(c.getWearingMaxLeatherPieces()));
+                            manager.setLimits(lim, false);
+                        }
+                    } else
                         if (ff.getName().equalsIgnoreCase("zones")) {
                             for (File fff : Objects.requireNonNull(ff.listFiles()))
                                 if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
@@ -230,6 +240,8 @@ public class FKManager {
 
                 .save();
 
+        limits.saveToConfig(id, soft);
+
         lobby.saveToConfig(id, soft);
         spawn.saveToConfig(id, soft);
         for (FKZone z : zones)
@@ -259,6 +271,8 @@ public class FKManager {
     private FKOptions options;
     private FKListener listener;
 
+    private Limits limits;
+
     private Portal nether, end;
 
     private FKZone lobby;
@@ -286,6 +300,7 @@ public class FKManager {
         setLinkedToSun(true, false);
         setOptions(FKOptions.getDefaultOptions(), false);
         setListener(new FKListener("fko-sb", "FALLEN KINGDOM X", 60 * 5), false);
+        setLimits(new Limits(), false);
         setNether(null, false);
         setEnd(null, false);
         setLobby(new FKZone(null, FKZone.Type.LOBBY,
@@ -336,9 +351,10 @@ public class FKManager {
 
 
     public FKManager(String id, State state, int day, Weather weather, long time, boolean linkedToSun, FKOptions options,
-                     FKListener listener, Portal nether, Portal end, FKZone lobby, FKZone spawn, ArrayList<FKZone> zones,
-                     ArrayList<FKPlayer> players, FKTeam gods, FKTeam specs, ArrayList<FKTeam> teams, FKPermissions global,
-                     FKPermissions neutral, FKPermissions friendly, FKPermissions hostile, FKPermissions priority) {
+                     FKListener listener, Limits limits, Portal nether, Portal end, FKZone lobby, FKZone spawn,
+                     ArrayList<FKZone> zones, ArrayList<FKPlayer> players, FKTeam gods, FKTeam specs,
+                     ArrayList<FKTeam> teams, FKPermissions global, FKPermissions neutral, FKPermissions friendly,
+                     FKPermissions hostile, FKPermissions priority) {
         this.id = id;
         setState(state, false);
         setDay(day, false);
@@ -349,6 +365,7 @@ public class FKManager {
         setLinkedToSun(linkedToSun, false);
         setOptions(options, false);
         setListener(listener, false);
+        setLimits(limits, false);
         setNether(nether, false);
         setEnd(end, false);
         setLobby(lobby, false);
@@ -768,6 +785,21 @@ public class FKManager {
                 .save();
     }
 
+    public Limits getLimits() {
+        return limits;
+    }
+
+    public void setLimits(Limits limits, boolean save) {
+        this.limits = limits;
+        if (save)
+            saveLimits();
+    }
+
+    public void saveLimits() {
+        if (limits != null)
+            limits.saveToConfig(id, false);
+    }
+
     public void savePortal(String id, Portal portal) {
         if (!getConfig().exists())
             save(true);
@@ -912,7 +944,6 @@ public class FKManager {
      *
      * @param name   The name of the player to get.
      * @param create If true, the player will be created if it doesn't exist.
-     *
      * @return A {@link FKPlayer} object
      */
     public FKPlayer getPlayer(@Nonnull String name, boolean create) {

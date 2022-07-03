@@ -8,6 +8,7 @@ import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,15 +18,15 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Events implements Listener {
 
@@ -72,6 +73,19 @@ public class Events implements Listener {
             Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE);
     public static List<Material> unbreakableMat = Arrays.asList(Material.MOB_SPAWNER, Material.WOOL);
     public static List<Material> unplaceableMat = Arrays.asList(Material.WOOL);
+
+    public static List<Material> diamond = Arrays.asList(Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE,
+            Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS, Material.DIAMOND_SWORD, Material.DIAMOND_AXE,
+            Material.DIAMOND_PICKAXE, Material.DIAMOND_SPADE, Material.DIAMOND_HOE);
+    public static List<Material> gold = Arrays.asList(Material.GOLD_HELMET, Material.GOLD_CHESTPLATE,
+            Material.GOLD_LEGGINGS, Material.GOLD_BOOTS, Material.GOLD_SWORD, Material.GOLD_AXE,
+            Material.GOLD_PICKAXE, Material.GOLD_SPADE, Material.GOLD_HOE);
+    public static List<Material> iron = Arrays.asList(Material.IRON_HELMET, Material.IRON_CHESTPLATE,
+            Material.IRON_LEGGINGS, Material.IRON_BOOTS, Material.IRON_SWORD, Material.IRON_AXE,
+            Material.IRON_PICKAXE, Material.IRON_SPADE, Material.IRON_HOE);
+    public static List<Material> leather = Arrays.asList(Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE,
+            Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS, Material.STONE_SWORD, Material.STONE_AXE,
+            Material.STONE_PICKAXE, Material.STONE_SPADE, Material.STONE_HOE);
 
     public static List<BlockLootsItem> breakBlockLoots = new ArrayList<BlockLootsItem>() {{
         add(new BlockLootsItem(Arrays.asList(Material.LOG, Material.LOG_2), false, new Loots().add(new ItemStack(Material.LOG))));
@@ -702,6 +716,17 @@ public class Events implements Listener {
         for (FKPlayer p : fkps)
             if (p != null)
                 p.getStats().increaseEnchantedItems();
+
+        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+                || FKManager.getCurrentGame().getPlayer(e.getEnchanter().getName(), false) == null)
+            return;
+
+        Limits lim = FKManager.getCurrentGame().getLimits();
+
+        for (Enchantment enchant : e.getEnchantsToAdd().keySet())
+            if (lim.getEnchant().containsKey(enchant)
+                    && e.getEnchantsToAdd().get(enchant) > lim.getEnchant().get(enchant))
+                e.setCancelled(true);
     }
 
     @EventHandler
@@ -716,6 +741,53 @@ public class Events implements Listener {
     @EventHandler
     public static void onWeatherChange(WeatherChangeEvent e) {
         Broadcast.log("Weather changed to " + e.toWeatherState());
+    }
+
+    @EventHandler
+    public static void onItemSwap(PlayerItemHeldEvent e) {
+        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+                || FKManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false) == null)
+            return;
+
+        ItemStack is = e.getPlayer().getInventory().getItem(e.getNewSlot());
+        if (is == null)
+            return;
+
+        Limits lim = FKManager.getCurrentGame().getLimits();
+        int d = Limits.diamondScore(e.getPlayer()), dd = diamond.contains(is.getType()) ? 1 : 0,
+                g = Limits.goldScore(e.getPlayer()), gg = gold.contains(is.getType()) ? 1 : 0,
+                i = Limits.ironScore(e.getPlayer()), ii = iron.contains(is.getType()) ? 1 : 0,
+                l = Limits.leatherScore(e.getPlayer()), ll = leather.contains(is.getType()) ? 1 : 0;
+
+        if ((dd == 1 && d + dd > lim.getWearingMaxDiamondPieces())
+                || (gg == 1 && g + gg > lim.getWearingMaxGoldPieces())
+                || (ii == 1 && i + ii > lim.getWearingMaxIronPieces())
+                || (ll == 1 && l + ll > lim.getWearingMaxLeatherPieces()))
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public static void onPotion(BrewEvent e) {
+        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+            || e.getContents().getIngredient().getType() != Material.GLOWSTONE_DUST)
+            return;
+
+        Limits lim = FKManager.getCurrentGame().getLimits();
+        HashMap<PotionEffectType, Integer> p = new HashMap<>();
+        for (ItemStack is : Arrays.asList(e.getContents().getItem(0),
+                e.getContents().getItem(1), e.getContents().getItem(2)))
+            if (is != null && is.getType() == Material.POTION)
+                Potion.fromItemStack(is).getEffects().forEach(pe -> {
+                    if (p.containsKey(pe.getType()))
+                        p.replace(pe.getType(), Math.max(pe.getAmplifier(), p.get(pe.getType())));
+                    else
+                        p.put(pe.getType(), pe.getAmplifier());
+                });
+        for (PotionEffectType pet : p.keySet())
+            if (lim.getPotion().containsKey(pet) && p.get(pet) + 1 > lim.getPotion().get(pet)) {
+                e.setCancelled(true);
+                return;
+            }
     }
 
 }

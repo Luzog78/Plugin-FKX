@@ -1,22 +1,64 @@
 package fr.luzog.pl.fkx.events;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
+import fr.luzog.pl.fkx.utils.Limits;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.Potion;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class InventoryClickHandler implements Listener {
 
     @EventHandler
     public static void onClick(InventoryClickEvent e) {
+        if (e.getInventory().getType() == InventoryType.BREWING && e.getCurrentItem().getType() == Material.POTION
+                && (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT)) {
+            e.setCancelled(true);
+            return;
+        }
+
+        if (e.getInventory().getType() == InventoryType.BREWING
+                && (e.getCurrentItem().getType() == Material.GLOWSTONE_DUST || (e.getCurrentItem().getType() == Material.AIR
+                && e.getCursor() != null && e.getCursor().getType() == Material.POTION
+                && (e.getSlot() == 0 || e.getSlot() == 1 || e.getSlot() == 2)))
+                && FKManager.getCurrentGame() != null && FKManager.getCurrentGame().getLimits() != null
+                && FKManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) != null) {
+            Limits lim = FKManager.getCurrentGame().getLimits();
+            HashMap<PotionEffectType, Integer> p = new HashMap<>();
+            for (ItemStack is : Arrays.asList(e.getCursor(), e.getInventory().getItem(0),
+                    e.getInventory().getItem(1), e.getInventory().getItem(2)))
+                if (is != null && is.getType() == Material.POTION) {
+                    Potion.fromItemStack(is).getEffects().forEach(pe -> {
+                        if (p.containsKey(pe.getType()))
+                            p.replace(pe.getType(), Math.max(pe.getAmplifier(), p.get(pe.getType())));
+                        else
+                            p.put(pe.getType(), pe.getAmplifier());
+                    });
+                }
+            for (PotionEffectType pet : p.keySet())
+                if (lim.getPotion().containsKey(pet) && p.get(pet) + 1 > lim.getPotion().get(pet)) {
+                    e.setCancelled(true);
+                    return;
+                }
+        }
+
         List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getWhoClicked().getName());
 
         for (FKPlayer fp : fps)
@@ -51,6 +93,55 @@ public class InventoryClickHandler implements Listener {
                         if (!s.equalsIgnoreCase("null"))
                             ((Player) e.getWhoClicked()).performCommand(s);
             }
+
+//      TODO : there is a problem of duplication :
+//        When the player pickup an item, idk why but, if it's clicked, no event is called.
+//        ... So for the next click (to complete the drag), the rollback notice an extra item.
+//        Eventually, the item is duplicated. ->> Big problem, but I don't have the time to patch
+//          it. I already spent about 1h30 so tht enough sorry, TO DO IN TIMES TO COME.
+//
+//        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+//                || FKManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) == null)
+//            return;
+//
+//        Limits lim = FKManager.getCurrentGame().getLimits();
+//        int d = Limits.diamondScore(e.getWhoClicked()),
+//                g = Limits.goldScore(e.getWhoClicked()),
+//                i = Limits.ironScore(e.getWhoClicked()),
+//                l = Limits.leatherScore(e.getWhoClicked());
+//
+//        ItemStack[] rollBackInv = e.getWhoClicked().getInventory().getContents(),
+//                rollBackArmor = e.getWhoClicked().getInventory().getArmorContents();
+//        ItemStack rollBackCursor = e.getCursor();
+//
+//        System.out.println("test");
+//
+//        new BukkitRunnable() {
+//            @Override
+//            public void run() {
+//                int dd = Limits.diamondScore(e.getWhoClicked()),
+//                        gg = Limits.goldScore(e.getWhoClicked()),
+//                        ii = Limits.ironScore(e.getWhoClicked()),
+//                        ll = Limits.leatherScore(e.getWhoClicked());
+//                System.out.println(Arrays.stream(rollBackInv).filter(Objects::nonNull).map(ItemStack::getType).map(Enum::name).collect(Collectors.toList()));
+//                System.out.println(Arrays.stream(rollBackArmor).filter(Objects::nonNull).map(ItemStack::getType).map(Enum::name).collect(Collectors.toList()));
+//                System.out.println(rollBackCursor.getType().name());
+//
+//                System.out.println(d + " / " + dd);
+//
+//                if ((dd > d && dd > lim.getWearingMaxDiamondPieces())
+//                        || (gg > g && gg > lim.getWearingMaxGoldPieces())
+//                        || (ii > i && ii > lim.getWearingMaxIronPieces())
+//                        || (ll > l && ll > lim.getWearingMaxLeatherPieces())) {
+//                    System.out.println("Cancel !");
+//                    e.getWhoClicked().getInventory().setContents(rollBackInv);
+//                    e.getWhoClicked().getInventory().setArmorContents(rollBackArmor);
+//                    if (e.getWhoClicked() instanceof Player)
+//                        ((Player) e.getWhoClicked()).updateInventory();
+//                    e.getWhoClicked().getWorld().dropItem(e.getWhoClicked().getLocation(), rollBackCursor);
+//                }
+//            }
+//        }.runTaskLater(Main.instance, 1);
     }
 
 }

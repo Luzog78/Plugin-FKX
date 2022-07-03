@@ -174,6 +174,7 @@ public class FKListener {
     }
 
     public void updateScoreLines() {
+        // TODO, CAN THROWS ConcurrentModificationException !!! (at "l.keySet().forEach(s -> {" line)
         l.keySet().forEach(s -> {
             if (!al.containsValue(s) || (al.containsKey(l.get(s)) && !al.get(l.get(s)).equals(s))) {
                 if (al.containsKey(l.get(s)))

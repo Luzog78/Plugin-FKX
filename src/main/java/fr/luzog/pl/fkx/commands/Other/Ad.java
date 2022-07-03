@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ad implements CommandExecutor, TabCompleter, Listener {
+    public static final String AD_PREFIX = "§8§l[§2Ad§8§l] >>  ";
     public static ArrayList<Item> ads = new ArrayList<>();
 
     public static Config getConfig() {
@@ -201,6 +202,13 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             u.succ("Nous prenons en charge votre demande," +
                     " patientez quelques insant en attendant une réponse.");
         }
+        if(FKManager.getCurrentGame() != null)
+            FKManager.getCurrentGame().getGods().getPlayers().forEach(p -> {
+                if(p.getPlayer() != null) {
+                    p.getPlayer().sendMessage(AD_PREFIX + "§aRequêtes disponibles pour les grands maîtres...");
+                    p.getPlayer().sendMessage(AD_PREFIX + "§7Un petit §8/ad help§7 pourrais vous être util. ^^");
+                }
+            });
         saveToConfig();
     }
 
@@ -279,6 +287,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 DecimalFormat df = new DecimalFormat("000");
                 if (args[0].equalsIgnoreCase("info"))
                     u.succ("Informations de la requête §3#" + df.format(i) + "§r :"
+                            + "\n§r - Date : §f" + new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(ads.get(i).getDate())
                             + "\n§r - Status : §f" + (ad.getState() == State.WAITING ? "§7EN ATTENTE"
                             : ad.getState() == State.ACCEPTED ? "§2PRIS EN CHARGE"
                             : ad.getState() == State.IGNORED ? "§8IGNORÉ"
@@ -289,7 +298,6 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                             : ads.get(i).getInsistence() == 3 ? "§c3"
                             : "§4" + ads.get(i).getInsistence())
 
-                            + "\n§r - Date : §f" + new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(ads.get(i).getDate())
                             + "\n§r - Joueur : §6" + ad.getSender()
                             + "\n§r - Admin : §f" + (ad.getAdmin() == null ? "§cnull" : ad.getAdmin())
                             + "\n§r - Description : §f" + (ad.getMessage() == null ? "§cnull" : ad.getMessage()));
@@ -329,7 +337,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
-        boolean isPlayer = sender instanceof Player || FKManager.getCurrentGame().getGods().getPlayer(sender.getName()) != null;
+        boolean isPlayer = sender instanceof Player && FKManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
         DecimalFormat df = new DecimalFormat("000");
 
         new ArrayList<String>() {{

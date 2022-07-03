@@ -8,6 +8,8 @@ import fr.luzog.pl.fkx.fk.FKZone;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Config {
 
@@ -677,6 +680,143 @@ public class Config {
         }
     }
 
+    public static class Limits extends Config {
+        public static final String CRAFT = "craft", POTION = "potion", ENCHANT = "enchant", HOLDING = "holding", WEARING_TIP = "wearing.tip",
+                WEARING_MAX_DIAMOND_PIECES = "wearing.max-pieces-of.diamond", WEARING_MAX_GOLD_PIECES = "wearing.max-pieces-of.gold",
+                WEARING_MAX_IRON_PIECES = "wearing.max-pieces-of.iron", WEARING_MAX_LEATHER_PIECES = "wearing.max-pieces-of.leather";
+
+        public Limits(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public Limits load() {
+            super.load();
+            set(CRAFT, new ArrayList<>(), false);
+            set(POTION, new HashMap<>(), false);
+            set(ENCHANT, new HashMap<>(), false);
+            set(HOLDING, new HashMap<>(), false);
+            set(WEARING_TIP, Arrays.asList("<Max pieces of> section includes armor pieces AND sword",
+                    new LinkedHashMap<Object, Object>() {{
+                        put("Example", "If max-diamond-pieces = 4, the player has 3 choices");
+                        put(1, "Full diamond armor (but without sword)");
+                        put(2, "3 pieces of diamond armor and it will be allowed to use the d sword");
+                        put(3, "Or wearing leather, chainmail, iron or gold x)");
+                    }}, "So it expect a number between 0 and 5 (included) ^^"), true);
+            set(WEARING_MAX_DIAMOND_PIECES, 5, false);
+            set(WEARING_MAX_GOLD_PIECES, 5, false);
+            set(WEARING_MAX_IRON_PIECES, 5, false);
+            set(WEARING_MAX_LEATHER_PIECES, 5, false);
+            return this;
+        }
+
+        @Override
+        public Limits save() {
+            super.save();
+            return this;
+        }
+
+        public ArrayList<Material> getCraft() {
+            return matchList(CRAFT, Material.values());
+        }
+
+        public Limits setCraft(ArrayList<Material> craft, boolean force) {
+            set(CRAFT, craft.stream().map(Enum::name).collect(Collectors.toList()), force);
+            return this;
+        }
+
+        public HashMap<PotionEffectType, Integer> getPotion() {
+            return new HashMap<PotionEffectType, Integer>() {{
+                if (contains(POTION))
+                    for (String k : getKeys(POTION, false))
+                        if (k != null)
+                            try {
+                                if (PotionEffectType.getByName(k.toUpperCase()) != null)
+                                    put(PotionEffectType.getByName(k.toUpperCase()), getInt(POTION + "." + k));
+                            } catch (NumberFormatException | NullPointerException ignore) {
+                            }
+            }};
+        }
+
+        public Limits setPotion(HashMap<PotionEffectType, Integer> potion, boolean force) {
+            potion.forEach((p, i) -> set(POTION + "." + p.getName(), i, force));
+            return this;
+        }
+
+        public HashMap<Enchantment, Integer> getEnchant() {
+            return new HashMap<Enchantment, Integer>() {{
+                if (contains(ENCHANT))
+                    for (String k : getKeys(ENCHANT, false))
+                        if (k != null)
+                            try {
+                                if (Enchantment.getByName(k.toUpperCase()) != null)
+                                    put(Enchantment.getByName(k.toUpperCase()), getInt(ENCHANT + "." + k));
+                            } catch (NumberFormatException | NullPointerException ignore) {
+                            }
+            }};
+        }
+
+        public Limits setEnchant(HashMap<Enchantment, Integer> enchant, boolean force) {
+            enchant.forEach((e, i) -> set(ENCHANT + "." + e.getName(), i, force));
+            return this;
+        }
+
+        public HashMap<Material, Integer> getHolding() {
+            return new HashMap<Material, Integer>() {{
+                if (contains(HOLDING))
+                    for (String k : getKeys(HOLDING, false))
+                        if (k != null)
+                            try {
+                                if (matchKey(k, Material.values()) != null)
+                                    put(matchKey(k, Material.values()), getInt(HOLDING + "." + k));
+                            } catch (NumberFormatException | NullPointerException ignore) {
+                            }
+            }};
+        }
+
+        public Limits setHolding(HashMap<Material, Integer> holding, boolean force) {
+            holding.forEach((h, i) -> set(HOLDING + "." + h.name(), i, force));
+            return this;
+        }
+
+        public int getWearingMaxDiamondPieces() {
+            return getInt(WEARING_MAX_DIAMOND_PIECES);
+        }
+
+        public Limits setWearingMaxDiamondPieces(int wearingMaxDiamondPieces, boolean force) {
+            set(WEARING_MAX_DIAMOND_PIECES, wearingMaxDiamondPieces, force);
+            return this;
+        }
+
+        public int getWearingMaxGoldPieces() {
+            return getInt(WEARING_MAX_GOLD_PIECES);
+        }
+
+        public Limits setWearingMaxGoldPieces(int wearingMaxGoldPieces, boolean force) {
+            set(WEARING_MAX_GOLD_PIECES, wearingMaxGoldPieces, force);
+            return this;
+        }
+
+        public int getWearingMaxIronPieces() {
+            return getInt(WEARING_MAX_IRON_PIECES);
+        }
+
+        public Limits setWearingMaxIronPieces(int wearingMaxIronPieces, boolean force) {
+            set(WEARING_MAX_IRON_PIECES, wearingMaxIronPieces, force);
+            return this;
+        }
+
+        public int getWearingMaxLeatherPieces() {
+            return getInt(WEARING_MAX_LEATHER_PIECES);
+        }
+
+        public Limits setWearingMaxLeatherPieces(int wearingMaxLeatherPieces, boolean force) {
+            set(WEARING_MAX_LEATHER_PIECES, wearingMaxLeatherPieces, force);
+            return this;
+        }
+
+    }
+
     public static final String LAST_SAVE = "last-save";
 
     private File file;
@@ -932,11 +1072,15 @@ public class Config {
         return this;
     }
 
-    public <T extends Enum<T>> T match(String path, T[] values) {
+    public <T extends Enum<T>> T matchKey(String item, T[] values) {
         for (T value : values)
-            if ((config.get(path) + "").equalsIgnoreCase(value.name()))
+            if ((item + "").equalsIgnoreCase(value.name()))
                 return value;
         return null;
+    }
+
+    public <T extends Enum<T>> T match(String path, T[] values) {
+        return matchKey(config.get(path) + "", values);
     }
 
     public <T extends Enum<T>> ArrayList<T> matchList(String path, T[] values) {
@@ -952,9 +1096,7 @@ public class Config {
      * This function returns a list of UUIDs from a path in the config.
      *
      * @param path The path to the list.
-     *
      * @return A list of UUIDs
-     *
      * @deprecated It will be removed in the future. (No UUID supported for offline mode)
      */
     @Deprecated

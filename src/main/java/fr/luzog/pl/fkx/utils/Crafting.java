@@ -2,8 +2,10 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.events.Events;
+import fr.luzog.pl.fkx.fk.FKManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -563,7 +565,7 @@ public class Crafting implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                update(e.getInventory());
+                update(e.getInventory(), e.getWhoClicked());
                 if (finalCraft)
                     new BukkitRunnable() {
                         @Override
@@ -579,19 +581,24 @@ public class Crafting implements Listener {
         }.runTask(Main.instance);
     }
 
-    public static void update(Inventory inv) {
+    public static void update(Inventory inv, HumanEntity whoClicked) {
         boolean craft = false;
+        FKManager fk = FKManager.getCurrentGame() == null
+                || FKManager.getCurrentGame().getPlayer(whoClicked.getName(), false) == null ? null
+                : FKManager.getCurrentGame();
+        Limits lim = fk == null || fk.getLimits() == null ? null : fk.getLimits();
+        ArrayList<Material> blacklist = lim == null || lim.getCraft() == null ? new ArrayList<>() : lim.getCraft();
         ItemStack[] ingredients = new ArrayList<ItemStack>() {{
             for (Integer slot : SLOTS) add(inv.getItem(slot) == null ? null : inv.getItem(slot).clone());
         }}.toArray(new ItemStack[9]);
         for (ShapedCraft r : shapedCrafts)
-            if (r.compare(ingredients)) {
+            if (r.compare(ingredients) && (r.getResult() == null || !blacklist.contains(r.getResult().getType()))) {
                 inv.setItem(RESULT, r.getResult());
                 craft = true;
                 break;
             }
         for (ShapelessCraft r : shapelessCrafts)
-            if (r.compare(ingredients)) {
+            if (r.compare(ingredients) && (r.getResult() == null || !blacklist.contains(r.getResult().getType()))) {
                 inv.setItem(RESULT, r.getResult());
                 craft = true;
                 break;
