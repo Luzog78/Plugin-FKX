@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -17,10 +18,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Crafting implements Listener {
 
@@ -484,6 +483,29 @@ public class Crafting implements Listener {
                     e.getPlayer().openInventory(getInv());
             }
         }.runTask(Main.instance);
+    }
+
+    @EventHandler
+    public static void onClose(InventoryCloseEvent e) {
+        if (!e.getInventory().getName().equals(NAME) || e.getInventory().getSize() != getInv().getSize())
+            return;
+        boolean hasMainItem = false;
+        for(ItemStack is : e.getInventory().getContents())
+            if(is != null && is.isSimilar(getItem()))
+                hasMainItem = true;
+        if(!hasMainItem)
+            return;
+
+        SLOTS.stream()
+                .map(i -> e.getInventory().getItem(i))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .forEach(is -> {
+                    if(e.getPlayer().getInventory().firstEmpty() != -1)
+                        e.getPlayer().getInventory().addItem(is);
+                    else
+                        e.getPlayer().getWorld().dropItemNaturally(e.getPlayer().getLocation(), is);
+                });
     }
 
     @EventHandler
