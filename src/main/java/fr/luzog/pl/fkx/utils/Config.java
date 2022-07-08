@@ -546,8 +546,8 @@ public class Config {
     }
 
     public static class Team extends Config {
-        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", RADIUS = "radius",
-                SPAWN = "spawn", PERMISSIONS = "permissions";
+        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", CHESTS_ROOM= "chests-room.loc",
+                GUARDIAN = "chests-room.guardian-uuid", RADIUS = "radius", SPAWN = "spawn", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
             super(path, true);
@@ -589,6 +589,28 @@ public class Config {
 
         public Team setColor(String color, boolean force) {
             super.set(COLOR, color, force);
+            return this;
+        }
+
+        public Location getChestsRoom() {
+            return super.getLoc(CHESTS_ROOM);
+        }
+
+        public Team setChestsRoom(Location chestsRoom, boolean force) {
+            super.setLoc(CHESTS_ROOM, chestsRoom, force);
+            return this;
+        }
+
+        public UUID getGuardian() {
+            try {
+                return UUID.fromString(getStr(GUARDIAN));
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
+        public Team setGuardian(UUID guardian, boolean force) {
+            super.set(GUARDIAN, guardian + "", force);
             return this;
         }
 

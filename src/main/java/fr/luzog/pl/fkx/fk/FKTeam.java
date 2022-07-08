@@ -1,10 +1,18 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
+import net.minecraft.server.v1_8_R3.EntityLiving;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.*;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.scoreboard.NameTagVisibility;
@@ -40,7 +48,8 @@ public class FKTeam {
 
     private String id, name, prefix;
     private ChatColor color;
-    private Location spawn;
+    private Location spawn, chestsRoom;
+    private UUID guardian;
     private double radius;
 
     private Team scoreboardTeam;
@@ -53,18 +62,23 @@ public class FKTeam {
         this.prefix = id + " ";
         this.color = ChatColor.WHITE;
         this.spawn = null;
+        this.chestsRoom = null;
+        this.guardian = null;
         this.radius = 0;
         this.permissions = new FKPermissions(FKPermissions.Definition.DEFAULT);
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
     }
 
-    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, double radius, FKPermissions permissions) {
+    public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, Location chestsRoom,
+                  UUID guardian, double radius, FKPermissions permissions) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
         this.color = color;
         this.spawn = spawn;
+        this.chestsRoom = chestsRoom;
+        this.guardian = guardian;
         this.radius = radius;
         this.permissions = permissions;
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
@@ -106,6 +120,26 @@ public class FKTeam {
         scoreboardTeam.setNameTagVisibility(NameTagVisibility.ALWAYS);
         scoreboardTeam.setCanSeeFriendlyInvisibles(false);
         scoreboardTeam.setAllowFriendlyFire(true);
+    }
+
+    public Entity spawnGuardian() {
+        if(chestsRoom == null && spawn == null)
+            return null;
+        Villager e = (Villager) Main.world.spawnEntity(chestsRoom == null ? spawn : chestsRoom, EntityType.VILLAGER);
+        e.setAdult();
+        e.setAgeLock(true);
+        e.setCanPickupItems(false);
+        e.setNoDamageTicks(Integer.MAX_VALUE);
+        e.setRemoveWhenFarAway(false);
+        //((CraftLivingEntity) e).getHandle().getDataWatcher().watch(15, (byte) 1); // 0 for AI (so 1 == NoAI)
+        EntityLiving nms = ((CraftLivingEntity) e).getHandle();
+        NBTTagCompound nbt = nms.getNBTTag();
+
+        nbt.setByte("NoAI", (byte) 1);
+        nbt.setByte("NoGravity", (byte) 1);
+
+        nms.f(nbt);
+        return e;
     }
 
     public String getId() {
@@ -188,6 +222,32 @@ public class FKTeam {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setSpawn(spawn, true).save();
+        }
+    }
+
+    public Location getChestsRoom() {
+        return chestsRoom;
+    }
+
+    public void setChestsRoom(Location chestsRoom, boolean save) {
+        this.chestsRoom = chestsRoom;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setChestsRoom(chestsRoom, true).save();
+        }
+    }
+
+    public UUID getGuardian() {
+        return guardian;
+    }
+
+    public void setGuardian(UUID guardian, boolean save) {
+        this.guardian = guardian;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setGuardian(guardian, true).save();
         }
     }
 

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCommand implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | event | game | (perm || permissions) | players | stats | teams | title | warp] [<args...>]";
+    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | event | game | (perm || permissions) | players | portal | stats | teams | title | warp] [<args...>]";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -56,6 +56,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "players":
                     FKCPlayers.onCommand(sender, command, msg, args);
                     break;
+                case "portal":
+                    FKCPortal.onCommand(sender, command, msg, args);
+                    break;
                 case "stats":
                     FKCStats.onCommand(sender, command, msg, args);
                     break;
@@ -93,6 +96,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
             temp.add("perm");
             temp.add("permissions");
             temp.add("players");
+            temp.add("portal");
             temp.add("stats");
             temp.add("teams");
             temp.add("title");
@@ -125,6 +129,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "players":
                     temp.addAll(FKCPlayers.onTabComplete(sender, command, msg, args));
+                    break;
+                case "portal":
+                    temp.addAll(FKCPortal.onTabComplete(sender, command, msg, args));
                     break;
                 case "stats":
                     temp.addAll(FKCStats.onTabComplete(sender, command, msg, args));

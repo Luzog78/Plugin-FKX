@@ -111,63 +111,64 @@ public class FKManager {
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxLeatherPieces(c.getWearingMaxLeatherPieces()));
                             manager.setLimits(lim, false);
                         }
-                    } else
-                        if (ff.getName().equalsIgnoreCase("zones")) {
-                            for (File fff : Objects.requireNonNull(ff.listFiles()))
-                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
-                                    Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
-                                    FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null, null, null, null, null);
+                    } else if (ff.getName().equalsIgnoreCase("zones")) {
+                        for (File fff : Objects.requireNonNull(ff.listFiles()))
+                            if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
+                                Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
+                                FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null, null, null, null, null);
 
-                                    Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType()), false));
-                                    Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn()), false));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1()), false));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2()), false));
-                                    Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions()), false));
+                                Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType()), false));
+                                Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn()), false));
+                                Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1()), false));
+                                Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2()), false));
+                                Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions()), false));
 
-                                    if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE))
-                                        manager.setLobby(zone, false);
-                                    else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
-                                        manager.setSpawn(zone, false);
-                                    else
-                                        manager.getZones().add(zone);
+                                if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE))
+                                    manager.setLobby(zone, false);
+                                else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
+                                    manager.setSpawn(zone, false);
+                                else
+                                    manager.getZones().add(zone);
+                            }
+                    } else if (ff.getName().equalsIgnoreCase("teams")) {
+                        for (File fff : Objects.requireNonNull(ff.listFiles()))
+                            if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
+                                Config.Team tc = new Config.Team(String.format("%s/teams/%s", f.getName(), fff.getName())).load();
+                                FKTeam team = new FKTeam(fff.getName().substring(0, fff.getName().length() - 4));
+
+                                Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setGuardian(Objects.requireNonNull(tc.getGuardian()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
+
+                                if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
+                                    manager.setGods(team, false);
+                                else if (fff.getName().equalsIgnoreCase(FKTeam.SPECS_FILE))
+                                    manager.setSpecs(team, false);
+                                else
+                                    manager.addTeam(team);
+                            }
+                    } else if (ff.getName().equalsIgnoreCase("players")) {
+                        for (File fff : Objects.requireNonNull(ff.listFiles()))
+                            if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml"))
+                                try {
+                                    Config.Player pc = new Config.Player(String.format("%s/players/%s", f.getName(), fff.getName())).load();
+                                    FKPlayer player = new FKPlayer(fff.getName().substring(0, fff.getName().length() - 4), null, null);
+
+                                    Utils.tryTo(printStackTrace, () -> player.setLastUuid(Objects.requireNonNull(pc.getLastUuid()), false));
+                                    Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam()), false));
+                                    Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats()), false));
+                                    Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions()), false));
+
+                                    if (!player.getName().equals(""))
+                                        manager.getPlayers().add(player);
+                                } catch (IllegalArgumentException ignored) {
                                 }
-                        } else if (ff.getName().equalsIgnoreCase("teams")) {
-                            for (File fff : Objects.requireNonNull(ff.listFiles()))
-                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
-                                    Config.Team tc = new Config.Team(String.format("%s/teams/%s", f.getName(), fff.getName())).load();
-                                    FKTeam team = new FKTeam(fff.getName().substring(0, fff.getName().length() - 4));
-
-                                    Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName()), false));
-                                    Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
-                                    Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
-                                    Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
-                                    Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
-                                    Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
-
-                                    if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
-                                        manager.setGods(team, false);
-                                    else if (fff.getName().equalsIgnoreCase(FKTeam.SPECS_FILE))
-                                        manager.setSpecs(team, false);
-                                    else
-                                        manager.addTeam(team);
-                                }
-                        } else if (ff.getName().equalsIgnoreCase("players")) {
-                            for (File fff : Objects.requireNonNull(ff.listFiles()))
-                                if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml"))
-                                    try {
-                                        Config.Player pc = new Config.Player(String.format("%s/players/%s", f.getName(), fff.getName())).load();
-                                        FKPlayer player = new FKPlayer(fff.getName().substring(0, fff.getName().length() - 4), null, null);
-
-                                        Utils.tryTo(printStackTrace, () -> player.setLastUuid(Objects.requireNonNull(pc.getLastUuid()), false));
-                                        Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam()), false));
-                                        Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats()), false));
-                                        Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions()), false));
-
-                                        if (!player.getName().equals(""))
-                                            manager.getPlayers().add(player);
-                                    } catch (IllegalArgumentException ignored) {
-                                    }
-                        }
+                    }
 
                 manager.register(false);
                 manager.getListener().scheduleTask();
@@ -327,8 +328,8 @@ public class FKManager {
                     new FKPermissions(FKPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);
-        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
-        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, null, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, null, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
