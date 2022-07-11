@@ -137,36 +137,36 @@ public class FKCPortal {
 
     public static List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         return new ArrayList<String>() {{
-            if(args.length == 2) {
+            if (args.length == 2) {
                 add("help");
                 add("nether");
                 add("end");
-            } else if((args[1].equalsIgnoreCase("nether") || args[1].equalsIgnoreCase("end"))) {
-                if(args.length == 3) {
+            } else if ((args[1].equalsIgnoreCase("nether") || args[1].equalsIgnoreCase("end"))) {
+                if (args.length == 3) {
                     add("over");
                     add("dim");
-                } else if(args[2].equalsIgnoreCase("over") || args[2].equalsIgnoreCase("dim")) {
-                    if(args.length == 4) {
+                } else if (args[2].equalsIgnoreCase("over") || args[2].equalsIgnoreCase("dim")) {
+                    if (args.length == 4) {
                         add("spawn");
                         add("pos1");
                         add("pos2");
-                    } else if(args[3].equalsIgnoreCase("spawn") || args[3].equalsIgnoreCase("pos1") || args[3].equalsIgnoreCase("pos2")) {
-                        if(args.length == 5) {
+                    } else if (args[3].equalsIgnoreCase("spawn") || args[3].equalsIgnoreCase("pos1") || args[3].equalsIgnoreCase("pos2")) {
+                        if (args.length == 5) {
                             add("get");
                             add("set");
-                        } else if(args[4].equalsIgnoreCase("set") && sender instanceof Player) {
-                            Location l  = ((Player) sender).getLocation();
+                        } else if (args[4].equalsIgnoreCase("set") && sender instanceof Player) {
+                            Location l = ((Player) sender).getLocation();
                             DecimalFormat df = new DecimalFormat("#.00");
-                            if(args.length == 6)
+                            if (args.length == 6)
                                 add(df.format(l.getX()));
-                            else if(args.length == 7)
+                            else if (args.length == 7)
                                 add(df.format(l.getY()));
-                            else if(args.length == 8)
+                            else if (args.length == 8)
                                 add(df.format(l.getZ()));
-                            else if(args.length == 9) {
+                            else if (args.length == 9) {
                                 add(df.format(l.getYaw()));
                                 addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
-                            } else if(args.length == 10)
+                            } else if (args.length == 10)
                                 add(df.format(l.getPitch()));
                             else if (args.length == 11)
                                 addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
