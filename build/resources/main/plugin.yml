@@ -163,6 +163,8 @@ commands:
 
 
   # Utils - Players
+  ad:
+    description: HELPPPP !!! /ad
   info:
     aliases: [ test ]
     description: Get server's or player's infos.
