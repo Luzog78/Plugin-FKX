@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
 
 import java.io.File;
+import java.util.Objects;
 
 public class FKZone {
 
@@ -24,6 +25,11 @@ public class FKZone {
                 .setPermissions(permissions, !soft)
 
                 .save();
+    }
+
+    public void delete(String gameId) {
+        Objects.requireNonNull(FKManager.getGame(gameId)).getNormalZones().removeIf(z -> z.getId().equalsIgnoreCase(id));
+        getConfig(gameId).delete();
     }
 
     public Config.Zone getConfig(String gameId) {

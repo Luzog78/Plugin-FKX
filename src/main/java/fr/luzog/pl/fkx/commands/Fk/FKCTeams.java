@@ -20,7 +20,7 @@ public class FKCTeams {
             syntaxe_create = "/fk teams create <id> [<options>]",
             syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | options ...]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
-            syntaxe_opts = "Options:\n  > -d <displayName>\n  > -p <prefix>\n  > -c <color>\n  > -r <radius>\n  > -s <x> <y> <z> [<yw> <pi>] [<world>]";
+            syntaxe_opts = "Options:\n  > --d <displayName>\n  > --p <prefix>\n  > --c <color>\n  > --r <radius>\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -139,21 +139,21 @@ public class FKCTeams {
     public static String handleString(String base, int substring) {
         String s = base.substring(substring);
         if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")))
-            s = s.substring(1, s.length() - 1);
+            s = s.substring(2, s.length() - 1);
         return s.replace("\\\"", "\"").replace("\\'", "'").replace("\\ ", " ").replace("\\\\", "\\");
     }
 
     public static void handleOptions(CmdUtils u, FKTeam t, String[] arguments, int substring) {
-        String[] args = (" " + String.join(" ", Arrays.copyOfRange(arguments, substring, arguments.length))).split(" -");
+        String[] args = (" " + String.join(" ", Arrays.copyOfRange(arguments, substring, arguments.length))).split(" --");
         for (int i = 0; i < args.length; i++)
-            args[i] = args[i].replace("\\-", "-").replace("\\\\", "\\");
+            args[i] = args[i].replace("\\--", "--").replace("\\\\", "\\");
         u.succ("Options de l'équipe §f" + t.getColor() + t.getName() + "§r :");
         boolean hasAnyOption = false;
         for (String arg : args) {
             if (arg.replace(" ", "").length() == 0)
                 continue;
             hasAnyOption = true;
-            boolean isEmpty = arg.length() < 2 || arg.charAt(1) != ' ' || arg.substring(2).replace(" ", "").length() == 0;
+            boolean isEmpty = arg.length() < 3 || arg.charAt(2) != ' ' || arg.substring(3).replace(" ", "").length() == 0;
             if (arg.toLowerCase().equals("d") || arg.toLowerCase().startsWith("d ")) {
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "displayName"));
@@ -264,23 +264,23 @@ public class FKCTeams {
 
     public static ArrayList<String> completeOptions(CommandSender sender, String[] args) {
         try {
-            if (args[args.length - 2].equalsIgnoreCase("-c"))
+            if (args[args.length - 2].equalsIgnoreCase("--c"))
                 return Arrays.stream(ChatColor.values()).map(ChatColor::name).collect(Collectors.toCollection(ArrayList::new));
-            else if (args[args.length - 2].equalsIgnoreCase("-r"))
+            else if (args[args.length - 2].equalsIgnoreCase("--r"))
                 return new ArrayList<>(Arrays.asList("5.0", "8.0", "10.0", "12.0", "15.0", "20.0", "25.0"));
-            else if (args[args.length - 2].equalsIgnoreCase("-s") && sender instanceof Player) {
+            else if (args[args.length - 2].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
                 Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
                 return new ArrayList<>(Collections.singletonList(loc.getBlockX() + ""));
-            } else if (args[args.length - 3].equalsIgnoreCase("-s") && sender instanceof Player) {
+            } else if (args[args.length - 3].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
                 Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
                 return new ArrayList<>(Collections.singletonList(loc.getBlockY() + ""));
-            } else if (args[args.length - 4].equalsIgnoreCase("-s") && sender instanceof Player) {
+            } else if (args[args.length - 4].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
                 Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
                 return new ArrayList<>(Collections.singletonList(loc.getBlockZ() + ""));
-            } else if (args[args.length - 5].equalsIgnoreCase("-s")) {
+            } else if (args[args.length - 5].equalsIgnoreCase("--s")) {
                 ArrayList<String> list = new ArrayList<>();
                 if (sender instanceof Player) {
                     Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
@@ -289,19 +289,19 @@ public class FKCTeams {
                 }
                 list.addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
                 return list;
-            } else if (args[args.length - 6].equalsIgnoreCase("-s") && sender instanceof Player) {
+            } else if (args[args.length - 6].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
                 Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
                 return new ArrayList<>(Collections.singletonList(loc.getPitch() + ""));
-            } else if (args[args.length - 7].equalsIgnoreCase("-s")) {
+            } else if (args[args.length - 7].equalsIgnoreCase("--s")) {
                 return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toCollection(ArrayList::new));
-            } else if (args[args.length - 1].startsWith("-") || !args[args.length - 2].startsWith("-"))
-                return new ArrayList<>(Arrays.asList("-d", "-p", "-c", "-r", "-s"));
+            } else if (args[args.length - 1].startsWith("--") || !args[args.length - 2].startsWith("--"))
+                return new ArrayList<>(Arrays.asList("--d", "--p", "--c", "--r", "--s"));
             else
                 return new ArrayList<>();
         } catch (IndexOutOfBoundsException e) {
-            if (args[args.length - 1].startsWith("-") || !args[args.length - 2].startsWith("-"))
-                return new ArrayList<>(Arrays.asList("-d", "-p", "-c", "-r", "-s"));
+            if (args[args.length - 1].startsWith("--") || !args[args.length - 2].startsWith("--"))
+                return new ArrayList<>(Arrays.asList("--d", "--p", "--c", "--r", "--s"));
             else
                 return new ArrayList<>();
         }

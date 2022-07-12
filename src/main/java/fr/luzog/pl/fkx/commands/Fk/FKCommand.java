@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCommand implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | event | game | (perm || permissions) | players | portal | stats | teams | title | warp] [<args...>]";
+    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | event | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -71,6 +71,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "warp":
                     FKCWarp.onCommand(sender, command, msg, args);
                     break;
+                case "zone":
+                    FKCZone.onCommand(sender, command, msg, args);
+                    break;
                 default:
                     u.err("Unknown command");
                     u.synt();
@@ -101,6 +104,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
             temp.add("teams");
             temp.add("title");
             temp.add("warp");
+            temp.add("zone");
         } else if (args.length > 1)
             switch (args[0].toLowerCase()) {
                 case "help":
@@ -144,6 +148,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                     break;
                 case "warp":
                     temp.addAll(FKCWarp.onTabComplete(sender, command, msg, args));
+                    break;
+                case "zone":
+                    temp.addAll(FKCZone.onTabComplete(sender, command, msg, args));
                     break;
             }
 

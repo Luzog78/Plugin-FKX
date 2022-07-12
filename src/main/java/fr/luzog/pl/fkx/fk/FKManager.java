@@ -128,7 +128,7 @@ public class FKManager {
                                 else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
                                     manager.setSpawn(zone, false);
                                 else
-                                    manager.getZones().add(zone);
+                                    manager.getNormalZones().add(zone);
                             }
                     } else if (ff.getName().equalsIgnoreCase("teams")) {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
@@ -316,16 +316,16 @@ public class FKManager {
                         new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF),
                         new FKPermissions.Item(FKPermissions.Type.MOBS, FKPermissions.Definition.OFF))), false);
         setNormalZones(new ArrayList<FKZone>() {{
-            add(new FKZone("nether", FKZone.Type.ZONE,
-                    Bukkit.getWorld("world_nether").getSpawnLocation(),
-                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-                    new FKPermissions(FKPermissions.Definition.ON)));
-            add(new FKZone("end", FKZone.Type.ZONE,
-                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
-                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-                    new FKPermissions(FKPermissions.Definition.ON)));
+//            add(new FKZone("nether", FKZone.Type.ZONE,
+//                    Bukkit.getWorld("world_nether").getSpawnLocation(),
+//                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+//                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+//                    new FKPermissions(FKPermissions.Definition.ON)));
+//            add(new FKZone("end", FKZone.Type.ZONE,
+//                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
+//                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+//                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+//                    new FKPermissions(FKPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, null, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);

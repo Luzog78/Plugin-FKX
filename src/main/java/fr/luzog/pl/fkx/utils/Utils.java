@@ -1,6 +1,5 @@
 package fr.luzog.pl.fkx.utils;
 
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
@@ -30,6 +29,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -389,7 +389,7 @@ public class Utils {
             capeURL = null;
 
             try {
-                JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.decode(this.rawTextures)));
+                JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.getDecoder().decode(this.rawTextures)));
                 if (obj.containsKey("timestamp"))
                     timestamp = Long.parseLong(obj.get("timestamp").toString());
                 if (obj.containsKey("profileId"))
