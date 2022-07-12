@@ -1,10 +1,7 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKOptions;
-import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.fk.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -546,7 +543,7 @@ public class Config {
     }
 
     public static class Team extends Config {
-        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", CHESTS_ROOM= "chests-room.loc",
+        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
                 GUARDIAN = "chests-room.guardian-uuid", RADIUS = "radius", SPAWN = "spawn", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
@@ -839,6 +836,111 @@ public class Config {
 
     }
 
+    public static class PickableLocks extends Config {
+        public static final String LOCKS = "locks", PICKING = "picking";
+
+        public PickableLocks(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public PickableLocks load() {
+            super.load();
+            return this;
+        }
+
+        @Override
+        public PickableLocks save() {
+            super.save();
+            return this;
+        }
+
+        public static FKPickableLocks.Lock mapToLock(Map<?, ?> map) {
+            try {
+                Map<?, ?> coolMap, locMap;
+                if (map.containsKey("id") && map.containsKey("rarity")
+                        && map.containsKey("pickable") && map.containsKey("picked")
+                        && map.containsKey("cooldown") && (coolMap = (Map<?, ?>) map.get("cooldown")) != null
+                        && coolMap.containsKey("original")
+                        && (locMap = (Map<?, ?>) map.get("location")) != null
+                        && locMap.containsKey("x") && locMap.containsKey("y") && locMap.containsKey("z")
+                        && locMap.containsKey("w")) {
+
+                    Location loc = new Location(Bukkit.getWorld((String) locMap.get("w")),
+                            Double.parseDouble(locMap.get("x") + ""),
+                            Double.parseDouble(locMap.get("y") + ""),
+                            Double.parseDouble(locMap.get("z") + ""));
+
+                    return new FKPickableLocks.Lock(map.get("id") + "", FKPickableLocks.Rarity.valueOf((map.get("rarity") + "").toUpperCase()),
+                            Boolean.parseBoolean(map.get("pickable") + ""),
+                            Boolean.parseBoolean(map.get("picked") + ""),
+                            Long.parseLong(coolMap.get("original") + ""),
+                            Long.parseLong(coolMap.get(coolMap.containsKey("current") ? "current" : "original") + ""),
+                            loc,
+                            map.containsKey("picker") && map.get("picker") != null ? map.get("picker") + "" : null,
+                            map.containsKey("key-type") ? FKPickableLocks.KeyType.valueOf(map.get("key-type") + "") : FKPickableLocks.KeyType.NONE,
+                            map.containsKey("armor-stand1") && map.get("armor-stand1") != null ? UUID.fromString(map.get("armor-stand1") + "") : null,
+                            map.containsKey("armor-stand2") && map.get("armor-stand2") != null ? UUID.fromString(map.get("armor-stand2") + "") : null);
+                }
+            } catch (ClassCastException | NullPointerException | NumberFormatException ignored) {
+            }
+            return null;
+        }
+
+        public static Map<String, Object> lockToMap(FKPickableLocks.Lock lock) {
+            LinkedHashMap<String, Long> coolMap = new LinkedHashMap<String, Long>() {{
+                put("original", lock.getOriginalCoolDown());
+                put("current", lock.getCoolDown());
+            }};
+            LinkedHashMap<String, Object> locMap = new LinkedHashMap<String, Object>() {{
+                put("x", lock.getLocation().getX());
+                put("y", lock.getLocation().getY());
+                put("z", lock.getLocation().getZ());
+                put("w", lock.getLocation().getWorld().getName());
+            }};
+            return new LinkedHashMap<String, Object>() {{
+                put("id", lock.getId());
+                put("rarity", lock.getRarity().name());
+                put("pickable", lock.isPickable());
+                put("picked", lock.isPicked());
+                put("cooldown", coolMap);
+                put("location", locMap);
+                put("picker", lock.getPicker());
+                put("key-type", lock.getKeyType().name());
+                put("armor-stand1", lock.getArmorStand1() != null ? lock.getArmorStand1().toString() : null);
+                put("armor-stand2", lock.getArmorStand2() != null ? lock.getArmorStand2().toString() : null);
+            }};
+        }
+
+        public ArrayList<FKPickableLocks.Lock> getLocks() {
+            return getMapList(LOCKS).stream().map(PickableLocks::mapToLock).filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
+
+        public PickableLocks setLocks(ArrayList<FKPickableLocks.Lock> locks, boolean force) {
+            super.set(LOCKS, locks.stream().map(PickableLocks::lockToMap)
+                    .collect(Collectors.toList()), force);
+            return this;
+        }
+
+        public HashMap<String, String> getPicking() {
+            return new HashMap<String, String>() {{
+                if (contains(PICKING))
+                    for (String k : getKeys(PICKING, false))
+                        if (k != null && get(PICKING + "." + k) != null)
+                            try {
+                                put(k, get(PICKING + "." + k) + "");
+                            } catch (NullPointerException ignore) {
+                            }
+            }};
+        }
+
+        public PickableLocks setPicking(HashMap<String, String> picking, boolean force) {
+            super.set(PICKING, picking, force);
+            return this;
+        }
+    }
+
     public static final String LAST_SAVE = "last-save";
 
     private File file;
@@ -1118,7 +1220,9 @@ public class Config {
      * This function returns a list of UUIDs from a path in the config.
      *
      * @param path The path to the list.
+     *
      * @return A list of UUIDs
+     *
      * @deprecated It will be removed in the future. (No UUID supported for offline mode)
      */
     @Deprecated

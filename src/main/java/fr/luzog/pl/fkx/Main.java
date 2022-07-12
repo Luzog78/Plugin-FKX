@@ -168,7 +168,7 @@ public class Main extends JavaPlugin implements Listener {
 
                 saveAll(true);
             }
-        }.runTaskLater(this, 20);
+        }.runTaskLater(this, 10);
 
         souf("");
         souf("");

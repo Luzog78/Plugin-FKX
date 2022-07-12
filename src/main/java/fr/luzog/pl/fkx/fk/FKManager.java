@@ -110,6 +110,18 @@ public class FKManager {
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxIronPieces(c.getWearingMaxIronPieces()));
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxLeatherPieces(c.getWearingMaxLeatherPieces()));
                             manager.setLimits(lim, false);
+                        } else if (ff.getName().substring(0, ff.getName().length() - 4).equals("PickableLocks")) {
+                            Config.PickableLocks c = new Config.PickableLocks(f.getName() + "/" + ff.getName()).load();
+                            FKPickableLocks pickableLocks = new FKPickableLocks();
+                            Utils.tryTo(printStackTrace, () -> pickableLocks.setPickableLocks(c.getLocks()));
+                            Utils.tryTo(printStackTrace, () -> pickableLocks.setInPicking(c.getPicking()));
+                            manager.setPickableLocks(pickableLocks, false);
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    manager.getPickableLocks().updateAll();
+                                }
+                            }.runTask(Main.instance);
                         }
                     } else if (ff.getName().equalsIgnoreCase("zones")) {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
@@ -242,6 +254,7 @@ public class FKManager {
                 .save();
 
         limits.saveToConfig(id, soft);
+        pickableLocks.saveToConfig(id, soft);
 
         lobby.saveToConfig(id, soft);
         spawn.saveToConfig(id, soft);
@@ -291,6 +304,8 @@ public class FKManager {
     private FKPermissions friendly;
     private FKPermissions hostile;
     private FKPermissions priority;
+
+    private FKPickableLocks pickableLocks;
 
 
     public FKManager(String id) {
@@ -346,6 +361,7 @@ public class FKManager {
                 new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
                 new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF)), false);
         setPriority(new FKPermissions(FKPermissions.Definition.OFF), false);
+        setPickableLocks(new FKPickableLocks(), false);
 
         setState(State.WAITING, false);
     }
@@ -355,7 +371,7 @@ public class FKManager {
                      FKListener listener, Limits limits, Portal nether, Portal end, FKZone lobby, FKZone spawn,
                      ArrayList<FKZone> zones, ArrayList<FKPlayer> players, FKTeam gods, FKTeam specs,
                      ArrayList<FKTeam> teams, FKPermissions global, FKPermissions neutral, FKPermissions friendly,
-                     FKPermissions hostile, FKPermissions priority) {
+                     FKPermissions hostile, FKPermissions priority, FKPickableLocks pickableLocks) {
         this.id = id;
         setState(state, false);
         setDay(day, false);
@@ -381,6 +397,7 @@ public class FKManager {
         setFriendly(friendly, false);
         setHostile(hostile, false);
         setPriority(priority, false);
+        setPickableLocks(pickableLocks, false);
     }
 
     public void register(boolean save) {
@@ -1104,5 +1121,19 @@ public class FKManager {
         this.priority = priority;
         if (save)
             getConfig().load().setPriorityPermissions(priority, true).save();
+    }
+
+    public FKPickableLocks getPickableLocks() {
+        return pickableLocks;
+    }
+
+    public void setPickableLocks(FKPickableLocks pickableLocks, boolean save) {
+        this.pickableLocks = pickableLocks;
+        if (save)
+            savePickableLocks();
+    }
+
+    public void savePickableLocks() {
+        this.pickableLocks.saveToConfig(id, false);
     }
 }

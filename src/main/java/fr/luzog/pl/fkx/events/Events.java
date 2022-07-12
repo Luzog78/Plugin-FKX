@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPickableLocks;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
@@ -36,6 +37,7 @@ public class Events implements Listener {
         add(new Freeze());
         add(new Crafting());
         add(new Ad());
+        add(new FKPickableLocks.Listener());
 
         /* *** - Raw Listeners - *** */
         add(new Events());

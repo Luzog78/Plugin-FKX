@@ -672,4 +672,108 @@ public class Utils {
                 return -1;
         }
     }
+
+    /**
+     * Let's make a <strong>ProgressBar</strong> !
+     *
+     * @param leftSide   The string to be placed to the left of the progress bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #ff0000; font-weight: 900;">[</code><code>####------------]</code><br>
+     * @param rightSide  The string to be appended to the right side of the progress bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code>[####------------</code><code style="color: #ff0000; font-weight: 900;">]</code><br>
+     * @param fill       The character to use to fill the progress bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code>[<code style="color: #ff0000; font-weight: 900;">####</code>------------]</code><br>
+     * @param empty      The character to use for the empty part of the bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code>[####<code style="color: #ff0000; font-weight: 900;">------------</code>]</code><br>
+     * @param endFill    If progress is 100%, the bar will be filled with the fill character.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">100% - </code><code>[<code style="color: #00ff00; font-weight: 900;">****************</code>]</code><br>
+     * @param startEmpty In contrary, at 0%, the bar will be filled with the empty character.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp; 0% - </code><code>[<code style="color: #0000ff; font-weight: 900;">~~~~~~~~~~~~~~~~</code>]</code><br>
+     * @param length     The length of the progress bar (number of characters).<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[####------------]</code>
+     *                   &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[##------]</code><br>
+     * @param progress   The progress of the bar, from 0 to 1.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[##------]</code>
+     *                   <code style="color: #00aa00">&nbsp;50% - </code><code style="color: #aaaaaa;">[####----]</code>
+     *                   <code style="color: #00aa00">&nbsp;75% - </code><code style="color: #aaaaaa;">[######--]</code><br>
+     * @param format     The format of the final bar with 5 vars: <b>{b}</b> | the formatted bar ; <b>{p}</b> | the percentage (int) ;
+     *                   <b>{p.}</b> | the percentage (double #0.0) ; <b>{p..}</b> | the percentage (double #0.00) ;
+     *                   <b>{p#}</b> | the progression (0 to 1 float) ; <b>{l}</b> | the length of the progress bar<br>
+     *                   Example:
+     *                   <ul>
+     *                          <li><code style="color: #aa00aa">{p}% - {b} </code>&nbsp; &nbsp; <code style="color: #00aaaa">25% - [####------------]</code></li>
+     *                          <li><code style="color: #aa00aa">{p.}% $ {b}</code>&nbsp; &nbsp; <code style="color: #00aaaa">25.00 $ [####------------]</code></li>
+     *                          <li><code style="color: #aa00aa">{b} >> {p#}</code>&nbsp; &nbsp; <code style="color: #00aaaa">[####------------] >> 0.25</code></li>
+     *                   </ul>
+     *
+     * @return A string that is a progress bar.
+     */
+    public static String progressBar(String leftSide, String rightSide, String fill, String empty, String endFill, String startEmpty,
+                                     int length, float progress, String format) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(leftSide);
+        for (int i = 0; i <= Math.round(length * progress); i++) {
+            sb.append(progress == 1 ? endFill : fill);
+        }
+        for (int i = 0; i < Math.round(length * (1 - progress)); i++) {
+            sb.append(progress == 0 ? startEmpty : empty);
+        }
+        sb.append(rightSide);
+        return format.replace("{b}", sb.toString()).replace("{p}", String.valueOf(Math.round(progress * 100)))
+                .replace("{p.}", String.format("%.1f", progress * 100)).replace("{p..}", String.format("%.2f", progress * 100))
+                .replace("{p#}", String.valueOf(progress)).replace("{l}", String.valueOf(length));
+    }
+
+    /**
+     * Let's make a <strong>ProgressBar</strong> !
+     *
+     * @param leftSide   The string to be placed to the left of the progress bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #ff0000; font-weight: 900;">[</code><code>####------------]</code><br>
+     * @param rightSide  The string to be appended to the right side of the progress bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code>[####------------</code><code style="color: #ff0000; font-weight: 900;">]</code><br>
+     * @param fillChars  The characters to use to fill the progress bar.<br>
+     *                   Example: If we use <code style="color: #555555">[".", "*", "/", "#"]</code>, the fill char will be :<br>
+     *                   &nbsp; >> &nbsp; <code style="color: #555555">"."</code> if progress is <code style="color: #00aa00">0%</code> to <code style="color: #00aa00">25%</code>,<br>
+     *                   &nbsp; >> &nbsp; <code style="color: #555555">"*"</code> if progress is <code style="color: #00aa00">25%</code> to <code style="color: #00aa00">50%</code>,<br>
+     *                   &nbsp; >> &nbsp; <code style="color: #555555">"/"</code> if progress is <code style="color: #00aa00">50%</code> to <code style="color: #00aa00">75%</code>,<br>
+     *                   &nbsp; >> &nbsp; <code style="color: #555555">"#"</code> if progress is <code style="color: #00aa00">75%</code> to <code style="color: #00aa00">100%</code>.<br>
+     * @param empty      The character to use for the empty part of the bar.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code>[####<code style="color: #ff0000; font-weight: 900;">------------</code>]</code><br>
+     * @param endFill    If progress is 100%, the bar will be filled with the fill character.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">100% - </code><code>[<code style="color: #00ff00; font-weight: 900;">****************</code>]</code><br>
+     * @param startEmpty In contrary, at 0%, the bar will be filled with the empty character.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp; 0% - </code><code>[<code style="color: #0000ff; font-weight: 900;">~~~~~~~~~~~~~~~~</code>]</code><br>
+     * @param length     The length of the progress bar (number of characters).<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[####------------]</code>
+     *                   &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[##------]</code><br>
+     * @param progress   The progress of the bar, from 0 to 1.<br>
+     *                   Example: &nbsp; <code style="color: #00aa00">&nbsp;25% - </code><code style="color: #aaaaaa;">[##------]</code>
+     *                   <code style="color: #00aa00">&nbsp;50% - </code><code style="color: #aaaaaa;">[####----]</code>
+     *                   <code style="color: #00aa00">&nbsp;75% - </code><code style="color: #aaaaaa;">[######--]</code><br>
+     * @param format     The format of the final bar with 5 vars: <b>{b}</b> | the formatted bar ; <b>{p}</b> | the percentage (int) ;
+     *                   <b>{p.}</b> | the percentage (double #0.0) ; <b>{p..}</b> | the percentage (double #0.00) ;
+     *                   <b>{p#}</b> | the progression (0 to 1 float) ; <b>{l}</b> | the length of the progress bar<br>
+     *                   Example:
+     *                   <ul>
+     *                          <li><code style="color: #aa00aa">{p}% - {b} </code>&nbsp; &nbsp; <code style="color: #00aaaa">25% - [####------------]</code></li>
+     *                          <li><code style="color: #aa00aa">{p.}% $ {b}</code>&nbsp; &nbsp; <code style="color: #00aaaa">25.00 $ [####------------]</code></li>
+     *                          <li><code style="color: #aa00aa">{b} >> {p#}</code>&nbsp; &nbsp; <code style="color: #00aaaa">[####------------] >> 0.25</code></li>
+     *                   </ul>
+     *
+     * @return A string that is a progress bar.
+     */
+    public static String progressBar(String leftSide, String rightSide, String[] fillChars, String empty, String endFill, String startEmpty,
+                                     int length, float progress, String format) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(leftSide);
+        for (int i = 0; i < Math.round(length * progress); i++) {
+            sb.append(progress == 1.0 ? endFill : fillChars[(int) (progress / (1.0 / fillChars.length))]);
+        }
+        for (int i = 0; i <= Math.round(length * (1 - progress)); i++) {
+            sb.append(progress == 0.0 ? startEmpty : empty);
+        }
+        sb.append(rightSide);
+        return format.replace("{b}", sb.toString()).replace("{p}", String.valueOf(Math.round(progress * 100)))
+                .replace("{p.}", String.format("%.1f", progress * 100)).replace("{p..}", String.format("%.2f", progress * 100))
+                .replace("{p#}", String.valueOf(progress)).replace("{l}", String.valueOf(length));
+    }
 }
