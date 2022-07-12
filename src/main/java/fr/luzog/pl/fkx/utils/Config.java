@@ -640,7 +640,7 @@ public class Config {
     }
 
     public static class Player extends Config {
-        public static final String NAME = "name", TEAM = "team", STATS = "stats", PERMISSIONS = "permissions";
+        public static final String LAST_UUID = "last-uuid", TEAM = "team", STATS = "stats", PERMISSIONS = "permissions";
 
         public Player(@Nonnull String path) {
             super(path, true);
@@ -660,14 +660,14 @@ public class Config {
 
         public UUID getLastUuid() {
             try {
-                return UUID.fromString(super.getStr(NAME));
+                return UUID.fromString(super.getStr(LAST_UUID));
             } catch (Exception e) {
                 return null;
             }
         }
 
         public Player setLastUuid(UUID lastUuid, boolean force) {
-            super.set(NAME, lastUuid == null ? null : lastUuid.toString(), force);
+            super.set(LAST_UUID, lastUuid == null ? null : lastUuid.toString(), force);
             return this;
         }
 

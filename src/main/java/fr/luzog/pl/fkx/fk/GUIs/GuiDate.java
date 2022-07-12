@@ -209,30 +209,30 @@ public class GuiDate {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Commande :",
-                        "§7fk date weather sun"
+                        "§7fk date weather set sun"
                 )
                 .setCantClickOn(true)
-                .setGlobalCommandOnClick("fk date weather sun\nfk date weather")
+                .setGlobalCommandOnClick("fk date weather set sun\nfk date weather")
                 .build());
         inv.setItem(Utils.posOf(4, 3), Items.builder(Material.WATER_BUCKET)
                 .setName("§9Déverser la Pluie")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Commande :",
-                        "§7fk date weather rain"
+                        "§7fk date weather set rain"
                 )
                 .setCantClickOn(true)
-                .setGlobalCommandOnClick("fk date weather rain\nfk date weather")
+                .setGlobalCommandOnClick("fk date weather set rain\nfk date weather")
                 .build());
         inv.setItem(Utils.posOf(6, 2), Items.builder(Material.LAVA_BUCKET)
                 .setName("§7Faire gronder l'Orage")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Commande :",
-                        "§7fk date weather thunder"
+                        "§7fk date weather set thunder"
                 )
                 .setCantClickOn(true)
-                .setGlobalCommandOnClick("fk date weather thunder\nfk date weather")
+                .setGlobalCommandOnClick("fk date weather set thunder\nfk date weather")
                 .build());
 
         return inv;

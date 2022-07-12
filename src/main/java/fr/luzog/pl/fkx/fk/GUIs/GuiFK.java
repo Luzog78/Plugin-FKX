@@ -1,12 +1,15 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Heads;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -16,6 +19,8 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class GuiFK {
 
@@ -108,9 +113,15 @@ public class GuiFK {
                 getMainItem(fk, "Clic pour rafraichir", "fk"),
                 GuiPlayers.getHead(opener == null ? null : opener.getName(), "Clic pour voir plus",
                         "fk players " + (opener == null ? null : opener.getName())));
+        ArrayList<String> l = new ArrayList<>(new HashSet<String>() {{
+            addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
+            addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
+        }});
 
         inv.setItem(Utils.posOf(1, 4), GuiPerm.getMainItem("Clic pour voir plus", "fk perm"));
         inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem("Clic pour voir plus", "fk date"));
+        inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null, "Clic pour voir plus", "fk players",
+                l.size(), (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())

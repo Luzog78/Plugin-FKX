@@ -136,11 +136,11 @@ public class GuiPlayers {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic pour donner un",
-                        " §7avertissement au joueur"
+                        " §7avertissement au joueur",
+                        " ",
+                        "§cNe fonctionne pas encore :p"
                 )
                 .setCantClickOn(true)
-                .setLeftRightCommandOnClick("kick " + player, "ban " + player)
-                .setMiddleCommandOnClick("ban-ip " + player)
                 .build());
 
         inv.setItem(Utils.posOf(1, 4), Items.builder(Material.BED)

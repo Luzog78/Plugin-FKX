@@ -6,6 +6,7 @@ import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Config;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -60,7 +61,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 }
             else
                 i.setDate(new Date(0));
-            if(i.getSender() != null && i.getDate() != null && i.getState() != null)
+            if (i.getSender() != null && i.getDate() != null && i.getState() != null)
                 ads.add(i);
         });
     }
@@ -193,7 +194,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
 
     public static void post(CmdUtils u, Item ad) {
         if (has(ad)) {
-            get(ad).increaseInsistence(ad); // Don't worry, it's 100% Safe !
+            Objects.requireNonNull(get(ad)).increaseInsistence(ad); // Don't worry, it's 100% Safe !
             u.succ("Nous avons rapellé le staff de votre demande, encore un peu de patience...");
         } else {
             ads.add(ad);
@@ -202,11 +203,14 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             u.succ("Nous prenons en charge votre demande," +
                     " patientez quelques insant en attendant une réponse.");
         }
-        if(FKManager.getCurrentGame() != null)
+        if (FKManager.getCurrentGame() != null)
             FKManager.getCurrentGame().getGods().getPlayers().forEach(p -> {
-                if(p.getPlayer() != null) {
+                if (p.getPlayer() != null) {
                     p.getPlayer().sendMessage(AD_PREFIX + "§aRequêtes disponibles pour les grands maîtres...");
                     p.getPlayer().sendMessage(AD_PREFIX + "§7Un petit §8/ad help§7 pourrais vous être util. ^^");
+                    List<Sound> sounds = Arrays.asList(Sound.GHAST_CHARGE, /* Sound.GHAST_DEATH, Sound.GHAST_FIREBALL, */
+                            Sound.GHAST_MOAN, Sound.GHAST_SCREAM, Sound.GHAST_SCREAM2);
+                    p.getPlayer().playSound(p.getPlayer().getLocation(), sounds.get(new Random().nextInt(sounds.size())), 1, 1);
                 }
             });
         saveToConfig();
