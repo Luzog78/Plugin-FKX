@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.commands.Utils;
 
 import fr.luzog.pl.fkx.utils.CmdUtils;
+import fr.luzog.pl.fkx.utils.Crafting;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,8 +13,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import static fr.luzog.pl.fkx.commands.Other.Ad.ads;
+
 public class Craft implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/craft [<players...>]";
+    public static final String syntaxe = "/craft [custom] [<players...>]";
 
     @Override
 	public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
@@ -28,6 +31,12 @@ public class Craft implements CommandExecutor, TabCompleter {
 
         else if(args[0].equals("?") || args[0].equalsIgnoreCase("help"))
             u.synt();
+
+        else if(args[0].equalsIgnoreCase("custom") || args[0].equalsIgnoreCase("c"))
+            CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
+                u.getPlayer().openInventory(Crafting.getInv());
+                u.succ("Vous avez ouvert §2la table de Craft §d§l§nCustom§r", player.equals(u.getPlayer()) ? "" : "§rà §6" + player.getDisplayName(), "§r!");
+            });
 
         else
             CmdUtils.getPlayersFromArray(args, 0).forEach(player -> {
@@ -44,6 +53,8 @@ public class Craft implements CommandExecutor, TabCompleter {
         ArrayList<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
+            if(args.length == 1)
+                add("custom");
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (content.contains(p))
                     add("!" + p.getName());
