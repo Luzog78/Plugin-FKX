@@ -105,7 +105,8 @@ public class GuiAd {
                         " ",
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour " + (ad.getState() == Ad.State.ACCEPTED ? "fermer" : "accepter"),
-                        "§7Clic Droit pour " + (ad.getState() == Ad.State.IGNORED ? "mettre en attente" : "ignorer")
+                        "§7Clic Droit pour " + (ad.getState() == Ad.State.IGNORED ? "mettre en attente" : "ignorer"),
+                        "§7Clic Molette pour se tp"
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(
@@ -114,6 +115,7 @@ public class GuiAd {
                         ad.getState() == Ad.State.IGNORED ? "ad waiting " + id + "\n" + command
                                 : "ad ignore " + id + "\n" + command
                 )
+                .setMiddleCommandOnClick("tp " + ad.getSender())
                 .build();
     }
 
