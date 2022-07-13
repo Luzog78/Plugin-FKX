@@ -373,7 +373,7 @@ public class FKPickableLocks {
                             p.sendMessage("§aVous avez détruit ce coffre.");
                         } else {
                             p.sendMessage("§aCoffre crochetable :");
-                            p.sendMessage("§a - Id : §9" + l.getId());
+                            p.sendMessage("§a - Id : §b" + l.getId());
                             p.sendMessage("§a - Rareté : §f" + l.getRarity().getFormattedName(false));
                             p.sendMessage("§a - Accessible :  §f" + (l.isPickable() ? "§2§l" + SpecialChars.YES + "  Oui" : "§4§l" + SpecialChars.NO + "  Non"));
                             p.sendMessage("§a - Crocheté :  §f" + (l.isPicked() ? "§2" + SpecialChars.YES + "  Oui" : "§4" + SpecialChars.NO + "  Non"));
@@ -381,8 +381,8 @@ public class FKPickableLocks {
                             p.sendMessage("§a - Temps restant à crocheter : §f" + l.getCoolDown() + " ticks");
                             p.sendMessage("§a - Nom du pilleur : §6" + (l.getPicker() == null ? "§cnull" : l.getPicker()));
                             p.sendMessage("§a - Location : §f" + Utils.locToString(l.getLocation(), false, false, true));
-                            p.sendMessage("§a - ArmorStand 1 : §8" + l.getArmorStand1());
-                            p.sendMessage("§a - ArmorStand 2 : §8" + l.getArmorStand2());
+//                            p.sendMessage("§a - ArmorStand 1 : §8" + l.getArmorStand1());
+//                            p.sendMessage("§a - ArmorStand 2 : §8" + l.getArmorStand2());
                         }
                     else if (sneak) {
                         if (l.isPickable()) {
@@ -427,27 +427,27 @@ public class FKPickableLocks {
                 }
 
                 if (pickableLocks.getInPicking().containsValue(l.getId())) {
-                    p.sendMessage("§cUn joueur crochète déjà ce coffre " + l.getRarity().getFormattedName(false) + "§a.");
+                    p.sendMessage("§cUn joueur crochète déjà ce coffre.\n  >  §cId : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                     return;
                 }
 
                 if (is == null || !new CustomNBT(is).hasKey(RARITY_TAG)) {
-                    p.sendMessage("§cVous ne possédez pas de clé pour déverrouiller ce coffre " + l.getRarity().getFormattedName(false) + "§a.");
+                    p.sendMessage("§cVous ne possédez pas de clé pour déverrouiller ce coffre.\n§c  >  Id : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                     return;
                 }
 
                 CustomNBT isNbt = new CustomNBT(is);
-                Rarity r = Rarity.valueOf(isNbt.getString(RARITY_TAG).split(":", 1)[0]);
-                String id = isNbt.getString(RARITY_TAG).contains(":") ? isNbt.getString(RARITY_TAG).split(":", 1)[1] : "";
+                Rarity r = Rarity.valueOf(isNbt.getString(RARITY_TAG).split(":", 2)[0]);
+                String id = isNbt.getString(RARITY_TAG).contains(":") ? isNbt.getString(RARITY_TAG).split(":", 2)[1] : "";
                 if (id.equals(""))
                     id = null;
 
                 if (!verifyKey(l.getId(), l.getRarity(), id, r)) {
-                    p.sendMessage("§cVous ne possédez pas la bonne clé pour déverrouiller ce coffre " + l.getRarity().getFormattedName(false) + "§a.");
+                    p.sendMessage("§cVous n'avez pas la bonne clé pour déverrouiller ce coffre.\n§c  >  Id : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                     return;
                 }
 
-                p.sendMessage("§aVous essayez de crocheter le coffre " + l.getRarity().getFormattedName(false) + "§a !");
+                p.sendMessage("§aVous essayez de crocheter un coffre !\n§a  >  Id : §b" + l.getId() + "§a   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                 if (is.getAmount() > 1)
                     is.setAmount(is.getAmount() - 1);
                 else
@@ -610,6 +610,12 @@ public class FKPickableLocks {
                         Bukkit.getPlayerExact(player).sendMessage("§aVous avez déverrouillé le coffre.");
                         Bukkit.getPlayerExact(player).playSound(Bukkit.getPlayerExact(player).getLocation(), Sound.LEVEL_UP, 1, 1);
                         FKManager.getGlobalPlayer(player).forEach(p -> p.getManager().savePickableLocks());
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                FKManager.registered.forEach(m -> m.getPickableLocks().updateAll());
+                            }
+                        }.runTaskLater(Main.instance, 1);
                         cancel();
                     }
                 else {

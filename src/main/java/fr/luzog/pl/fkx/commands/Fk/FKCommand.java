@@ -1,10 +1,7 @@
 package fr.luzog.pl.fkx.commands.Fk;
 
-import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.GUIs.GuiFK;
-import fr.luzog.pl.fkx.fk.GUIs.Guis;
 import fr.luzog.pl.fkx.utils.CmdUtils;
-import fr.luzog.pl.fkx.utils.Items;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -15,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCommand implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | event | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
+    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | locks | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -43,11 +40,11 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "date":
                     FKCDate.onCommand(sender, command, msg, args);
                     break;
-                case "event":
-                    FKCEvent.onCommand(sender, command, msg, args);
-                    break;
                 case "game":
                     FKCGame.onCommand(sender, command, msg, args);
+                    break;
+                case "locks":
+                    FKCLocks.onCommand(sender, command, msg, args);
                     break;
                 case "perm":
                 case "permissions":
@@ -94,8 +91,8 @@ public class FKCommand implements CommandExecutor, TabCompleter {
             temp.add("bc");
             temp.add("broadcast");
             temp.add("date");
-            temp.add("event");
             temp.add("game");
+            temp.add("locks");
             temp.add("perm");
             temp.add("permissions");
             temp.add("players");
@@ -121,11 +118,11 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "date":
                     temp.addAll(FKCDate.onTabComplete(sender, command, msg, args));
                     break;
-                case "event":
-                    temp.addAll(FKCEvent.onTabComplete(sender, command, msg, args));
-                    break;
                 case "game":
                     temp.addAll(FKCGame.onTabComplete(sender, command, msg, args));
+                    break;
+                case "locks":
+                    temp.addAll(FKCLocks.onTabComplete(sender, command, msg, args));
                     break;
                 case "perm":
                 case "permissions":
