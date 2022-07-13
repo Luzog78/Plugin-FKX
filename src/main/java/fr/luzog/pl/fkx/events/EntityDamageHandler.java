@@ -69,7 +69,7 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled())
+                    if (!e.isCancelled() && Main.activeCustomLootingSystem)
                         Events.killMobLoots.forEach(loot -> {
                             if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
                                     && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))

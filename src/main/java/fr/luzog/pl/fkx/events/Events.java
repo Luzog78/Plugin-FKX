@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.commands.Other.Ad;
@@ -685,7 +686,8 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEntityDeath(EntityDeathEvent e) {
-        e.getDrops().clear();
+        if (Main.activeCustomLootingSystem)
+            e.getDrops().clear();
     }
 
     @EventHandler
@@ -771,7 +773,7 @@ public class Events implements Listener {
     @EventHandler
     public static void onPotion(BrewEvent e) {
         if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
-            || e.getContents().getIngredient().getType() != Material.GLOWSTONE_DUST)
+                || e.getContents().getIngredient().getType() != Material.GLOWSTONE_DUST)
             return;
 
         Limits lim = FKManager.getCurrentGame().getLimits();
