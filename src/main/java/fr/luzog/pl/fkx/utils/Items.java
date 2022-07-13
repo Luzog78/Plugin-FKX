@@ -58,6 +58,10 @@ public class Items {
         return i(Material.STAINED_GLASS_PANE, 1, (short) 14, " ", false, true, true);
     }
 
+    public static ItemStack black() {
+        return i(Material.STAINED_GLASS_PANE, 1, (short) 15, " ", false, true, true);
+    }
+
     public static ItemStack stone_sword() {
         return builder(Material.STONE_SWORD).setName("§7Épée en Pierre").build();
     }
@@ -261,7 +265,7 @@ public class Items {
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, boolean canClickOn, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, boolean cantClickOn, Pair<Enchantment, Integer>... enchants) {
         ItemStack is = new ItemStack(material, amount, damage);
         ItemMeta meta = is.getItemMeta();
         if (meta == null)
@@ -275,7 +279,7 @@ public class Items {
         for (Pair<Enchantment, Integer> e : enchants)
             meta.addEnchant(e.getKey(), e.getValue(), true);
         is.setItemMeta(meta);
-        return canClickOn ? new CustomNBT(is).setBoolean(Events.cantClickOnTag, true).build() : is;
+        return cantClickOn ? new CustomNBT(is).setBoolean(Events.cantClickOnTag, true).build() : is;
     }
 
     public static Builder builder(Material mat) {

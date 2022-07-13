@@ -6,10 +6,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -22,6 +19,8 @@ public class EntityDamageHandler implements Listener {
 
     @EventHandler
     public static void onDamage(EntityDamageEvent e) {
+        if(e.getEntity().getType() == EntityType.ARMOR_STAND)
+            return;
         System.out.println("onDamage " + e.getEntityType() + " " + e.getCause() + " " + e.getEntity().getLocation());
 
         if (!(e.getEntity() instanceof LivingEntity))

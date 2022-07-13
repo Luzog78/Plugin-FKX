@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.fk.GUIs;
 
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Heads;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -12,10 +13,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GuiAd {
@@ -126,10 +124,23 @@ public class GuiAd {
         } else if (sorted == SortType.DATE) {
             ads.addAll(Ad.ads.stream().sorted((a, b) -> b.getDate().compareTo(a.getDate())).collect(Collectors.toList()));
         } else if (sorted == SortType.STATUS) {
-            ads.addAll(Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.WAITING).collect(Collectors.toList()));
-            ads.addAll(Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.ACCEPTED).collect(Collectors.toList()));
-            ads.addAll(Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.IGNORED).collect(Collectors.toList()));
-            ads.addAll(Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.CLOSED).collect(Collectors.toList()));
+            new ArrayList<List<Ad.Item>>(Arrays.asList(
+                    Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.WAITING).collect(Collectors.toList()),
+                    Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.ACCEPTED).collect(Collectors.toList()),
+                    Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.CLOSED).collect(Collectors.toList()),
+                    Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.IGNORED).collect(Collectors.toList())
+            )) {{
+                forEach(l -> {
+                    if (!l.isEmpty()) {
+                        if (indexOf(l) != 0) {
+                            for (int i = 0; i < 8; i++) {
+                                ads.add(null);
+                            }
+                        }
+                        ads.addAll(l);
+                    }
+                });
+            }};
         } else if (sorted == SortType.INSISTENCE) {
             ads.addAll(Ad.ads.stream().sorted((a, b) -> b.getInsistence() - a.getInsistence()).collect(Collectors.toList()));
         } else if (sorted == SortType.SENDER) {
@@ -140,11 +151,13 @@ public class GuiAd {
             ads.addAll(Ad.ads.stream().sorted(Comparator.comparing(ad -> ad.getMessage() == null ? "\uffff" : ad.getMessage())).collect(Collectors.toList()));
         }
 
-        ArrayList<ItemStack> items = ads.stream().map(ad -> getAdItem(Ad.ads.indexOf(ad), ad,
-                navigationBaseCommand + " " + (reversed ? "-" : "+") + sorted.name() + " " + page))
+        ArrayList<ItemStack> items = ads.stream().map(ad -> ad == null ? null : getAdItem(Ad.ads.indexOf(ad),
+                        ad, navigationBaseCommand + " " + (reversed ? "-" : "+") + sorted.name() + " " + page))
                 .collect(Collectors.toCollection(ArrayList::new));
+        items.replaceAll(item -> item == null ? new CustomNBT(Items.black())
+                .setString("nonStackable", UUID.randomUUID().toString()).build() : item);
 
-        if(reversed)
+        if (reversed)
             Collections.reverse(items);
 
         return Guis.getPagedInventory("ads", 54, back,
