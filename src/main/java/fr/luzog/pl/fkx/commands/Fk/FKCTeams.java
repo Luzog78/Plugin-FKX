@@ -139,7 +139,7 @@ public class FKCTeams {
     public static String handleString(String base, int substring) {
         String s = base.substring(substring);
         if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")))
-            s = s.substring(2, s.length() - 1);
+            s = s.substring(1, s.length() - 1);
         return s.replace("\\\"", "\"").replace("\\'", "'").replace("\\ ", " ").replace("\\\\", "\\");
     }
 
@@ -153,7 +153,7 @@ public class FKCTeams {
             if (arg.replace(" ", "").length() == 0)
                 continue;
             hasAnyOption = true;
-            boolean isEmpty = arg.length() < 3 || arg.charAt(2) != ' ' || arg.substring(3).replace(" ", "").length() == 0;
+            boolean isEmpty = arg.length() < 3 || arg.charAt(1) != ' ' || arg.substring(3).replace(" ", "").length() == 0;
             if (arg.toLowerCase().equals("d") || arg.toLowerCase().startsWith("d ")) {
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "displayName"));
