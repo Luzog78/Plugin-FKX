@@ -9,23 +9,26 @@ import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Player;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FKCLocks {
-    public static final String syntaxe = "/fk event [key <rarity>[:<id>] | create <rarity> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
-    public static final String synt_lock = "/fk event <id> [info | destroy | getKey | lock | unlock | pickable (true | false) | armorStands (hide | show) | cooldown <cooldown> | rarity <rarity>]";
-    public static final String rarity = "Rarity : " + String.join(" / ", Arrays.stream(FKPickableLocks.Rarity.values())
-            .map(Enum::name).toArray(String[]::new));
+    public static final String syntaxe = "/fk locks [create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
+    public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock]"
+            + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level>]"
+            + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
-        CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe + "\n§r" + rarity);
+        CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
 
         if (args.length == 0)
             return false;
@@ -36,31 +39,10 @@ public class FKCLocks {
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
 
-        else if (args[1].equalsIgnoreCase("key")) {
-            if (args.length == 2)
-                u.err(CmdUtils.err_missing_arg.replace("%ARG%", "<rarity>[:<id>]"));
-            else
-                try {
-                    if (sender instanceof Player)
-                        if (u.getPlayer().getInventory().firstEmpty() != -1)
-                            u.getPlayer().getInventory().addItem(args[2].contains(":") ?
-                                    FKPickableLocks.getLockItem(
-                                            FKPickableLocks.Rarity.valueOf(args[2].split(":", 2)[0]
-                                                    .toUpperCase()), args[2].split(":", 2)[1])
-                                    : args[2].equalsIgnoreCase("admin") ? FKPickableLocks.getMasterKey()
-                                    : FKPickableLocks.getLockItem(
-                                    FKPickableLocks.Rarity.valueOf(args[2].toUpperCase())));
-                        else
-                            u.err("Vous n'avez pas de place dans votre inventaire.");
-                    else
-                        u.err(CmdUtils.err_not_player);
-                } catch (IllegalArgumentException e) {
-                    u.err("Rareté invalide. (" + (args[2].contains(":") ? args[2].split(":", 2)[0] : args[2]) + ")");
-                }
-        } else if (args[1].equalsIgnoreCase("create")) {
+        else if (args[1].equalsIgnoreCase("create")) {
             if (args.length >= 3)
                 try {
-                    FKPickableLocks.Rarity rarity = FKPickableLocks.Rarity.valueOf(args[2].toUpperCase());
+                    int level = Integer.parseInt(args[2].toUpperCase());
                     if (args.length >= 6) {
                         Location loc = null;
                         String id = null;
@@ -104,37 +86,45 @@ public class FKCLocks {
                         if (loc != null && id != null) {
                             TileEntity te = ((CraftWorld) loc.getWorld()).getTileEntityAt(loc.getBlockX(),
                                     loc.getBlockY(), loc.getBlockZ());
-                            if (te != null) {
-                                FKManager.getCurrentGame().getPickableLocks().addLock(
-                                        new FKPickableLocks.Lock(id, rarity, true, 0L, loc));
-                                u.succ("Coffre crochetable §b" + id + "§r créé avec les paramètres par défaut !");
-                                FKManager.getCurrentGame().savePickableLocks();
-                                FKManager.getCurrentGame().getPickableLocks().updateAll();
-                            } else
+                            if (te != null)
+                                if (FKManager.getCurrentGame().getPickableLocks().isPickableLock(loc)) {
+                                    FKManager.getCurrentGame().getPickableLocks().addLock(
+                                            new FKPickableLocks.Lock(id, level, true, 0L, loc));
+                                    u.succ("Coffre crochetable §b" + id + "§r de niveau §f" + level
+                                            + "§r créé avec les paramètres par défaut !");
+                                    FKManager.getCurrentGame().savePickableLocks();
+                                    FKManager.getCurrentGame().getPickableLocks().updateAll();
+                                } else
+                                    u.err("Cette endroit est déjà utilisée pour un coffre crochetable.");
+                            else
                                 u.err("Aucune TileEntity n'est présente à cet endroit.");
                         }
                     } else
                         u.synt();
-                } catch (IllegalArgumentException e) {
-                    u.err("Rareté invalide. (" + args[2] + ")");
+                } catch (NumberFormatException e) {
+                    u.err("Niveau invalide. (" + args[2] + ")");
                 }
             else
-                u.err(CmdUtils.err_missing_arg.replace("%ARG%", "rarity"));
+                u.err(CmdUtils.err_missing_arg.replace("%ARG%", "level"));
         } else {
-            u.setSyntaxe(synt_lock + "\n§r" + rarity);
+            u.setSyntaxe(synt_lock);
+            if (args.length >= 3 && (args[2].equalsIgnoreCase("help") || args[2].equals("?"))) {
+                u.synt();
+                return false;
+            }
+
             FKPickableLocks.Lock l = FKManager.getCurrentGame().getPickableLocks().getLock(args[1]);
             if (l == null) {
                 u.err("Ce coffre crochetable n'existe pas. (" + args[1] + ")");
                 return true;
             }
+
             if (args.length == 2)
                 u.succ("TODO -> Event GUI");
-            else if (args[2].equalsIgnoreCase("help") || args[2].equals("?"))
-                u.synt();
             else if (args[2].equalsIgnoreCase("info")) {
                 u.succ("Coffre crochetable :");
                 u.succ(" - Id : §b" + l.getId());
-                u.succ(" - Rareté : §f" + l.getRarity().getFormattedName(false));
+                u.succ(" - Niveau : §f" + l.getLevel());
                 u.succ(" - Accessible :  §f" + (l.isPickable() ? "§2§l" + SpecialChars.YES + "  Oui" : "§4§l" + SpecialChars.NO + "  Non"));
                 u.succ(" - Crocheté :  §f" + (l.isPicked() ? "§2" + SpecialChars.YES + "  Oui" : "§4" + SpecialChars.NO + "  Non"));
                 u.succ(" - Temps pour crocheter : §f" + l.getOriginalCoolDown() + " ticks");
@@ -144,14 +134,6 @@ public class FKCLocks {
             } else if (args[2].equalsIgnoreCase("destroy")) {
                 l.destroy(FKManager.getCurrentGame());
                 u.succ("Vous avez détruit ce coffre.");
-            } else if (args[2].equalsIgnoreCase("getKey")) {
-                if (sender instanceof Player)
-                    if (u.getPlayer().getInventory().firstEmpty() != -1)
-                        u.getPlayer().getInventory().addItem(l.getKey());
-                    else
-                        u.err("Votre inventaire est plein.");
-                else
-                    u.err(CmdUtils.err_not_player);
             } else if (args[2].equalsIgnoreCase("lock")) {
                 l.lock();
                 u.succ("Vous avez verrouillé ce coffre §b" + l.getId() + "§r.");
@@ -161,12 +143,12 @@ public class FKCLocks {
                 u.succ("Vous avez déverrouillé le coffre §b" + l.getId() + "§r.");
                 FKManager.getCurrentGame().savePickableLocks();
             } else if (args[2].equalsIgnoreCase("pickable")) {
-                if(args.length >= 4)
-                    if(args[3].equalsIgnoreCase("true")) {
+                if (args.length >= 4)
+                    if (args[3].equalsIgnoreCase("true")) {
                         l.setPickable(true);
                         u.succ("Le coffre §b" + l.getId() + "§r est désormais crochetable.");
                         FKManager.getCurrentGame().savePickableLocks();
-                    } else if(args[3].equalsIgnoreCase("false")) {
+                    } else if (args[3].equalsIgnoreCase("false")) {
                         l.setPickable(false);
                         u.succ("Le coffre §b" + l.getId() + "§r est désormais inaccessible.");
                         FKManager.getCurrentGame().savePickableLocks();
@@ -175,12 +157,12 @@ public class FKCLocks {
                 else
                     u.err("Vous devez préciser si le coffre est accessible ou non.");
             } else if (args[2].equalsIgnoreCase("armorStands")) {
-                if(args.length >= 4)
-                    if(args[3].equalsIgnoreCase("hide")) {
+                if (args.length >= 4)
+                    if (args[3].equalsIgnoreCase("hide")) {
                         l.hideArmorStand();
                         u.succ("Les armor stands du coffre §b" + l.getId() + "§r sont désormais cachés.");
                         FKManager.getCurrentGame().savePickableLocks();
-                    } else if(args[3].equalsIgnoreCase("show")) {
+                    } else if (args[3].equalsIgnoreCase("show")) {
                         l.updateArmorStand();
                         u.succ("Les armor stands du coffre §b" + l.getId() + "§r sont désormais visibles.");
                         FKManager.getCurrentGame().savePickableLocks();
@@ -189,7 +171,7 @@ public class FKCLocks {
                 else
                     u.err("Vous devez préciser si les armor stands doivent être visibles ou non.");
             } else if (args[2].equalsIgnoreCase("cooldown")) {
-                if(args.length >= 4)
+                if (args.length >= 4)
                     try {
                         l.setOriginalCoolDown(Long.parseLong(args[3]));
                         l.resetCoolDown();
@@ -201,18 +183,18 @@ public class FKCLocks {
                     }
                 else
                     u.err("Vous devez préciser si les armor stands doivent être visibles ou non.");
-            } else if (args[2].equalsIgnoreCase("rarity")) {
-                if(args.length >= 4)
+            } else if (args[2].equalsIgnoreCase("level")) {
+                if (args.length >= 4)
                     try {
-                        l.setRarity(FKPickableLocks.Rarity.valueOf(args[3].toUpperCase()));
-                        u.succ("Le coffre §b" + l.getId() + "§r est désormais de rareté §f"
-                                + l.getRarity().getFormattedName(false) + "§r !");
+                        l.setLevel(Integer.parseInt(args[3]));
+                        u.succ("Le coffre §b" + l.getId() + "§r est désormais de niveau §f"
+                                + l.getLevel() + "§r !");
                         FKManager.getCurrentGame().savePickableLocks();
-                    } catch (IllegalArgumentException e) {
-                        u.err("Rareté invalide. (" + args[3] + ")");
+                    } catch (NumberFormatException e) {
+                        u.err("Niveau invalide. (" + args[3] + ")");
                     }
                 else
-                    u.err("Vous devez préciser la rareté du coffre.");
+                    u.err("Vous devez préciser le niveau du coffre.");
             } else
                 u.synt();
         }
@@ -221,6 +203,117 @@ public class FKCLocks {
     }
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
-        return null;
+        DecimalFormat df = new DecimalFormat("0.00");
+        ArrayList<Material> containers = new ArrayList<>(Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST,
+                Material.ENDER_CHEST, Material.HOPPER, Material.DROPPER, Material.DISPENSER, Material.FURNACE,
+                Material.BURNING_FURNACE, Material.BREWING_STAND, Material.ANVIL, Material.BEACON, Material.JUKEBOX));
+        return new ArrayList<String>() {{
+            FKManager m = FKManager.getCurrentGame();
+            FKPickableLocks.Lock l = null;
+            if (m != null)
+                if (args.length == 2) {
+                    add("help");
+                    add("list");
+                    add("create");
+                    addAll(m.getPickableLocks().getPickableLocks().stream()
+                            .sorted((a, b) -> {
+                                if(sender instanceof Player) {
+                                    Block bb = ((Player) sender).getTargetBlock(
+                                            new HashSet<>(Collections.singletonList(Material.AIR)), 200);
+                                    if(bb != null && containers.contains(bb.getType())
+                                            && bb.getLocation().getBlockX() == a.getLocation().getBlockX()
+                                            && bb.getLocation().getBlockY() == a.getLocation().getBlockY()
+                                            && bb.getLocation().getBlockZ() == a.getLocation().getBlockZ())
+                                        return -1;
+                                }
+                                return 0;
+                            })
+                            .map(FKPickableLocks.Lock::getId)
+                            .collect(Collectors.toList()));
+                } else if (args[1].equalsIgnoreCase("create")) {
+                    if (args.length == 3) {
+                        add("0");
+                        add((m.getDay() + 1) + "");
+                        add((m.getDay() + 2) + "");
+                        add((m.getDay() + 3) + "");
+                        add((m.getDay() + 4) + "");
+                        add((m.getDay() + 5) + "");
+                    } else if (args.length == 4) {
+                        for (int i = 0; i < 6; i++)
+                            add(UUID.randomUUID().toString().substring(0, 6));
+                    } else if (args.length == 5) {
+                        if (sender instanceof Player) {
+                            Block b = ((Player) sender).getTargetBlock(
+                                    new HashSet<>(Collections.singletonList(Material.AIR)), 200);
+                            if (b != null && containers.contains(b.getType()))
+                                add(b.getLocation().getBlockX() + "");
+                            else
+                                add(df.format(((Player) sender).getLocation().getBlockX()));
+                        } else {
+                            add("0");
+                        }
+                    } else if (args.length == 6) {
+                        if (sender instanceof Player) {
+                            Block b = ((Player) sender).getTargetBlock(
+                                    new HashSet<>(Collections.singletonList(Material.AIR)), 200);
+                            if (b != null && containers.contains(b.getType()))
+                                add(b.getLocation().getBlockY() + "");
+                            else
+                                add(df.format(((Player) sender).getLocation().getBlockY()));
+                        } else {
+                            add("0");
+                        }
+                    } else if (args.length == 7) {
+                        if (sender instanceof Player) {
+                            Block b = ((Player) sender).getTargetBlock(
+                                    new HashSet<>(Collections.singletonList(Material.AIR)), 200);
+                            if (b != null && containers.contains(b.getType()))
+                                add(b.getLocation().getBlockZ() + "");
+                            else
+                                add(df.format(((Player) sender).getLocation().getBlockZ()));
+                        } else {
+                            add("0");
+                        }
+                    } else if (args.length == 8) {
+                        addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
+                    }
+                } else if((l = m.getPickableLocks().getLock(args[1])) != null) {
+                    if(args.length == 3) {
+                        add("help");
+                        add("info");
+                        add("destroy");
+                        add("lock");
+                        add("unlock");
+                        add("cooldown");
+                        add("level");
+                        add("pickable");
+                        add("armorStands");
+                    } else if(args.length == 4) {
+                        if(args[2].equalsIgnoreCase("cooldown")) {
+                            add("100");
+                            add("200");
+                            add("400");
+                            add("600");
+                            add("1200");
+                            add("2400");
+                            add("3600");
+                            add("6000");
+                        } else if(args[2].equalsIgnoreCase("level")) {
+                            add("0");
+                            add((m.getDay() + 1) + "");
+                            add((m.getDay() + 2) + "");
+                            add((m.getDay() + 3) + "");
+                            add((m.getDay() + 4) + "");
+                            add((m.getDay() + 5) + "");
+                        } else if(args[2].equalsIgnoreCase("pickable")) {
+                            add("true");
+                            add("false");
+                        } else if(args[2].equalsIgnoreCase("armorStands")) {
+                            add("hide");
+                            add("show");
+                        }
+                    }
+                }
+        }};
     }
 }

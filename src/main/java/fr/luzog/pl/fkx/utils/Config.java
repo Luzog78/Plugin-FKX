@@ -858,7 +858,7 @@ public class Config {
         public static FKPickableLocks.Lock mapToLock(Map<?, ?> map) {
             try {
                 Map<?, ?> coolMap, locMap;
-                if (map.containsKey("id") && map.containsKey("rarity")
+                if (map.containsKey("id") && map.containsKey("level")
                         && map.containsKey("pickable") && map.containsKey("picked")
                         && map.containsKey("cooldown") && (coolMap = (Map<?, ?>) map.get("cooldown")) != null
                         && coolMap.containsKey("original")
@@ -871,14 +871,13 @@ public class Config {
                             Double.parseDouble(locMap.get("y") + ""),
                             Double.parseDouble(locMap.get("z") + ""));
 
-                    return new FKPickableLocks.Lock(map.get("id") + "", FKPickableLocks.Rarity.valueOf((map.get("rarity") + "").toUpperCase()),
+                    return new FKPickableLocks.Lock(map.get("id") + "", Integer.parseInt(map.get("level") + ""),
                             Boolean.parseBoolean(map.get("pickable") + ""),
                             Boolean.parseBoolean(map.get("picked") + ""),
                             Long.parseLong(coolMap.get("original") + ""),
                             Long.parseLong(coolMap.get(coolMap.containsKey("current") ? "current" : "original") + ""),
                             loc,
                             map.containsKey("picker") && map.get("picker") != null ? map.get("picker") + "" : null,
-                            map.containsKey("key-type") ? FKPickableLocks.KeyType.valueOf(map.get("key-type") + "") : FKPickableLocks.KeyType.NONE,
                             map.containsKey("armor-stand1") && map.get("armor-stand1") != null ? UUID.fromString(map.get("armor-stand1") + "") : null,
                             map.containsKey("armor-stand2") && map.get("armor-stand2") != null ? UUID.fromString(map.get("armor-stand2") + "") : null);
                 }
@@ -900,13 +899,12 @@ public class Config {
             }};
             return new LinkedHashMap<String, Object>() {{
                 put("id", lock.getId());
-                put("rarity", lock.getRarity().name());
+                put("level", lock.getLevel());
                 put("pickable", lock.isPickable());
                 put("picked", lock.isPicked());
                 put("cooldown", coolMap);
                 put("location", locMap);
                 put("picker", lock.getPicker());
-                put("key-type", lock.getKeyType().name());
                 put("armor-stand1", lock.getArmorStand1() != null ? lock.getArmorStand1().toString() : null);
                 put("armor-stand2", lock.getArmorStand2() != null ? lock.getArmorStand2().toString() : null);
             }};

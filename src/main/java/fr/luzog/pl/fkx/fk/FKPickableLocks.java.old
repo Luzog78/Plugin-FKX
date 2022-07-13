@@ -11,6 +11,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.ContainerBlock;
+import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ArmorStand;
@@ -30,47 +33,92 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
-
-import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 
 public class FKPickableLocks {
 
-    public static final String LOCK_KEY = "§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-", LOCK_ID_TAG = "fkxLockIdTag", RARITY_TAG = "fkxRarityTag";
+    public static final String LOCK_KEY = "$FKX", LOCK_ID_TAG = "fkxLockIdTag", RARITY_TAG = "fkxRarityTag";
     public static final int maxDistance = 4;
+
+    public static enum KeyType {NONE, RARITY, ID}
+
+    public static enum Rarity {
+        NONE(0, "§f"),
+        COMMON(1, "§7"),
+        RARE(2, "§a"),
+        EPIC(3, "§d"),
+        LEGENDARY(4, "§6"),
+        SPECIAL(5, "§4");
+
+        private int value;
+        private String color;
+
+        Rarity(int value, String color) {
+            this.value = value;
+            this.color = color;
+        }
+
+        public String getFormattedName(boolean key) {
+            return color + "§l-=[ §k0§r" + color + " " + name() + (key ? " KEY" : "") + " §l§k0§r" + color + " §l]=-";
+        }
+
+        public String getFormattedLore() {
+            return "§r   " + color + "[§l" + name() + "§r" + color + "]";
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public void setValue(int value) {
+            this.value = value;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+    }
 
     public static class Lock {
         private String id;
-        private int level;
+        private Rarity rarity;
         private boolean pickable, picked;
         private long originalCoolDown, coolDown;
         private Location location;
         private String picker;
+        private KeyType keyType;
         private UUID armorStand1, armorStand2;
 
-        public Lock(String id, int level, boolean pickable, long originalCoolDown, Location location) {
+        public Lock(String id, Rarity rarity, boolean pickable, long originalCoolDown, Location location) {
             this.id = id;
-            this.level = level;
+            this.rarity = rarity;
             this.pickable = pickable;
             this.picked = false;
             this.originalCoolDown = originalCoolDown;
             this.coolDown = originalCoolDown;
             this.location = location;
             this.picker = null;
+            this.keyType = KeyType.NONE;
             this.armorStand1 = null;
             this.armorStand2 = null;
         }
 
-        public Lock(String id, int level, boolean pickable, boolean picked, long originalCoolDown, long coolDown,
-                    Location location, String picker, UUID armorStand1, UUID armorStand2) {
+        public Lock(String id, Rarity rarity, boolean pickable, boolean picked, long originalCoolDown, long coolDown,
+                    Location location, String picker, KeyType keyType, UUID armorStand1, UUID armorStand2) {
             this.id = id;
-            this.level = level;
+            this.rarity = rarity;
             this.pickable = pickable;
             this.picked = picked;
             this.originalCoolDown = originalCoolDown;
             this.coolDown = coolDown;
             this.location = location;
             this.picker = picker;
+            this.keyType = keyType;
             this.armorStand1 = armorStand1;
             this.armorStand2 = armorStand2;
         }
@@ -108,6 +156,16 @@ public class FKPickableLocks {
             te.update();
         }
 
+        public static ItemStack getKey(KeyType keyType, Rarity rarity, @Nullable String id) {
+            if (keyType == KeyType.RARITY)
+                return FKPickableLocks.getLockItem(rarity);
+            return FKPickableLocks.getLockItem(rarity, id);
+        }
+
+        public ItemStack getKey() {
+            return getKey(keyType, rarity, id);
+        }
+
         public String getId() {
             return id;
         }
@@ -116,12 +174,12 @@ public class FKPickableLocks {
             this.id = id;
         }
 
-        public int getLevel() {
-            return level;
+        public Rarity getRarity() {
+            return rarity;
         }
 
-        public void setLevel(int level) {
-            this.level = level;
+        public void setRarity(Rarity rarity) {
+            this.rarity = rarity;
         }
 
         public boolean isPickable() {
@@ -174,6 +232,14 @@ public class FKPickableLocks {
 
         public void setPicker(String picker) {
             this.picker = picker;
+        }
+
+        public KeyType getKeyType() {
+            return keyType;
+        }
+
+        public void setKeyType(KeyType keyType) {
+            this.keyType = keyType;
         }
 
         public Pair<ArmorStand, ArmorStand> showArmorStand() {
@@ -230,8 +296,8 @@ public class FKPickableLocks {
 
         public void updateArmorStand() {
             Pair<ArmorStand, ArmorStand> as = showArmorStand();
-            if (!as.getKey().getCustomName().equals("Niveau " + level))
-                as.getKey().setCustomName("Niveau " + level);
+            if (!as.getKey().getCustomName().equals(rarity.getFormattedName(false)))
+                as.getKey().setCustomName(rarity.getFormattedName(false));
             as.getValue().setCustomName(getProgressBar(originalCoolDown, coolDown));
         }
 
@@ -268,15 +334,13 @@ public class FKPickableLocks {
 
         @EventHandler(priority = EventPriority.LOW)
         public static void onBreakBlock(BlockBreakEvent e) {
-            if (FKManager.getCurrentGame() != null &&
-                    FKManager.getCurrentGame().getPickableLocks().isPickableLock(e.getBlock().getLocation()))
+            if (isPickableLock(e.getBlock().getLocation()))
                 e.setCancelled(true);
         }
 
         @EventHandler(priority = EventPriority.LOW)
         public static void onExplode(BlockExplodeEvent e) {
-            e.blockList().removeIf(block -> FKManager.getCurrentGame() != null &&
-                    FKManager.getCurrentGame().getPickableLocks().isPickableLock(block.getLocation()));
+            e.blockList().removeIf(block -> isPickableLock(block.getLocation()));
         }
 
         @EventHandler(priority = EventPriority.LOW)
@@ -286,48 +350,31 @@ public class FKPickableLocks {
             boolean sneak = e.getPlayer().isSneaking();
             Block b = e.getClickedBlock();
             ItemStack is = e.getItem();
-            FKPlayer fkp;
+            List<FKPlayer> fkps = FKManager.getGlobalPlayer(p.getName());
 
-            if (!(a == RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK) || b == null || FKManager.getCurrentGame() == null
-                    || (fkp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) == null
-                    || (fkp.getManager().getState() == FKManager.State.PAUSED
-                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
-                    || fkp.getTeam() == null || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.SPECS_ID)
-                /*TODO -> || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.GODS_ID)*/)
+            if (!(a == Action.RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK)
+                    || b == null || !isPickableLock(b.getLocation()))
                 return;
 
-            FKPickableLocks pickableLocks = fkp.getManager().getPickableLocks();
-            if (!pickableLocks.isPickableLock(b.getLocation()) || pickableLocks.getLock(b.getMetadata(LOCK_ID_TAG).get(0).asString()) == null) {
-                if (is != null && new CustomNBT(is).hasKey(RARITY_TAG) && new CustomNBT(is).getString(RARITY_TAG).equals("admin"))
-                    if (a == RIGHT_CLICK_BLOCK) {
-                        p.sendMessage("§cCe bloc n'est pas un coffre crochetable." +
-                                "\n§cVous pouvez faire §7Clic Gauche§c sur un bloc pour le rendre crochetable.");
-                        e.setCancelled(true);
-                    } else {
-                        String id;
-                        do
-                            id = UUID.randomUUID().toString().substring(0, 6);
-                        while (FKManager.getCurrentGame().getPickableLocks().getLock(id) != null);
-                        Lock l = new FKPickableLocks.Lock(id, 0, true, 0L, b.getLocation());
-                        pickableLocks.addLock(l);
-                        p.sendMessage("§aVous avez créé un coffre crochetable !" +
-                                "\n§a  >  §aId : §b" + l.getId() + "§a   |   Niveau : §f" + l.getLevel());
-                        fkp.getManager().savePickableLocks();
-                        pickableLocks.updateAll();
-                    }
-            } else {
+            for (FKPlayer fkp : fkps) {
+                if ((fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+                        || fkp.getTeam() == null || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.SPECS_ID) /*TODO -> || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.GODS_ID)*/)
+                    return;
+
+                FKPickableLocks pickableLocks = fkp.getManager().getPickableLocks();
                 Lock l = pickableLocks.getLock(b.getMetadata(LOCK_ID_TAG).get(0).asString());
+                if (l == null)
+                    return;
 
                 if (is != null && new CustomNBT(is).hasKey(RARITY_TAG) && new CustomNBT(is).getString(RARITY_TAG).equals("admin")) {
-                    if (a == RIGHT_CLICK_BLOCK)
+                    if (a == Action.RIGHT_CLICK_BLOCK)
                         if (sneak) {
                             l.destroy(fkp.getManager());
                             p.sendMessage("§aVous avez détruit ce coffre.");
-                            e.setCancelled(true);
                         } else {
                             p.sendMessage("§aCoffre crochetable :");
                             p.sendMessage("§a - Id : §b" + l.getId());
-                            p.sendMessage("§a - Niveau : §f" + l.getLevel());
+                            p.sendMessage("§a - Rareté : §f" + l.getRarity().getFormattedName(false));
                             p.sendMessage("§a - Accessible :  §f" + (l.isPickable() ? "§2§l" + SpecialChars.YES + "  Oui" : "§4§l" + SpecialChars.NO + "  Non"));
                             p.sendMessage("§a - Crocheté :  §f" + (l.isPicked() ? "§2" + SpecialChars.YES + "  Oui" : "§4" + SpecialChars.NO + "  Non"));
                             p.sendMessage("§a - Temps pour crocheter : §f" + l.getOriginalCoolDown() + " ticks");
@@ -345,7 +392,6 @@ public class FKPickableLocks {
                             l.setPickable(true);
                             p.sendMessage("§aCe coffre est désormais crochetable.");
                         }
-                        e.setCancelled(true);
                         fkp.getManager().savePickableLocks();
                     } else {
                         if (l.isPicked()) {
@@ -355,19 +401,19 @@ public class FKPickableLocks {
                             l.unlock();
                             p.sendMessage("§aVous avez déverrouillé ce coffre.");
                         }
-                        e.setCancelled(true);
                         fkp.getManager().savePickableLocks();
                     }
+                    e.setCancelled(true);
                     return;
                 }
 
-                if (!l.isPickable()) {
+                if (!l.isPickable() && (fkp.getTeam() == null || !fkp.getTeam().getId().equals(FKTeam.GODS_ID))) {
                     p.sendMessage("§cLe coffre n'est pas crochetable à l'heure actuelle.");
                     e.setCancelled(true);
                     return;
                 }
 
-                if (!pickableLocks.isLocked(b.getLocation()))
+                if (!isLocked(b.getLocation()))
                     return;
 
                 if (l.isPicked()) {
@@ -381,17 +427,33 @@ public class FKPickableLocks {
                 }
 
                 if (pickableLocks.getInPicking().containsValue(l.getId())) {
-                    p.sendMessage("§cUn joueur crochète déjà ce coffre.\n  >  §cId : §b" + l.getId() + "§c   |   Niveau : §f" + l.getLevel());
+                    p.sendMessage("§cUn joueur crochète déjà ce coffre.\n  >  §cId : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                     return;
                 }
 
-                if (l.getLevel() > getPickingLevel(FKManager.getCurrentGame())) {
-                    p.sendMessage("§cVous n'avez pas le niveau requis pour déverrouiller ce coffre.\n§c  >  Id : §b" + l.getId() + "§c   |   Niveau : §f" + l.getLevel());
+                if (is == null || !new CustomNBT(is).hasKey(RARITY_TAG)) {
+                    p.sendMessage("§cVous ne possédez pas de clé pour déverrouiller ce coffre.\n§c  >  Id : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
                     return;
                 }
 
-                p.sendMessage("§aVous essayez de crocheter un coffre !\n§a  >  Id : §b" + l.getId() + "§a   |   Niveau : §f" + l.getLevel());
+                CustomNBT isNbt = new CustomNBT(is);
+                Rarity r = Rarity.valueOf(isNbt.getString(RARITY_TAG).split(":", 2)[0]);
+                String id = isNbt.getString(RARITY_TAG).contains(":") ? isNbt.getString(RARITY_TAG).split(":", 2)[1] : "";
+                if (id.equals(""))
+                    id = null;
+
+                if (!verifyKey(l.getId(), l.getRarity(), id, r)) {
+                    p.sendMessage("§cVous n'avez pas la bonne clé pour déverrouiller ce coffre.\n§c  >  Id : §b" + l.getId() + "§c   |   Rareté : §f" + l.getRarity().getFormattedName(false));
+                    return;
+                }
+
+                p.sendMessage("§aVous essayez de crocheter un coffre !\n§a  >  Id : §b" + l.getId() + "§a   |   Rareté : §f" + l.getRarity().getFormattedName(false));
+                if (is.getAmount() > 1)
+                    is.setAmount(is.getAmount() - 1);
+                else
+                    p.setItemInHand(null);
                 l.setPicker(p.getName());
+                l.setKeyType(id == null ? KeyType.RARITY : KeyType.ID);
                 pickableLocks.pickALock(p.getName(), l.getId());
             }
         }
@@ -411,13 +473,54 @@ public class FKPickableLocks {
         return new Config.PickableLocks("game-" + gameId + "/PickableLocks.yml");
     }
 
-    public static int getPickingLevel(FKManager manager) {
-        return manager.getDay();
+    public static boolean isPickableLock(Location location) {
+        TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        if (te == null)
+            return false;
+        return location.getBlock().hasMetadata(LOCK_ID_TAG);
+    }
+
+    public static boolean isLocked(Location location) {
+        TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        if (te == null)
+            return false;
+        NBTTagCompound nbt = new NBTTagCompound();
+        te.b(nbt);
+        return nbt.hasKey("Lock") && !nbt.getString("Lock").equals("") && location.getBlock().hasMetadata(LOCK_ID_TAG);
+    }
+
+    public static ItemStack getLockItem(Rarity rarity) {
+        return Items.builder(Material.TRIPWIRE_HOOK)
+                .setName(rarity.getFormattedName(true))
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        " ",
+                        "§7 Cette clé vous permet de",
+                        "§7  déverrouiller nombre de",
+                        "§7  trésors plus fous les uns",
+                        "§7  que les autres...",
+                        "§7  Prenez-en grand soin !",
+                        " ",
+                        " " + rarity.getFormattedLore(),
+                        " ",
+                        "§8" + Guis.loreSeparator
+                )
+                .getNBT()
+                .setString(RARITY_TAG, rarity.name())
+                .build();
+    }
+
+    public static ItemStack getLockItem(Rarity rarity, String id) {
+        return Items.builder(getLockItem(rarity))
+                .addLore("§8Dévérouille : §7" + id)
+                .getNBT()
+                .setString(RARITY_TAG, rarity.name() + ":" + id)
+                .build();
     }
 
     public static ItemStack getMasterKey() {
         return Items.builder(Material.TRIPWIRE_HOOK)
-                .setName(LOCK_KEY)
+                .setName("§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
@@ -448,6 +551,11 @@ public class FKPickableLocks {
 
     public static boolean verifyDistance(Location lock, Location picking) {
         return Utils.normalize(lock, true).distance(picking) <= maxDistance;
+    }
+
+    public static boolean verifyKey(String lockId, Rarity lockRarity, String keyId, Rarity keyRarity) {
+        return (keyId == null && keyRarity.getValue() == lockRarity.getValue())
+                || (keyId != null && keyId.equals(lockId) && keyRarity.getValue() == lockRarity.getValue());
     }
 
     public static String getProgressBar(long originalCountDown, long currentCoolDown) {
@@ -515,10 +623,16 @@ public class FKPickableLocks {
                     if (Bukkit.getOfflinePlayer(player).isOnline()) {
                         Bukkit.getPlayerExact(player).sendMessage("§cCrochetage annulé.");
                         Bukkit.getPlayerExact(player).playSound(Bukkit.getPlayerExact(player).getLocation(), Sound.ANVIL_LAND, 1, 1);
+                        if (lock != null)
+                            if (Bukkit.getPlayerExact(player).getInventory().firstEmpty() == -1)
+                                Bukkit.getPlayerExact(player).getWorld().dropItemNaturally(Bukkit.getPlayerExact(player).getLocation(), lock.getKey());
+                            else
+                                Bukkit.getPlayerExact(player).getInventory().addItem(lock.getKey());
                     }
                     if (lock != null) {
                         lock.resetCoolDown();
                         lock.setPicker(null);
+                        lock.setKeyType(KeyType.NONE);
                         lock.hideArmorStand();
                     }
                     inPicking.remove(player);
@@ -539,23 +653,6 @@ public class FKPickableLocks {
                 l.lock();
             l.setCoolDown(tempCoolDown);
         }
-    }
-
-    public boolean isPickableLock(Location location) {
-        TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        if (te == null)
-            return false;
-        return location.getBlock().hasMetadata(LOCK_ID_TAG) && getLock(location.getBlock().getMetadata(LOCK_ID_TAG).get(0).asString()) != null;
-    }
-
-    public boolean isLocked(Location location) {
-        TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-        if (te == null)
-            return false;
-        NBTTagCompound nbt = new NBTTagCompound();
-        te.b(nbt);
-        return nbt.hasKey("Lock") && !nbt.getString("Lock").equals("") && location.getBlock().hasMetadata(LOCK_ID_TAG)
-                && getLock(location.getBlock().getMetadata(LOCK_ID_TAG).get(0).asString()) != null;
     }
 
     public Lock getLock(String id) {

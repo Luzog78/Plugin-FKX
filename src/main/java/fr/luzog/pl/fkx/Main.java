@@ -31,7 +31,7 @@ public class Main extends JavaPlugin implements Listener {
 
     public static Config.Globals globalConfig;
 
-    public static boolean dontSave = false;
+    public static boolean activeCustomCraftingTable = false, activeCustomLoots = false;
 
     @Override
     public void onLoad() {
