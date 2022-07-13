@@ -47,19 +47,9 @@ public class FKCPlayers {
                 Bukkit.dispatchCommand(sender, "fk players page 0");
             else
                 try {
-                    ArrayList<String> l = new ArrayList<>(new HashSet<String>() {{
-                        addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
-                        addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
-                    }});
                     if (sender instanceof Player)
-                        u.getPlayer().openInventory(Guis.getPagedInventory("FirstPaged", 54, "fk",
-                                GuiPlayers.getMain(null, "Clic pour rafraîchir",
-                                        "fk players", l.size(), (int) l.stream().filter(p ->
-                                                Bukkit.getOfflinePlayer(p).isOnline()).count(),
-                                        Bukkit.getMaxPlayers()), null, "fk players page",
-                                Integer.parseInt(args[2]), l.stream().map(p ->
-                                        GuiPlayers.getHead(p, "Clic pour voir plus",
-                                        "fk players " + p)).collect(Collectors.toList())));
+                        u.getPlayer().openInventory(GuiPlayers.getPlayersInventory("fk",
+                                "fk players page", Integer.parseInt(args[2])));
                     else
                         u.synt();
                 } catch (NumberFormatException e) {

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.commands.Other;
 
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.GUIs.GuiAd;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Config;
@@ -29,8 +30,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Ad implements CommandExecutor, TabCompleter, Listener {
-    public static final String AD_PREFIX = "§8§l[§2Ad§8§l] >>  ";
+    public static final String AD_PREFIX = "§8§l[§2Ad§8§l] >>  ",
+            SYS_NAME = "§4§lSYSTEM";
     public static ArrayList<Item> ads = new ArrayList<>();
+    public static DecimalFormat df = new DecimalFormat("000");
 
     public static Config getConfig() {
         return new Config("Ads.yml", true);
@@ -224,7 +227,9 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     }
 
     public static final String syntaxe_player = "/ad [help | [<admin>] [<message...>]]";
-    public static final String syntaxe_admin = "/ad [help | list | all | (info | accept | ignore | close) <id> | ad [<admin>] [<message...>]]";
+    public static final String syntaxe_admin = "/ad [help | list | all | page [[+/-]<filter>] <page> | <status> <id> | ad [<admin>] [<message...>]]" +
+            "\n§r  >  Filters : " + String.join(" / ", Arrays.stream(GuiAd.SortType.values()).map(Enum::name).toArray(String[]::new))
+            + "\n§r  >  Status : " + String.join(" / ", Arrays.stream(State.values()).map(Enum::name).toArray(String[]::new));
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
@@ -255,9 +260,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 post(u, new Item(u.getPlayer().getName(), null, String.join(" ", args)));
 
         else if (args.length == 0)
-            u.succ("TODO -> AD GUIs");
+            Bukkit.dispatchCommand(sender, "ad page 0");
         else if (args[0].equalsIgnoreCase("all")) {
-            DecimalFormat df = new DecimalFormat("000");
             u.succ("Liste des requêtes (§f" + ads.size() + "§r) :");
             for (int i = 0; i < ads.size(); i++)
                 u.succ(" - §3#" + df.format(i) + "§7-" +
@@ -269,7 +273,6 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                         + "§r : §f" + (ads.get(i).getMessage() == null ? "§cnull"
                         : ads.get(i).getMessage().substring(0, Math.min(60, ads.get(i).getMessage().length()))));
         } else if (args[0].equalsIgnoreCase("list")) {
-            DecimalFormat df = new DecimalFormat("000");
             ArrayList<String> waiting = new ArrayList<>();
             for (int i = 0; i < ads.size(); i++)
                 if (ads.get(i).getState() == State.WAITING)
@@ -283,12 +286,30 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                             : ads.get(i).getMessage().substring(0, Math.min(60, ads.get(i).getMessage().length()))));
             u.succ("Liste des requêtes en attente (§f" + waiting.size() + "§r) :");
             waiting.forEach(u::succ);
+        } else if (args[0].equalsIgnoreCase("page")) {
+            if (args.length == 1)
+                Bukkit.dispatchCommand(sender, "ad page 0");
+            else if (args.length == 2)
+                Bukkit.dispatchCommand(sender, "ad page " + GuiAd.SortType.STATUS.name() + " " + args[1]);
+            else
+                try {
+                    String arg = args[1].startsWith("-") || args[1].startsWith("+") ? args[1].substring(1) : args[1];
+                    if (sender instanceof Player)
+                        u.getPlayer().openInventory(GuiAd.getAdsInventory(GuiAd.SortType.valueOf(arg.toUpperCase()),
+                                args[1].startsWith("-"), null, "ad page", Integer.parseInt(args[2])));
+                    else
+                        u.err(CmdUtils.err_not_player);
+                } catch (NumberFormatException e) {
+                    u.err(CmdUtils.err_number_format + " (" + args[2] + ")");
+                } catch (IllegalArgumentException e) {
+                    Bukkit.dispatchCommand(sender, "ad page +" + GuiAd.SortType.STATUS.name() + " " + args[2]);
+                }
         } else if (args[0].equalsIgnoreCase("info") || args[0].equalsIgnoreCase("accept")
-                || args[0].equalsIgnoreCase("ignore") || args[0].equalsIgnoreCase("close"))
+                || args[0].equalsIgnoreCase("ignore") || args[0].equalsIgnoreCase("close")
+                || args[0].equalsIgnoreCase("waiting"))
             try {
                 int i = Integer.parseInt(args[1]);
                 Item ad = ads.get(i);
-                DecimalFormat df = new DecimalFormat("000");
                 if (args[0].equalsIgnoreCase("info"))
                     u.succ("Informations de la requête §3#" + df.format(i) + "§r :"
                             + "\n§r - Date : §f" + new SimpleDateFormat("HH:mm:ss dd/MM/yyyy").format(ads.get(i).getDate())
@@ -308,12 +329,19 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 else if (args[0].equalsIgnoreCase("accept")) {
                     ad.setState(State.ACCEPTED);
                     u.succ("Requête §3#" + df.format(i) + "§r : §2Acceptée");
+                    saveToConfig();
                 } else if (args[0].equalsIgnoreCase("ignore")) {
                     ad.setState(State.IGNORED);
-                    u.succ("Requête §3#" + df.format(i) + "§r : §7Ignorée");
+                    u.succ("Requête §3#" + df.format(i) + "§r : §8Ignorée");
+                    saveToConfig();
                 } else if (args[0].equalsIgnoreCase("close")) {
                     ad.setState(State.CLOSED);
                     u.succ("Requête §3#" + df.format(i) + "§r : §4Fermée");
+                    saveToConfig();
+                } else if (args[0].equalsIgnoreCase("waiting")) {
+                    ad.setState(State.WAITING);
+                    u.succ("Requête §3#" + df.format(i) + "§r : §7En attente");
+                    saveToConfig();
                 }
             } catch (NullPointerException | IndexOutOfBoundsException | NumberFormatException e) {
                 u.synt();
@@ -321,15 +349,15 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             }
         else if (args[0].equalsIgnoreCase("ad"))
             if (args.length == 1)
-                post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : "§4§lSYSTEM", null, null));
+                post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, null, null));
             else if (FKManager.getCurrentGame().getGods().getPlayer(args[1]) != null)
                 if (args.length == 2)
-                    post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : "§4§lSYSTEM", args[1], null));
+                    post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, args[1], null));
                 else
-                    post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : "§4§lSYSTEM", args[1],
+                    post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, args[1],
                             String.join(" ", Arrays.copyOfRange(args, 2, args.length))));
             else
-                post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : "§4§lSYSTEM", null,
+                post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, null,
                         String.join(" ", Arrays.copyOfRange(args, 1, args.length))));
 
         else
@@ -342,7 +370,6 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
         boolean isPlayer = sender instanceof Player && FKManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
-        DecimalFormat df = new DecimalFormat("000");
 
         new ArrayList<String>() {{
             if (args.length == 1)
@@ -352,7 +379,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
 
             else if (args.length == 1)
-                addAll(Arrays.asList("list", "all", "info", "accept", "ignore", "close", "ad"));
+                addAll(Arrays.asList("list", "all", "info", "accept", "ignore", "close", "waiting", "ad"));
             else if (args[0].equalsIgnoreCase("info"))
                 for (int i = 0; i < ads.size(); i++)
                     add(df.format(i));
@@ -361,11 +388,16 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                     if (ads.get(i).getState() == State.WAITING)
                         add(df.format(i));
             } else if (args[0].equalsIgnoreCase("ignore")
-                    || args[0].equalsIgnoreCase("close"))
+                    || args[0].equalsIgnoreCase("close")) {
                 for (int i = 0; i < ads.size(); i++)
                     if (ads.get(i).getState() == State.WAITING
                             || ads.get(i).getState() == State.ACCEPTED)
                         add(df.format(i));
+            } else if (args[0].equalsIgnoreCase("waiting")) {
+                for (int i = 0; i < ads.size(); i++)
+                    if (ads.get(i).getState() != State.WAITING)
+                        add(df.format(i));
+            }
         }}.forEach(p -> {
             if (p.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 list.add(p);

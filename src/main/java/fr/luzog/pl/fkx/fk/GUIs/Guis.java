@@ -82,7 +82,8 @@ public class Guis {
     public static ItemStack navigationFeather(int page, int maxPage, int pageSize) {
         return Items.builder(Material.FEATHER)
                 .setName("§fNavigation")
-                .setLore("§8" + loreSeparator, "§8Avec " + pageSize + " item/page", " ", "§8Page :  §f" + (page + 1) + "§7/" + maxPage)
+                .setLore("§8" + loreSeparator, "§8Avec " + pageSize + " item/page", " ", "§8Page :  §f"
+                        + (page + (maxPage == 0 ? 0 : 1)) + "§7/" + maxPage)
                 .setCantClickOn(true)
                 .build();
     }
@@ -185,9 +186,11 @@ public class Guis {
             inv.setItem(3, Items.blue());
             inv.setItem(5, Items.blue());
 
-            inv.setItem(6, page == 0 ? Items.blue() : navigationArrow(page, content.size(), true, navigationBaseCommand));
+            inv.setItem(6, page == 0 ? Items.blue()
+                    : navigationArrow(page, content.size(), true, navigationBaseCommand));
             inv.setItem(7, navigationFeather(page, content.size(), 1));
-            inv.setItem(8, page == content.size() ? Items.blue() : navigationArrow(page, content.size(), false, navigationBaseCommand));
+            inv.setItem(8, page + 1 == content.size() || content.size() == 0 ? Items.blue()
+                    : navigationArrow(page, content.size(), false, navigationBaseCommand));
 
             try {
                 inv.setItem(4, new ArrayList<>(content).get(page));
@@ -216,9 +219,11 @@ public class Guis {
             int isPerPage = 5;
             int max = ((int) (content.size() / (isPerPage + 0.0))) + (content.size() % isPerPage == 0 ? 0 : 1);
 
-            inv.setItem(6, page == 0 ? Items.blue() : navigationArrow(page, max, true, navigationBaseCommand));
+            inv.setItem(6, page == 0 ? Items.blue()
+                    : navigationArrow(page, max, true, navigationBaseCommand));
             inv.setItem(7, navigationFeather(page, max, isPerPage));
-            inv.setItem(8, page + 1 == max ? Items.blue() : navigationArrow(page, max, false, navigationBaseCommand));
+            inv.setItem(8, page + 1 == max || max == 0 ? Items.blue()
+                    : navigationArrow(page, max,false, navigationBaseCommand));
 
             int i = 0, start = 11;
             while (inv.firstEmpty() != -1) {
@@ -242,9 +247,11 @@ public class Guis {
             int isPerPage = size - 2 * ((size - 18) / 9) - 18;
             int max = ((int) (content.size() / (isPerPage + 0.0))) + (content.size() % isPerPage == 0 ? 0 : 1);
 
-            inv.setItem(size - 9, page == 0 ? Items.blue() : navigationArrow(page, max, true, navigationBaseCommand));
+            inv.setItem(size - 9, page == 0 ? Items.blue()
+                    : navigationArrow(page, max, true, navigationBaseCommand));
             inv.setItem(size - 5, navigationFeather(page, max, isPerPage));
-            inv.setItem(size - 1, page + 1 == max ? Items.blue() : navigationArrow(page, max, false, navigationBaseCommand));
+            inv.setItem(size - 1, page + 1 == max || max == 0 ? Items.blue()
+                    : navigationArrow(page, max, false, navigationBaseCommand));
 
             int i = 0;
             while (i < isPerPage) {

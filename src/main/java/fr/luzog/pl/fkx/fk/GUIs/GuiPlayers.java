@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +20,8 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public class GuiPlayers {
 
@@ -102,6 +105,21 @@ public class GuiPlayers {
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(command)
                 .build();
+    }
+
+    public static Inventory getPlayersInventory(String back, String navigationBaseCommand, int page) {
+        ArrayList<String> l = new ArrayList<>(new HashSet<String>() {{
+            addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
+            addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
+        }});
+        return Guis.getPagedInventory("FirstPaged", 54, back,
+                GuiPlayers.getMain(null, "Clic pour rafraîchir",
+                        navigationBaseCommand + " " + page, l.size(),
+                        (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(),
+                        Bukkit.getMaxPlayers()), null, navigationBaseCommand,
+                page, l.stream().map(p ->
+                        GuiPlayers.getHead(p, "Clic pour voir plus",
+                                "fk players " + p)).collect(Collectors.toList()));
     }
 
     public static Inventory getPlayer(String player, @Nonnull Player opener, String back) {

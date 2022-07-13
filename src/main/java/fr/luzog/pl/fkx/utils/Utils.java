@@ -28,11 +28,7 @@ import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
@@ -775,5 +771,26 @@ public class Utils {
         return format.replace("{b}", sb.toString()).replace("{p}", String.valueOf(Math.round(progress * 100)))
                 .replace("{p.}", String.format("%.1f", progress * 100)).replace("{p..}", String.format("%.2f", progress * 100))
                 .replace("{p#}", String.valueOf(progress)).replace("{l}", String.valueOf(length));
+    }
+
+    /**
+     * It returns the difference between two dates in the format of Xd Xh Xmin Xsec Xms.
+     *
+     * @param from   The date to start the comparison from.
+     * @param to     The date to compare to.
+     * @param millis If true, the milliseconds will be included in the output.
+     *
+     * @return A string that represents the difference between two dates.
+     */
+    public static String compareDate(Date from, Date to, boolean millis) {
+        long diff = to.getTime() - from.getTime();
+        int days = (int) (diff / (1000 * 60 * 60 * 24));
+        int hours = (int) ((diff - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
+        int minutes = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60));
+        int seconds = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours) - (1000 * 60 * minutes)) / 1000);
+        int milliseconds = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours) - (1000 * 60 * minutes) - (1000 * seconds)));
+        String out = (days == 0 ? "" : days + "d ") + (hours == 0 ? "" : hours + "h ") + (minutes == 0 ? "" : minutes + "m ")
+                + (seconds == 0 ? "" : seconds + "s ") + (millis && milliseconds != 0 ? milliseconds + "ms " : "");
+        return out.equals("") ? millis ? "0ms" : "0s" : out.substring(0, out.length() - 1);
     }
 }
