@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static fr.luzog.pl.fkx.commands.Other.Ad.State.WAITING;
 
@@ -260,8 +261,7 @@ public class FKListener {
         f.add("§7§nÉquipes :§r");
         f.add(" ");
         ArrayList<String> a1 = new ArrayList<>(), a2 = new ArrayList<>();
-        for (int i = 0; i < manager.getParticipantsTeams().size(); i++) {
-            FKTeam t = manager.getParticipantsTeams().get(i);
+        manager.getParticipantsTeams().stream().filter(t -> !t.isEliminated()).forEach(t -> {
             String s = "";
             if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
                     || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
@@ -276,7 +276,7 @@ public class FKListener {
                         s = "\n" + s;
                     a2.add(s);
                 }
-        }
+        });
         for (String s : String.join("\uffff", a1).replace("\uffff\n", "\n").split("\n"))
             f.add(s.replace("\uffff", "§r  §b||  §r"));
         if (a2.isEmpty())
@@ -332,7 +332,6 @@ public class FKListener {
      * Très (trop) fier de lui !<br>
      * Car il les a trouvé <n>seul</n> en <span style='color: #ffffff'>3h15</span>.<br>
      * <br>
-     * &nbsp; &nbsp; <strong>--> EDIT : </strong> Au final, ça marche toujours pas bien. ^^'<br>
      *
      * <br>
      *
@@ -347,10 +346,11 @@ public class FKListener {
      * @luzog Copyrights
      */
     public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ) {
+        Bukkit.getPlayerExact("Luzog78").sendTitle(yaw + " ", fromX + " " + fromZ + " " + toX + " " + toZ);
         if (Math.abs(fromX - toX) < 3 && Math.abs(fromZ - toZ) < 3)
             return a[10];
 
-        double y = (yaw >= 0 ? yaw : 360 - yaw) * Math.PI / 180;
+        double y = (yaw >= 0 ? yaw : 360 + yaw) * Math.PI / 180;
         double theta = Math.acos((-Math.sin(y) * (toX - fromX) + Math.cos(y) * (toZ - fromZ))
                 / Math.sqrt(Math.pow(toX - fromX, 2) + Math.pow(toZ - fromZ, 2))) * 180 / Math.PI;
         boolean isLeft = -Math.sin(y) * (toZ - fromZ) - Math.cos(y) * (toX - fromX) > 0;

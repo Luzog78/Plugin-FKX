@@ -1136,6 +1136,9 @@ public class FKManager {
 
     public void removeTeam(FKTeam team) {
         teams.remove(team);
+        team.getConfig(id).delete();
+        getPlayers().stream().filter(p -> p.getTeam() != null && p.getTeam().getId().equals(team.getId()))
+                .forEach(p -> p.leaveTeam(true));
     }
 
     public void removeTeam(String id) {

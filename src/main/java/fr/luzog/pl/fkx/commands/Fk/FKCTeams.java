@@ -57,7 +57,9 @@ public class FKCTeams {
                 u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
             else if (FKManager.getCurrentGame().getTeam(args[2]) == null)
                 u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
-            else if(FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
+            else if (args[2].equalsIgnoreCase(FKTeam.GODS_ID) || args[2].equalsIgnoreCase(FKTeam.SPECS_ID))
+                u.err("Cette équipe ne peut pas être disqualifiée.");
+            else if (FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
                 u.err("Cette équipe est déjà éliminée.");
             else {
                 FKManager.getCurrentGame().getTeam(args[2]).eliminate(true, true);
@@ -67,7 +69,9 @@ public class FKCTeams {
                 u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
             else if (FKManager.getCurrentGame().getTeam(args[2]) == null)
                 u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
-            else if(!FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
+            else if (args[2].equalsIgnoreCase(FKTeam.GODS_ID) || args[2].equalsIgnoreCase(FKTeam.SPECS_ID))
+                u.err("Cette équipe ne peut pas être requalifiée.");
+            else if (!FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
                 u.err("Cette équipe est déjà participante.");
             else {
                 FKManager.getCurrentGame().getTeam(args[2]).reintroduce(true, true);
@@ -77,6 +81,8 @@ public class FKCTeams {
                 u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
             else if (FKManager.getCurrentGame().getTeam(args[2]) == null)
                 u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
+            else if (args[2].equalsIgnoreCase(FKTeam.GODS_ID) || args[2].equalsIgnoreCase(FKTeam.SPECS_ID))
+                u.err("Cette équipe ne peut pas être supprimée.");
             else {
                 FKManager.getCurrentGame().removeTeam(args[2]);
                 u.succ("Equipe §6" + args[2] + "§r supprimée.");
@@ -345,13 +351,16 @@ public class FKCTeams {
                 add("help");
                 add("list");
                 add("create");
+                add("eliminate");
+                add("reintroduce");
                 add("delete");
                 addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
             } else {
                 if (args[1].equalsIgnoreCase("create")) {
                     if (args.length >= 4)
                         addAll(completeOptions(sender, args));
-                } else if (args[1].equalsIgnoreCase("delete")) {
+                } else if (args[1].equalsIgnoreCase("eliminate") || args[1].equalsIgnoreCase("reintroduce")
+                        || args[1].equalsIgnoreCase("delete")) {
                     if (args.length == 3)
                         addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
                 } else if (FKManager.getCurrentGame().getTeam(args[1]) != null) {

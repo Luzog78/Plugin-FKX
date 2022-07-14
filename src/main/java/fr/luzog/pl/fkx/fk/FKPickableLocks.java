@@ -28,9 +28,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 
@@ -98,14 +96,25 @@ public class FKPickableLocks {
             picked = true;
             coolDown = 0;
             updateArmorStand();
-            TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-            if (te == null)
-                return;
-            NBTTagCompound nbt = new NBTTagCompound();
-            te.b(nbt);
-            nbt.setString("Lock", "");
-            te.a(nbt);
-            te.update();
+            if (location.getBlock() != null)
+                (location.getBlock().getType() == Material.CHEST
+                        || location.getBlock().getType() == Material.TRAPPED_CHEST ? Arrays.asList(location,
+                        location.clone().add(-1, 0, -1), location.clone().add(0, 0, -1),
+                        location.clone().add(1, 0, -1), location.clone().add(-1, 0, 0),
+                        location.clone().add(1, 0, 0), location.clone().add(-1, 0, 1),
+                        location.clone().add(0, 0, 1), location.clone().add(1, 0, 1))
+                        : Collections.singletonList(location)).stream().filter(l -> l.getBlock() != null
+                        && l.getBlock().getType() == location.getBlock().getType()).forEach(loc -> {
+                    TileEntity te = ((CraftWorld) loc.getWorld()).getTileEntityAt(loc.getBlockX(),
+                            loc.getBlockY(), loc.getBlockZ());
+                    if (te != null) {
+                        NBTTagCompound nbt = new NBTTagCompound();
+                        te.b(nbt);
+                        nbt.setString("Lock", "");
+                        te.a(nbt);
+                        te.update();
+                    }
+                });
         }
 
         public String getId() {
@@ -357,7 +366,7 @@ public class FKPickableLocks {
                     return;
                 }
 
-                if((fkp.getManager().getState() == FKManager.State.PAUSED
+                if ((fkp.getManager().getState() == FKManager.State.PAUSED
                         && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
                         || fkp.getTeam() == null || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.SPECS_ID)
                     /*TODO -> || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.GODS_ID)*/)
