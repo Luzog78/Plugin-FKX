@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCLocks {
-    public static final String syntaxe = "/fk locks [create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
+    public static final String syntaxe = "/fk locks [list | tool | create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
     public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock]"
             + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level>]"
             + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
@@ -39,7 +39,14 @@ public class FKCLocks {
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
 
-        else if (args[1].equalsIgnoreCase("create")) {
+        else if (args[1].equalsIgnoreCase("list")) {
+
+        }else if (args[1].equalsIgnoreCase("tool")) {
+            if(sender instanceof Player)
+                ((Player) sender).getInventory().addItem(FKPickableLocks.getMasterKey());
+            else
+                u.err(CmdUtils.err_not_player);
+        }else if (args[1].equalsIgnoreCase("create")) {
             if (args.length >= 3)
                 try {
                     int level = Integer.parseInt(args[2].toUpperCase());
@@ -214,6 +221,7 @@ public class FKCLocks {
                 if (args.length == 2) {
                     add("help");
                     add("list");
+                    add("tool");
                     add("create");
                     addAll(m.getPickableLocks().getPickableLocks().stream()
                             .sorted((a, b) -> {

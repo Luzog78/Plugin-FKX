@@ -21,15 +21,18 @@ public class Limits {
 
 
     public void saveToConfig(String gameId, boolean soft) {
+        if(soft)
+            return;
+
         getConfig(gameId).load()
 
-                .setCraft(craft, !soft)
-                .setPotion(potion, !soft)
-                .setEnchant(enchant, !soft)
-                .setWearingMaxDiamondPieces(wearingMaxDiamondPieces, !soft)
-                .setWearingMaxGoldPieces(wearingMaxGoldPieces, !soft)
-                .setWearingMaxIronPieces(wearingMaxIronPieces, !soft)
-                .setWearingMaxLeatherPieces(wearingMaxLeatherPieces, !soft)
+                .setCraft(craft, true)
+                .setPotion(potion, true)
+                .setEnchant(enchant, true)
+                .setWearingMaxDiamondPieces(wearingMaxDiamondPieces, true)
+                .setWearingMaxGoldPieces(wearingMaxGoldPieces, true)
+                .setWearingMaxIronPieces(wearingMaxIronPieces, true)
+                .setWearingMaxLeatherPieces(wearingMaxLeatherPieces, true)
 
                 .save();
     }

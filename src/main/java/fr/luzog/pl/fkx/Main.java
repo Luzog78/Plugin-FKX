@@ -72,8 +72,13 @@ public class Main extends JavaPlugin implements Listener {
         soufInstruction("§6Initialisation du module : §eAd§6...");
         Ad.initFromConfig();
 
+        soufInstruction("§6Initialisation du module : §eRunnable§6...");
+        FKListener.scheduleMainTask();
+
         soufInstruction("§6Initialisation du module : §eFKManager§6...");
         FKManager.initFromConfig(false);
+        if(FKManager.getCurrentGame() != null)
+            FKManager.getCurrentGame().getListener().scheduleTask();
 
         soufInstruction("§6Initialisation du module : §eListeners§6...");
         getServer().getPluginManager().registerEvents(this, this);
@@ -201,6 +206,11 @@ public class Main extends JavaPlugin implements Listener {
 
         soufInstruction("§6Sauvegarde legere de toutes les §eFKGames§6...");
         FKManager.saveAll(true);
+
+        soufInstruction("§6Desactivation de tous les §eRunnable§6...");
+        FKListener.cancelMainTask();
+        if (FKManager.getCurrentGame() != null)
+            FKManager.getCurrentGame().getListener().cancelTask();
 
         souf("");
         soufInstruction("§cFin du processus de cloture.");

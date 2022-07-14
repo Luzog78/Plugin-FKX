@@ -18,6 +18,7 @@ import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FKListener {
 
@@ -27,21 +28,47 @@ public class FKListener {
     public static final String deactivated = "§c§oDesactivé";
     public static final String no_team = "§4§lAucune équipe";
 
+    public static int mainTaskID;
+
+    public static void scheduleMainTask() {
+        mainTaskID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(Main.instance, new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                new ArrayList<Player>(Bukkit.getOnlinePlayers()) {{
+                    if (FKManager.getCurrentGame() != null)
+                        removeIf(p -> FKManager.getCurrentGame().getPlayer(p.getName(), false) != null);
+                }}.forEach(p -> {
+                    p.setPlayerListName("§z§8§l[§2" + SpecialChars.LYS + "§8§l]§8 » " + p.getName());
+                    p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
+                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
+                });
+            }
+
+        }, 0, 5); // Each 1/4 sec
+    }
+
+    public static void cancelMainTask() {
+        try {
+            Bukkit.getScheduler().cancelTask(mainTaskID);
+        } catch (Exception e) {
+            Broadcast.err("!Error : Cannot Cancelling Main Task. (" + e + ")");
+        }
+    }
+
     private FKManager manager;
 
     private int taskID;
     private long savingTimeOut;
     private long savingCoolDown;
-    private final String objectiveId;
 
     private Objective objective;
     private Map<String, Integer> l; // ScoreBoard List
     private Map<Integer, String> al; // Ancian ScoreBoard List -> to up to date
     private String scoreName /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
 
-    public FKListener(String objectiveId, String scoreName, long savingTimeOut) {
-        this.scoreName = scoreName;
-        this.objectiveId = objectiveId;
+    public FKListener(long savingTimeOut) {
+        this.scoreName = "FKX";
 
         this.savingTimeOut = savingTimeOut; // 60 * 5; // 5 min in sec
         savingCoolDown = savingTimeOut;
@@ -50,6 +77,9 @@ public class FKListener {
     }
 
     public void scheduleTask() {
+        objective = Bukkit.getScoreboardManager().getMainScoreboard().registerNewObjective("fko"
+                + UUID.randomUUID().toString().substring(0, 8), "dummy");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         taskID = Bukkit.getScheduler().scheduleAsyncRepeatingTask(Main.instance, new BukkitRunnable() {
 
             final long delayer = 4L; // Each at 1/4 sec so : original = time / (1/4) == time * 4
@@ -102,6 +132,9 @@ public class FKListener {
 
                     p.setDisplayName(displayName);
 
+                    if (fkp.getTeam() == null)
+                        displayName = "§z§8§l[§4" + SpecialChars.ATOM + "§8§l]§8 » " + displayName;
+
                     if (Vanish.vanished.contains(p.getName()))
                         if (Vanish.isPrefix)
                             displayName = Vanish.pre_suf_ix + displayName;
@@ -115,13 +148,6 @@ public class FKListener {
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTHF(p));
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getActionBar(p));
                 });
-
-                new ArrayList<Player>(Bukkit.getOnlinePlayers()) {{
-                    removeIf(p -> !FKManager.getGlobalPlayer(p.getName()).isEmpty());
-                }}.forEach(p -> {
-                    p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
-                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
-                });
             }
 
         }, 0, 5); // Each 1/4 sec
@@ -129,6 +155,12 @@ public class FKListener {
 
     public void cancelTask() {
         try {
+            l.clear();
+            al.clear();
+            Bukkit.getScoreboardManager().getMainScoreboard().getObjectives().forEach(o -> {
+                if (o.getName().startsWith("fko"))
+                    o.unregister();
+            });
             Bukkit.getScheduler().cancelTask(taskID);
         } catch (Exception e) {
             Broadcast.err("!Error : Cannot Cancelling Auto Task. (" + e + ")");
@@ -190,7 +222,7 @@ public class FKListener {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateur : §f" + "Mathis_Bruel");
+        h.add("§9Organisateur : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getName(), false) == null ? p.getDisplayName() : manager.getPlayer(p.getName(), false).getDisplayName()) + "§3,");
@@ -210,25 +242,50 @@ public class FKListener {
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
         DecimalFormat df = new DecimalFormat("0.0");
-        f.add("§8§l§nVous :§r  " + (manager.getPlayer(p.getName(), false) == null
+        f.add(manager.getPlayer(p.getName(), false) == null
                 || manager.getPlayer(p.getName(), false).getTeam() == null ? no_team
                 : manager.getPlayer(p.getName(), false).getTeam().getName() + "§7 - §6"
                 + (!p.getWorld().getUID().equals(manager.getPlayer(p.getName(), false).getTeam().getSpawn().getWorld().getUID()) ?
                 "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
                 : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
                 + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(), false).getTeam().getSpawn().getZ()))));
+                manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
+                        false).getTeam().getSpawn().getZ())));
         f.add(" ");
-        f.add("§8§l§nAutres équipes :§r");
+        f.add("§7§nÉquipes :§r");
         f.add(" ");
-        manager.getParticipantsTeams().forEach(t -> {
+        ArrayList<String> a1 = new ArrayList<>(), a2 = new ArrayList<>();
+        for (int i = 0; i < manager.getParticipantsTeams().size(); i++) {
+            FKTeam t = manager.getParticipantsTeams().get(i);
+            String s = "";
             if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
                     || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
-                f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
-                        "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
-                        : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),
-                        p.getLocation().getZ(), t.getSpawn().getX(), t.getSpawn().getZ())));
-        });
+                s = t.getName() + "§7 - §6" + df.format(p.getLocation().distance(t.getSpawn()));
+            if (!s.equals(""))
+                if (!t.isEliminated()) {
+                    if (!a1.isEmpty() && a1.size() % 3 == 0)
+                        s = "\n" + s;
+                    a1.add(s);
+                } else {
+                    if (!a2.isEmpty() && a2.size() % 3 == 0)
+                        s = "\n" + s;
+                    a2.add(s);
+                }
+        }
+        for (String s : String.join("\uffff", a1).replace("\uffff\n", "\n").split("\n"))
+            f.add(s.replace("\uffff", "§r  §b||  §r"));
+        if (a2.isEmpty())
+            f.add(" ");
+        for (String s : String.join("\uffff", a2).replace("\uffff\n", "\n").split("\n"))
+            f.add(s.replace("\uffff", "§r  §b||  §r"));
+//        manager.getParticipantsTeams().forEach(t -> {
+//            if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
+//                    || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
+//                f.add(t.getName() + "§7 - §6" + (!p.getWorld().getUID().equals(t.getSpawn().getWorld().getUID()) ?
+//                        "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
+//                        : df.format(p.getLocation().distance(t.getSpawn())) + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(),
+//                        p.getLocation().getZ(), t.getSpawn().getX(), t.getSpawn().getZ())));
+//        });
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
@@ -238,18 +295,20 @@ public class FKListener {
         return Utils.getTabHeaderAndFooter(h, f);
     }
 
-    public PacketPlayOutPlayerListHeaderFooter getDefaultTHF(Player p) {
+    public static PacketPlayOutPlayerListHeaderFooter getDefaultTHF(Player p) {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateur : §f" + "Mathis_Bruel");
+        h.add("§9Organisateur : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
         h.add("§cMalheureusement, tu n'es actuellement");
-        h.add("§cpas un participant à §6Fallen Kingdom §lX§c.");
-        h.add("§cDemande à un §4Administrateur");
-        h.add("§cde t'ajouter dans une partie.");
+        h.add("§cpas un participant de la partie actuelle");
+        h.add("§cde §9§l[ §6Fallen Kingdom §lX §9§l]§c.");
+        h.add("§cDemande à un §4Administrateur de");
+        h.add("§ct'ajouter à la partie ou patiente");
+        h.add("§cquelques instants...");
         h.add(" ");
         h.add(" ");
         h.add("§7Joueurs en ligne :");
@@ -347,8 +406,6 @@ public class FKListener {
 
     public void setManager(FKManager manager) {
         this.manager = manager;
-        objective = Bukkit.getScoreboardManager().getMainScoreboard().registerNewObjective("fko" + UUID.randomUUID().toString().substring(0, 4) + ":" + objectiveId, "dummy");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
     public int getTaskID() {
@@ -374,10 +431,6 @@ public class FKListener {
 
     public void setSavingCoolDown(long savingCoolDown) {
         this.savingCoolDown = savingCoolDown;
-    }
-
-    public String getObjectiveId() {
-        return objectiveId;
     }
 
     public Objective getObjective() {

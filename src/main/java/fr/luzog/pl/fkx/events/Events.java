@@ -686,7 +686,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEntityDeath(EntityDeathEvent e) {
-        if (Main.activeCustomLootingSystem)
+        if (Main.activeCustomLootingSystem && !(e.getEntity() instanceof Player))
             e.getDrops().clear();
     }
 

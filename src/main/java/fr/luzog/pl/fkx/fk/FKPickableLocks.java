@@ -289,11 +289,7 @@ public class FKPickableLocks {
             FKPlayer fkp;
 
             if (!(a == RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK) || b == null || FKManager.getCurrentGame() == null
-                    || (fkp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) == null
-                    || (fkp.getManager().getState() == FKManager.State.PAUSED
-                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
-                    || fkp.getTeam() == null || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.SPECS_ID)
-                /*TODO -> || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.GODS_ID)*/)
+                    || (fkp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) == null)
                 return;
 
             FKPickableLocks pickableLocks = fkp.getManager().getPickableLocks();
@@ -361,6 +357,12 @@ public class FKPickableLocks {
                     return;
                 }
 
+                if((fkp.getManager().getState() == FKManager.State.PAUSED
+                        && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+                        || fkp.getTeam() == null || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.SPECS_ID)
+                    /*TODO -> || fkp.getTeam().getId().equalsIgnoreCase(FKTeam.GODS_ID)*/)
+                    return;
+
                 if (!l.isPickable()) {
                     p.sendMessage("§cLe coffre n'est pas crochetable à l'heure actuelle.");
                     e.setCancelled(true);
@@ -399,10 +401,13 @@ public class FKPickableLocks {
     }
 
     public void saveToConfig(String gameId, boolean soft) {
+        if (soft)
+            return;
+
         getConfig(gameId).load()
 
-                .setLocks(pickableLocks, !soft)
-                .setPicking(inPicking, !soft)
+                .setLocks(pickableLocks, true)
+                .setPicking(inPicking, true)
 
                 .save();
     }

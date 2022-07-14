@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.commands.Fk;
 
+import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.GUIs.GuiFK;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import org.bukkit.command.Command;
@@ -19,10 +20,15 @@ public class FKCommand implements CommandExecutor, TabCompleter {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
 
         if (args.length == 0)
-            if (sender instanceof Player)
-                u.getPlayer().openInventory(GuiFK.getInv(u.getPlayer(), null));
+            if (FKManager.getCurrentGame() != null)
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiFK.getInv(u.getPlayer(), null));
+                else
+                    u.synt();
             else
-                u.synt();
+                u.err("Aucune partie n'est en cours."
+                        + (sender.isOp() ? "Utilisez /fk game new <id> pour créer une partie."
+                        : "Patientez un peu, le temps que les admins créent une partie."));
 
         else
             switch (args[0].toLowerCase()) {

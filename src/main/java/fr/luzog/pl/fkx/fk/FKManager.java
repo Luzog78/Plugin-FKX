@@ -183,7 +183,6 @@ public class FKManager {
                     }
 
                 manager.register(false);
-                manager.getListener().scheduleTask();
             }
     }
 
@@ -258,21 +257,26 @@ public class FKManager {
 
         lobby.saveToConfig(id, soft);
         spawn.saveToConfig(id, soft);
-        for (FKZone z : zones)
-            z.saveToConfig(id, soft);
+        if (!soft)
+            for (FKZone z : zones)
+                z.saveToConfig(id, false);
 
         gods.saveToConfig(id, soft);
         specs.saveToConfig(id, soft);
-        for (FKTeam t : teams)
-            t.saveToConfig(id, soft);
+        if (!soft)
+            for (FKTeam t : teams)
+                t.saveToConfig(id, false);
 
-        for (FKPlayer p : players)
-            p.saveToConfig(id, soft);
+        if (!soft)
+            for (FKPlayer p : players)
+                p.saveToConfig(id, false);
     }
 
     public Config.Manager getConfig() {
         return new Config.Manager(String.format(CONFIG_FILE, "game-" + id));
     }
+
+    private int taskID;
 
     private String id;
     private State state;
@@ -315,7 +319,7 @@ public class FKManager {
         setTime(0, false);
         setLinkedToSun(true, false);
         setOptions(FKOptions.getDefaultOptions(), false);
-        setListener(new FKListener("fko-sb", "FALLEN KINGDOM X", 60 * 5), false);
+        setListener(new FKListener(60 * 5), false);
         setLimits(new Limits(), false);
         setNether(null, false);
         setEnd(null, false);
@@ -409,8 +413,10 @@ public class FKManager {
     }
 
     public void unregister(boolean delete) {
+        getListener().cancelTask();
         registered.remove(this);
-        currentGameId = registered.isEmpty() ? null : registered.get(0).getId();
+        if (id.equals(currentGameId))
+            currentGameId = registered.isEmpty() ? null : registered.get(0).getId();
         if (delete) {
             if (!getConfig().exists())
                 save(true);
@@ -962,6 +968,7 @@ public class FKManager {
      *
      * @param name   The name of the player to get.
      * @param create If true, the player will be created if it doesn't exist.
+     *
      * @return A {@link FKPlayer} object
      */
     public FKPlayer getPlayer(@Nonnull String name, boolean create) {

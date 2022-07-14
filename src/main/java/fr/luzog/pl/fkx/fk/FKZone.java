@@ -15,14 +15,17 @@ public class FKZone {
             SPAWN_ID = "spawn", SPAWN_FILE = "Spawn.yml";
 
     public void saveToConfig(String gameId, boolean soft) {
+        if(soft)
+            return;
+
         getConfig(gameId)
                 .load()
 
-                .setType(type == null ? null : type.name(), !soft)
-                .setSpawn(spawn, !soft)
-                .setPos1(pos1, !soft)
-                .setPos2(pos2, !soft)
-                .setPermissions(permissions, !soft)
+                .setType(type == null ? null : type.name(), true)
+                .setSpawn(spawn, true)
+                .setPos1(pos1, true)
+                .setPos2(pos2, true)
+                .setPermissions(permissions, true)
 
                 .save();
     }

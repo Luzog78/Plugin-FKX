@@ -29,15 +29,18 @@ public class FKTeam {
             SPECS_ID = "specs", SPECS_FILE = "Specs.yml";
 
     public void saveToConfig(String gameId, boolean soft) {
+        if(soft)
+            return;
+
         getConfig(gameId)
                 .load()
 
-                .setName(name, !soft)
-                .setPrefix(prefix, !soft)
-                .setColor(color.name(), !soft)
-                .setRadius(radius, !soft)
-                .setSpawn(spawn, !soft)
-                .setPermissions(permissions, !soft)
+                .setName(name, true)
+                .setPrefix(prefix, true)
+                .setColor(color.name(), true)
+                .setRadius(radius, true)
+                .setSpawn(spawn, true)
+                .setPermissions(permissions, true)
 
                 .save();
     }
@@ -83,6 +86,10 @@ public class FKTeam {
         this.permissions = permissions;
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
+    }
+
+    public boolean isEliminated() {
+        return false;
     }
 
     public boolean isInside(Location loc) {

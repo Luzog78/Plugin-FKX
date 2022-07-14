@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCPlayers {
-    public static final String syntaxe = "/fk players [help | list | <player> [info] | page <page>]";
+    public static final String syntaxe = "/fk players [help | list | <player> [info | init] | page <page>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -75,6 +75,13 @@ public class FKCPlayers {
                             : p.getWorld().getName().equalsIgnoreCase("world_the_end") ? "§5End"
                             : p.getWorld().getName())));
                     u.succ(" - Zone : §f" + (fkp == null ? "§cHors Jeu" : fkp.getZone() == null ? "§cAucune" : fkp.getZone().getId() + "§7 (" + fkp.getZone().getType() + ")"));
+                } else if (args[2].equalsIgnoreCase("init")) {
+                    if (fkp == null) {
+                        fkp = FKManager.getCurrentGame().getPlayer(args[1], true);
+                        u.succ("Joueur créé : §f" + fkp.getDisplayName());
+                    } else {
+                        u.err("Joueur déjà créé : §f" + fkp.getDisplayName());
+                    }
                 } else
                     u.synt();
             else if (sender instanceof Player)
@@ -93,8 +100,10 @@ public class FKCPlayers {
             add("list");
             addAll(Utils.getAllPlayers());
         }} : args.length == 3 ? new ArrayList<String>() {{
-            if (Bukkit.getOfflinePlayer(args[1]).isOnline())
+            if (Bukkit.getOfflinePlayer(args[1]).isOnline()) {
                 add("info");
+                add("init");
+            }
         }} : new ArrayList<>();
     }
 }

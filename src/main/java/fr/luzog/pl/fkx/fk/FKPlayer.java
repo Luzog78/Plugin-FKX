@@ -15,13 +15,16 @@ import java.util.UUID;
 public class FKPlayer {
 
     public void saveToConfig(String gameId, boolean soft) {
+        if(soft)
+            return;
+
         getConfig(gameId)
                 .load()
 
-                .setLastUuid(lastUuid, !soft)
-                .setTeam(teamId, !soft)
-                .setStats(stats, !soft)
-                .setPermissions(personalPermissions, !soft)
+                .setLastUuid(lastUuid, true)
+                .setTeam(teamId, true)
+                .setStats(stats, true)
+                .setPermissions(personalPermissions, true)
 
                 .save();
     }
