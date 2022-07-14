@@ -120,7 +120,8 @@ public class FKListener {
                         Broadcast.log("Nouvelle journée dans !2 !minutes§r...");
                     else if (manager.getTime() == 24000 - 1200 * 3)
                         Broadcast.log("Nouvelle journée dans !3 !minutes§r...");
-                }
+                } else
+                    manager.increaseTime(0, false);
 
                 setScoreLines();
                 updateScoreLines();

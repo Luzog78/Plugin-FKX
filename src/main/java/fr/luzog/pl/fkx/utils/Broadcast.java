@@ -157,7 +157,7 @@ public class Broadcast {
                 else
                     add(part);
             }
-        }}, " ")).replace("§r", "§" + base.getChar());
+        }}, " ")).replace("\n", "\n§r  ").replace("§r", "§" + base.getChar());
     }
 
 }

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.EntityLiving;
@@ -11,7 +12,6 @@ import org.bukkit.block.banner.PatternType;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -39,6 +39,7 @@ public class FKTeam {
                 .setPrefix(prefix, true)
                 .setColor(color.name(), true)
                 .setRadius(radius, true)
+                .setOldPlayers(oldPlayers, true)
                 .setSpawn(spawn, true)
                 .setPermissions(permissions, true)
 
@@ -54,6 +55,7 @@ public class FKTeam {
     private Location spawn, chestsRoom;
     private UUID guardian;
     private double radius;
+    private ArrayList<String> oldPlayers;
 
     private Team scoreboardTeam;
 
@@ -68,13 +70,14 @@ public class FKTeam {
         this.chestsRoom = null;
         this.guardian = null;
         this.radius = 0;
+        this.oldPlayers = new ArrayList<>();
         this.permissions = new FKPermissions(FKPermissions.Definition.DEFAULT);
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
     }
 
     public FKTeam(String id, String name, String prefix, ChatColor color, Location spawn, Location chestsRoom,
-                  UUID guardian, double radius, FKPermissions permissions) {
+                  UUID guardian, double radius, ArrayList<String> oldPlayers, FKPermissions permissions) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
@@ -83,13 +86,60 @@ public class FKTeam {
         this.chestsRoom = chestsRoom;
         this.guardian = guardian;
         this.radius = radius;
+        this.oldPlayers = oldPlayers == null ? new ArrayList<>() : oldPlayers;
         this.permissions = permissions;
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
         updateParams();
     }
 
     public boolean isEliminated() {
-        return false;
+        return !oldPlayers.isEmpty();
+    }
+
+    public void eliminate(boolean broadcast, boolean save) {
+        getPlayers().forEach(p -> {
+            oldPlayers.add(p.getName());
+            if(broadcast && p.getPlayer() != null)
+                    p.getPlayer().sendMessage(Main.PREFIX + "§4§lVous avez été éliminé de la partie.");
+            p.leaveTeam(false);
+            p.setTeam(FKTeam.SPECS_ID, true);
+            if(p.getPlayer() != null) {
+                p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                if(getManager().getSpawn().getSpawn() != null)
+                    p.getPlayer().teleport(getManager().getSpawn().getSpawn());
+                else if(getManager().getLobby().getSpawn() != null)
+                    p.getPlayer().teleport(getManager().getLobby().getSpawn());
+            }
+        });
+        Broadcast.announcement(Main.PREFIX + "§r§lLa team " + name + " a été !éliminée de la partie."
+                + "\nDonc !" + oldPlayers.size() + " !joueurs ont été éliminés.");
+        if(save && getManager() != null)
+            saveToConfig(getManager().getId(), false);
+    }
+
+    public void reintroduce(boolean broadcast, boolean save) {
+        int count = oldPlayers.size();
+        oldPlayers.forEach(pName -> {
+            FKPlayer p = getManager().getPlayer(pName, true);
+            if(broadcast && p.getPlayer() != null)
+                p.getPlayer().sendMessage(Main.PREFIX + "§2§lVous avez été réintégré à la partie.");
+            p.leaveTeam(false);
+            p.setTeam(id, true);
+            if(p.getPlayer() != null) {
+                p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                if(spawn != null)
+                    p.getPlayer().teleport(spawn);
+                else if(getManager().getSpawn().getSpawn() != null)
+                    p.getPlayer().teleport(getManager().getSpawn().getSpawn());
+                else if(getManager().getLobby().getSpawn() != null)
+                    p.getPlayer().teleport(getManager().getLobby().getSpawn());
+            }
+        });
+        oldPlayers.clear();
+        Broadcast.announcement(Main.PREFIX + "§r§lLa team " + name + " a été !réintégrée à la partie."
+                + "\nDonc !" + count + " !joueurs sont de retour.");
+        if(save && getManager() != null)
+            saveToConfig(getManager().getId(), false);
     }
 
     public boolean isInside(Location loc) {
@@ -268,6 +318,19 @@ public class FKTeam {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setRadius(radius, true).save();
+        }
+    }
+
+    public ArrayList<String> getOldPlayers() {
+        return oldPlayers;
+    }
+
+    public void setOldPlayers(ArrayList<String> oldPlayers, boolean save) {
+        this.oldPlayers = oldPlayers;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setOldPlayers(oldPlayers, true).save();
         }
     }
 

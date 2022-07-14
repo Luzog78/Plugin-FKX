@@ -6,6 +6,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -13,13 +14,15 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EntityDamageHandler implements Listener {
 
     @EventHandler
     public static void onDamage(EntityDamageEvent e) {
-        if(e.getEntity().getType() == EntityType.ARMOR_STAND)
+        if (e.getEntity().getType() == EntityType.ARMOR_STAND)
             return;
         System.out.println("onDamage " + e.getEntityType() + " " + e.getCause() + " " + e.getEntity().getLocation());
 
@@ -27,6 +30,7 @@ public class EntityDamageHandler implements Listener {
             return;
 
         LivingEntity entity = (LivingEntity) e.getEntity();
+        Location tempLoc = entity.getLocation().add(0, 0.5, 0);
 
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
@@ -43,7 +47,9 @@ public class EntityDamageHandler implements Listener {
                     e.setCancelled(true);
                     return;
                 }
-                fp.getStats().increaseDamageTaken(e.getDamage());
+
+                if (e.getDamage() < 1_000_000_000_000_000_000_000.0) // Avoid /kill command
+                    fp.getStats().increaseDamageTaken(e.getDamage());
 
                 if (entity.getHealth() - e.getFinalDamage() <= 0) {
                     fp.getStats().increaseDeaths();
@@ -64,6 +70,17 @@ public class EntityDamageHandler implements Listener {
                             : p.getBedSpawnLocation());
                 }
 
+            }
+
+            if (entity.getHealth() - e.getFinalDamage() <= 0) {
+                new ArrayList<ItemStack>() {{
+                    addAll(Arrays.asList(p.getInventory().getContents()));
+                    addAll(Arrays.asList(p.getInventory().getArmorContents()));
+                    removeIf(is -> is == null || is.getType() == Material.AIR);
+                    forEach(is -> p.getWorld().dropItemNaturally(tempLoc, is));
+                }};
+                p.getInventory().setArmorContents(new ItemStack[4]);
+                p.getInventory().clear();
             }
         } else if (entity.getHealth() - e.getFinalDamage() <= 0)
             new BukkitRunnable() {

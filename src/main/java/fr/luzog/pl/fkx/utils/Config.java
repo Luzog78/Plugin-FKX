@@ -544,7 +544,8 @@ public class Config {
 
     public static class Team extends Config {
         public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
-                GUARDIAN = "chests-room.guardian-uuid", RADIUS = "radius", SPAWN = "spawn", PERMISSIONS = "permissions";
+                GUARDIAN = "chests-room.guardian-uuid", RADIUS = "radius", OLD_PLAYERS = "old-players",
+                SPAWN = "spawn", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
             super(path, true);
@@ -617,6 +618,15 @@ public class Config {
 
         public Team setRadius(double radius, boolean force) {
             super.set(RADIUS, radius, force);
+            return this;
+        }
+
+        public ArrayList<String> getOldPlayers() {
+            return new ArrayList<>(super.getStrList(OLD_PLAYERS));
+        }
+
+        public Team setOldPlayers(Collection<String> oldPlayers, boolean force) {
+            super.set(OLD_PLAYERS, new ArrayList<>(oldPlayers), force);
             return this;
         }
 

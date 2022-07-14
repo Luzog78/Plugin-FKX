@@ -16,10 +16,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FKManager {
 
@@ -159,6 +157,7 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setGuardian(Objects.requireNonNull(tc.getGuardian()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
 
@@ -357,9 +356,9 @@ public class FKManager {
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED,
-                loc, null, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+                loc, null, null, 0, new ArrayList<>(), new FKPermissions(FKPermissions.Definition.ON)), false);
         setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY,
-                loc, null, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+                loc, null, null, 0, new ArrayList<>(), new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
@@ -522,13 +521,23 @@ public class FKManager {
                             p.getPlayer().setFoodLevel(20);
                             p.getPlayer().setSaturation(20);
                             p.getPlayer().setFireTicks(0);
-                            p.getPlayer().getInventory().clear();
-                            p.getPlayer().getInventory().setArmorContents(null);
-                            p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));
-                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2400, 255, false, false), true);
-                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 2400, 255, false, false), true);
-                            p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
-                            p.getPlayer().teleport(p.getTeam() == null ? getSpawn().getSpawn() : p.getTeam().getSpawn());
+                            if (p.getTeam() != null)
+                                if (p.getTeam().getId().equals(FKTeam.GODS_ID)) {
+                                    p.getPlayer().setGameMode(GameMode.CREATIVE);
+                                    p.getPlayer().setFlying(true);
+                                } else if (p.getTeam().getId().equals(FKTeam.SPECS_ID)) {
+                                    p.getPlayer().setGameMode(GameMode.SPECTATOR);
+                                } else {
+                                    p.getPlayer().getInventory().clear();
+                                    p.getPlayer().getInventory().setArmorContents(null);
+                                    p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));
+                                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 2400, 255, false, false), true);
+                                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 2400, 255, false, false), true);
+                                    p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
+                                }
+                            p.getPlayer().teleport(p.getTeam() == null ? getLobby().getSpawn()
+                                    : p.getTeamId().equals(FKTeam.GODS_ID) || p.getTeamId().equals(FKTeam.SPECS_ID) ?
+                                    getSpawn().getSpawn() : p.getTeam().getSpawn());
                         }
                     });
                     setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
@@ -537,38 +546,76 @@ public class FKManager {
     }
 
     public void pause(int countDown) {
-        Utils.countDown(null, countDown, false, true, true, "Le jeu se suspend dans §c%i%§r secondes !\n§7Vous serez momentanément bloqués.", "Le jeu est en pause.\n§7Excusez-nous pour la gêne occasionnée...", "§e", "§6", "§c", "§4", "§4§l", new Runnable() {
-            @Override
-            public void run() {
-                setState(State.PAUSED, true);
-            }
-        });
+        Utils.countDown(null, countDown, false, true, true,
+                "Le jeu se suspend dans §c%i%§r secondes !\n§7Vous serez momentanément bloqués.",
+                "Le jeu est en pause.\n§7Excusez-nous pour la gêne occasionnée...",
+                "§e", "§6", "§c", "§4", "§4§l", new Runnable() {
+                    @Override
+                    public void run() {
+                        setState(State.PAUSED, true);
+                    }
+                });
     }
 
     public void resume(int countDown) {
-        Utils.countDown(null, countDown, false, true, true, "Le jeu reprend dans §c%i%§r secondes !\n§7Et la compétition continue.", "Et c'est reparti !\n§7Amusez-vous !", "§e", "§6", "§c", "§4", "§2§l", new Runnable() {
-            @Override
-            public void run() {
-                setState(State.RUNNING, true);
-            }
-        });
+        Utils.countDown(null, countDown, false, true, true,
+                "Le jeu reprend dans §c%i%§r secondes !\n§7Et la compétition continue.",
+                "Et c'est reparti !\n§7Amusez-vous !",
+                "§e", "§6", "§c", "§4", "§2§l", new Runnable() {
+                    @Override
+                    public void run() {
+                        setState(State.RUNNING, true);
+                    }
+                });
     }
 
     public void end() {
-        String m1 = "§4§lFin de la partie", m2 = "§7RDV dans qq minutes pour les résultats !";
+        ArrayList<FKTeam> winnerTeams = teams.stream().filter(t ->
+                !t.isEliminated()).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<FKPlayer> winners = teams.stream().map(FKTeam::getPlayers).flatMap(Collection::stream)
+                .collect(Collectors.toCollection(ArrayList::new));
+        String a1 = "§4§lFin de la partie", a2 = "§7RDV dans qq secondes pour les résultats !";
+        String b1 = "§6§lVictoire " + (winnerTeams.size() == 0 ? "d'§cAucune Équipe§6§l..."
+                : winnerTeams.size() == 1 ? "de l'Équipe §a" + winnerTeams.get(0) + "§r !!"
+                : "des §a" + winnerTeams.stream().map(FKTeam::getName)
+                .collect(Collectors.joining("§6§l, §a")) + "§r !!"),
+                b2 = "§aBravo§7 à tous et §aMerci§7 d'avoir participé !";
         getPlayers().forEach(p -> {
             if (p.getPlayer() != null) {
                 p.getPlayer().setHealth(p.getPlayer().getMaxHealth());
                 p.getPlayer().setFoodLevel(20);
                 p.getPlayer().setSaturation(20);
-                p.getPlayer().sendTitle(m1, m2);
-                p.getPlayer().sendMessage(Main.PREFIX + m1);
-                p.getPlayer().sendMessage(Main.PREFIX + m2);
                 p.getPlayer().teleport(getLobby().getSpawn());
+                if(winners.contains(p) || (p.getTeam() != null && p.getTeam().getId().equals(FKTeam.GODS_ID))) {
+                    p.getPlayer().setGameMode(GameMode.CREATIVE);
+                    p.getPlayer().setFlying(true);
+                } else {
+                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
+                }
+                if(p.getTeam() == null || !p.getTeam().getId().equals(FKTeam.GODS_ID)) {
+                    p.getPlayer().getInventory().clear();
+                    p.getPlayer().getInventory().setArmorContents(null);
+                }
             }
         });
         setPriority(new FKPermissions(FKPermissions.Definition.OFF), true);
         setState(State.ENDED, true);
+        new BukkitRunnable() {
+            boolean c = true;
+
+            @Override
+            public void run() {
+                getPlayers().stream().map(FKPlayer::getPlayer)
+                        .filter(Objects::nonNull).forEach(p -> {
+                            p.sendTitle(c ? a1 : b1, c ? a2 : b2);
+                            p.sendMessage(Main.PREFIX + (c ? a1 : b1));
+                            p.sendMessage(Main.PREFIX + (c ? a2 : b2));
+                        });
+                if(!c)
+                    cancel();
+                c = false;
+            }
+        }.runTaskTimer(Main.instance, 0, 20 * 6);
     }
 
     public void reboot() {

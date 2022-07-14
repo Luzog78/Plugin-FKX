@@ -16,7 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCTeams {
-    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | delete <id> | <id> ...]",
+    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
             syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | options ...]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
@@ -52,6 +52,26 @@ public class FKCTeams {
                 if (args.length > 3)
                     handleOptions(u, team, args, 3);
             }
+        } else if (args[1].equalsIgnoreCase("eliminate")) {
+            if (args.length == 2)
+                u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
+            else if (FKManager.getCurrentGame().getTeam(args[2]) == null)
+                u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
+            else if(FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
+                u.err("Cette équipe est déjà éliminée.");
+            else {
+                FKManager.getCurrentGame().getTeam(args[2]).eliminate(true, true);
+            }
+        } else if (args[1].equalsIgnoreCase("reintroduce")) {
+            if (args.length == 2)
+                u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
+            else if (FKManager.getCurrentGame().getTeam(args[2]) == null)
+                u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
+            else if(!FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
+                u.err("Cette équipe est déjà participante.");
+            else {
+                FKManager.getCurrentGame().getTeam(args[2]).reintroduce(true, true);
+            }
         } else if (args[1].equalsIgnoreCase("delete")) {
             if (args.length == 2)
                 u.err(CmdUtils.err_missing_arg.replace("%ARG%", "id"));
@@ -80,6 +100,12 @@ public class FKCTeams {
                 u.succ(" - Autorisations :");
                 t.getPermissions().getPermissions().keySet().stream().sorted(Comparator.comparingInt(o -> o.name().length())).forEach(k ->
                         u.succ("    > §6" + k.name() + "§r : §f" + t.getPermissions().getPermission(k).toFormattedString()));
+            } else if (args[2].equalsIgnoreCase("list")) {
+                u.succ("Joueurs de §f" + t.getColor() + t.getName() + "§r :");
+                if (t.getPlayers().isEmpty())
+                    u.err(" - Aucun joueur");
+                else
+                    t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getLastUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
             } else if (args[2].equalsIgnoreCase("list")) {
                 u.succ("Joueurs de §f" + t.getColor() + t.getName() + "§r :");
                 if (t.getPlayers().isEmpty())
