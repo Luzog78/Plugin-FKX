@@ -346,7 +346,6 @@ public class FKListener {
      * @luzog Copyrights
      */
     public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ) {
-        Bukkit.getPlayerExact("Luzog78").sendTitle(yaw + " ", fromX + " " + fromZ + " " + toX + " " + toZ);
         if (Math.abs(fromX - toX) < 3 && Math.abs(fromZ - toZ) < 3)
             return a[10];
 
