@@ -38,7 +38,8 @@ public class EntityDamageHandler implements Listener {
 
             for (FKPlayer fp : fps) {
 
-                if (fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
+                if (fp.getManager().getState() == FKManager.State.PAUSED
+                        && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
                     e.setCancelled(true);
                     return;
                 }

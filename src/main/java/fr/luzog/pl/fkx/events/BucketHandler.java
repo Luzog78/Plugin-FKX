@@ -22,7 +22,8 @@ public class BucketHandler implements Listener {
         }
 
         for (FKPlayer fp : fps) {
-            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED
+                    && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
                     || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? FKPermissions.Type.PLACESPE :
                     FKPermissions.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
                 e.setCancelled(true);
@@ -40,7 +41,8 @@ public class BucketHandler implements Listener {
         }
 
         for (FKPlayer fp : fps) {
-            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+            if (fp != null && ((fp.getManager().getState() == FKManager.State.PAUSED
+                    && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
                     || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? FKPermissions.Type.BREAKSPE :
                     FKPermissions.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation())))) {
                 e.setCancelled(true);

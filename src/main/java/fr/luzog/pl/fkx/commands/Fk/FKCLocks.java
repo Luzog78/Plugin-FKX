@@ -40,7 +40,23 @@ public class FKCLocks {
             u.synt();
 
         else if (args[1].equalsIgnoreCase("list")) {
-
+            u.succ("Coffres crochetables (§f" + FKManager.getCurrentGame().getPickableLocks().getPickableLocks().size() + "§r) :");
+            ArrayList<FKPickableLocks.Lock> pickable = FKManager.getCurrentGame().getPickableLocks().getPickableLocks()
+                    .stream().filter(FKPickableLocks.Lock::isPickable)
+                    .collect(Collectors.toCollection(ArrayList::new)),
+                    nonPickable = FKManager.getCurrentGame().getPickableLocks().getPickableLocks()
+                            .stream().filter(l -> !l.isPickable())
+                            .collect(Collectors.toCollection(ArrayList::new));
+            new ArrayList<FKPickableLocks.Lock>() {{
+                addAll(pickable.stream().sorted((a, b) ->
+                                a.isPicked() == b.isPicked() ? 0 : a.isPicked() ? 1 : -1)
+                        .collect(Collectors.toList()));
+                addAll(nonPickable.stream().sorted((a, b) ->
+                                a.isPicked() == b.isPicked() ? 0 : a.isPicked() ? 1 : -1)
+                        .collect(Collectors.toList()));
+            }}.forEach(l ->
+                    u.succ("  >  " + (l.isPickable() ? "§b" : "§c") + l.getId() + "§r - §f" + l.getLevel() + "§r :  "
+                            + (l.isPicked() ? "§2✔ Crocheté" : "§4✖ À Crocheter")));
         }else if (args[1].equalsIgnoreCase("tool")) {
             if(sender instanceof Player)
                 ((Player) sender).getInventory().addItem(FKPickableLocks.getMasterKey());

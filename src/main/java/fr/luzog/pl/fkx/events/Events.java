@@ -590,7 +590,8 @@ public class Events implements Listener {
             if (fkp != null)
                 fkp.getStats().increaseDroppedItems();
 
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
+                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
                 e.setCancelled(true);
         }
     }
@@ -607,7 +608,8 @@ public class Events implements Listener {
             if (fkp != null)
                 fkp.getStats().increasePickedItems();
 
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
+                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
                 e.setCancelled(true);
         }
     }
@@ -621,7 +623,8 @@ public class Events implements Listener {
         }
 
         for (FKPlayer fkp : fkps)
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
+                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
                 e.setCancelled(true);
     }
 
@@ -643,12 +646,14 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onBlockExplode(BlockExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
     }
 
     @EventHandler
     public static void onEntityExplode(EntityExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
     }
 
     @EventHandler

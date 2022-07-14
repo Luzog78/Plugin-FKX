@@ -29,7 +29,8 @@ public class PlayerInteractHandler implements Listener {
                 continue;
             fkp.getStats().increaseInteractions();
 
-            if (fkp.getManager().getState() == FKManager.State.PAUSED && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId())) {
+            if (fkp.getManager().getState() == FKManager.State.PAUSED
+                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId())) {
                 event.setCancelled(true);
                 return;
             }

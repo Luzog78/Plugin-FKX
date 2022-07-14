@@ -18,7 +18,6 @@ import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class FKListener {
 
@@ -65,10 +64,9 @@ public class FKListener {
     private Objective objective;
     private Map<String, Integer> l; // ScoreBoard List
     private Map<Integer, String> al; // Ancian ScoreBoard List -> to up to date
-    private String scoreName /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
+    private String scoreName = "FKX" /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
 
     public FKListener(long savingTimeOut) {
-        this.scoreName = "FKX";
 
         this.savingTimeOut = savingTimeOut; // 60 * 5; // 5 min in sec
         savingCoolDown = savingTimeOut;
@@ -93,8 +91,8 @@ public class FKListener {
                 } else
                     countDown--;
 
-                // TODO -> refreshScoreName();
-                // TODO -> objective.setDisplayName(scoreName);
+                refreshScoreName();
+                objective.setDisplayName(scoreName);
 
                 if (manager.getState() == FKManager.State.RUNNING) {
                     manager.increaseTime(5, false);
@@ -168,15 +166,9 @@ public class FKListener {
     }
 
     public void refreshScoreName() {
-        String c = "abcde123456789";
-        String space = "   ";
-        List<String> l = new ArrayList<>();
-        for (char ch : c.toCharArray())
-            l.add(ch + "");
-        String p = "§";
-        scoreName = space + p + ca(l) + "F" + p + ca(l) + "a" + p + ca(l) + "l" + p + ca(l) + "l" + p + ca(l) + "e" + p
-                + ca(l) + "n " + p + ca(l) + "K" + p + ca(l) + "i" + p + ca(l) + "n" + p + ca(l) + "g" + p + ca(l) + "d"
-                + p + ca(l) + "o" + p + ca(l) + "m " + p + ca(l) + "I" + space;
+        scoreName = "FALLEN KINGDOM X";
+        int index = (int) (manager.getTime() / 5 % scoreName.length());
+        scoreName = "§6§l" + scoreName.substring(0, index) + "§f§l" + scoreName.charAt(index) + "§6§l" + scoreName.substring(index + 1);
     }
 
     private String ca(List<String> l) { // ca for charAt
@@ -199,10 +191,11 @@ public class FKListener {
             l.put("§a" + o.getName() + "§a : " + (o.isActivated() ? y : n + "§7§O (J" + o.getActivationDay() + ")"), /* . */ -i + 8);
         }
         l.put("§c---------- ", /* ............................................................................................ */ 4);
-        l.put("§9Type : §9Normal", /* ........................................................................................ */ 3);
-        l.put("§9Chest : §4None", /* ......................................................................................... */ 2);
+        l.put("§9Niveau : §f" + FKPickableLocks.getPickingLevel(manager), /* ................................................. */ 3);
+        l.put("§9Coffres : §c" + manager.getPickableLocks().getPickableLocks().stream().filter(l ->
+                l.isPickable() && !l.isPicked()).count(), /* ................................................................. */ 2);
         l.put("§c----------  ", /* ........................................................................................... */ 1);
-        l.put("§d{EVENT}", /* ................................................................................................ */ 0);
+        l.put("§d        " + SpecialChars.MISC_3, /* ......................................................................... */ 0);
     }
 
     public void updateScoreLines() {

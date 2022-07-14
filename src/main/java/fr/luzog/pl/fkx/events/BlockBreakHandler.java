@@ -39,7 +39,8 @@ public class BlockBreakHandler implements Listener {
         }
 
         for (FKPlayer fp : fps) {
-            if (fp == null || !fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ? FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
+            if (fp == null || !fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ?
+                    FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
                 e.setCancelled(true);
                 return;
             }
