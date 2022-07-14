@@ -304,7 +304,7 @@ public class FKPickableLocks {
                         do
                             id = UUID.randomUUID().toString().substring(0, 6);
                         while (FKManager.getCurrentGame().getPickableLocks().getLock(id) != null);
-                        Lock l = new FKPickableLocks.Lock(id, 0, true, 0L, b.getLocation());
+                        Lock l = new FKPickableLocks.Lock(id, 0, true, 1L, b.getLocation());
                         pickableLocks.addLock(l);
                         p.sendMessage("§aVous avez créé un coffre crochetable !" +
                                 "\n§a  >  §aId : §b" + l.getId() + "§a   |   Niveau : §f" + l.getLevel());

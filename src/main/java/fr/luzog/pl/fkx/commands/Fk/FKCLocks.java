@@ -112,7 +112,7 @@ public class FKCLocks {
                             if (te != null)
                                 if (FKManager.getCurrentGame().getPickableLocks().isPickableLock(loc)) {
                                     FKManager.getCurrentGame().getPickableLocks().addLock(
-                                            new FKPickableLocks.Lock(id, level, true, 0L, loc));
+                                            new FKPickableLocks.Lock(id, level, true, 1L, loc));
                                     u.succ("Coffre crochetable §b" + id + "§r de niveau §f" + level
                                             + "§r créé avec les paramètres par défaut !");
                                     FKManager.getCurrentGame().savePickableLocks();

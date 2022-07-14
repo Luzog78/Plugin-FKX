@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 public class FKCGame {
     public static final String syntaxe = "/fk game [help | list | current | (new | switch | delete) <id> | state | start | end | reboot | (pause | resume) [<cooldown>]]";
+    public static final String err_no_game_running = "Aucune partie n'est en cours.";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -38,7 +39,7 @@ public class FKCGame {
                     + Strings.join(FKManager.registered.stream().map(FKManager::getId).collect(Collectors.toList()), "§r, §f"));
 
         else if (args[1].equalsIgnoreCase("current"))
-            u.succ("Partie actuelle : §f" + FKManager.getCurrentGame().getId());
+            u.succ("Partie actuelle : §f" + (FKManager.getCurrentGame() == null ? "§cnull" : FKManager.getCurrentGame().getId()));
 
         else if (args[1].equalsIgnoreCase("new"))
             if (args.length >= 3)
@@ -90,33 +91,48 @@ public class FKCGame {
                 u.err(CmdUtils.err_not_player);
 
         else if (args[1].equalsIgnoreCase("start"))
-            FKManager.getCurrentGame().start();
+            if (FKManager.getCurrentGame() != null)
+                FKManager.getCurrentGame().start();
+            else
+                u.err(err_no_game_running);
 
         else if (args[1].equalsIgnoreCase("end"))
-            FKManager.getCurrentGame().end();
+            if (FKManager.getCurrentGame() != null)
+                FKManager.getCurrentGame().end();
+            else
+                u.err(err_no_game_running);
 
         else if (args[1].equalsIgnoreCase("reboot"))
-            FKManager.getCurrentGame().reboot();
+            if (FKManager.getCurrentGame() != null)
+                FKManager.getCurrentGame().reboot();
+            else
+                u.err(err_no_game_running);
 
         else if (args[1].equalsIgnoreCase("pause"))
-            if (args.length >= 3)
-                try {
-                    FKManager.getCurrentGame().pause(Integer.parseInt(args[2]));
-                } catch (NumberFormatException e) {
-                    u.err(CmdUtils.err_number_format);
-                }
+            if (FKManager.getCurrentGame() != null)
+                if (args.length >= 3)
+                    try {
+                        FKManager.getCurrentGame().pause(Integer.parseInt(args[2]));
+                    } catch (NumberFormatException e) {
+                        u.err(CmdUtils.err_number_format);
+                    }
+                else
+                    FKManager.getCurrentGame().pause(0);
             else
-                FKManager.getCurrentGame().pause(0);
+                u.err(err_no_game_running);
 
         else if (args[1].equalsIgnoreCase("resume"))
-            if (args.length >= 3)
-                try {
-                    FKManager.getCurrentGame().resume(Integer.parseInt(args[2]));
-                } catch (NumberFormatException e) {
-                    u.err(CmdUtils.err_number_format);
-                }
+            if (FKManager.getCurrentGame() != null)
+                if (args.length >= 3)
+                    try {
+                        FKManager.getCurrentGame().resume(Integer.parseInt(args[2]));
+                    } catch (NumberFormatException e) {
+                        u.err(CmdUtils.err_number_format);
+                    }
+                else
+                    FKManager.getCurrentGame().resume(0);
             else
-                FKManager.getCurrentGame().resume(0);
+                u.err(err_no_game_running);
 
         else
             u.synt();
@@ -125,6 +141,7 @@ public class FKCGame {
     }
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
-        return args.length == 2 ? Arrays.asList("help", "current", "list", "new", "switch", "start", "end", "pause", "resume") : new ArrayList<>();
+        return args.length == 2 ? Arrays.asList("help", "current", "list", "new", "switch", "delete",
+                "state", "start", "end", "pause", "resume") : new ArrayList<>();
     }
 }

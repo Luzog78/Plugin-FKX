@@ -64,7 +64,7 @@ public class FKTeam {
         this.name = id;
         this.prefix = id + " ";
         this.color = ChatColor.WHITE;
-        this.spawn = null;
+        this.spawn = new Location(Main.world, 0, 0, 0);
         this.chestsRoom = null;
         this.guardian = null;
         this.radius = 0;

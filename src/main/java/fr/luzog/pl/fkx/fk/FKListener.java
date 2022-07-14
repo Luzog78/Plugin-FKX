@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
+import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -18,6 +19,8 @@ import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
 import java.util.*;
+
+import static fr.luzog.pl.fkx.commands.Other.Ad.State.WAITING;
 
 public class FKListener {
 
@@ -102,6 +105,7 @@ public class FKListener {
                         manager.setTime(0, false);
                         Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
                         manager.checkActivations(false);
+                        manager.saveManager(false);
                     } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
                         Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
                     else if (manager.getTime() == 24000 - 200)
@@ -144,7 +148,14 @@ public class FKListener {
                     if (!p.getScoreboard().equals(Bukkit.getScoreboardManager().getMainScoreboard()))
                         p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getTHF(p));
-                    ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getActionBar(p));
+
+//                  String directionalArrow = "§6" + new DecimalFormat("0.0").format(p.getLocation().distance(new Location(p.getWorld(), -256.5, p.getLocation().getY(), -143.5)))
+//                          + "m §e" + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), -256.5, -143.5);
+                    long waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count();
+                    if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID) && waitingAds > 0)
+                        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+                                new PacketPlayOutChat(new ChatComponentText(
+                                        Ad.AD_PREFIX + "§f" + waitingAds + "§a ads en attente"), (byte) 2));
                 });
             }
 
@@ -193,7 +204,7 @@ public class FKListener {
         l.put("§c---------- ", /* ............................................................................................ */ 4);
         l.put("§9Niveau : §f" + FKPickableLocks.getPickingLevel(manager), /* ................................................. */ 3);
         l.put("§9Coffres : §c" + manager.getPickableLocks().getPickableLocks().stream().filter(l ->
-                l.isPickable() && !l.isPicked()).count(), /* ................................................................. */ 2);
+                l.isPickable() && !l.isPicked() && l.getLevel() <= FKPickableLocks.getPickingLevel(manager)).count(), /* ..... */ 2);
         l.put("§c----------  ", /* ........................................................................................... */ 1);
         l.put("§d        " + SpecialChars.MISC_3, /* ......................................................................... */ 0);
     }
@@ -313,12 +324,6 @@ public class FKListener {
                 + (Bukkit.getServer().getIp().equals("") ? "localhost" : Bukkit.getServer().getIp()));
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
-    }
-
-    public PacketPlayOutChat getActionBar(Player p) {
-        String msg = "§6" + new DecimalFormat("0.0").format(p.getLocation().distance(new Location(p.getWorld(), -256.5, p.getLocation().getY(), -143.5)))
-                + "m §e" + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), -256.5, -143.5);
-        return new PacketPlayOutChat(new ChatComponentText(msg), (byte) 2);
     }
 
     /**

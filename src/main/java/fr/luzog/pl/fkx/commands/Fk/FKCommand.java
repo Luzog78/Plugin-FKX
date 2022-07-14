@@ -27,61 +27,86 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                     u.synt();
             else
                 u.err("Aucune partie n'est en cours."
-                        + (sender.isOp() ? "Utilisez /fk game new <id> pour créer une partie."
+                        + (sender.isOp() ? "\nUtilisez /fk game new <id> pour créer une partie."
                         : "Patientez un peu, le temps que les admins créent une partie."));
 
-        else
+        else {
             switch (args[0].toLowerCase()) {
                 case "help":
                 case "?":
                     FKCHelp.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "activations":
+                    if (isNull())
+                        break;
                     FKCActivations.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "bc":
                 case "broadcast":
                     FKCBroadcast.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "date":
+                    if (isNull())
+                        break;
                     FKCDate.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "game":
                     FKCGame.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "locks":
+                    if (isNull())
+                        break;
                     FKCLocks.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "perm":
                 case "permissions":
+                    if (isNull())
+                        break;
                     FKCPermissions.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "players":
+                    if (isNull())
+                        break;
                     FKCPlayers.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "portal":
+                    if (isNull())
+                        break;
                     FKCPortal.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "stats":
+                    if (isNull())
+                        break;
                     FKCStats.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "teams":
+                    if (isNull())
+                        break;
                     FKCTeams.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "title":
                     FKCTitle.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "warp":
+                    if (isNull())
+                        break;
                     FKCWarp.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 case "zone":
+                    if (isNull())
+                        break;
                     FKCZone.onCommand(sender, command, msg, args);
-                    break;
+                    return false;
                 default:
                     u.err("Unknown command");
                     u.synt();
                     break;
             }
+
+            u.err("Aucune partie n'est en cours."
+                    + (sender.isOp() ? "\nUtilisez /fk game new <id> pour créer une partie."
+                    : "Patientez un peu, le temps que les admins créent une partie."));
+        }
 
         return false;
     }
@@ -93,21 +118,32 @@ public class FKCommand implements CommandExecutor, TabCompleter {
         if (args.length == 1) {
             temp.add("?");
             temp.add("help");
-            temp.add("activations");
+            if (!isNull())
+                temp.add("activations");
             temp.add("bc");
             temp.add("broadcast");
-            temp.add("date");
+            if (!isNull())
+                temp.add("date");
             temp.add("game");
-            temp.add("locks");
-            temp.add("perm");
-            temp.add("permissions");
-            temp.add("players");
-            temp.add("portal");
-            temp.add("stats");
-            temp.add("teams");
+            if (!isNull())
+                temp.add("locks");
+            if (!isNull())
+                temp.add("perm");
+            if (!isNull())
+                temp.add("permissions");
+            if (!isNull())
+                temp.add("players");
+            if (!isNull())
+                temp.add("portal");
+            if (!isNull())
+                temp.add("stats");
+            if (!isNull())
+                temp.add("teams");
             temp.add("title");
-            temp.add("warp");
-            temp.add("zone");
+            if (!isNull())
+                temp.add("warp");
+            if (!isNull())
+                temp.add("zone");
         } else if (args.length > 1)
             switch (args[0].toLowerCase()) {
                 case "help":
@@ -115,45 +151,55 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                     temp.addAll(FKCHelp.onTabComplete(sender, command, msg, args));
                     break;
                 case "activations":
-                    temp.addAll(FKCActivations.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCActivations.onTabComplete(sender, command, msg, args));
                     break;
                 case "bc":
                 case "broadcast":
                     temp.addAll(FKCBroadcast.onTabComplete(sender, command, msg, args));
                     break;
                 case "date":
-                    temp.addAll(FKCDate.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCDate.onTabComplete(sender, command, msg, args));
                     break;
                 case "game":
                     temp.addAll(FKCGame.onTabComplete(sender, command, msg, args));
                     break;
                 case "locks":
-                    temp.addAll(FKCLocks.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCLocks.onTabComplete(sender, command, msg, args));
                     break;
                 case "perm":
                 case "permissions":
-                    temp.addAll(FKCPermissions.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCPermissions.onTabComplete(sender, command, msg, args));
                     break;
                 case "players":
-                    temp.addAll(FKCPlayers.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCPlayers.onTabComplete(sender, command, msg, args));
                     break;
                 case "portal":
-                    temp.addAll(FKCPortal.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCPortal.onTabComplete(sender, command, msg, args));
                     break;
                 case "stats":
-                    temp.addAll(FKCStats.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCStats.onTabComplete(sender, command, msg, args));
                     break;
                 case "teams":
-                    temp.addAll(FKCTeams.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCTeams.onTabComplete(sender, command, msg, args));
                     break;
                 case "title":
                     temp.addAll(FKCTitle.onTabComplete(sender, command, msg, args));
                     break;
                 case "warp":
-                    temp.addAll(FKCWarp.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCWarp.onTabComplete(sender, command, msg, args));
                     break;
                 case "zone":
-                    temp.addAll(FKCZone.onTabComplete(sender, command, msg, args));
+                    if (!isNull())
+                        temp.addAll(FKCZone.onTabComplete(sender, command, msg, args));
                     break;
             }
 
@@ -162,5 +208,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 if (arg.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                     add(arg);
         }};
+    }
+
+    public static boolean isNull() {
+        return FKManager.getCurrentGame() == null;
     }
 }

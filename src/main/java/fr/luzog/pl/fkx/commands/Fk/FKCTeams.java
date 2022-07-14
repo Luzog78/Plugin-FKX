@@ -153,7 +153,7 @@ public class FKCTeams {
             if (arg.replace(" ", "").length() == 0)
                 continue;
             hasAnyOption = true;
-            boolean isEmpty = arg.length() < 3 || arg.charAt(1) != ' ' || arg.substring(3).replace(" ", "").length() == 0;
+            boolean isEmpty = arg.length() < 3 || arg.charAt(1) != ' ' || arg.substring(2).replace(" ", "").length() == 0;
             if (arg.toLowerCase().equals("d") || arg.toLowerCase().startsWith("d ")) {
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "displayName"));
@@ -188,7 +188,7 @@ public class FKCTeams {
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "radius"));
                 else {
                     try {
-                        t.setRadius(Integer.parseInt(handleString(arg, 2)), true);
+                        t.setRadius(Double.parseDouble(handleString(arg, 2)), true);
                         u.succ(" - Rayon : §f" + t.getRadius());
                     } catch (NumberFormatException e) {
                         u.err(" - Rayon '" + handleString(arg, 2) + "' invalide.");

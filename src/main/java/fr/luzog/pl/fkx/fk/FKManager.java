@@ -44,15 +44,20 @@ public class FKManager {
                 Utils.tryTo(printStackTrace, () -> {
                     for (String o : config.getOptions())
                         if (o != null) {
-                            FKOptions.FKOption option = new FKOptions.FKOption(config.getOptionName(o), config.getOptionActivation(o), config.isOptionActivated(o));
-                            if (o.equalsIgnoreCase("pvp"))
-                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setPvp(option));
-                            else if (o.equalsIgnoreCase("nether"))
-                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setNether(option));
-                            else if (o.equalsIgnoreCase("assaults"))
-                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setAssaults(option));
-                            else if (o.equalsIgnoreCase("end"))
-                                Utils.tryTo(printStackTrace, () -> manager.getOptions().setEnd(option));
+                            FKOptions.FKOption option = o.equalsIgnoreCase("pvp") ? manager.getOptions().getPvp()
+                                    : o.equalsIgnoreCase("nether") ? manager.getOptions().getNether()
+                                    : o.equalsIgnoreCase("assaults") ? manager.getOptions().getAssaults()
+                                    : o.equalsIgnoreCase("end") ? manager.getOptions().getEnd() : null;
+                            if (option != null) {
+                                Utils.tryTo(printStackTrace, () -> option.setName(Objects.requireNonNull(config.getOptionName(o))));
+                                Utils.tryTo(printStackTrace, () -> option.setActivationDay(config.getOptionActivation(o)));
+                                Utils.tryTo(printStackTrace, () -> {
+                                    if (config.isOptionActivated(o))
+                                        option.activate(false);
+                                    else
+                                        option.deactivate(false);
+                                });
+                            }
                         }
                 });
                 Utils.tryTo(printStackTrace, () -> manager.getListener().setScoreName(Objects.requireNonNull(config.getListenerName())));
@@ -188,13 +193,13 @@ public class FKManager {
 
     public static void saveAll(boolean soft) {
         for (FKManager manager : registered)
-            manager.save(soft);
+            manager.saveGlobals(soft);
     }
 
-    public void save(boolean soft) {
+    public void saveManager(boolean soft) {
         getConfig()
                 .load()
-                .setState(state, !soft)
+                .setState(state, true)
                 .setDay(day, !soft)
                 .setCurrentWeather(weather, !soft)
                 .setTime(time, true)
@@ -251,6 +256,10 @@ public class FKManager {
                 .setPriorityPermissions(priority, !soft)
 
                 .save();
+    }
+
+    public void saveGlobals(boolean soft) {
+        saveManager(soft);
 
         limits.saveToConfig(id, soft);
         pickableLocks.saveToConfig(id, soft);
@@ -313,23 +322,23 @@ public class FKManager {
 
 
     public FKManager(String id) {
+        Location loc = new Location(Main.world, 0, 0, 0);
         this.id = id;
         setDay(1, false);
-        this.weather = Main.world == null ? Weather.CLEAR : Main.world.isThundering() ? Weather.THUNDER : Main.world.hasStorm() ? Weather.RAIN : Weather.CLEAR;
+        this.weather = Main.world == null ? Weather.CLEAR : Main.world.isThundering() ? Weather.THUNDER
+                : Main.world.hasStorm() ? Weather.RAIN : Weather.CLEAR;
         setTime(0, false);
         setLinkedToSun(true, false);
         setOptions(FKOptions.getDefaultOptions(), false);
         setListener(new FKListener(60 * 5), false);
         setLimits(new Limits(), false);
-        setNether(null, false);
-        setEnd(null, false);
+        setNether(new Portal("§dNether", loc, null, null, loc, null, null, Material.PORTAL, Material.AIR, (byte) 0, 100, false), false);
+        setEnd(new Portal("§5End", loc, null, null, loc, null, null, Material.ENDER_PORTAL, Material.AIR, (byte) 0, 10, false), false);
         setLobby(new FKZone(null, FKZone.Type.LOBBY,
-                new Location(Main.world, 0, 0, 0),
-                null, null,
+                loc, loc, loc,
                 new FKPermissions(FKPermissions.Definition.OFF)), false);
         setSpawn(new FKZone(null, FKZone.Type.SPAWN,
-                new Location(Main.world, 0, 0, 0),
-                null, null,
+                loc, loc, loc,
                 new FKPermissions(FKPermissions.Definition.DEFAULT,
                         new FKPermissions.Item(FKPermissions.Type.BREAK, FKPermissions.Definition.OFF),
                         new FKPermissions.Item(FKPermissions.Type.PLACE, FKPermissions.Definition.OFF),
@@ -347,8 +356,10 @@ public class FKManager {
 //                    new FKPermissions(FKPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);
-        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED, null, null, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
-        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY, null, null, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED,
+                loc, null, null, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY,
+                loc, null, null, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
@@ -408,8 +419,10 @@ public class FKManager {
         registered.add(this);
         currentGameId = id;
         getTeams().forEach(FKTeam::updatePlayers);
-        if (save)
-            save(false);
+        if (save) {
+            saveManager(false);
+            saveGlobals(true);
+        }
     }
 
     public void unregister(boolean delete) {
@@ -418,8 +431,10 @@ public class FKManager {
         if (id.equals(currentGameId))
             currentGameId = registered.isEmpty() ? null : registered.get(0).getId();
         if (delete) {
-            if (!getConfig().exists())
-                save(true);
+            if (!getConfig().exists()) {
+                saveManager(false);
+                saveGlobals(true);
+            }
             getConfig().getFile().getParentFile().renameTo(new File(getConfig().getFile().getParentFile().getParentFile().getPath() + "/old-" + id));
         }
     }
@@ -574,9 +589,9 @@ public class FKManager {
         setTime(0, false);
         getNether().close();
         getEnd().close();
-        getOptions().getOptions().forEach(FKOptions.FKOption::deactivate);
+        getOptions().getOptions().forEach(opt -> opt.deactivate(true));
         setPriority(new FKPermissions(FKPermissions.Definition.OFF), false);
-        save(false);
+        saveManager(false);
     }
 
     public void checkActivations(boolean force) {
@@ -584,11 +599,11 @@ public class FKManager {
             if (force) {
                 if (day >= opt.getActivationDay()) {
                     if (!opt.isActivated())
-                        opt.activate();
+                        opt.activate(true);
                 } else if (opt.isActivated())
-                    opt.deactivate();
+                    opt.deactivate(true);
             } else if (day == opt.getActivationDay())
-                opt.activate();
+                opt.activate(true);
     }
 
     public FKZone getZone(Location loc) {
@@ -654,7 +669,7 @@ public class FKManager {
         this.id = id;
         if (renameFile && getConfig() != null) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().getFile().getParentFile().renameTo(new File(getConfig().getFile().getParentFile().getParentFile().getPath(), "/game-" + id + "/Manager.yml"));
         }
     }
@@ -667,7 +682,7 @@ public class FKManager {
         this.state = state;
         if (save) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().load().setState(state, true).save();
         }
     }
@@ -680,7 +695,7 @@ public class FKManager {
         this.day = day;
         if (save) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().load().setDay(day, true).save();
         }
     }
@@ -706,7 +721,7 @@ public class FKManager {
         }.runTask(Main.instance);
         if (save) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().load().setCurrentWeather(weather, true).save();
         }
     }
@@ -731,7 +746,7 @@ public class FKManager {
         }.runTask(Main.instance);
         if (save) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().load().setTime(time, true).save();
         }
     }
@@ -748,7 +763,7 @@ public class FKManager {
         this.linkedToSun = linkedToSun;
         if (save) {
             if (!getConfig().exists())
-                save(true);
+                saveManager(false);
             getConfig().load().setLinkedToSun(linkedToSun, true).save();
         }
     }
@@ -766,7 +781,7 @@ public class FKManager {
 
     public void saveOptions() {
         if (!getConfig().exists())
-            save(true);
+            saveManager(false);
         getConfig()
                 .load()
 
@@ -799,7 +814,7 @@ public class FKManager {
 
     public void saveListener() {
         if (!getConfig().exists())
-            save(true);
+            saveManager(false);
         getConfig()
                 .load()
 
@@ -826,7 +841,7 @@ public class FKManager {
 
     public void savePortal(String id, Portal portal) {
         if (!getConfig().exists())
-            save(true);
+            saveManager(false);
         getConfig()
                 .load()
 

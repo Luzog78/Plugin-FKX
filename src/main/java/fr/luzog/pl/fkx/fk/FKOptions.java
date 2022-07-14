@@ -1,6 +1,8 @@
 package fr.luzog.pl.fkx.fk;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Broadcast;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -81,6 +83,7 @@ public class FKOptions {
                 manager.saveEnd();
             }
         });
+
     }
 
     public static FKOptions getDefaultOptions() {
@@ -97,12 +100,13 @@ public class FKOptions {
         private String name;
         private int activationDay;
         private boolean activated;
-        private FKOptionListener optionListener = null;
+        private FKOptionListener optionListener;
 
         public FKOption(String name, int activationDay, boolean activated) {
             this.name = name;
             this.activationDay = activationDay;
             this.activated = activated;
+            optionListener = null;
         }
 
         public FKOption(String name, int activationDay, boolean activated, FKOptionListener optionListener) {
@@ -148,24 +152,26 @@ public class FKOptions {
             return activated;
         }
 
-        public void activate() {
-            activate(true);
-        }
-
         public void activate(boolean broadcast) {
             this.activated = true;
             if (optionListener != null)
-                optionListener.onActivate(broadcast);
-        }
-
-        public void deactivate() {
-            deactivate(true);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        optionListener.onActivate(broadcast);
+                    }
+                }.runTask(Main.instance);
         }
 
         public void deactivate(boolean broadcast) {
             this.activated = false;
             if (optionListener != null)
-                optionListener.onDeactivate(broadcast);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        optionListener.onDeactivate(broadcast);
+                    }
+                }.runTask(Main.instance);
         }
 
         public FKOptionListener getOptionListener() {

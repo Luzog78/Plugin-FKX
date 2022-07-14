@@ -50,9 +50,9 @@ public class FKCActivations {
                 u.succ("Activation :\n§r - " + format(opt));
             else if (args.length >= 4 && args[2].equalsIgnoreCase("set")) {
                 if (args[3].equalsIgnoreCase("on"))
-                    opt.activate();
+                    opt.activate(true);
                 else if (args[3].equalsIgnoreCase("off"))
-                    opt.deactivate();
+                    opt.deactivate(true);
                 else
                     try {
                         opt.setActivationDay(Integer.parseInt(args[3]));
