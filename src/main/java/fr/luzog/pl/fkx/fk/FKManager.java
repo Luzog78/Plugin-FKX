@@ -154,10 +154,13 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
-                                Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false));
-                                Utils.tryTo(printStackTrace, () -> team.setGuardian(Objects.requireNonNull(tc.getGuardian()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setEliminators(tc.getEliminators(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false, false));
+                                Utils.tryTo(printStackTrace, () -> team.setGuardianUuid(Objects.requireNonNull(tc.getGuardian()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setArmorStandUuid(Objects.requireNonNull(tc.getArmorStand()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setEliminated(tc.isEliminated(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
 
@@ -167,6 +170,16 @@ public class FKManager {
                                     manager.setSpecs(team, false);
                                 else
                                     manager.addTeam(team);
+
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        if(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID))
+                                            return;
+                                        team.setChestsRoom(team.getChestsRoom() == null ? team.getSpawn()
+                                                : team.getChestsRoom(), true, false);
+                                    }
+                                }.runTask(Main.instance);
                             }
                     } else if (ff.getName().equalsIgnoreCase("players")) {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
@@ -355,10 +368,10 @@ public class FKManager {
 //                    new FKPermissions(FKPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);
-        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", ChatColor.DARK_RED,
-                loc, null, null, 0, new ArrayList<>(), new FKPermissions(FKPermissions.Definition.ON)), false);
-        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", ChatColor.GRAY,
-                loc, null, null, 0, new ArrayList<>(), new FKPermissions(FKPermissions.Definition.OFF)), false);
+        setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", null, ChatColor.DARK_RED,
+                loc, null, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+        setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", null, ChatColor.GRAY,
+                loc, null, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
@@ -594,8 +607,8 @@ public class FKManager {
                 .collect(Collectors.toCollection(ArrayList::new));
         String a1 = "§4§lFin de la partie", a2 = "§7RDV dans qq secondes pour les résultats !";
         String b1 = "§6§lVictoire " + (winnerTeams.size() == 0 ? "d'§cAucune Équipe§6§l..."
-                : winnerTeams.size() == 1 ? "de l'Équipe §a" + winnerTeams.get(0) + "§r !!"
-                : "des §a" + winnerTeams.stream().map(FKTeam::getName)
+                : winnerTeams.size() == 1 ? "de l'Équipe §a" + winnerTeams.get(0).getColor() + winnerTeams.get(0).getName() + "§r !!"
+                : "des §a" + winnerTeams.stream().map(t -> t.getColor() + t.getName())
                 .collect(Collectors.joining("§6§l, §a")) + "§r !!"),
                 b2 = "§aBravo§7 à tous et §aMerci§7 d'avoir participé !";
         getPlayers().forEach(p -> {
@@ -685,7 +698,7 @@ public class FKManager {
         return null;
     }
 
-    public boolean hasPermission(FKPermissions.Type permissionType, Location loc) {
+    public boolean hasPermission(FKPermissions.Type permissionType, Location loc, boolean teamNeutral) {
         if (priority.getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return priority.getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getZone(loc) != null)
@@ -708,12 +721,12 @@ public class FKManager {
                     break;
 
                 case FRIENDLY:
-                    if (friendly.getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
+                    if (teamNeutral || friendly.getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
                     return friendly.getPermission(permissionType) == FKPermissions.Definition.ON;
 
                 case HOSTILE:
-                    if (hostile.getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
+                    if (teamNeutral || hostile.getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
                     return hostile.getPermission(permissionType) == FKPermissions.Definition.ON;
 

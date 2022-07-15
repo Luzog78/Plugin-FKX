@@ -571,8 +571,10 @@ public class Config {
     }
 
     public static class Team extends Config {
-        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
-                GUARDIAN = "chests-room.guardian-uuid", RADIUS = "radius", OLD_PLAYERS = "old-players",
+        public static final String NAME = "name", PREFIX = "prefix", ELIMINATED = "eliminated",
+                ELIMINATORS = "eliminators", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
+                GUARDIAN = "chests-room.guardian-uuid",  ARMOR_STAND = "chests-room.armor-stand-uuid",
+                RADIUS = "radius", OLD_PLAYERS = "old-players",
                 SPAWN = "spawn", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
@@ -609,6 +611,24 @@ public class Config {
             return this;
         }
 
+        public boolean isEliminated() {
+            return super.getBool(ELIMINATED);
+        }
+
+        public Team setEliminated(boolean eliminated, boolean force) {
+            super.set(ELIMINATED, eliminated, force);
+            return this;
+        }
+
+        public String getEliminators() {
+            return super.getStr(ELIMINATORS);
+        }
+
+        public Team setEliminators(String eliminators, boolean force) {
+            super.set(ELIMINATORS, eliminators, force);
+            return this;
+        }
+
         public ChatColor getColor() {
             return super.match(COLOR, ChatColor.values());
         }
@@ -637,6 +657,19 @@ public class Config {
 
         public Team setGuardian(UUID guardian, boolean force) {
             super.set(GUARDIAN, guardian + "", force);
+            return this;
+        }
+
+        public UUID getArmorStand() {
+            try {
+                return UUID.fromString(getStr(ARMOR_STAND));
+            } catch (IllegalArgumentException e) {
+                return null;
+            }
+        }
+
+        public Team setArmorStand(UUID armorStand, boolean force) {
+            super.set(ARMOR_STAND, armorStand + "", force);
             return this;
         }
 

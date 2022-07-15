@@ -9,6 +9,7 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 public class FKCTeams {
     public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
-            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | options ...]",
+            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | armorStand (hide | show) | options ...]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
             syntaxe_opts = "Options:\n  > --d <displayName>\n  > --p <prefix>\n  > --c <color>\n  > --r <radius>\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]";
 
@@ -62,7 +63,9 @@ public class FKCTeams {
             else if (FKManager.getCurrentGame().getTeam(args[2]).isEliminated())
                 u.err("Cette équipe est déjà éliminée.");
             else {
-                FKManager.getCurrentGame().getTeam(args[2]).eliminate(true, true);
+                FKManager.getCurrentGame().getTeam(args[2]).eliminate(true,
+                        FKManager.getCurrentGame().getState() == FKManager.State.RUNNING
+                                || FKManager.getCurrentGame().getState() == FKManager.State.PAUSED, true);
             }
         } else if (args[1].equalsIgnoreCase("reintroduce")) {
             if (args.length == 2)
@@ -151,6 +154,21 @@ public class FKCTeams {
                 } catch (FKException.PlayerDoesNotExistException e) {
                     u.err(CmdUtils.err_player_does_not_exist + " (" + args[3] + ")");
                 }
+            } else if (args[2].equalsIgnoreCase("armorStand")) {
+                if (args.length == 3)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "show | hide"));
+                else if (args[3].equalsIgnoreCase("show")) {
+                    Entity e = t.getArmorStand();
+                    e.setCustomName(t.getProgressBar());
+                    e.setCustomNameVisible(true);
+                    u.succ("ArmorStand de l'équipe §f" + t.getColor() + t.getName() + "§r visible.");
+                } else if (args[3].equalsIgnoreCase("hide")) {
+                    Entity e = t.getArmorStand();
+                    e.setCustomName(t.getProgressBar());
+                    e.setCustomNameVisible(false);
+                    u.succ("ArmorStand de l'équipe §f" + t.getColor() + t.getName() + "§r caché.");
+                } else
+                    u.err("Argument '" + args[3] + "' invalide.");
             } else if (args[2].equalsIgnoreCase("options")) {
                 u.setSyntaxe(syntaxe_team_options + "\n" + syntaxe_opts);
                 if (args.length == 3)
@@ -370,10 +388,16 @@ public class FKCTeams {
                         add("list");
                         add("add");
                         add("remove");
+                        add("armorStand");
                         add("options");
                     } else if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
                         if (args.length == 4)
                             addAll(Utils.getAllPlayers());
+                    } else if (args[2].equalsIgnoreCase("armorStand")) {
+                        if (args.length == 4) {
+                            add("hide");
+                            add("show");
+                        }
                     } else if (args[2].equalsIgnoreCase("options")) {
                         if (args.length == 4) {
                             add("help");

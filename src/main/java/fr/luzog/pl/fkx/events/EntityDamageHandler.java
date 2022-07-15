@@ -3,6 +3,7 @@ package fr.luzog.pl.fkx.events;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,47 +32,44 @@ public class EntityDamageHandler implements Listener {
         LivingEntity entity = (LivingEntity) e.getEntity();
         Location tempLoc = entity.getLocation().add(0, 0.5, 0);
 
+        if (FKManager.getCurrentGame() != null && entity.hasMetadata(FKTeam.GUARDIAN_TAG)
+                && e.getDamage() < 1_000_000_000_000_000_000_000.0) {
+            e.setCancelled(true);
+            return;
+        }
+
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            List<FKPlayer> fps = FKManager.getGlobalPlayer(p.getName());
-            if (fps.isEmpty()) {
+            FKPlayer fp = FKManager.getCurrentGame() == null ? null : FKManager.getCurrentGame().getPlayer(p.getName(), false);
+
+            if (fp == null || (fp.getManager().getState() == FKManager.State.PAUSED
+                    && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))) {
                 e.setCancelled(true);
                 return;
             }
 
-            for (FKPlayer fp : fps) {
-
-                if (fp.getManager().getState() == FKManager.State.PAUSED
-                        && !fp.getTeam().getId().equals(fp.getManager().getGods().getId())) {
-                    e.setCancelled(true);
-                    return;
-                }
-
-                if (e.getDamage() < 1_000_000_000_000_000_000_000.0) // Avoid /kill command
-                    fp.getStats().increaseDamageTaken(e.getDamage());
-
-                if (entity.getHealth() - e.getFinalDamage() <= 0) {
-                    fp.getStats().increaseDeaths();
-                    Broadcast.mess(fp.getDisplayName() + "§c est mort.");
-                    e.setCancelled(true);
-                    p.setHealth(p.getMaxHealth());
-                    p.setFoodLevel(20);
-                    p.setSaturation(20f);
-                    p.teleport(p.getBedSpawnLocation() == null ?
-                            fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
-                                    fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
-                                            fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?
-                                                    Main.world == null ?
-                                                            p.getLocation()
-                                                            : Main.world.getSpawnLocation()
-                                                    : fp.getManager().getLobby().getSpawn() : fp.getManager().getSpawn().getSpawn()
-                                    : fp.getTeam().getSpawn()
-                            : p.getBedSpawnLocation());
-                }
-
-            }
+            if (e.getDamage() < 1_000_000_000_000_000_000_000.0) // Avoid /kill command
+                fp.getStats().increaseDamageTaken(e.getDamage());
 
             if (entity.getHealth() - e.getFinalDamage() <= 0) {
+                fp.getStats().increaseDeaths();
+                Broadcast.mess(fp.getDisplayName() + "§c est mort.");
+                e.setCancelled(true);
+                p.setHealth(p.getMaxHealth());
+                p.setFoodLevel(20);
+                p.setSaturation(20f);
+                p.teleport(p.getBedSpawnLocation() == null ?
+                        fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
+                                fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
+                                        fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?
+                                                Main.world == null ?
+                                                        p.getLocation()
+                                                        : Main.world.getSpawnLocation()
+                                                : fp.getManager().getLobby().getSpawn()
+                                        : fp.getManager().getSpawn().getSpawn()
+                                : fp.getTeam().getSpawn()
+                        : p.getBedSpawnLocation());
+
                 new ArrayList<ItemStack>() {{
                     addAll(Arrays.asList(p.getInventory().getContents()));
                     addAll(Arrays.asList(p.getInventory().getArmorContents()));
@@ -85,7 +83,7 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled() && Main.customLootingSystem)
+                    if (!e.isCancelled() && Main.customLootingSystem && !entity.hasMetadata(FKTeam.GUARDIAN_TAG))
                         Events.killMobLoots.forEach(loot -> {
                             if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
                                     && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))

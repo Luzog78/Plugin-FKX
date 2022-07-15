@@ -646,14 +646,18 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onBlockExplode(BlockExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
+                || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
+                || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true));
     }
 
     @EventHandler
     public static void onEntityExplode(EntityExplodeEvent e) {
-        e.blockList().removeIf(b -> !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation())));
+        e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
+                || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
+                || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true));
     }
 
     @EventHandler
