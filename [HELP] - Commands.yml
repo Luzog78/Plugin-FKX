@@ -1,0 +1,259 @@
+Commands:
+
+HELP:
+  - <[!](<player> | @a)...>
+  - NOT SAME: <players...>
+  - BUT.. Yes, approximatively. Examples:
+    - Pattrick Josh Thomas          # Only Pat, Jsh and Thms
+    - @a !Pattrick !Josh !Thomas   # Everyone except Pat, Jsh ans Thms
+    - @a Pattrick !@a Thomas       # Everyone, adding Pattrick (so, everyone...), excepted Everyone (means nobody), plus Thomas >> equals "Thomas" >> Stupid but fun !
+
+Misc:
+  - /(r || rl)
+  - Admin:
+    - /execute <player> <command>
+    - /(g || gm)[0|1|2|3] [<gmode>] [<[!](<player> | @a)...>]
+    - /(invsee || seeinventory) <seerPlayer> <targetPlayer> [(-n || --normal) | (-a || --armor) | (-ec || --ender-chest)]
+    - /(v || vanish) [(on | off)] [<[!](<player> | @a)...>]
+    - /sun [<duration> | default]
+    - /rain [<duration> | default]
+    - /thunder [<duration> | default]
+  - Cheat:
+    - /(ench || enchantment) (<enchants...> | all) [(<lvl> | max | overMax)], ...
+    - /(feed || nourriture) [<[!](<player> | @a)...>]
+    - /freeze [(on | off)] <[!](<player> | @a)...>
+    - /god [(on | off)] [<[!](<player> | @a)...>]
+    - /(heal || guerissement) [<[!](<player> | @a)...>]
+    - /sethealth [<player> | @a] <health>
+    - /speed [<player> | @a] (w || walk | f || fly) <speed>
+  - Fun:
+    - /bounce [-v <dx> <dy> <dz>] <entities...>
+    - /burn <player> <seconds>
+    - /damage <player> <damage>
+    - /hat [<material>] [<player>]
+    - /head [<owner>]
+    - /lightning (-rod | -pos <x> <y> <z> [<times>] | [<times>] <[!](<player> | @a)...>)
+    - /rename (reset | name <name...> | lore <line>;...)
+    - /shuffle (hotbar | inv) <[!](<player> | @a)...>
+  - Utils:
+    - /craft [custom] [<[!](<player> | @a)...>]
+    - /(ec || viewec || enderchest || viewenderchest) [[<seer>] <target>]
+    - /trash [<[!](<player> | @a)...>]
+
+AD:
+  - /ad help
+  - Joueurs:
+    - /ad
+    - /ad <message...>
+    - /ad <admin> <message...>
+  - Dieux:
+    - /ad
+    - /ad list
+    - /ad all
+    - /ad page
+    - /ad page <page>
+    - /ad page <filter> <page>
+    - /ad page (+/-)<filter> <page>
+    - /ad <status> <id>
+    - /ad ad
+    - /ad ad <message...>
+    - /ad ad <admin> <message...>
+
+FK:
+  - Aliases: [ fallenkingdom ]
+  - /fk help
+  - Activations:
+    - /fk activations
+    - /fk activations help
+    - /fk activations list
+    - /fk activations check
+    - /fk activations <act> get
+    - /fk activations <act> set (on | off)
+    - /fk activations <act> set <day>
+  - Banner:
+    - /fk banner
+    - /fk banner [color]
+  - Broadcast:
+    - /fk (bc || broadcast) help
+    - /fk (bc || broadcast) <type> <message...>
+    - Type: [normal, succ, err, log, info, announcement, event, warn, sys_succ, sys_err]
+  - Date:
+    - /fk date
+    - /fk date help
+    - /fk date day
+    - /fk date day get
+    - /fk date day set <day>
+    - /fk date time
+    - /fk date time get
+    - /fk date time set <time>
+    - /fk date time set <moment>
+    - /fk date time set <hh>:<mm>
+    - /fk date weather
+    - /fk date weather get
+    - /fk date weather set (sun | rain | thunder)
+    - /fk date weather set (sun | rain | thunder) <timeout>
+  - Game:
+    # /fk game
+    - /fk game help
+    - /fk game list
+    - /fk game current
+    - /fk game new <id>
+    - /fk game switch <id>
+    - /fk game delete <id>
+    - /fk game state
+    - /fk game start
+    - /fk game reboot
+    - /fk game pause
+    - /fk game pause <cooldown>
+    - /fk game resume
+    - /fk game resume <cooldown>
+  - Locks:
+    # /fk locks
+    - /fk locks help
+    - /fk locks list
+    - /fk locks tool
+    - /fk locks create <level> <x> <y> <z>
+    - /fk locks create <level> <x> <y> <z> <world>
+    - /fk locks create <level> <id> <x> <y> <z>
+    - /fk locks create <level> <id> <x> <y> <z> <world>
+    # /fk locks <id>
+    - /fk locks <id> help
+    - /fk locks <id> info
+    - /fk locks <id> destroy
+    - /fk locks <id> lock
+    - /fk locks <id> unlock
+    - /fk locks <id> cooldown <cooldown>
+    - /fk locks <id> level <level>
+    - /fk locks <id> pickable (true | false)
+    - /fk locks <id> armorStands (hide | show)
+  - Permissions:
+    - /fk (perm || permissions)
+    - /fk (perm || permissions) help
+    - /fk (perm || permissions) list
+    - /fk (perm || permissions) team <teamId>
+    - /fk (perm || permissions) team <teamId> info
+    - /fk (perm || permissions) team <teamId> <permission>
+    - /fk (perm || permissions) team <teamId> <permission> <value>
+    - /fk (perm || permissions) zone <zoneId>
+    - /fk (perm || permissions) zone <zoneId> info
+    - /fk (perm || permissions) zone <zoneId> <permission>
+    - /fk (perm || permissions) zone <zoneId> <permission> <value>
+    - /fk (perm || permissions) player <playerName>
+    - /fk (perm || permissions) player <playerName> info
+    - /fk (perm || permissions) player <playerName> <permission>
+    - /fk (perm || permissions) player <playerName> <permission> <value>
+    - /fk (perm || permissions) global
+    - /fk (perm || permissions) global info
+    - /fk (perm || permissions) global <permission>
+    - /fk (perm || permissions) global <permission> <value>
+    - /fk (perm || permissions) neutral
+    - /fk (perm || permissions) neutral info
+    - /fk (perm || permissions) neutral <permission>
+    - /fk (perm || permissions) neutral <permission> <value>
+    - /fk (perm || permissions) friendly
+    - /fk (perm || permissions) friendly info
+    - /fk (perm || permissions) friendly <permission>
+    - /fk (perm || permissions) friendly <permission> <value>
+    - /fk (perm || permissions) hostile
+    - /fk (perm || permissions) hostile info
+    - /fk (perm || permissions) hostile <permission>
+    - /fk (perm || permissions) hostile <permission> <value>
+    - /fk (perm || permissions) priority
+    - /fk (perm || permissions) priority info
+    - /fk (perm || permissions) priority <permission>
+    - /fk (perm || permissions) priority <permission> <value>
+  - Players:
+    - /fk players
+    - /fk players help
+    - /fk players list
+    - /fk players <player>
+    - /fk players <player> info
+    - /fk players <player> init
+    - /fk players page
+    - /fk players page <page>
+  - Portal:
+    # /fk portal
+    - /fk portal help
+    # /fk portal nether
+    - /fk portal nether (over | dim) spawn get
+    - /fk portal nether (over | dim) spawn set <x> <y> <z>
+    - /fk portal nether (over | dim) spawn set <x> <y> <z> <world>
+    - /fk portal nether (over | dim) spawn set <x> <y> <z> <yw> <pi>
+    - /fk portal nether (over | dim) spawn set <x> <y> <z> <yw> <pi> <world>
+    - /fk portal nether (over | dim) (pos1 | pos2) get
+    - /fk portal nether (over | dim) (pos1 | pos2) set <x> <y> <z>
+    - /fk portal nether (over | dim) (pos1 | pos2) set <x> <y> <z> <world>
+    - /fk portal nether (over | dim) (pos1 | pos2) set <x> <y> <z> <yw> <pi>
+    - /fk portal nether (over | dim) (pos1 | pos2) set <x> <y> <z> <yw> <pi> <world>
+    # /fk portal end
+    - /fk portal end (over | dim) spawn get
+    - /fk portal end (over | dim) spawn set <x> <y> <z>
+    - /fk portal end (over | dim) spawn set <x> <y> <z> <world>
+    - /fk portal end (over | dim) spawn set <x> <y> <z> <yw> <pi>
+    - /fk portal end (over | dim) spawn set <x> <y> <z> <yw> <pi> <world>
+    - /fk portal end (over | dim) (pos1 | pos2) get
+    - /fk portal end (over | dim) (pos1 | pos2) set <x> <y> <z>
+    - /fk portal end (over | dim) (pos1 | pos2) set <x> <y> <z> <world>
+    - /fk portal end (over | dim) (pos1 | pos2) set <x> <y> <z> <yw> <pi>
+    - /fk portal end (over | dim) (pos1 | pos2) set <x> <y> <z> <yw> <pi> <world>
+  - Stats:
+    - /fk stats help
+    - /fk stats <player>
+    - /fk stats <player> get <stat>
+    - /fk stats <player> get all
+    - /fk stats <player> reset <stat>
+    - /fk stats <player> reset all
+    - /fk stats <player> set <stat> <value>
+    - /fk stats <player> increase <stat> <value>
+    - /fk stats <player> decrease <stat> <value>
+  - Teams:
+    # /fk teams
+    - /fk teams help
+    - /fk teams list
+    - /fk teams create <id>
+    - /fk teams create <id> <options...>
+    - /fk teams eliminate <id>
+    - /fk teams reintroduce <id>
+    - /fk teams delete <id>
+    # /fk teams <id>
+    - /fk teams <id> help
+    - /fk teams <id> list
+    - /fk teams <id> add <player>
+    - /fk teams <id> remove <player>
+    - /fk teams <id> armorStand (hide | show)
+    - /fk teams <id> options help
+    - /fk teams <id> options list
+    - /fk teams <id> options <options...>
+    - Options:
+      - --d <displayName>
+      - --p <prefix>
+      - --c <color>
+      - --r <radius>
+      - --s <x> <y> <z>
+      - --s <x> <y> <z> <world>
+      - --s <x> <y> <z> <yw> <pi>
+      - --s <x> <y> <z> <yw> <pi> <world>
+  - Title: []
+  - Warp:
+    # /fk warp
+    - /fk warp help
+    - /fk warp list
+    - /fk warp lobby
+    - /fk warp lobby <players...>
+    - /fk warp lobby <[!]<player>...>
+    - /fk warp spawn
+    - /fk warp spawn <players...>
+    - /fk warp spawn <[!]<player>...>
+    - /fk warp nether
+    - /fk warp nether <players...>
+    - /fk warp nether <[!]<player>...>
+    - /fk warp end
+    - /fk warp end <players...>
+    - /fk warp end <[!]<player>...>
+    - /fk warp team <teamId>
+    - /fk warp team <teamId> <players...>
+    - /fk warp team <teamId> <[!]<player>...>
+    - /fk warp zone <zoneId>
+    - /fk warp zone <zoneId> <players...>
+    - /fk warp zone <zoneId> <[!]<player>...>
+
