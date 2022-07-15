@@ -64,6 +64,8 @@ public class PlayerInteractAtEntityHandler implements Listener {
                     p.sendMessage("§cCette équipe a déjà été éliminée.");
                 else if (t.isEliminating())
                     p.sendMessage("§cCette équipe est déjà en train de se faire éliminer.");
+                else if(t.getManager().getState() != FKManager.State.RUNNING)
+                    p.sendMessage("§cImpossible de se faire éliminer dans cette phase.");
                 else
                     t.tryToEliminate(fp.getTeam());
             }

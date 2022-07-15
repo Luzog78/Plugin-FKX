@@ -187,7 +187,6 @@ public class FKCZone {
                 }
             } else if (arg.equalsIgnoreCase("pos1") || arg.toLowerCase().startsWith("pos1 ")) {
                 String handled = handleString(arg, 5);
-                System.out.println(handled);
 
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "<x> <y> <z>"));

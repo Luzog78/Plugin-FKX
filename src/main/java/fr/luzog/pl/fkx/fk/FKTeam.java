@@ -142,7 +142,8 @@ public class FKTeam {
                 e.setCustomNameVisible(true);
 
                 if (!isEliminated && team.getPlayers().stream().anyMatch(p -> p.getPlayer() != null
-                        && p.getPlayer().getLocation().distance(chestsRoom) <= 5) && team.getId().equals(eliminators))
+                        && p.getPlayer().getLocation().distance(chestsRoom) <= 5) && team.getId().equals(eliminators)
+                        && getManager().getState() == FKManager.State.RUNNING)
                     if (eliminationCooldown < ELIMINATION_TIMEOUT) {
                         eliminationCooldown++;
                         e.setCustomName(getProgressBar());

@@ -230,8 +230,6 @@ public class Loots {
         List<ItemStack> loots = new ArrayList<>();
         this.loots.forEach(l -> {
             double p = random.nextDouble();
-            System.out.println("r: " + p + " p: " + l.getProba() * (1 + chanceLvlProbaCoefficient * chanceLvl)
-                    + " >> " + (p < l.getProba() * (1 + chanceLvlProbaCoefficient * chanceLvl)));
             if (l.getChanceLvl() == -2 && !getMaxChanceLvl().contains(chanceLvl)) {
                 if (p < l.getProba() * (1 + chanceLvlProbaCoefficient * chanceLvl)
                         && (l.hasSilkTouch() == hasSilkTouch || l.hasSilkTouch() == null || hasSilkTouch == null)) {
@@ -244,7 +242,6 @@ public class Loots {
                     && (l.hasSilkTouch() == hasSilkTouch || l.hasSilkTouch() == null || hasSilkTouch == null))
                 loots.add(l.getItem().clone());
         });
-        System.out.println("---------------------------------------------");
         return loots;
     }
 

@@ -753,7 +753,6 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onWeatherChange(WeatherChangeEvent e) {
-        Broadcast.log("Weather changed to " + e.toWeatherState());
     }
 
     @EventHandler

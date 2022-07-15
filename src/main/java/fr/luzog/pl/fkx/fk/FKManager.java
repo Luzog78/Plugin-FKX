@@ -541,7 +541,7 @@ public class FKManager {
      */
 
     public void start() {
-        Utils.countDown(null, 30, false, true, true,
+        Utils.countDown(null, 20, false, true, true,
                 "La partie commence dans §c%i%§rs...\n§7Préparez-vous à démarrer votre aventure !",
                 "Bonne chance à tous !\n§7Prêt ?  Partez !", "§a", "§6", "§c§l",
                 "§4§l", "§2§l", () -> {

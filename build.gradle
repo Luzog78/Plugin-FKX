@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'fr.luzog.pl'
-version 'alpha1.0'
+version 'beta1.0'
 
 compileJava.options.encoding = 'UTF-8'
 
@@ -28,4 +28,4 @@ test {
     useJUnitPlatform()
 }
 
-jar.destinationDir = new File("C:/Users/Luzog/Servers/Minecraft Servers/1.8.8 - FKX Plugin/plugins")
+jar.destinationDir = new File("Build - Jar Files")
