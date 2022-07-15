@@ -14,7 +14,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 public class Gm implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/gm[(0|1|2|3)] [<gmode>] [[!]<players...>]";
+    public static final String syntaxe = "/gm[0|1|2|3] [<gmode>] [<players...>]";
 
     public GameMode type;
 

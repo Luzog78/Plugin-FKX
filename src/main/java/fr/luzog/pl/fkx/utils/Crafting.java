@@ -472,7 +472,7 @@ public class Crafting implements Listener {
 
     @EventHandler
     public static void onBlockInteract(PlayerInteractEvent e) {
-        if (!Main.activeCustomCraftingTable || !e.hasBlock() || e.getClickedBlock().getType() != Material.WORKBENCH)
+        if (!Main.customCraftingTable || !e.hasBlock() || e.getClickedBlock().getType() != Material.WORKBENCH)
             return;
 
         new BukkitRunnable() {

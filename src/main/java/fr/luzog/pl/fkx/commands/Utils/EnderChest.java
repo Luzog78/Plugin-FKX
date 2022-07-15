@@ -34,7 +34,7 @@ public class EnderChest implements CommandExecutor, TabCompleter {
                 if (Bukkit.getPlayerExact(args[0]) != null) {
                     u.getPlayer().openInventory(Bukkit.getPlayerExact(args[0]).getEnderChest());
                     u.succ("Vous ouvrez l'§dEnderChest§r de§6", Bukkit.getPlayerExact(args[0]).getDisplayName(), "§r!");
-                }else
+                } else
                     u.err(CmdUtils.err_player_not_found);
             else
                 u.err(CmdUtils.err_not_player);
@@ -44,7 +44,7 @@ public class EnderChest implements CommandExecutor, TabCompleter {
                 Bukkit.getPlayerExact(args[0]).openInventory(Bukkit.getPlayerExact(args[1]).getEnderChest());
                 u.succ("§6" + Bukkit.getPlayerExact(args[1]).getDisplayName(), "§rouvre l'§dEnderChest§r de§6",
                         Bukkit.getPlayerExact(args[1]).getDisplayName(), "§r!");
-            }else
+            } else
                 u.err(CmdUtils.err_player_not_found, "('" + args[1] + "')");
         else
             u.err(CmdUtils.err_player_not_found, "('" + args[0] + "')");
@@ -54,7 +54,7 @@ public class EnderChest implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
-        if(args.length > 2)
+        if (args.length > 2)
             return new ArrayList<>();
         return new ArrayList<String>() {{
             Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()).forEach(p -> {

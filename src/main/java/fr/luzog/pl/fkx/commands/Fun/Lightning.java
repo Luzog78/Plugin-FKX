@@ -82,7 +82,7 @@ public class Lightning implements CommandExecutor, TabCompleter {
                     @Override
                     public void run() {
                         players.forEach(player -> {
-                            if(player.isOnline()) {
+                            if (player.isOnline()) {
                                 player.getWorld().strikeLightning(player.getLocation());
                                 u.succ("§6" + player.getDisplayName() + "§r a été §efoudroyé§r !" + timer);
                             }

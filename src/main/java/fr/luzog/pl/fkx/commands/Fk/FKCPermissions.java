@@ -53,7 +53,7 @@ public class FKCPermissions {
                     if (args.length == 3)
                         if (sender instanceof Player)
                             u.getPlayer().openInventory(GuiPerm.getPermsInv(t.getPermissions(),
-                                    t.getBanner(),
+                                    FKManager.getBanner(t.getColor()),
                                     GuiPerm.getPermsItem(t.getPermissions(), Material.IRON_SWORD,
                                             "§fPermissions de Team", null, "null"),
                                     "team " + t.getId(), "fk teams " + t.getId()));

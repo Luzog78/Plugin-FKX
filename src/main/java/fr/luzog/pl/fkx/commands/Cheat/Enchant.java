@@ -217,7 +217,8 @@ public class Enchant implements CommandExecutor, TabCompleter {
                 int i = Integer.parseInt(args[args.length - 1]);
                 for (int j = 0; j < 10; j++)
                     add(i + "" + j + ",");
-            }catch (NumberFormatException ignored) { }
+            } catch (NumberFormatException ignored) {
+            }
         }}.forEach(p -> {
             if (p.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))
                 list.add(p);

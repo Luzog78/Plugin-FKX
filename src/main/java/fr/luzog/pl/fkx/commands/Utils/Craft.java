@@ -19,7 +19,7 @@ public class Craft implements CommandExecutor, TabCompleter {
     public static final String syntaxe = "/craft [custom] [<players...>]";
 
     @Override
-	public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
+    public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, syntaxe);
 
         if (args.length == 0)
@@ -29,10 +29,10 @@ public class Craft implements CommandExecutor, TabCompleter {
             } else
                 u.err(CmdUtils.err_not_player);
 
-        else if(args[0].equals("?") || args[0].equalsIgnoreCase("help"))
+        else if (args[0].equals("?") || args[0].equalsIgnoreCase("help"))
             u.synt();
 
-        else if(args[0].equalsIgnoreCase("custom") || args[0].equalsIgnoreCase("c"))
+        else if (args[0].equalsIgnoreCase("custom") || args[0].equalsIgnoreCase("c"))
             CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
                 u.getPlayer().openInventory(Crafting.getInv());
                 u.succ("Vous avez ouvert §2la table de Craft §d§l§nCustom§r", player.equals(u.getPlayer()) ? "" : "§rà §6" + player.getDisplayName(), "§r!");
@@ -44,16 +44,16 @@ public class Craft implements CommandExecutor, TabCompleter {
                 u.succ("Vous avez ouvert §2la table de Craft§r", player.equals(u.getPlayer()) ? "" : "§rà §6" + player.getDisplayName(), "§r!");
             });
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         LinkedHashSet<Player> content = CmdUtils.getPlayersFromArray(args, 0);
         ArrayList<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
-            if(args.length == 1)
+            if (args.length == 1)
                 add("custom");
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (content.contains(p))
@@ -71,5 +71,5 @@ public class Craft implements CommandExecutor, TabCompleter {
         });
 
         return list;
-	}
+    }
 }

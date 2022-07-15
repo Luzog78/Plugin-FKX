@@ -2,17 +2,14 @@ package fr.luzog.pl.fkx.commands.Fun;
 
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Shuffle implements CommandExecutor, TabCompleter {
     public static final String syntaxe = "/shuffle (hotbar | inv) <players...>";
@@ -23,30 +20,29 @@ public class Shuffle implements CommandExecutor, TabCompleter {
 
         if (args.length <= 1)
             u.synt();
+        else if (args[0].equalsIgnoreCase("hotbar"))
+            CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
+                ArrayList<ItemStack> items = new ArrayList<>();
+                for (int i = 0; i < 9; i++)
+                    items.add(player.getInventory().getItem(i));
+                Collections.shuffle(items);
+                for (int i = 0; i < items.size(); i++)
+                    player.getInventory().setItem(i, items.get(i));
+                player.updateInventory();
+                u.succ("La hotbar de§6", player.getDisplayName(), "§ra été §emélangé§r !");
+            });
+        else if (args[0].equalsIgnoreCase("inv"))
+            CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
+                ArrayList<ItemStack> items = new ArrayList<>();
+                player.getInventory().forEach(items::add);
+                Collections.shuffle(items);
+                for (int i = 0; i < items.size(); i++)
+                    player.getInventory().setItem(i, items.get(i));
+                player.updateInventory();
+                u.succ("L'inventaire de§6", player.getDisplayName(), "§ra été §emélangé§r !");
+            });
         else
-            if(args[0].equalsIgnoreCase("hotbar"))
-                CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
-                    ArrayList<ItemStack> items = new ArrayList<>();
-                    for (int i = 0; i < 9; i++)
-                        items.add(player.getInventory().getItem(i));
-                    Collections.shuffle(items);
-                    for (int i = 0; i < items.size(); i++)
-                        player.getInventory().setItem(i, items.get(i));
-                    player.updateInventory();
-                    u.succ("La hotbar de§6", player.getDisplayName(), "§ra été §emélangé§r !");
-                });
-            else if(args[0].equalsIgnoreCase("inv"))
-                CmdUtils.getPlayersFromArray(args, 1).forEach(player -> {
-                    ArrayList<ItemStack> items = new ArrayList<>();
-                    player.getInventory().forEach(items::add);
-                    Collections.shuffle(items);
-                    for (int i = 0; i < items.size(); i++)
-                        player.getInventory().setItem(i, items.get(i));
-                    player.updateInventory();
-                    u.succ("L'inventaire de§6", player.getDisplayName(), "§ra été §emélangé§r !");
-                });
-            else
-                u.synt();
+            u.synt();
 
         return false;
     }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class Weather implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/(sun | rain | thunder) [(<duration> | default)]";
+    public static final String syntaxe = "/(sun | rain | thunder) [<duration> | default]";
 
     public static enum WeatherType {SUN, RAIN, THUNDER}
 

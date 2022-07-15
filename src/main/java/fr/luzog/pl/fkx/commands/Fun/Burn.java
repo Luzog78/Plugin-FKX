@@ -1,7 +1,6 @@
 package fr.luzog.pl.fkx.commands.Fun;
 
 import fr.luzog.pl.fkx.utils.CmdUtils;
-import fr.luzog.pl.fkx.utils.SpecialChars;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

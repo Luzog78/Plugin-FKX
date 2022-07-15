@@ -26,7 +26,7 @@ public class Heal implements CommandExecutor, TabCompleter {
             } else
                 u.err(CmdUtils.err_not_player);
 
-        else if(args[0].equals("?") || args[0].equalsIgnoreCase("help"))
+        else if (args[0].equals("?") || args[0].equalsIgnoreCase("help"))
             u.synt();
 
         else

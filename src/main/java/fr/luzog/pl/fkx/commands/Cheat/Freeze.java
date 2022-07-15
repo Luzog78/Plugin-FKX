@@ -16,7 +16,6 @@ import org.bukkit.event.player.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class Freeze implements CommandExecutor, TabCompleter, Listener {
@@ -55,12 +54,12 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
             Freeze.frozen.add(name);
     }
 
-    public static void frozenWarning(Player player){
+    public static void frozenWarning(Player player) {
         player.sendMessage(Main.PREFIX + "§cVous ne pouvez pas effectuer cette action.");
     }
 
     @EventHandler
-    public static void onMove(PlayerMoveEvent e){
+    public static void onMove(PlayerMoveEvent e) {
         if (isFrozen(e.getPlayer().getName()) && (e.getFrom().getX() != e.getTo().getX()
                 || e.getFrom().getY() != e.getTo().getY() || e.getFrom().getZ() != e.getFrom().getZ())) {
             frozenWarning(e.getPlayer());
@@ -69,7 +68,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onInteract(PlayerInteractEvent e){
+    public static void onInteract(PlayerInteractEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -77,7 +76,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onInteractEntity(PlayerInteractEntityEvent e){
+    public static void onInteractEntity(PlayerInteractEntityEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -85,7 +84,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onInteractAtEntity(PlayerInteractAtEntityEvent e){
+    public static void onInteractAtEntity(PlayerInteractAtEntityEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -93,7 +92,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onPickup(PlayerPickupItemEvent e){
+    public static void onPickup(PlayerPickupItemEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -101,7 +100,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onDrop(PlayerDropItemEvent e){
+    public static void onDrop(PlayerDropItemEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -109,7 +108,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onBedEnter(PlayerBedEnterEvent e){
+    public static void onBedEnter(PlayerBedEnterEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -117,7 +116,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onBucketEmpty(PlayerBucketEmptyEvent e){
+    public static void onBucketEmpty(PlayerBucketEmptyEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -125,7 +124,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     }
 
     @EventHandler
-    public static void onBucketFill(PlayerBucketFillEvent e){
+    public static void onBucketFill(PlayerBucketFillEvent e) {
         if (isFrozen(e.getPlayer().getName())) {
             frozenWarning(e.getPlayer());
             e.setCancelled(true);
@@ -135,7 +134,7 @@ public class Freeze implements CommandExecutor, TabCompleter, Listener {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         return new ArrayList<String>() {{
-            new ArrayList<String>(){{
+            new ArrayList<String>() {{
                 addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
                 if (args.length == 1)
                     addAll(Arrays.asList("on", "off"));

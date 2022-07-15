@@ -12,18 +12,18 @@ import java.util.List;
 
 public class R implements CommandExecutor, TabCompleter {
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
 
-		Bukkit.broadcastMessage(Main.PREFIX + "§4Le plugin se prepare...");
-		Main.instance.getServer().reload();
-		Bukkit.broadcastMessage(Main.PREFIX + "§2Le plugin est pret !");
+        Bukkit.broadcastMessage(Main.PREFIX + "§4Le plugin se prepare...");
+        Main.instance.getServer().reload();
+        Bukkit.broadcastMessage(Main.PREFIX + "§2Le plugin est pret !");
 
-		return true;
-	}
+        return true;
+    }
 
-	@Override
-	public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
-		return new ArrayList<>();
-	}
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
+        return new ArrayList<>();
+    }
 }

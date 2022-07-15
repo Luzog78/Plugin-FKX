@@ -32,7 +32,7 @@ public class Hat implements CommandExecutor, TabCompleter {
             else
                 u.err(CmdUtils.err_not_player);
 
-        else if(Material.matchMaterial(args[0]) != null)
+        else if (Material.matchMaterial(args[0]) != null)
             if (args.length == 1)
                 if (sender instanceof Player)
                     hat(u.getPlayer(), new ItemStack(Material.matchMaterial(args[0])), u);
@@ -48,7 +48,7 @@ public class Hat implements CommandExecutor, TabCompleter {
         return false;
     }
 
-    public static void hat(Player p, ItemStack is, CmdUtils u){
+    public static void hat(Player p, ItemStack is, CmdUtils u) {
         if ((p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR)
                 && (p.getInventory().getHelmet() != null && p.getInventory().getHelmet().getType() != Material.AIR))
             u.err(p.equals(u.getPlayer()) ? CmdUtils.err_too_items_hold :
@@ -62,7 +62,7 @@ public class Hat implements CommandExecutor, TabCompleter {
         }
     }
 
-    public static void hat(Player p, CmdUtils u){
+    public static void hat(Player p, CmdUtils u) {
         if ((p.getItemInHand() != null && p.getItemInHand().getType() != Material.AIR)
                 || (p.getInventory().getHelmet() != null && p.getInventory().getHelmet().getType() != Material.AIR)) {
             ItemStack hand = p.getItemInHand();
@@ -71,8 +71,8 @@ public class Hat implements CommandExecutor, TabCompleter {
             u.succ("Vous avez remplacé", (p.equals(u.getPlayer()) ? "votre tête" :
                     "la tête de §6" + p.getDisplayName()), "§rpar§b", hand.getType().name(), "§r!");
         } else
-        u.err(p.equals(u.getPlayer()) ? CmdUtils.err_no_item_hold :
-                CmdUtils.err_no_item_hold_on.replace("%PLAYER%", p.getDisplayName()));
+            u.err(p.equals(u.getPlayer()) ? CmdUtils.err_no_item_hold :
+                    CmdUtils.err_no_item_hold_on.replace("%PLAYER%", p.getDisplayName()));
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Hat implements CommandExecutor, TabCompleter {
         ArrayList<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
-            if(args.length == 1)
+            if (args.length == 1)
                 addAll(Arrays.stream(Material.values()).map(Enum::name).collect(Collectors.toList()));
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (content.contains(p))

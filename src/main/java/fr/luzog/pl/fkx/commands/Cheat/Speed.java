@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Speed implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/speed [<players>] (w || walk | f || fly) <speed>";
+    public static final String syntaxe = "/speed [<player> | @a] (w || walk | f || fly) <speed>";
     public static final String err_too_high = "La vitesse est comprise entre 0 et 1.";
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, syntaxe);
 
-        if(args.length == 1 && (args[0].equals("?") || args[0].equalsIgnoreCase("help")))
+        if (args.length == 1 && (args[0].equals("?") || args[0].equalsIgnoreCase("help")))
             u.synt();
 
         if (args.length == 2)
@@ -99,15 +99,13 @@ public class Speed implements CommandExecutor, TabCompleter {
             if (args.length == 1) {
                 addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
                 addAll(t);
-            }
-            else if(args.length == 2){
-                if(!Arrays.asList("w", "walk", "f", "fly").contains(args[0].toLowerCase()))
+            } else if (args.length == 2) {
+                if (!Arrays.asList("w", "walk", "f", "fly").contains(args[0].toLowerCase()))
                     addAll(t);
                 else
                     addAll(s);
-            }
-            else if(args.length == 3){
-                if(!Arrays.asList("w", "walk", "f", "fly").contains(args[0].toLowerCase()))
+            } else if (args.length == 3) {
+                if (!Arrays.asList("w", "walk", "f", "fly").contains(args[0].toLowerCase()))
                     addAll(s);
             }
             addAll(Arrays.asList("2.0", "6.0", "10.0", "20.0", "40.0", "60.0", "100.0"));

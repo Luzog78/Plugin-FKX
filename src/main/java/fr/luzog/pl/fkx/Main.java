@@ -31,7 +31,7 @@ public class Main extends JavaPlugin implements Listener {
 
     public static Config.Globals globalConfig;
 
-    public static boolean activeCustomCraftingTable = true, activeCustomLootingSystem = true;
+    public static boolean customCrafts, customCraftingTable, customLootingSystem;
 
     @Override
     public void onLoad() {
@@ -52,7 +52,15 @@ public class Main extends JavaPlugin implements Listener {
                 .setVersion(VERSION, true)
                 .setLang("fr-FR", false)
                 .setWorlds("world", "world_nether", "world_the_end", false)
-                .save();
+                .setCustomVanillaCraftsActivated(false, false)
+                .setCustomCraftingTableActivated(true, false)
+                .setCustomLootingSystemActivated(true, false)
+                .save()
+                .load(); // Reload the config for the next lines
+
+        customCrafts = globalConfig.isCustomVanillaCraftsActivated();
+        customCraftingTable = globalConfig.isCustomCraftingTableActivated();
+        customLootingSystem = globalConfig.isCustomLootingSystemActivated();
 
         new BukkitRunnable() {
             @Override
@@ -77,7 +85,7 @@ public class Main extends JavaPlugin implements Listener {
 
         soufInstruction("§6Initialisation du module : §eFKManager§6...");
         FKManager.initFromConfig(false);
-        if(FKManager.getCurrentGame() != null)
+        if (FKManager.getCurrentGame() != null)
             FKManager.getCurrentGame().getListener().scheduleTask();
 
         soufInstruction("§6Initialisation du module : §eListeners§6...");
@@ -239,7 +247,7 @@ public class Main extends JavaPlugin implements Listener {
                 .setVersion(VERSION, true)
                 .setLastGame(FKManager.currentGameId, true);
 
-        if(world != null && nether != null && end != null)
+        if (world != null && nether != null && end != null)
             globalConfig.setWorlds(world.getName(), nether.getName(), end.getName(), true);
 
         globalConfig.save();

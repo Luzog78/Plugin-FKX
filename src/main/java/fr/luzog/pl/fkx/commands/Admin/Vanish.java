@@ -84,12 +84,12 @@ public class Vanish implements CommandExecutor, TabCompleter, Listener {
 
     public static void refreshVanished() {
         Bukkit.getOnlinePlayers().forEach(seer ->
-            Bukkit.getOnlinePlayers().forEach(target -> {
-                if (isVanished(seer.getName()) || !isVanished(target.getName()))
-                    seer.showPlayer(target);
-                else
-                    seer.hidePlayer(target);
-            }));
+                Bukkit.getOnlinePlayers().forEach(target -> {
+                    if (isVanished(seer.getName()) || !isVanished(target.getName()))
+                        seer.showPlayer(target);
+                    else
+                        seer.hidePlayer(target);
+                }));
     }
 
     @Override

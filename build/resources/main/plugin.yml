@@ -6,8 +6,8 @@
 
 # Plugin Infos
 name: FKX
-version: 1.0
-description: "\n\n    §6--------[ §9§lFKX §6]--------§r\n\n        This plugin is the AzionMC's Mining\n          Servers Plugin.§r\n        Version 1.0 - Made by Luzog78§r\n        In January 2022§r\n        Enjoy !\n\n    §6---------------------------------"
+version: 1.0.0
+description: "\n\n    §6--------[ §9§lFKX §6]--------§r\n\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 1.0.0 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n\n    §6---------------------------------"
 
 # Authors Infos
 author: Luzog78
@@ -119,10 +119,10 @@ commands:
     description: Get Player's Head
   rename:
     description: Modify the Name or the Lore of an Item
-#  funcommands:
-#    description: Send all Fun Commands
-#  roll:
-#    description: Roll a Dice
+  #  funcommands:
+  #    description: Send all Fun Commands
+  #  roll:
+  #    description: Roll a Dice
   lightning:
     description: Strike a lightning !!
   damage:
@@ -133,8 +133,8 @@ commands:
     description: Bounce a player high in the sky ! :)
   burn:
     description: Set on fire a player xD
-#  explode:
-#    description: Create an explosion ;)
+  #  explode:
+  #    description: Create an explosion ;)
   shuffle:
     description: Shuffle Player's inventory x)
 

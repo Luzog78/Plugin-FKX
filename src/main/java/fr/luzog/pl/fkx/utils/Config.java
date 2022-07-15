@@ -20,8 +20,9 @@ public class Config {
 
     public static class Globals extends Config {
         public static final String VERSION = "version", LANG = "lang", OVERWORLD = "worlds.over",
-                NETHER = "worlds.nether", END = "worlds.end", LAST_GAME = "last-game",
-                VANISH_PRE_SUF_IX = "vanish.pre-suf-ix", VANISH_IS_PREFIX = "vanish.is-prefix",
+                NETHER = "worlds.nether", END = "worlds.end", CUSTOM_CRAFTS = "custom-options.vanilla-crafts",
+                CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table", CUSTOM_LOOTING = "custom-options.looting-system",
+                LAST_GAME = "last-game", VANISH_PRE_SUF_IX = "vanish.pre-suf-ix", VANISH_IS_PREFIX = "vanish.is-prefix",
                 VANISH_PLAYERS = "vanish.players";
 
         public Globals(@Nonnull String path) {
@@ -70,6 +71,33 @@ public class Config {
             } catch (IllegalArgumentException e) {
                 return Bukkit.getWorld(super.getStr(END));
             }
+        }
+
+        public boolean isCustomVanillaCraftsActivated() {
+            return super.getBool(CUSTOM_CRAFTS);
+        }
+
+        public Globals setCustomVanillaCraftsActivated(boolean customCrafts, boolean force) {
+            super.set(CUSTOM_CRAFTS, customCrafts, force);
+            return this;
+        }
+
+        public boolean isCustomCraftingTableActivated() {
+            return super.getBool(CUSTOM_CRAFTING_TABLE);
+        }
+
+        public Globals setCustomCraftingTableActivated(boolean customCraftingTable, boolean force) {
+            super.set(CUSTOM_CRAFTING_TABLE, customCraftingTable, force);
+            return this;
+        }
+
+        public boolean isCustomLootingSystemActivated() {
+            return super.getBool(CUSTOM_LOOTING);
+        }
+
+        public Globals setCustomLootingSystemActivated(boolean customLooting, boolean force) {
+            super.set(CUSTOM_LOOTING, customLooting, force);
+            return this;
         }
 
         public String getLastGame() {

@@ -12,17 +12,21 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FKCBroadcast {
-    public static final String syntaxe = "/fk bc [? || help] <type> <message>";
-    public static final String dsyntaxe = "(normal | succ | err | log | info | announcement" +
+    public static final String syntaxe = "/fk bc [? || help] <type> <message...>";
+    public static final String dsyntaxe = "Types : (normal | succ | err | log | info | announcement" +
             "| event | warn | sys_succ | sys_err)";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
-        CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
+        CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe + "\n§r" + dsyntaxe);
 
         if (args.length == 0)
             return false;
 
+        else if (args.length == 1)
+            u.synt();
+
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?")) {
+            u.setSyntaxe(syntaxe);
             u.synt();
             u.err("Types :");
             u.err(" - §6normal§r : §fJust a normal message that everyone can see.");
@@ -85,7 +89,7 @@ public class FKCBroadcast {
 
     public static List<String> onTabComplete(CommandSender sender, Command command, String msg, String[] args) {
         return new ArrayList<String>() {{
-            if(args.length == 2){
+            if (args.length == 2) {
                 add("help");
                 add("normal");
                 add("succ");

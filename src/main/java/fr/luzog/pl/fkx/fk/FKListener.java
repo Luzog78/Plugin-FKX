@@ -330,7 +330,7 @@ public class FKListener {
     /**
      * Formules de <strong style='color: #ff0000'>Luzog78</strong> !<br>
      * Très (trop) fier de lui !<br>
-     * Car il les a trouvé <n>seul</n> en <span style='color: #ffffff'>3h15</span>.<br>
+     * Car il les a trouvé <b>seul</b> en <span style='color: #ffffff'>3h15</span>.<br>
      * <br>
      *
      * <br>

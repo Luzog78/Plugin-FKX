@@ -411,18 +411,4 @@ public class FKTeam {
             getConfig(getManager().getId()).load().setPermissions(permissions, true).save();
         }
     }
-
-    public ItemStack getBanner() {
-        ItemStack banner = new ItemStack(Material.BANNER, 1, (short) (15 - Utils.chatToDataColor(color)));
-        BannerMeta meta = (BannerMeta) banner.getItemMeta();
-        DyeColor dye = Utils.chatToDyeColor(color), white = DyeColor.WHITE;
-        meta.addPattern(new Pattern(dye, PatternType.CURLY_BORDER));
-        meta.addPattern(new Pattern(white, PatternType.CURLY_BORDER));
-        meta.addPattern(new Pattern(dye, PatternType.STRIPE_CENTER));
-        meta.addPattern(new Pattern(white, PatternType.STRIPE_CENTER));
-        meta.addPattern(new Pattern(dye, PatternType.FLOWER));
-        meta.addPattern(new Pattern(white, PatternType.FLOWER));
-        banner.setItemMeta(meta);
-        return banner;
-    }
 }

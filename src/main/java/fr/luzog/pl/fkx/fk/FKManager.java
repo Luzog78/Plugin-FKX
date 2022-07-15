@@ -439,14 +439,31 @@ public class FKManager {
     }
 
     public static ItemStack getBanner() {
-        ItemStack banner = new ItemStack(Material.BANNER);
+        ItemStack banner = new ItemStack(Material.BANNER, 1, (short) 15);
         BannerMeta meta = (BannerMeta) banner.getItemMeta();
+        meta.setDisplayName("§9§l-=[ §6Fallen Kingdoms X §9§l]=-");
         meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS_MIDDLE));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CURLY_BORDER));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CIRCLE_MIDDLE));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CREEPER));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLE_TOP));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLES_TOP));
+        banner.setItemMeta(meta);
+        return banner;
+    }
+
+    public static ItemStack getBanner(ChatColor color) {
+        ItemStack banner = new ItemStack(Material.BANNER, 1, (short) (15 - Utils.chatToDataColor(color)));
+        BannerMeta meta = (BannerMeta) banner.getItemMeta();
+        meta.setDisplayName("§r" + color + "Bannière de couleur §l[ §k0§r" + color + " " + color.name().charAt(0)
+                + color.name().toLowerCase().substring(1) + " §l§k0§r" + color + "§l ]");
+        DyeColor dye = Utils.chatToDyeColor(color), white = DyeColor.WHITE;
+        meta.addPattern(new Pattern(dye, PatternType.CURLY_BORDER));
+        meta.addPattern(new Pattern(white, PatternType.CURLY_BORDER));
+        meta.addPattern(new Pattern(dye, PatternType.STRIPE_CENTER));
+        meta.addPattern(new Pattern(white, PatternType.STRIPE_CENTER));
+        meta.addPattern(new Pattern(dye, PatternType.FLOWER));
+        meta.addPattern(new Pattern(white, PatternType.FLOWER));
         banner.setItemMeta(meta);
         return banner;
     }
@@ -511,7 +528,7 @@ public class FKManager {
      */
 
     public void start() {
-        Utils.countDown(null, 3, false, true, true,
+        Utils.countDown(null, 30, false, true, true,
                 "La partie commence dans §c%i%§rs...\n§7Préparez-vous à démarrer votre aventure !",
                 "Bonne chance à tous !\n§7Prêt ?  Partez !", "§a", "§6", "§c§l",
                 "§4§l", "§2§l", () -> {
@@ -528,6 +545,7 @@ public class FKManager {
                                 } else if (p.getTeam().getId().equals(FKTeam.SPECS_ID)) {
                                     p.getPlayer().setGameMode(GameMode.SPECTATOR);
                                 } else {
+                                    p.getPlayer().setGameMode(GameMode.SURVIVAL);
                                     p.getPlayer().getInventory().clear();
                                     p.getPlayer().getInventory().setArmorContents(null);
                                     p.getPlayer().getActivePotionEffects().forEach(e -> p.getPlayer().removePotionEffect(e.getType()));

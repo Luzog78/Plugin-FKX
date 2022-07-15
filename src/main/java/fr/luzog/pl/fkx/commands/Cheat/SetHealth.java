@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SetHealth implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/sethealth [<players>] <health>";
+    public static final String syntaxe = "/sethealth [<player> | @a] <health>";
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {

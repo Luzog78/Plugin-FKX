@@ -3,7 +3,6 @@ package fr.luzog.pl.fkx.commands.Fk;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.GUIs.GuiFK;
 import fr.luzog.pl.fkx.utils.CmdUtils;
-import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.libs.joptsimple.internal.Strings;
@@ -16,7 +15,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class FKCGame {
-    public static final String syntaxe = "/fk game [help | list | current | (new | switch | delete) <id> | state | start | end | reboot | (pause | resume) [<cooldown>]]";
+    public static final String syntaxe = "/fk game [help | list | current | (new | switch | delete) <id> | state"
+            + " | start | end | reboot | (pause | resume) [<cooldown>]]";
     public static final String err_no_game_running = "Aucune partie n'est en cours.";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {

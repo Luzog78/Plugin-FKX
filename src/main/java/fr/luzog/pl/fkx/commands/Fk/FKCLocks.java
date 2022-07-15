@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCLocks {
-    public static final String syntaxe = "/fk locks [list | tool | create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
+    public static final String syntaxe = "/fk locks [help | list | tool | create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
     public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock]"
             + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level>]"
             + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
@@ -57,12 +57,12 @@ public class FKCLocks {
             }}.forEach(l ->
                     u.succ("  >  " + (l.isPickable() ? "§b" : "§c") + l.getId() + "§r - §f" + l.getLevel() + "§r :  "
                             + (l.isPicked() ? "§2✔ Crocheté" : "§4✖ À Crocheter")));
-        }else if (args[1].equalsIgnoreCase("tool")) {
-            if(sender instanceof Player)
+        } else if (args[1].equalsIgnoreCase("tool")) {
+            if (sender instanceof Player)
                 ((Player) sender).getInventory().addItem(FKPickableLocks.getMasterKey());
             else
                 u.err(CmdUtils.err_not_player);
-        }else if (args[1].equalsIgnoreCase("create")) {
+        } else if (args[1].equalsIgnoreCase("create")) {
             if (args.length >= 3)
                 try {
                     int level = Integer.parseInt(args[2].toUpperCase());
@@ -241,10 +241,10 @@ public class FKCLocks {
                     add("create");
                     addAll(m.getPickableLocks().getPickableLocks().stream()
                             .sorted((a, b) -> {
-                                if(sender instanceof Player) {
+                                if (sender instanceof Player) {
                                     Block bb = ((Player) sender).getTargetBlock(
                                             new HashSet<>(Collections.singletonList(Material.AIR)), 200);
-                                    if(bb != null && containers.contains(bb.getType())
+                                    if (bb != null && containers.contains(bb.getType())
                                             && bb.getLocation().getBlockX() == a.getLocation().getBlockX()
                                             && bb.getLocation().getBlockY() == a.getLocation().getBlockY()
                                             && bb.getLocation().getBlockZ() == a.getLocation().getBlockZ())
@@ -301,8 +301,8 @@ public class FKCLocks {
                     } else if (args.length == 8) {
                         addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
                     }
-                } else if((l = m.getPickableLocks().getLock(args[1])) != null) {
-                    if(args.length == 3) {
+                } else if ((l = m.getPickableLocks().getLock(args[1])) != null) {
+                    if (args.length == 3) {
                         add("help");
                         add("info");
                         add("destroy");
@@ -312,8 +312,8 @@ public class FKCLocks {
                         add("level");
                         add("pickable");
                         add("armorStands");
-                    } else if(args.length == 4) {
-                        if(args[2].equalsIgnoreCase("cooldown")) {
+                    } else if (args.length == 4) {
+                        if (args[2].equalsIgnoreCase("cooldown")) {
                             add("100");
                             add("200");
                             add("400");
@@ -322,17 +322,17 @@ public class FKCLocks {
                             add("2400");
                             add("3600");
                             add("6000");
-                        } else if(args[2].equalsIgnoreCase("level")) {
+                        } else if (args[2].equalsIgnoreCase("level")) {
                             add("0");
                             add((m.getDay() + 1) + "");
                             add((m.getDay() + 2) + "");
                             add((m.getDay() + 3) + "");
                             add((m.getDay() + 4) + "");
                             add((m.getDay() + 5) + "");
-                        } else if(args[2].equalsIgnoreCase("pickable")) {
+                        } else if (args[2].equalsIgnoreCase("pickable")) {
                             add("true");
                             add("false");
-                        } else if(args[2].equalsIgnoreCase("armorStands")) {
+                        } else if (args[2].equalsIgnoreCase("armorStands")) {
                             add("hide");
                             add("show");
                         }

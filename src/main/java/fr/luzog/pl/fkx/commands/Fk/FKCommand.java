@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCommand implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/fk [(? || help) | activations | (bc || broadcast) | date | locks | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
+    public static final String syntaxe = "/fk [(? || help) | activations | banner | (bc || broadcast) | date | locks | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -40,6 +40,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                     if (isNull())
                         break;
                     FKCActivations.onCommand(sender, command, msg, args);
+                    return false;
+                case "banner":
+                    FKCBanner.onCommand(sender, command, msg, args);
                     return false;
                 case "bc":
                 case "broadcast":
@@ -120,6 +123,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
             temp.add("help");
             if (!isNull())
                 temp.add("activations");
+            temp.add("banner");
             temp.add("bc");
             temp.add("broadcast");
             if (!isNull())
@@ -153,6 +157,9 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "activations":
                     if (!isNull())
                         temp.addAll(FKCActivations.onTabComplete(sender, command, msg, args));
+                    break;
+                case "banner":
+                    temp.addAll(FKCBanner.onTabComplete(sender, command, msg, args));
                     break;
                 case "bc":
                 case "broadcast":

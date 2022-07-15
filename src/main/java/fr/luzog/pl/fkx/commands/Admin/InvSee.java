@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class InvSee implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/invsee <seerPlayer> <targetPlayer> [(arg)]\nArgs :\n > -n / --normal\n > -a / --armor\n > -ec / --ender-chest";
+    public static final String syntaxe = "/invsee <seerPlayer> <targetPlayer> [<arg>]\nArgs :\n > -n / --normal\n > -a / --armor\n > -ec / --ender-chest";
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
@@ -84,10 +84,10 @@ public class InvSee implements CommandExecutor, TabCompleter {
         List<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
-            if(args.length == 1 || args.length == 2)
+            if (args.length == 1 || args.length == 2)
                 addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
 
-            if(args.length == 2 || args.length == 3)
+            if (args.length == 2 || args.length == 3)
                 addAll(Arrays.asList("--normal", "-n", "--armor", "-a", "--ender-chest", "-ec"));
         }}.forEach(p -> {
             if (p.toLowerCase().startsWith(args[args.length - 1].toLowerCase()))

@@ -69,11 +69,11 @@ public class Events implements Listener {
     public static final String lastDamageSilkTouchTag = "lastDamageSilkTouch";
 
     public static List<Material> specialMat = Arrays.asList(Material.TNT, Material.TORCH, Material.REDSTONE_TORCH_ON,
-            Material.REDSTONE_TORCH_OFF, Material.YELLOW_FLOWER, Material.RED_ROSE, Material.WHEAT, Material.HAY_BLOCK,
+            Material.REDSTONE_TORCH_OFF, Material.YELLOW_FLOWER, Material.RED_ROSE, Material.WHEAT, /*Material.HAY_BLOCK,*/
             Material.SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS, Material.CARROT, Material.CARROT_ITEM,
             Material.POTATO, Material.POTATO_ITEM, Material.FIRE, Material.FLINT_AND_STEEL, Material.BUCKET,
-            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET, Material.WORKBENCH,
-            Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE);
+            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET/*, Material.WORKBENCH,
+            Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE*/);
     public static List<Material> unbreakableMat = Arrays.asList(Material.MOB_SPAWNER, Material.WOOL);
     public static List<Material> unplaceableMat = Arrays.asList(Material.WOOL);
 
@@ -691,7 +691,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEntityDeath(EntityDeathEvent e) {
-        if (Main.activeCustomLootingSystem && !(e.getEntity() instanceof Player))
+        if (Main.customLootingSystem && !(e.getEntity() instanceof Player))
             e.getDrops().clear();
     }
 

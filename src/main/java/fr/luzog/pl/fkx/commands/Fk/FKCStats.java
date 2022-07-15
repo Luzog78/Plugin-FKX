@@ -5,13 +5,13 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import fr.luzog.pl.fkx.utils.Utils;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FKCStats {
     public static final String syntaxe = "/fk stats (help | <player> [(get | reset) (<stat> | all) | (set | increase | decrease) <stat> <value>])";
@@ -23,7 +23,7 @@ public class FKCStats {
             return false;
 
         if (args.length == 1)
-            u.succ("TODO -> Stats GUIs");
+            u.synt();
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
@@ -35,7 +35,7 @@ public class FKCStats {
                 return false;
             }
             if (args.length == 2)
-                u.succ("TODO -> Stats GUI");
+                Bukkit.dispatchCommand(sender, "fk players " + p.getName());
             else if (args.length >= 4)
                 try {
                     if (args[2].equalsIgnoreCase("get") && args[3].equalsIgnoreCase("all")) {

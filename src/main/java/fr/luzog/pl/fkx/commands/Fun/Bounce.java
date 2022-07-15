@@ -50,9 +50,7 @@ public class Bounce implements CommandExecutor, TabCompleter {
                     u.succ("Vélocité de§f", finalV, "§rappliquée sur", e instanceof Player ? "§6" + ((Player) e).getDisplayName()
                             : "§b" + e.getType().toString().toUpperCase().charAt(0) + e.getType().toString().toLowerCase().substring(1), "§r!");
                 });
-        }
-
-        else
+        } else
             u.synt();
 
         return false;
@@ -64,7 +62,7 @@ public class Bounce implements CommandExecutor, TabCompleter {
         ArrayList<String> list = new ArrayList<>();
 
         new ArrayList<String>() {{
-            if(args.length == 1)
+            if (args.length == 1)
                 add("-v");
             Bukkit.getOnlinePlayers().forEach(p -> {
                 if (content.contains(p))

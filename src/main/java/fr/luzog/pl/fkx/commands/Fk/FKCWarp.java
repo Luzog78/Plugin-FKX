@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCWarp {
-    public static final String syntaxe = "/fk warp [? || help | list] (lobby | spawn | nether | end | team <id> | zone <id>) [gui | info | [!]<players...>]";
+    public static final String syntaxe = "/fk warp [? || help | list | lobby | spawn | nether | end | team <id> | zone <id>] [[!]<players...>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
