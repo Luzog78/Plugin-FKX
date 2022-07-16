@@ -44,105 +44,111 @@ commands:
   # Admin
   execute:
     description: Force to execute command
+    permission: fkx.admin.execute
   invsee:
     aliases: [ seeinventory ]
     description: See an inventory
+    permission: fkx.admin.invsee
   sun:
     description: Change Weather.
+    permission: fkx.admin.sun
   rain:
     description: Change Weather.
+    permission: fkx.admin.rain
   thunder:
     description: Change Weather.
+    permission: fkx.admin.thunder
   gm:
     aliases: [ g ]
     description: Change GameMode
+    permission: fkx.admin.gm
   gm0:
     aliases: [ g0 ]
     description: Change GameMode
+    permission: fkx.admin.gm0
   gm1:
     aliases: [ g1 ]
     description: Change GameMode
+    permission: fkx.admin.gm1
   gm2:
     aliases: [ g2 ]
     description: Change GameMode
+    permission: fkx.admin.gm2
   gm3:
     aliases: [ g3 ]
     description: Change GameMode
+    permission: fkx.admin.gm3
   vanish:
     aliases: [ v ]
     description: Toggle Vanish Mod
-
-
-
-  # Chat's Commands [bc, event, prevent, warn, alert]
-  broadcast:
-    description: Send a broadcast
-  bc:
-    description: Send a broadcast
-  event:
-    description: Send a broadcast
-  prevent:
-    description: Send a broadcast
-  warn:
-    description: Send a broadcast
-  alert:
-    description: Send a broadcast
-
-
+    permission: fkx.admin.vanish
 
   # Cheat
   ench:
     aliases: [ enchantment ]
     description: Enchant an item
+    permission: fkx.cheat.ench
   feed:
     aliases: [ nourriture ]
     description: Feed - Saturation Effect
+    permission: fkx.cheat.feed
   god:
     description: Become Invulnerable
+    permission: fkx.cheat.god
   heal:
     aliases: [ guerissement ]
     description: Heal - Instant Heal Effect
+    permission: fkx.cheat.heal
   sethealth:
     description: Set Max Health
+    permission: fkx.cheat.sethealth
   speed:
     description: Set Walk/Fly Speed
-  i:
-    aliases: [ item, giveitem ]
-    description: Give an item
+    permission: fkx.cheat.speed
 
 
 
   # Fun commands
   hat:
     description: Change ur helmet ^^
+    permission: fkx.fun.hat
   head:
     description: Get Player's Head
+    permission: fkx.fun.head
   rename:
     description: Modify the Name or the Lore of an Item
+    permission: fkx.fun.rename
   #  funcommands:
   #    description: Send all Fun Commands
   #  roll:
   #    description: Roll a Dice
   lightning:
     description: Strike a lightning !!
+    permission: fkx.fun.lightning
   damage:
     description: Give damages X_X
+    permission: fkx.fun.damage
   freeze:
     description: Freeze a player -_-
+    permission: fkx.fun.freeze
   bounce:
     description: Bounce a player high in the sky ! :)
+    permission: fkx.fun.bounce
   burn:
     description: Set on fire a player xD
+    permission: fkx.fun.burn
   #  explode:
   #    description: Create an explosion ;)
   shuffle:
     description: Shuffle Player's inventory x)
+    permission: fkx.fun.shuffle
 
 
   # Location Commands
   tp:
     aliases: [ teleport ]
     description: Teleport to a player
+    permission: minecraft.command.teleport
   #  home:
   #    aliases: [h]
   #    description: Goto, Set or Del a Personnal Home
@@ -160,6 +166,7 @@ commands:
   # Server's Commands
   r:
     description: Aliases [reload, rl, r]
+    permission: bukkit.command.reload
   #  save:
   #    description: Save and Reload the Config
 
@@ -168,13 +175,13 @@ commands:
   # Utils - Players
   ad:
     description: HELPPPP !!! /ad
-  info:
-    aliases: [ test ]
-    description: Get server's or player's infos.
   ec:
     aliases: [ enderchest, viewec, viewenderchest ]
     description: See an EnderChest
+    permission: fkx.utils.ec
   craft:
     description: Open the Workbench
+    permission: fkx.utils.craft
   trash:
     description: Open the Trash
+    permission: fkx.utils.trash

@@ -108,10 +108,12 @@ public class FKCPlayers {
             add("help");
             add("list");
             addAll(Utils.getAllPlayers());
+            add("page");
         }} : args.length == 3 ? new ArrayList<String>() {{
             if (Bukkit.getOfflinePlayer(args[1]).isOnline()) {
                 add("info");
                 add("init");
+                add("team");
             }
         }} : new ArrayList<>();
     }
