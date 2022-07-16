@@ -30,11 +30,12 @@ public class PlayerInteractAtEntityHandler implements Listener {
 
         if (e instanceof Player) {
 
-        } else if (p.isSneaking())
-            p.sendMessage("§aType: §b" + e.getType() + "§a,\nVie: §c" + e.getHealth() + "§7/" + e.getMaxHealth()
-                    + "§a,\nVélocité: §f" + df.format(e.getVelocity().getX()) + " ; "
-                    + df.format(e.getVelocity().getY()) + " ; " + df.format(e.getVelocity().getZ())
-                    + "§a,\nUUID: §f" + e.getUniqueId());
+        } else if (p.isSneaking()) {
+//            p.sendMessage("§aType: §b" + e.getType() + "§a,\nVie: §c" + e.getHealth() + "§7/" + e.getMaxHealth()
+//                    + "§a,\nVélocité: §f" + df.format(e.getVelocity().getX()) + " ; "
+//                    + df.format(e.getVelocity().getY()) + " ; " + df.format(e.getVelocity().getZ())
+//                    + "§a,\nUUID: §f" + e.getUniqueId());
+        }
 
         if (new CustomNBT(p.getItemInHand()).getBoolean("Mjolnir") && !p.isSneaking()) {
             p.getWorld().strikeLightning(e.getLocation());

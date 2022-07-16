@@ -220,7 +220,12 @@ FK:
     - /fk teams <id> list
     - /fk teams <id> add <player>
     - /fk teams <id> remove <player>
+    - /fk teams <id> guardian (kill | spawn)
     - /fk teams <id> armorStand (hide | show)
+    - /fk teams <id> chestRoom <x> <y> <z>
+    - /fk teams <id> chestRoom <x> <y> <z> <world>
+    - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi>
+    - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi> <world>
     - /fk teams <id> options help
     - /fk teams <id> options list
     - /fk teams <id> options <options...>

@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.utils.Broadcast;
+import fr.luzog.pl.fkx.utils.Color;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
@@ -225,13 +226,14 @@ public class FKListener {
     }
 
     public PacketPlayOutPlayerListHeaderFooter getTHF(Player p) {
+        FKPlayer fp = manager.getPlayer(p.getName(), false);
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateur : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Developpeur : §f" + "Luzog78");
+        h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
+        h.add("§9Builder : §f" + "Isumaki" + "§9  ||  Developpeur : §f" + "Luzog78");
         h.add(" ");
-        h.add("§3Bienvenue à toi cher §9" + (manager.getPlayer(p.getName(), false) == null ? p.getDisplayName() : manager.getPlayer(p.getName(), false).getDisplayName()) + "§3,");
+        h.add("§3Bienvenue à toi cher §9" + (fp == null ? p.getDisplayName() : fp.getDisplayName()) + "§3,");
         h.add("§3l'équipe souhaite une bonne aventure !");
         h.add("§3N'oublie pas §5§l§o§n[§2§l§o§n/ad§5§l§o§n]§3 si tu as un besoin...");
         h.add("§3Les " + manager.getGods().getColor() + manager.getGods().getName() + "§3 seront là pour aider ^^");
@@ -248,15 +250,21 @@ public class FKListener {
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
         DecimalFormat df = new DecimalFormat("0.0");
-        f.add(manager.getPlayer(p.getName(), false) == null
-                || manager.getPlayer(p.getName(), false).getTeam() == null ? no_team
-                : manager.getPlayer(p.getName(), false).getTeam().getName() + "§7 - §6"
-                + (!p.getWorld().getUID().equals(manager.getPlayer(p.getName(), false).getTeam().getSpawn().getWorld().getUID()) ?
-                "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
-                : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
-                + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
-                        false).getTeam().getSpawn().getZ())));
+        try {
+            f.add(fp == null || fp.getTeam() == null ? no_team
+                    : fp.getTeam().getName() + "§7 - §6" +
+                    (!p.getWorld().getName().equals(fp.getTeam().getSpawn().getWorld().getName()) ?
+                            "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
+                            : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
+                            + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
+                            manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
+                                    false).getTeam().getSpawn().getZ())));
+        } catch (Exception e) {
+            f.add("§cErreur...");
+            System.out.print(Color.RED);
+            e.printStackTrace();
+            System.out.println(Color.RESET);
+        }
         f.add(" ");
         f.add("§7§nÉquipes :§r");
         f.add(" ");
@@ -265,9 +273,10 @@ public class FKListener {
             String s = "";
             if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
                     || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
-                s = t.getName() + "§7 - §6" + df.format(p.getLocation().distance(t.getSpawn()));
+                s = t.getName() + "§7 » §6" + df.format(t.getSpawn().getX())
+                        + " " + df.format(t.getSpawn().getZ()); // p.getLocation().distance(t.getSpawn())
             if (!s.equals(""))
-                if (!t.isEliminated()) {
+                if (!t.isEliminated()) { // Always false but.. it's wrote so.. I let it here.
                     if (!a1.isEmpty() && a1.size() % 3 == 0)
                         s = "\n" + s;
                     a1.add(s);
@@ -295,7 +304,7 @@ public class FKListener {
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
         f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
-                + (Bukkit.getServer().getIp().equals("") ? "localhost" : Bukkit.getServer().getIp()));
+                + (Bukkit.getServer().getIp().equals("") ? "play.azion.fr:25580" : Bukkit.getServer().getIp()));
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
@@ -304,8 +313,8 @@ public class FKListener {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateur : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Developpeur : §f" + "Luzog78");
+        h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
+        h.add("§9Builder : §f" + "Isumaki" + "§9  ||  Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
         h.add("§cMalheureusement, tu n'es actuellement");
@@ -322,7 +331,7 @@ public class FKListener {
         f.add(" ");
         f.add(" ");
         f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
-                + (Bukkit.getServer().getIp().equals("") ? "localhost" : Bukkit.getServer().getIp()));
+                + (Bukkit.getServer().getIp().equals("") ? "play.azion.fr:25580" : Bukkit.getServer().getIp()));
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }

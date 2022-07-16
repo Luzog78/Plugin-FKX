@@ -1,9 +1,10 @@
 plugins {
     id 'java'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 group 'fr.luzog.pl'
-version 'beta1.0'
+version 'beta1.1'
 
 compileJava.options.encoding = 'UTF-8'
 
@@ -29,3 +30,4 @@ test {
 }
 
 jar.destinationDir = new File("Build - Jar Files")
+shadowJar.destinationDir = new File("Build - Jar Files")

@@ -62,11 +62,11 @@ public class Portal {
     public Location nextSpawn(Location loc) {
         if (loc == null)
             return null;
-        if (overPortal1 != null && overPortal2 != null && loc.getWorld().getUID().equals(overPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(overPortal2.getWorld().getUID()))
+        if (overPortal1 != null && overPortal2 != null && loc.getWorld().getName().equals(overPortal1.getWorld().getName()) && loc.getWorld().getName().equals(overPortal2.getWorld().getName()))
             for (Block b : Utils.getBlocksIn(overPortal1, overPortal2))
                 if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return dimSpawn;
-        if (dimPortal1 != null && dimPortal2 != null && loc.getWorld().getUID().equals(dimPortal1.getWorld().getUID()) && loc.getWorld().getUID().equals(dimPortal2.getWorld().getUID()))
+        if (dimPortal1 != null && dimPortal2 != null && loc.getWorld().getName().equals(dimPortal1.getWorld().getName()) && loc.getWorld().getName().equals(dimPortal2.getWorld().getName()))
             for (Block b : Utils.getBlocksIn(dimPortal1, dimPortal2))
                 if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return overSpawn;
@@ -80,6 +80,11 @@ public class Portal {
             if (nextSpawn(e.getLocation()) != null)
                 e.teleport(nextSpawn(e.getLocation()));
             inTeleportation.remove(e.getUniqueId());
+            if (save && manager != null)
+                if (this.equals(manager.getNether()))
+                    manager.saveNether();
+                else if (this.equals(manager.getEnd()))
+                    manager.saveEnd();
         }, coolDown));
         if (save && manager != null)
             if (this.equals(manager.getNether()))

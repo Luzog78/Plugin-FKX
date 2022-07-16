@@ -155,13 +155,13 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setEliminators(tc.getEliminators(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false, false));
                                 Utils.tryTo(printStackTrace, () -> team.setGuardianUuid(Objects.requireNonNull(tc.getGuardian()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setArmorStandUuid(Objects.requireNonNull(tc.getArmorStand()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setEliminated(tc.isEliminated(), false));
-                                Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
 
                                 if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
@@ -369,9 +369,9 @@ public class FKManager {
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", null, ChatColor.DARK_RED,
-                loc, null, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+                loc, loc, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
         setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", null, ChatColor.GRAY,
-                loc, null, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+                loc, loc, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
@@ -572,6 +572,12 @@ public class FKManager {
                         }
                     });
                     setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
+                    getParticipantsTeams().forEach(t -> {
+                        t.killGuardian();
+                        t.killArmorStand();
+                        t.getGuardian();
+                        t.getArmorStand();
+                    });
                     setState(State.RUNNING, true);
                 });
     }
@@ -663,8 +669,9 @@ public class FKManager {
             }
         });
         setState(State.WAITING, false);
-        setDay(0, false);
+        setDay(1, false);
         setTime(0, false);
+        getParticipantsTeams().forEach(t -> t.reintroduce(false, false));
         getNether().close();
         getEnd().close();
         getOptions().getOptions().forEach(opt -> opt.deactivate(true));

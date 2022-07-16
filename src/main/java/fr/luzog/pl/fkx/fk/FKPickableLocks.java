@@ -3,7 +3,6 @@ package fr.luzog.pl.fkx.fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.GUIs.Guis;
 import fr.luzog.pl.fkx.utils.*;
-import javafx.util.Pair;
 import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.TileEntity;
 import org.bukkit.Bukkit;
@@ -185,7 +184,7 @@ public class FKPickableLocks {
             this.picker = picker;
         }
 
-        public Pair<ArmorStand, ArmorStand> showArmorStand() {
+        public Utils.Pair<ArmorStand, ArmorStand> showArmorStand() {
             ArmorStand a1 = null, a2 = null;
             for (Entity e : location.getWorld().getEntities())
                 if (e instanceof ArmorStand)
@@ -228,7 +227,7 @@ public class FKPickableLocks {
             if (save)
                 FKManager.registered.forEach(FKManager::savePickableLocks);
 
-            return new Pair<>(a1, a2);
+            return new Utils.Pair<>(a1, a2);
         }
 
         public void hideArmorStand() {
@@ -238,7 +237,7 @@ public class FKPickableLocks {
         }
 
         public void updateArmorStand() {
-            Pair<ArmorStand, ArmorStand> as = showArmorStand();
+            Utils.Pair<ArmorStand, ArmorStand> as = showArmorStand();
             if (!as.getKey().getCustomName().equals("Niveau " + level))
                 as.getKey().setCustomName("Niveau " + level);
             as.getValue().setCustomName(getProgressBar(originalCoolDown, coolDown));

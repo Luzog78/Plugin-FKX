@@ -20,14 +20,17 @@ public class PlayerChatHandler implements Listener {
             return;
         }
 
+        boolean teamChat = !e.getMessage().startsWith("!");
+        int sub = e.getMessage().startsWith("!") ? 1 : 0;
+
         for (FKPlayer fkp : fkps) {
-            String format = (e.getMessage().startsWith("!") ? "§7[§aT§7]  §f" : "")
+            String format = (teamChat ? "§7[§aT§7]  §f" : "")
                     + fkp.getDisplayName() + "§8  >>  §7"
-                    + e.getMessage().substring(e.getMessage().startsWith("!") ? 1 : 0).replace("&", "§").replace("§§", "&");
+                    + e.getMessage().substring(sub).replace("&", "§").replace("§§", "&");
 
             fkp.getStats().increaseChats();
 
-            if (!e.getMessage().startsWith("!"))
+            if (!teamChat)
                 Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(format));
             else
                 Bukkit.getOnlinePlayers().forEach(p -> {
@@ -38,7 +41,8 @@ public class PlayerChatHandler implements Listener {
                             p.sendMessage(format);
                 });
 
-            Bukkit.getLogger().warning("Chat: " + (e.getMessage().startsWith("!") ? "[T] " : "    ") + fkp.getDisplayName() + " >> " + e.getMessage().substring(e.getMessage().startsWith("!") ? 1 : 0));
+            Bukkit.getLogger().warning("Chat: " + (teamChat ? "[T] " : "    ")
+                    + fkp.getDisplayName() + " >> " + e.getMessage().substring(sub));
         }
     }
 

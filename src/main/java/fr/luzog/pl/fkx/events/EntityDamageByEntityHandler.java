@@ -34,7 +34,7 @@ public class EntityDamageByEntityHandler implements Listener {
              *      p.sendMessage("§aVous avez réinitialisé la position de votre gardien.");
              *      return;
              *  }
-            */
+             */
 
             if (event.getEntity() instanceof Player) {
                 Player e = (Player) event.getEntity();
@@ -51,7 +51,11 @@ public class EntityDamageByEntityHandler implements Listener {
                     return;
                 }
             } else {
-                if (fp == null || !fp.hasPermission(FKPermissions.Type.MOBS, event.getEntity().getLocation())) {
+                if ((event.getEntity().hasMetadata(FKTeam.GUARDIAN_TAG) && ((fp == null && !p.isOp())
+                        || (fp != null && (fp.getTeam() == null || !fp.getTeam().getId().equals(FKTeam.GODS_ID)))))
+                        || (!event.getEntity().hasMetadata(FKTeam.GUARDIAN_TAG) && ((fp == null && !p.isOp())
+                        || (fp != null && !fp.hasPermission(FKPermissions.Type.MOBS,
+                        event.getEntity().getLocation()))))) {
                     event.setCancelled(true);
                     return;
                 }

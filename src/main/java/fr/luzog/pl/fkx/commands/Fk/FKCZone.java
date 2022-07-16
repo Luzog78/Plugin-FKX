@@ -8,18 +8,14 @@ import fr.luzog.pl.fkx.fk.FKZone;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCZone {
@@ -66,7 +62,7 @@ public class FKCZone {
                     FKZone z = new FKZone(args[2], FKZone.Type.ZONE, base, base, base, new FKPermissions(FKPermissions.Definition.DEFAULT));
                     FKManager.getCurrentGame().getNormalZones().add(z);
                     u.succ("Zone §6" + z.getId() + "§r créée et ajoutée à §f" + FKManager.getCurrentGame().getId() + "§r !");
-                    if(args.length > 3)
+                    if (args.length > 3)
                         handleOptions(u, z, args, 3);
                 } else
                     u.err("La zone " + args[2] + " existe déjà.");
@@ -318,6 +314,59 @@ public class FKCZone {
             u.err(" - " + CmdUtils.err_unknown);
     }
 
+    public static ArrayList<String> completeOptions(CommandSender sender, String[] args) {
+        try {
+            if ((args[args.length - 2].equalsIgnoreCase("--s")
+                    || args[args.length - 2].equalsIgnoreCase("--pos1")
+                    || args[args.length - 2].equalsIgnoreCase("--pos2")) && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockX() + ""));
+            } else if ((args[args.length - 3].equalsIgnoreCase("--s")
+                    || args[args.length - 3].equalsIgnoreCase("--pos1")
+                    || args[args.length - 3].equalsIgnoreCase("--pos2")) && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block == null || block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockY() + ""));
+            } else if ((args[args.length - 4].equalsIgnoreCase("--s")
+                    || args[args.length - 4].equalsIgnoreCase("--pos1")
+                    || args[args.length - 4].equalsIgnoreCase("--pos2")) && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getBlockZ() + ""));
+            } else if (args[args.length - 5].equalsIgnoreCase("--s")
+                    || args[args.length - 5].equalsIgnoreCase("--pos1")
+                    || args[args.length - 5].equalsIgnoreCase("--pos2")) {
+                ArrayList<String> list = new ArrayList<>();
+                if (sender instanceof Player) {
+                    Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                    Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                    list.add(loc.getYaw() + "");
+                }
+                list.addAll(Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList()));
+                return list;
+            } else if ((args[args.length - 6].equalsIgnoreCase("--s")
+                    || args[args.length - 6].equalsIgnoreCase("--pos1")
+                    || args[args.length - 6].equalsIgnoreCase("--pos2")) && sender instanceof Player) {
+                Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
+                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                return new ArrayList<>(Collections.singletonList(loc.getPitch() + ""));
+            } else if (args[args.length - 7].equalsIgnoreCase("--s")
+                    || args[args.length - 7].equalsIgnoreCase("--pos1")
+                    || args[args.length - 7].equalsIgnoreCase("--pos2")) {
+                return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toCollection(ArrayList::new));
+            } else if (args[args.length - 1].startsWith("--") || !args[args.length - 2].startsWith("--"))
+                return new ArrayList<>(Arrays.asList("--s", "--pos1", "--pos2"));
+            else
+                return new ArrayList<>();
+        } catch (IndexOutOfBoundsException e) {
+            if (args[args.length - 1].startsWith("--") || !args[args.length - 2].startsWith("--"))
+                return new ArrayList<>(Arrays.asList("--s", "--pos1", "--pos2"));
+            else
+                return new ArrayList<>();
+        }
+    }
+
     public static List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         return new ArrayList<String>() {{
             if (args.length == 2) {
@@ -328,12 +377,15 @@ public class FKCZone {
                 add("remove");
                 add("create");
                 add("options");
-            } else if(args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("gui") || args[1].equalsIgnoreCase("remove")) {
+            } else if (args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("gui") || args[1].equalsIgnoreCase("remove")) {
                 addAll(FKManager.getCurrentGame().getZones().stream().map(FKZone::getId).collect(Collectors.toList()));
-            } else if(args[1].equalsIgnoreCase("create") || args[1].equalsIgnoreCase("options") && args.length == 4) {
-                add("--s");
-                add("--pos1");
-                add("--pos2");
+            } else if (args[1].equalsIgnoreCase("create") && args.length >= 5) {
+                addAll(completeOptions(sender, args));
+            } else if (args[1].equalsIgnoreCase("options")) {
+                if (args.length == 4)
+                    addAll(FKManager.getCurrentGame().getZones().stream().map(FKZone::getId).collect(Collectors.toList()));
+                else
+                    addAll(completeOptions(sender, args));
             }
         }};
     }

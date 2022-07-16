@@ -13,15 +13,22 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCTeams {
-    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | <id> ...]",
+    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | clearEntities | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
-            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | armorStand (hide | show) | options ...]",
+            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show) | options ...]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
-            syntaxe_opts = "Options:\n  > --d <displayName>\n  > --p <prefix>\n  > --c <color>\n  > --r <radius>\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]";
+            syntaxe_opts = "Options:"
+                    + "\n  > --d <displayName>"
+                    + "\n  > --p <prefix>"
+                    + "\n  > --c <color>"
+                    + "\n  > --r <radius>"
+                    + "\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Spawn§r"
+                    + "\n  > --g <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Guardian§r";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -38,6 +45,8 @@ public class FKCTeams {
         else if (args[1].equalsIgnoreCase("list")) {
             u.succ("Teams :");
             FKManager.getCurrentGame().getTeams().forEach(t -> u.succ(" - §6" + t.getId() + "§r : §f" + t.getName()));
+        } else if (args[1].equalsIgnoreCase("clearEntities")) {
+            u.succ("Vous venez de supprimer §c" + FKTeam.killAllChestRoomEntities() + "§r entités !");
         } else if (args[1].equalsIgnoreCase("create")) {
             u.setSyntaxe(syntaxe_create + "\n" + syntaxe_opts);
             if (args.length < 3)
@@ -115,12 +124,6 @@ public class FKCTeams {
                     u.err(" - Aucun joueur");
                 else
                     t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getLastUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
-            } else if (args[2].equalsIgnoreCase("list")) {
-                u.succ("Joueurs de §f" + t.getColor() + t.getName() + "§r :");
-                if (t.getPlayers().isEmpty())
-                    u.err(" - Aucun joueur");
-                else
-                    t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getLastUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
             } else if (args[2].equalsIgnoreCase("add")) {
                 if (args.length == 3)
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "player"));
@@ -154,6 +157,85 @@ public class FKCTeams {
                 } catch (FKException.PlayerDoesNotExistException e) {
                     u.err(CmdUtils.err_player_does_not_exist + " (" + args[3] + ")");
                 }
+            } else if (args[2].equalsIgnoreCase("chestRoom")) {
+                if (t.getId().equals(FKTeam.GODS_ID) || t.getId().equals(FKTeam.SPECS_ID))
+                    u.err("Cette équipe n'a pas de salle des coffres.");
+                else if (args.length == 3)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "<x> <y> <z>"));
+                else if (args.length == 4)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "<y> <z>"));
+                else if (args.length == 5)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "<z>"));
+                else {
+                    Double x = null, y = null, z = null;
+                    Float yw = null, pi = null;
+                    World w = Main.world;
+                    boolean orientation = args.length >= 8;
+
+                    try {
+                        x = Double.parseDouble(args[3]);
+                    } catch (NumberFormatException ignored) {
+                    }
+                    try {
+                        y = Double.parseDouble(args[4]);
+                    } catch (NumberFormatException ignored) {
+                    }
+                    try {
+                        z = Double.parseDouble(args[5]);
+                    } catch (NumberFormatException ignored) {
+                    }
+                    if (orientation) {
+                        try {
+                            yw = Float.parseFloat(args[6]);
+                        } catch (NumberFormatException ignored) {
+                        }
+                        try {
+                            pi = Float.parseFloat(args[7]);
+                        } catch (NumberFormatException ignored) {
+                        }
+                    }
+                    if (args.length >= (orientation ? 9 : 7)) {
+                        w = Bukkit.getWorld(args[orientation ? 8 : 6]);
+                    }
+
+                    List<String> err = new ArrayList<>();
+                    if (x == null)
+                        err.add("X");
+                    if (y == null)
+                        err.add("Y");
+                    if (z == null)
+                        err.add("Z");
+                    if (orientation && yw == null)
+                        err.add("Yaw");
+                    if (orientation && pi == null)
+                        err.add("Pitch");
+                    if (w == null)
+                        err.add("World");
+
+                    if (err.size() > 0) {
+                        u.err("Erreur avec le(s) paramètre(s) : " + String.join(", ", err) + ".");
+                    } else {
+                        Location loc = orientation ? new Location(w, x, y, z, yw, pi) : new Location(w, x, y, z);
+                        t.setChestsRoom(loc, true, true);
+                        u.succ("Position de la salle des coffres mise à jour en §f"
+                                + Utils.locToString(loc, true, orientation, true));
+                    }
+                }
+            } else if (args[2].equalsIgnoreCase("guardian")) {
+                if (t.getId().equals(FKTeam.GODS_ID) || t.getId().equals(FKTeam.SPECS_ID))
+                    u.err("Cette équipe n'a pas de §6Gardien§r.");
+                else if (args.length == 3)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "kill | spawn"));
+                else if (args[3].equalsIgnoreCase("spawn")) {
+                    t.getGuardian();
+                    t.getArmorStand();
+                    u.succ("Le §6Gardien§r de l'équipe §f" + t.getColor() + t.getName() + "§r est revenu parmi nous !");
+                } else if (args[3].equalsIgnoreCase("kill")) {
+                    t.killGuardian();
+                    t.killArmorStand();
+                    u.succ("Le §6Gardien§r de l'équipe §f" + t.getColor() + t.getName() + "§r est mort !");
+                } else
+                    u.err("Argument '" + args[3] + "' invalide.");
             } else if (args[2].equalsIgnoreCase("armorStand")) {
                 if (args.length == 3)
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "show | hide"));
@@ -324,7 +406,7 @@ public class FKCTeams {
                 return new ArrayList<>(Collections.singletonList(loc.getBlockX() + ""));
             } else if (args[args.length - 3].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
-                Location loc = block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
+                Location loc = block == null || block.getType() == Material.AIR ? ((Player) sender).getLocation() : block.getLocation();
                 return new ArrayList<>(Collections.singletonList(loc.getBlockY() + ""));
             } else if (args[args.length - 4].equalsIgnoreCase("--s") && sender instanceof Player) {
                 Block block = ((Player) sender).getTargetBlock(new HashSet<>(Collections.singletonList(Material.AIR)), 7);
@@ -372,6 +454,7 @@ public class FKCTeams {
                 add("eliminate");
                 add("reintroduce");
                 add("delete");
+                add("clearEntities");
                 addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
             } else {
                 if (args[1].equalsIgnoreCase("create")) {
@@ -388,11 +471,57 @@ public class FKCTeams {
                         add("list");
                         add("add");
                         add("remove");
+                        add("chestRoom");
+                        add("guardian");
                         add("armorStand");
                         add("options");
                     } else if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
                         if (args.length == 4)
                             addAll(Utils.getAllPlayers());
+                    } else if (args[2].equalsIgnoreCase("chestRoom")) {
+                        DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+                        Block b = sender instanceof Player ? ((Player) sender).getTargetBlock(new HashSet<>(
+                                Collections.singletonList(Material.AIR)), 7) : null;
+                        Location loc1 = sender instanceof Player ? ((Player) sender).getLocation() : null,
+                                loc2 = b != null ? Utils.normalize(b.getLocation(), false) : null;
+                        if (args.length == 4) {
+                            if(loc1 != null)
+                                add("" + df.format(loc1.getX()));
+                            if(loc2 != null)
+                                add("" + df.format(loc2.getX()));
+                            add("0.00");
+                        } else if (args.length == 5) {
+                            if(loc1 != null)
+                                add("" + df.format(loc1.getY()));
+                            if(loc2 != null)
+                                add("" + df.format(loc2.getY()));
+                            add("0.00");
+                        } else if (args.length == 6) {
+                            if(loc1 != null)
+                                add("" + df.format(loc1.getZ()));
+                            if(loc2 != null)
+                                add("" + df.format(loc2.getZ()));
+                            add("0.00");
+                        } else if (args.length == 7) {
+                            if(loc1 != null)
+                                add("" + df.format(loc1.getYaw()));
+                            if(loc2 != null)
+                                add("" + df.format(loc2.getYaw()));
+                            add("0.0");
+                        } else if (args.length == 8) {
+                            if(loc1 != null)
+                                add("" + df.format(loc1.getPitch()));
+                            if(loc2 != null)
+                                add("" + df.format(loc2.getPitch()));
+                            add("0.0");
+                        } else if (args.length == 9) {
+                            Bukkit.getWorlds().stream().map(World::getName).forEach(this::add);
+                        }
+                    } else if (args[2].equalsIgnoreCase("guardian")) {
+                        if (args.length == 4) {
+                            add("kill");
+                            add("spawn");
+                        }
                     } else if (args[2].equalsIgnoreCase("armorStand")) {
                         if (args.length == 4) {
                             add("hide");

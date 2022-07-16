@@ -1,7 +1,6 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.events.Events;
-import javafx.util.Pair;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -14,7 +13,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Items {
 
@@ -235,37 +233,37 @@ public class Items {
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, 1, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, amount, null, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, @Nullable String name, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, @Nullable String name, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, amount, (short) 0, name, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, amount, damage, name, false, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, amount, damage, name, unbreakable, false, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, Utils.Pair<Enchantment, Integer>... enchants) {
         return i(material, amount, damage, name, unbreakable, hideAttributes, false, enchants);
     }
 
     @SafeVarargs
-    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, boolean cantClickOn, Pair<Enchantment, Integer>... enchants) {
+    public static ItemStack i(Material material, int amount, short damage, @Nullable String name, boolean unbreakable, boolean hideAttributes, boolean cantClickOn, Utils.Pair<Enchantment, Integer>... enchants) {
         ItemStack is = new ItemStack(material, amount, damage);
         ItemMeta meta = is.getItemMeta();
         if (meta == null)
@@ -276,7 +274,7 @@ public class Items {
             meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE,
                     ItemFlag.HIDE_POTION_EFFECTS, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_PLACED_ON);
         meta.spigot().setUnbreakable(unbreakable);
-        for (Pair<Enchantment, Integer> e : enchants)
+        for (Utils.Pair<Enchantment, Integer> e : enchants)
             meta.addEnchant(e.getKey(), e.getValue(), true);
         is.setItemMeta(meta);
         return cantClickOn ? new CustomNBT(is).setBoolean(Events.cantClickOnTag, true).build() : is;

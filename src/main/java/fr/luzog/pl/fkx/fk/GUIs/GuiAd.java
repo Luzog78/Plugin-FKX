@@ -162,7 +162,7 @@ public class GuiAd {
         if (reversed)
             Collections.reverse(items);
 
-        return Guis.getPagedInventory("ads", 54, back,
+        return Guis.getPagedInventory(Ad.AD_PREFIX + "§List", 54, back,
                 getMainItem("Clic pour rafraîchir", navigationBaseCommand + " "
                         + (reversed ? "-" : "+") + sorted.name() + " " + page),
                 getFilterItem(sorted, reversed, navigationBaseCommand, page),

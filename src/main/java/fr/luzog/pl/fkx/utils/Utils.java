@@ -3,7 +3,6 @@ package fr.luzog.pl.fkx.utils;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
-import javafx.util.Pair;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
@@ -792,5 +791,31 @@ public class Utils {
         String out = (days == 0 ? "" : days + "d ") + (hours == 0 ? "" : hours + "h ") + (minutes == 0 ? "" : minutes + "m ")
                 + (seconds == 0 ? "" : seconds + "s ") + (millis && milliseconds != 0 ? milliseconds + "ms " : "");
         return out.equals("") ? millis ? "0ms" : "0s" : out.substring(0, out.length() - 1);
+    }
+
+    public static class Pair<A, B> {
+        private A a;
+        private B b;
+
+        public Pair(A a, B b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        public A getKey() {
+            return a;
+        }
+
+        public B getValue() {
+            return b;
+        }
+
+        public void setKey(A a) {
+            this.a = a;
+        }
+
+        public void setValue(B b) {
+            this.b = b;
+        }
     }
 }

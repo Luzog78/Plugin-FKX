@@ -4,7 +4,10 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Utils;
+import net.minecraft.server.v1_8_R3.EntityVillager;
+import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -17,9 +20,14 @@ import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FKTeam {
 
@@ -73,7 +81,7 @@ public class FKTeam {
         this.eliminators = null;
         this.color = ChatColor.WHITE;
         this.spawn = new Location(Main.world, 0, 0, 0);
-        this.chestsRoom = null;
+        this.chestsRoom = new Location(Main.world, 0, 0, 0);
         this.guardian = null;
         this.armorStand = null;
         this.radius = 0;
@@ -285,11 +293,21 @@ public class FKTeam {
                 break;
             }
         if (e == null) {
+//            EntityVillager vil = new EntityVillager(((CraftWorld) chestsRoom.getWorld()).getHandle()) {
+//                public String t() {
+//                    return "";
+//                }
+//            };
+//
+//            vil.spawnIn(((CraftWorld) chestsRoom.getWorld()).getHandle());
+//            vil.teleportTo(chestsRoom, false);
+//            e = (Villager) vil.getBukkitEntity();
+
             e = (Villager) Main.world.spawnEntity(chestsRoom, EntityType.VILLAGER);
             e.setAdult();
             e.setAgeLock(true);
             e.setCanPickupItems(false);
-            e.setNoDamageTicks(Integer.MAX_VALUE);
+//            e.setNoDamageTicks(Integer.MAX_VALUE);
             e.setRemoveWhenFarAway(false);
             ((CraftLivingEntity) e).getHandle().getDataWatcher().watch(15, (byte) 1); // NoGravity Option
 //            EntityLiving nms = ((CraftLivingEntity) e).getHandle();
@@ -334,6 +352,7 @@ public class FKTeam {
             e.setRemoveWhenFarAway(false);
             e.setNoDamageTicks(Integer.MAX_VALUE); // ~3.4 years of god mod
             setArmorStandUuid(e.getUniqueId(), true);
+            e.setMetadata(GUARDIAN_TAG, new FixedMetadataValue(Main.instance, id));
         }
         return e;
     }
@@ -342,6 +361,13 @@ public class FKTeam {
         if (armorStand != null)
             Main.world.getEntities().stream().filter(e -> e.getUniqueId().equals(armorStand)).forEach(Entity::remove);
         setArmorStandUuid(null, true);
+    }
+
+    public static int killAllChestRoomEntities() {
+        List<Entity> l = Main.world.getEntities().stream().filter(e ->
+                e.hasMetadata(GUARDIAN_TAG)).collect(Collectors.toList());
+        l.forEach(Entity::remove);
+        return l.size();
     }
 
     public String getId() {

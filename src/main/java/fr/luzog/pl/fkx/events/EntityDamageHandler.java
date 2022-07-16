@@ -33,7 +33,8 @@ public class EntityDamageHandler implements Listener {
         Location tempLoc = entity.getLocation().add(0, 0.5, 0);
 
         if (FKManager.getCurrentGame() != null && entity.hasMetadata(FKTeam.GUARDIAN_TAG)
-                && e.getDamage() < 1_000_000_000_000_000_000_000.0) {
+                && e.getDamage() < 1_000_000_000_000_000_000_000.0
+                && e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             e.setCancelled(true);
             return;
         }
