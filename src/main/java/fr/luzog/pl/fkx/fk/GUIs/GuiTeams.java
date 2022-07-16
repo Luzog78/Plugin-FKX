@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -196,6 +197,7 @@ public class GuiTeams {
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk teams " + team.getId() + " colorGui")
                 .build());
+        Location nLoc = Utils.normalize(seer.getLocation());
         inv.setItem(Utils.posOf(2, 4), Items.builder(Material.BED)
                 .setName("§6Spawn")
                 .setLore(
@@ -219,9 +221,9 @@ public class GuiTeams {
                         "tp " + team.getSpawn().getX() + " " + team.getSpawn().getY() + " " + team.getSpawn().getZ()
                                 + " " + team.getSpawn().getYaw() + " " + team.getSpawn().getPitch()
                                 + " " + team.getSpawn().getWorld().getName() + "\n" + refresh,
-                        "fk teams " + team.getId() + " options --s " + seer.getLocation().getX()
-                                + " " + seer.getLocation().getY() + " " + seer.getLocation().getZ()
-                                + " " + seer.getLocation().getYaw() + " " + seer.getLocation().getPitch()
+                        "fk teams " + team.getId() + " options --s " + nLoc.getX()
+                                + " " + nLoc.getY() + " " + nLoc.getZ()
+                                + " " + nLoc.getYaw() + " " + nLoc.getPitch()
                                 + " " + seer.getWorld().getName() + "\n" + refresh
                 )
                 .build());

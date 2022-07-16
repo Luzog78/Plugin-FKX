@@ -33,8 +33,10 @@ public class Speed implements CommandExecutor, TabCompleter {
                         float speed = Float.parseFloat(args[1]);
                         if (args[0].equalsIgnoreCase("w") || args[0].contains("walk"))
                             ((CraftPlayer) u.getPlayer()).getHandle().abilities.walkSpeed = speed / 2;
-                        else
-                            ((CraftPlayer) u.getPlayer()).getHandle().abilities.flySpeed = speed / 2;
+                        else {
+//                            ((CraftPlayer) u.getPlayer()).getHandle().abilities.flySpeed = speed / 2;  TODO: Doesn't work
+                            u.getPlayer().setFlySpeed(speed);
+                        }
                         u.succ("Vous avez défini votre vitesse de",
                                 (args[0].equalsIgnoreCase("w") || args[0].contains("walk") ? "§9Marche" : "§bVol"),
                                 "§rà§e", speed, "§r!");
@@ -61,8 +63,10 @@ public class Speed implements CommandExecutor, TabCompleter {
                         }}.forEach(player -> {
                             if (args[1].equalsIgnoreCase("w") || args[1].contains("walk"))
                                 ((CraftPlayer) player).getHandle().abilities.walkSpeed = speed / 2;
-                            else
-                                ((CraftPlayer) player).getHandle().abilities.flySpeed = speed / 2;
+                            else {
+//                            ((CraftPlayer) player).getHandle().abilities.flySpeed = speed / 2;  TODO: Doesn't work
+                                player.setFlySpeed(speed);
+                            }
                         });
                         u.succ("Vous avez défini la vitesse de",
                                 (args[1].equalsIgnoreCase("w") || args[1].contains("walk") ? "§9Marche" : "§bVol"),

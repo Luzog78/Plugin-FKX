@@ -246,7 +246,7 @@ FK:
       - --s <x> <y> <z> <yw> <pi> <world>
   - Title: []
   - Warp:
-    # /fk warp
+    - /fk warp
     - /fk warp help
     - /fk warp list
     - /fk warp page

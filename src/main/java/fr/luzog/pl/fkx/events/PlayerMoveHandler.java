@@ -35,11 +35,26 @@ public class PlayerMoveHandler implements Listener {
             }
 
             FKZone from = p.getZone(e.getFrom()), to = p.getZone(e.getTo());
-            if (from == null && to != null || from != null && to == null || from != null && !from.getId().equals(to.getId()))
-                e.getPlayer().sendMessage("§aVous entrez dans " + (to == null ? "la §2Zone Neutre§a !"
-                        : to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
+            if (from == null && to != null)
+                e.getPlayer().sendMessage("§aVous entrez dans "
+                        + (to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
                         : to.getId().equals(FKZone.SPAWN_ID) ? "le §4Spawn§a !"
-                        : "la zone §f" + to.getId() + "§a !  §7§o(" + to.getType().name().toLowerCase() + ")"));
+                        : "la zone §f" + to.getId()));
+
+            else if (from != null && to == null)
+                e.getPlayer().sendMessage("§aVous sortez "
+                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a !"
+                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a !"
+                        : "de la zone §f" + from.getId()));
+
+            else if (from != null && !from.getId().equals(to.getId()))
+                e.getPlayer().sendMessage("§aVous sortez "
+                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a !"
+                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a !"
+                        : "de la zone §f" + from.getId()) + "§a pour entrer dans "
+                        + (to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
+                        : to.getId().equals(FKZone.SPAWN_ID) ? "le §4Spawn§a !"
+                        : "la zone §f" + to.getId()));
 
             if (!e.isCancelled()) {
                 p.getManager().getNether().tryToTeleport(e.getPlayer(), p.getManager(), true);
