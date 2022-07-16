@@ -7,10 +7,10 @@ import fr.luzog.pl.fkx.utils.Heads;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -107,6 +107,32 @@ public class GuiPlayers {
                 .build();
     }
 
+    public static Inventory getPlayerChangeTeamInventory(String player, String back, String navigationBaseCommand, int page) {
+        if (FKManager.getCurrentGame() == null)
+            return Guis.getErrorInventory("§cAucune partie en cours", back);
+        FKPlayer fkp = FKManager.getCurrentGame().getPlayer(player, false);
+        return Guis.getPagedInventory("§6Équipes", 54, back,
+                getHead(player, "Clic pour rafraîchir", navigationBaseCommand + " " + page),
+                GuiTeams.getTeamItem(fkp == null ? null : fkp.getTeam(), null, "null"),
+                navigationBaseCommand, page, FKManager.getCurrentGame().getTeams().stream().map(t ->
+                    Items.builder(GuiTeams.getTeamItem(t, null, "null"))
+                            .addLore(
+                                    "§7Clic Gauche pour ajouter à l'équipe",
+                                    "§7Clic Droit pour supprimer de l'équipe",
+                                    "§7Clic molette pour voir l'équipe"
+                            )
+                            .setCantClickOn(true)
+                            .setLeftRightCommandOnClick(
+                                    (fkp == null ? "fk players " + player + " init\n"
+                                            : fkp.getTeam() != null ? "fk teams " + fkp.getTeam().getId() + " remove " + player + "\n" : "")
+                                            + "fk teams " + t.getId() + " add " + player + "\n" + navigationBaseCommand + " " + page,
+                                    (fkp != null && fkp.getTeam() != null && fkp.getTeam().getId().equals(t.getId()) ?
+                                            "fk teams " + t.getId() + " remove " + player + "\n" : "") + navigationBaseCommand + " " + page
+                            )
+                            .setMiddleCommandOnClick("fk teams " + t.getId())
+                            .build()).collect(Collectors.toList()));
+    }
+
     public static Inventory getPlayersInventory(String back, String navigationBaseCommand, int page) {
         ArrayList<String> l = new ArrayList<>(new HashSet<String>() {{
             addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
@@ -122,7 +148,7 @@ public class GuiPlayers {
                                 "fk players " + p)).collect(Collectors.toList()));
     }
 
-    public static Inventory getPlayer(String player, @Nonnull Player opener, String back) {
+    public static Inventory getPlayerInventory(String player, @Nonnull Player opener, String back) {
         if (player == null)
             return Guis.getErrorInventory("Joueur Nul.", back);
         OfflinePlayer op = Bukkit.getOfflinePlayer(player);
@@ -132,6 +158,21 @@ public class GuiPlayers {
 
         inv.setItem(Utils.posOf(3, 2), GuiPerm.getPermsItem(fkp == null ? null : fkp.getPersonalPermissions(),
                 Material.IRON_SWORD, "§fPermissions Personnelles", "§7Clic pour voir plus", "fk perm player " + player));
+        inv.setItem(Utils.posOf(4, 2), Items.builder(GuiTeams.getTeamItem(fkp == null ? null
+                        : fkp.getTeam(), null, "null"))
+                .addLore(
+                        fkp == null || fkp.getTeam() == null ?
+                                "§7Clic pour changer l'équipe"
+                                : "§7Clic Gauche pour voir plus"
+                                + "\n§7Clic Droit pour changer l'équipe"
+                )
+                .setLeftRightCommandOnClick(
+                        fkp == null || fkp.getTeam() == null ?
+                                "fk players " + player + " team"
+                                : "fk teams " + fkp.getTeam().getId(),
+                        "fk players " + player + " team"
+                )
+                .setCantClickOn(true).build());
         inv.setItem(Utils.posOf(5, 2), getStats(fkp, "§7Cliquez pour rafraichir", "fk players " + player));
 
         inv.setItem(Utils.posOf(6, 3), Guis.tp(false, "tp " + player));

@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.commands.Admin.*;
 import fr.luzog.pl.fkx.commands.Cheat.*;
 import fr.luzog.pl.fkx.commands.Fk.FKCommand;
 import fr.luzog.pl.fkx.commands.Fun.*;
+import fr.luzog.pl.fkx.commands.Location.Tp;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Other.Test;
 import fr.luzog.pl.fkx.commands.Server.R;
@@ -60,7 +61,7 @@ public enum CommandManager {
     ),
 
     LOCATION(
-
+            new CommandItem(new Tp(), "tp")
     ),
 
     OTHER(

@@ -292,6 +292,13 @@ public class Utils {
         return packet;
     }
 
+    public static String getFormattedWorld(String world) {
+        return world.equalsIgnoreCase("world") ? "§aOverWorld"
+                : world.equalsIgnoreCase("world_nether") ? "§dNether"
+                : world.equalsIgnoreCase("world_the_end") ? "§5End"
+                : world;
+    }
+
     public static String locToString(Location loc, boolean decimal, boolean ywPi, boolean world) {
         DecimalFormat df = new DecimalFormat(decimal ? "0.00" : "#");
         // Formatting the location of the player to a string.

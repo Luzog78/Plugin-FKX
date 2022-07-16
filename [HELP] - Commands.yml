@@ -169,6 +169,8 @@ FK:
     - /fk players <player>
     - /fk players <player> info
     - /fk players <player> init
+    - /fk players <player> team
+    - /fk players <player> team <page>
     - /fk players page
     - /fk players page <page>
   - Portal:
@@ -207,17 +209,21 @@ FK:
     - /fk stats <player> increase <stat> <value>
     - /fk stats <player> decrease <stat> <value>
   - Teams:
-    # /fk teams
+    - /fk teams
     - /fk teams help
     - /fk teams list
+    - /fk teams page <id>
     - /fk teams create <id>
     - /fk teams create <id> <options...>
     - /fk teams eliminate <id>
     - /fk teams reintroduce <id>
     - /fk teams delete <id>
-    # /fk teams <id>
+    - /fk teams <id>
     - /fk teams <id> help
     - /fk teams <id> list
+    - /fk teams <id> colorGui
+    - /fk teams <id> playersGui
+    - /fk teams <id> playersGui <page>
     - /fk teams <id> add <player>
     - /fk teams <id> remove <player>
     - /fk teams <id> guardian (kill | spawn)
@@ -243,6 +249,8 @@ FK:
     # /fk warp
     - /fk warp help
     - /fk warp list
+    - /fk warp page
+    - /fk warp page <page>
     - /fk warp lobby
     - /fk warp lobby <players...>
     - /fk warp lobby <[!]<player>...>

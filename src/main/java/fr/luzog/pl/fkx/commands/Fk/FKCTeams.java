@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.*;
+import fr.luzog.pl.fkx.fk.GUIs.GuiTeams;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -18,9 +19,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCTeams {
-    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | clearEntities | <id> ...]",
+    public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | clearEntities | page <page> | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
-            syntaxe_team = "/fk teams <id> [help | info | list | (add | remove) <player> | chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show) | options ...]",
+            syntaxe_team = "/fk teams <id> [help | info | list | colorGui | playersGui [<page>] | (add | remove) <player>]"
+                    + "\n§r/fk teams <id> [chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show) | options ...]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
             syntaxe_opts = "Options:"
                     + "\n  > --d <displayName>"
@@ -37,7 +39,7 @@ public class FKCTeams {
             return false;
 
         else if (args.length == 1)
-            u.succ("TODO -> Teams GUIs");
+            Bukkit.dispatchCommand(sender, "fk teams page 0");
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
@@ -45,6 +47,17 @@ public class FKCTeams {
         else if (args[1].equalsIgnoreCase("list")) {
             u.succ("Teams :");
             FKManager.getCurrentGame().getTeams().forEach(t -> u.succ(" - §6" + t.getId() + "§r : §f" + t.getName()));
+        } else if (args[1].equalsIgnoreCase("page")) {
+            if (args.length == 2)
+                Bukkit.dispatchCommand(sender, "fk teams page 0");
+            else if (sender instanceof Player)
+                try {
+                    u.getPlayer().openInventory(GuiTeams.getTeamsInventory("fk", "fk teams page", Integer.parseInt(args[2])));
+                } catch (NumberFormatException e) {
+                    Bukkit.dispatchCommand(sender, "fk teams page 0");
+                }
+            else
+                u.err(CmdUtils.err_not_player);
         } else if (args[1].equalsIgnoreCase("clearEntities")) {
             u.succ("Vous venez de supprimer §c" + FKTeam.killAllChestRoomEntities() + "§r entités !");
         } else if (args[1].equalsIgnoreCase("create")) {
@@ -104,7 +117,10 @@ public class FKCTeams {
             FKTeam t = FKManager.getCurrentGame().getTeam(args[1]);
 
             if (args.length == 2)
-                u.succ("TODO -> Team GUIs");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiTeams.getTeamInventory(u.getPlayer(), t, "fk teams"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("info")) {
                 u.succ("Team :");
                 u.succ(" - Id : §6" + t.getId());
@@ -124,6 +140,23 @@ public class FKCTeams {
                     u.err(" - Aucun joueur");
                 else
                     t.getPlayers().forEach(p -> u.succ(" - §6" + p.getName() + "§r §7" + (p.getLastUuid() + "").replace("-", ":") + "§r :  " + (p.getPlayer() != null ? "§2" + SpecialChars.STAR_4_FILLED + " here" : "§4" + SpecialChars.STAR_4_EMPTY + " off")));
+            } else if (args[2].equalsIgnoreCase("colorGui")) {
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiTeams.getColorInventory(t, "fk teams " + t.getId()));
+                else
+                    u.err(CmdUtils.err_not_player);
+            } else if (args[2].equalsIgnoreCase("playersGui")) {
+                if (args.length == 3)
+                    Bukkit.dispatchCommand(sender, "fk teams " + t.getId() + " playersGui 0");
+                else if (sender instanceof Player)
+                    try {
+                        u.getPlayer().openInventory(GuiTeams.getTeamPlayers(t, "fk teams " + t.getId(),
+                                "fk teams " + t.getId() + " playersGui", Integer.parseInt(args[3])));
+                    } catch (NumberFormatException e) {
+                        Bukkit.dispatchCommand(sender, "fk teams " + t.getId() + " playersGui 0");
+                    }
+                else
+                    u.err(CmdUtils.err_not_player);
             } else if (args[2].equalsIgnoreCase("add")) {
                 if (args.length == 3)
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "player"));
@@ -454,6 +487,7 @@ public class FKCTeams {
                 add("eliminate");
                 add("reintroduce");
                 add("delete");
+                add("page");
                 add("clearEntities");
                 addAll(FKManager.getCurrentGame().getTeams().stream().map(FKTeam::getId).collect(Collectors.toList()));
             } else {
@@ -471,10 +505,12 @@ public class FKCTeams {
                         add("list");
                         add("add");
                         add("remove");
+                        add("options");
                         add("chestRoom");
                         add("guardian");
                         add("armorStand");
-                        add("options");
+                        add("playersGui");
+                        add("colorGui");
                     } else if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
                         if (args.length == 4)
                             addAll(Utils.getAllPlayers());
@@ -485,33 +521,33 @@ public class FKCTeams {
                         Location loc1 = sender instanceof Player ? ((Player) sender).getLocation() : null,
                                 loc2 = b != null ? Utils.normalize(b.getLocation(), false) : null;
                         if (args.length == 4) {
-                            if(loc1 != null)
+                            if (loc1 != null)
                                 add("" + df.format(loc1.getX()));
-                            if(loc2 != null)
+                            if (loc2 != null)
                                 add("" + df.format(loc2.getX()));
                             add("0.00");
                         } else if (args.length == 5) {
-                            if(loc1 != null)
+                            if (loc1 != null)
                                 add("" + df.format(loc1.getY()));
-                            if(loc2 != null)
+                            if (loc2 != null)
                                 add("" + df.format(loc2.getY()));
                             add("0.00");
                         } else if (args.length == 6) {
-                            if(loc1 != null)
+                            if (loc1 != null)
                                 add("" + df.format(loc1.getZ()));
-                            if(loc2 != null)
+                            if (loc2 != null)
                                 add("" + df.format(loc2.getZ()));
                             add("0.00");
                         } else if (args.length == 7) {
-                            if(loc1 != null)
+                            if (loc1 != null)
                                 add("" + df.format(loc1.getYaw()));
-                            if(loc2 != null)
+                            if (loc2 != null)
                                 add("" + df.format(loc2.getYaw()));
                             add("0.0");
                         } else if (args.length == 8) {
-                            if(loc1 != null)
+                            if (loc1 != null)
                                 add("" + df.format(loc1.getPitch()));
-                            if(loc2 != null)
+                            if (loc2 != null)
                                 add("" + df.format(loc2.getPitch()));
                             add("0.0");
                         } else if (args.length == 9) {

@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Entity;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.potion.PotionEffect;
@@ -461,6 +462,7 @@ public class FKManager {
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CREEPER));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLE_TOP));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.TRIANGLES_TOP));
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         banner.setItemMeta(meta);
         return banner;
     }
@@ -477,6 +479,7 @@ public class FKManager {
         meta.addPattern(new Pattern(white, PatternType.STRIPE_CENTER));
         meta.addPattern(new Pattern(dye, PatternType.FLOWER));
         meta.addPattern(new Pattern(white, PatternType.FLOWER));
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         banner.setItemMeta(meta);
         return banner;
     }
@@ -541,7 +544,7 @@ public class FKManager {
      */
 
     public void start() {
-        Utils.countDown(null, 20, false, true, true,
+        Utils.countDown(null, 15, false, true, true,
                 "La partie commence dans §c%i%§rs...\n§7Préparez-vous à démarrer votre aventure !",
                 "Bonne chance à tous !\n§7Prêt ?  Partez !", "§a", "§6", "§c§l",
                 "§4§l", "§2§l", () -> {

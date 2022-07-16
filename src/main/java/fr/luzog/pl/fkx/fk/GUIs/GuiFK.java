@@ -1,12 +1,13 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
+import fr.luzog.pl.fkx.fk.FKListener;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.Heads;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.DyeColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
@@ -15,11 +16,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GuiFK {
@@ -105,6 +104,85 @@ public class GuiFK {
         return inv;
     }
 
+    public static ItemStack getWarpsMainItem(FKManager fk, String lastLoreLine, String command) {
+        if (fk == null)
+            return Items.builder(Material.PAPER)
+                    .setName("§fWarps")
+                    .setLore(
+                            "§8" + Guis.loreSeparator
+                                    + (lastLoreLine == null ? "" : "\n§7" + lastLoreLine)
+                    )
+                    .setCantClickOn(true)
+                    .setGlobalCommandOnClick(command)
+                    .build();
+        return Items.builder(Material.PAPER)
+                .setName("§fWarps")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        " ",
+                        "  §fWarps : §6" + (4 + fk.getTeams().size() + fk.getNormalZones().size()),
+                        "  §8  >  §31§8 Lobby",
+                        "  §8  >  §31§8 Spawn",
+                        "  §8  >  §32§8 Portails",
+                        "  §8  >  §3" + fk.getTeams().size() + "§8 Équipes",
+                        "  §8  >  §3" + fk.getNormalZones().size() + "§8 Zones",
+                        " ",
+                        "§8" + Guis.loreSeparator
+                                + (lastLoreLine == null ? "" : "\n§7" + lastLoreLine)
+                )
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(command)
+                .build();
+    }
+
+    public static ItemStack getWarpItem(ItemStack base, String name, Location from, Location loc) {
+        return Items.builder(base)
+                .setName("§f" + name)
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        " ",
+                        "  §8Distance : §6" + new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+                                .format(from.distance(loc)) + "m  §7-  §6" + FKListener.getOrientationChar(
+                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()),
+                        " ",
+                        "  §8Position :",
+                        "  §8  > X : §f" + loc.getX(),
+                        "  §8  > Y : §f" + loc.getY(),
+                        "  §8  > Z : §f" + loc.getZ(),
+                        "  §8  > Yaw : §f" + loc.getYaw(),
+                        "  §8  > Pitch : §f" + loc.getPitch(),
+                        "  §8  > Pitch : §f" + loc.getPitch(),
+                        "  §8  > World : §f" + Utils.getFormattedWorld(loc.getWorld().getName()),
+                        " ",
+                        "§8" + Guis.loreSeparator,
+                        "§7Clique pour aller à §f" + name
+                )
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick("tp " + loc.getX() + " " + loc.getY() + " " + loc.getZ()
+                        + " " + loc.getYaw() + " " + loc.getPitch() + " " + loc.getWorld().getName())
+                .build();
+    }
+
+    public static Inventory getWarpsInventory(FKManager fk, Location from, String back, String navigationBaseCommand, int page) {
+        if (fk == null)
+            return Guis.getErrorInventory("Game null", back);
+        return Guis.getPagedInventory("§fWarps", 54, back,
+                null, null,
+                navigationBaseCommand, page, new ArrayList<ItemStack>() {{
+                    add(getWarpItem(new ItemStack(Material.GOLD_BLOCK), "§6Lobby", from, fk.getLobby().getSpawn()));
+                    add(getWarpItem(new ItemStack(Material.REDSTONE_BLOCK), "§4Spawn", from, fk.getSpawn().getSpawn()));
+                    addAll(fk.getTeams().stream().map(t -> getWarpItem(FKManager.getBanner(t.getColor()),
+                            t.getColor() + t.getName(), from, t.getSpawn())).collect(Collectors.toList()));
+                    add(getWarpItem(new ItemStack(Material.OBSIDIAN), "§bPortails du Nether",
+                            from, fk.getNether().getOverSpawn()));
+                    add(getWarpItem(new ItemStack(Material.ENDER_PORTAL_FRAME), "§5Portails de l'End",
+                            from, fk.getEnd().getOverSpawn()));
+                    addAll(fk.getNormalZones().stream().map(z -> getWarpItem(
+                            new ItemStack(Material.LONG_GRASS, 1, (short) 2), "§2" + z.getId(),
+                            from, z.getSpawn())).collect(Collectors.toList()));
+                }});
+    }
+
     public static Inventory getInv(Player opener, String back) {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("No game running", back);
@@ -122,6 +200,7 @@ public class GuiFK {
         inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem("Clic pour voir plus", "fk date"));
         inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null, "Clic pour voir plus", "fk players",
                 l.size(), (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
+        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem("Clic pour voir plus", "fk teams"));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())
@@ -129,6 +208,8 @@ public class GuiFK {
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk game state")
                 .build());
+        inv.setItem(Utils.posOf(7, 1), getWarpsMainItem(FKManager.getCurrentGame(),
+                "Clic pour voir plus", "fk warp"));
 
         return inv;
     }

@@ -3,6 +3,8 @@ package fr.luzog.pl.fkx.commands.Fk;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.fk.GUIs.GuiFK;
+import fr.luzog.pl.fkx.fk.GUIs.GuiPlayers;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
@@ -16,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCWarp {
-    public static final String syntaxe = "/fk warp [? || help | list | lobby | spawn | nether | end | team <id> | zone <id>] [[!]<players...>]";
+    public static final String syntaxe = "/fk warp [? || help | list | page <page> | lobby | spawn | nether | end | team <id> | zone <id>] [[!]<players...>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -24,7 +26,7 @@ public class FKCWarp {
         if (args.length == 0) {
             u.synt();
         } else if (args.length == 1) {
-            u.succ("TODO -> Warp GUIs");
+            Bukkit.dispatchCommand(sender, "fk warp page 0");
         } else if (args[1].equals("?") || args[1].equalsIgnoreCase("help")) {
             u.synt();
         } else if (args[1].equalsIgnoreCase("list")) {
@@ -41,6 +43,20 @@ public class FKCWarp {
             u.succ(" - §6end");
             fk.getTeams().forEach(t -> u.succ(" - §6team §f" + t.getId()));
             fk.getZones().forEach(z -> u.succ(" - §6zone §f" + z.getId()));
+        } else if (args[1].equalsIgnoreCase("page")) {
+            if (args.length == 2)
+                Bukkit.dispatchCommand(sender, "fk warp page 0");
+            else
+                try {
+                    if (sender instanceof Player)
+                        u.getPlayer().openInventory(GuiFK.getWarpsInventory(FKManager.getCurrentGame(),
+                                u.getPlayer().getLocation(), "fk", "fk warp page",
+                                Integer.parseInt(args[2])));
+                    else
+                        u.synt();
+                } catch (NumberFormatException e) {
+                    u.err(CmdUtils.err_number_format + " (" + args[2] + ")");
+                }
         } else {
             FKManager fk = u.getPlayer() == null || FKManager.getGlobalPlayer(u.getPlayer().getName()).isEmpty() ?
                     FKManager.getCurrentGame() : FKManager.getGlobalPlayer(u.getPlayer().getName()).get(0).getManager();

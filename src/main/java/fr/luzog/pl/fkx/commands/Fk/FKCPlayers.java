@@ -3,25 +3,21 @@ package fr.luzog.pl.fkx.commands.Fk;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.GUIs.GuiPlayers;
-import fr.luzog.pl.fkx.fk.GUIs.Guis;
+import fr.luzog.pl.fkx.fk.GUIs.GuiTeams;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FKCPlayers {
-    public static final String syntaxe = "/fk players [help | list | <player> [info | init] | page <page>]";
+    public static final String syntaxe = "/fk players [help | list | <player> [info | init | team [<page>]] | page <page>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -82,10 +78,23 @@ public class FKCPlayers {
                     } else {
                         u.err("Joueur déjà créé : §f" + fkp.getDisplayName());
                     }
+                } else if (args[2].equalsIgnoreCase("team")) {
+                    if (args.length == 3)
+                        Bukkit.dispatchCommand(sender, "fk players " + args[1] + " team 0");
+                    else if (sender instanceof Player)
+                        try {
+                            u.getPlayer().openInventory(GuiPlayers.getPlayerChangeTeamInventory(args[1],
+                                    "fk players " + args[1], "fk players " + args[1] + " team",
+                                    Integer.parseInt(args[3])));
+                        } catch (NumberFormatException e) {
+                            Bukkit.dispatchCommand(sender, "fk players " + args[1] + " team 0");
+                        }
+                    else
+                        u.err(CmdUtils.err_not_player);
                 } else
                     u.synt();
             else if (sender instanceof Player)
-                u.getPlayer().openInventory(GuiPlayers.getPlayer(p == null ? Bukkit.getOfflinePlayer(args[1]).getName() : p.getName(), u.getPlayer(), "fk players"));
+                u.getPlayer().openInventory(GuiPlayers.getPlayerInventory(p == null ? Bukkit.getOfflinePlayer(args[1]).getName() : p.getName(), u.getPlayer(), "fk players"));
             else
                 u.succ(CmdUtils.err_not_player);
 

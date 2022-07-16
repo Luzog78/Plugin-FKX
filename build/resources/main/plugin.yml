@@ -6,7 +6,7 @@
 
 # Plugin Infos
 name: FKX
-version: Beta 1.0
+version: Beta 1.1
 description: "\n\n    §6--------[ §9§lFKX §6]--------§r\n\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 1.0.0 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n\n    §6---------------------------------"
 
 # Authors Infos
@@ -140,6 +140,9 @@ commands:
 
 
   # Location Commands
+  tp:
+    aliases: [ teleport ]
+    description: Teleport to a player
   #  home:
   #    aliases: [h]
   #    description: Goto, Set or Del a Personnal Home
@@ -157,8 +160,8 @@ commands:
   # Server's Commands
   r:
     description: Aliases [reload, rl, r]
-  save:
-    description: Save and Reload the Config
+  #  save:
+  #    description: Save and Reload the Config
 
 
 
