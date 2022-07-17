@@ -243,6 +243,7 @@ FK:
     - /fk teams <id> chestRoom <x> <y> <z> <world>
     - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi>
     - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi> <world>
+    - /fk teams <id> altar
     - /fk teams <id> wall <material>
     - /fk teams <id> wall <height> <material>
     - /fk teams <id> options help

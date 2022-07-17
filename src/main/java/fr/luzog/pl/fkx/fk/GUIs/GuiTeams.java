@@ -215,7 +215,9 @@ public class GuiTeams {
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour se téléporter",
                         "§7Clic Droit pour redéfinir ici",
-                        "§7Commande :",
+                        "§7Clic molette pour invoquer l'Autel",
+                        "§7Commandes :",
+                        "§7/fk teams " + team.getId() + " altar",
                         "§7/fk teams " + team.getId() + " options --s <x> <y> <z> <yaw> [<pitch>] [<world>]"
                 )
                 .setCantClickOn(true)
@@ -228,6 +230,7 @@ public class GuiTeams {
                                 + " " + nLoc.getYaw() + " " + nLoc.getPitch()
                                 + " " + seer.getWorld().getName() + "\n" + refresh
                 )
+                .setMiddleCommandOnClick("fk teams " + team.getId() + " altar")
                 .build());
         inv.setItem(Utils.posOf(1, 4), Items.builder(Material.FENCE)
                 .setName("§6Rayon : §f" + team.getRadius())

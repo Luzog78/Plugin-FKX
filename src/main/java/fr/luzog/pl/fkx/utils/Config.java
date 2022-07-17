@@ -21,7 +21,9 @@ public class Config {
     public static class Globals extends Config {
         public static final String VERSION = "version", LANG = "lang", OVERWORLD = "worlds.over",
                 NETHER = "worlds.nether", END = "worlds.end", CUSTOM_CRAFTS = "custom-options.vanilla-crafts",
-                CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table", CUSTOM_LOOTING = "custom-options.looting-system",
+                CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table",
+                CUSTOM_LOOTING_BLOCKS = "custom-options.block-looting-system",
+                CUSTOM_LOOTING_MOBS = "custom-options.mob-looting-system",
                 LAST_GAME = "last-game", VANISH_PRE_SUF_IX = "vanish.pre-suf-ix", VANISH_IS_PREFIX = "vanish.is-prefix",
                 VANISH_PLAYERS = "vanish.players";
 
@@ -91,12 +93,21 @@ public class Config {
             return this;
         }
 
-        public boolean isCustomLootingSystemActivated() {
-            return super.getBool(CUSTOM_LOOTING);
+        public boolean isCustomLootingBlocksSystemActivated() {
+            return super.getBool(CUSTOM_LOOTING_BLOCKS);
         }
 
-        public Globals setCustomLootingSystemActivated(boolean customLooting, boolean force) {
-            super.set(CUSTOM_LOOTING, customLooting, force);
+        public Globals setCustomLootingBlocksSystemActivated(boolean customLootingBlocks, boolean force) {
+            super.set(CUSTOM_LOOTING_BLOCKS, customLootingBlocks, force);
+            return this;
+        }
+
+        public boolean isCustomLootingMobsSystemActivated() {
+            return super.getBool(CUSTOM_LOOTING_MOBS);
+        }
+
+        public Globals setCustomLootingMobsSystemActivated(boolean customLootingMobs, boolean force) {
+            super.set(CUSTOM_LOOTING_MOBS, customLootingMobs, force);
             return this;
         }
 

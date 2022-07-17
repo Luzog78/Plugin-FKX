@@ -68,16 +68,17 @@ public class BlockBreakHandler implements Listener {
                 silkTouch = true;
 
             boolean finalSilkTouch = silkTouch;
-            Events.breakBlockLoots.forEach(item -> {
-                if (item.getMaterials().contains(e.getBlock().getType())) {
-                    e.setCancelled(true);
-                    e.getBlock().setType(Material.AIR, true);
-                    if (item.isExclusive())
-                        dropNormally(e.getBlock().getLocation(), item.getLoots().lootsExclusive(chanceLvl, finalSilkTouch));
-                    else
-                        dropNormally(e.getBlock().getLocation(), item.getLoots().lootsInclusive(chanceLvl, finalSilkTouch));
-                }
-            });
+            if (Main.customLootingBlocksSystem)
+                Events.breakBlockLoots.forEach(item -> {
+                    if (item.getMaterials().contains(e.getBlock().getType())) {
+                        e.setCancelled(true);
+                        e.getBlock().setType(Material.AIR, true);
+                        if (item.isExclusive())
+                            dropNormally(e.getBlock().getLocation(), item.getLoots().lootsExclusive(chanceLvl, finalSilkTouch));
+                        else
+                            dropNormally(e.getBlock().getLocation(), item.getLoots().lootsInclusive(chanceLvl, finalSilkTouch));
+                    }
+                });
         }
     }
 

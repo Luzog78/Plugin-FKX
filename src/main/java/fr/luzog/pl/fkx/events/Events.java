@@ -3,7 +3,6 @@ package fr.luzog.pl.fkx.events;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
-import fr.luzog.pl.fkx.commands.Location.Tp;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
@@ -94,81 +93,120 @@ public class Events implements Listener {
     public static List<BlockLootsItem> breakBlockLoots = new ArrayList<BlockLootsItem>() {{
         add(new BlockLootsItem(Arrays.asList(Material.LOG, Material.LOG_2), false, new Loots().add(new ItemStack(Material.LOG))));
         add(new BlockLootsItem(Collections.singletonList(Material.WOOD), false, new Loots().add(new ItemStack(Material.WOOD))));
-        add(new BlockLootsItem(Collections.singletonList(Material.STONE), false, new Loots().add(new ItemStack(Material.STONE))));
-        add(new BlockLootsItem(Collections.singletonList(Material.COBBLESTONE), false, new Loots().add(new ItemStack(Material.COBBLESTONE))));
+        add(new BlockLootsItem(Collections.singletonList(Material.STONE), false, new Loots()
+                .add(new ItemStack(Material.STONE), -1, true)
+                .add(new ItemStack(Material.COBBLESTONE), -1, false)
+        ));
+        add(new BlockLootsItem(Collections.singletonList(Material.COBBLESTONE), false, new Loots()
+                .add(new ItemStack(Material.STONE), -1, true)
+                .add(new ItemStack(Material.COBBLESTONE), -1, false)
+        ));
         add(new BlockLootsItem(Collections.singletonList(Material.SAND), false, new Loots().add(new ItemStack(Material.SAND))));
-        add(new BlockLootsItem(Collections.singletonList(Material.SAND), false, new Loots().add(new ItemStack(Material.SAND))));
-        add(new BlockLootsItem(Arrays.asList(Material.LEAVES, Material.LEAVES), false, new Loots()
-                .add(1, new CustomNBT(new ItemStack(Material.LEAVES)).setBoolean(canInteractTag, false).build(), -1, true)
-                .add(0.25, new ItemStack(Material.LEAVES), -1, true)
-                .add(0.2, new ItemStack(Material.SAPLING))
-                .add(0.0666, new ItemStack(Material.APPLE), 0, null)
-                .add(0.01, new ItemStack(Material.GOLDEN_APPLE), 0, null)
-                .add(0.1, new ItemStack(Material.APPLE), 1, null)
-                .add(0.02, new ItemStack(Material.GOLDEN_APPLE), 1, null)
-                .add(0.2, new ItemStack(Material.APPLE), 2, null)
-                .add(0.04, new ItemStack(Material.GOLDEN_APPLE), 2, null)
-                .add(0.3, new ItemStack(Material.APPLE), 3, null)
-                .add(0.08, new ItemStack(Material.GOLDEN_APPLE), 3, null)
-                .add(1, new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1), 32767, null)
+        add(new BlockLootsItem(Collections.singletonList(Material.SANDSTONE), false, new Loots().add(new ItemStack(Material.SANDSTONE))));
+        add(new BlockLootsItem(Collections.singletonList(Material.RED_SANDSTONE), false, new Loots().add(new ItemStack(Material.RED_SANDSTONE))));
+        add(new BlockLootsItem(Collections.singletonList(Material.GRAVEL), true, new Loots()
+                .add(0.05, new ItemStack(Material.FLINT, 2), 0, null)
+                .add(0.95, new ItemStack(Material.FLINT, 1), 0, null)
 
-                .add(0.005, new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1), -1, null)
+                .add(0.05, new ItemStack(Material.FLINT, 3), 1, null)
+                .add(0.90, new ItemStack(Material.FLINT, 2), 1, null)
+                .add(0.05, new ItemStack(Material.FLINT, 1), 1, null)
+
+                .add(0.05, new ItemStack(Material.FLINT, 4), 2, null)
+                .add(0.90, new ItemStack(Material.FLINT, 3), 2, null)
+                .add(0.05, new ItemStack(Material.FLINT, 2), 2, null)
+
+                .add(0.05, new ItemStack(Material.FLINT, 5), 3, null)
+                .add(0.90, new ItemStack(Material.FLINT, 4), 3, null)
+                .add(0.05, new ItemStack(Material.FLINT, 3), 3, null)
+        ));
+        add(new BlockLootsItem(Arrays.asList(Material.LEAVES, Material.LEAVES_2), false, new Loots()
+                .add(1, new ItemStack(Material.LEAVES), -1, true)
+                .add(0.05, new ItemStack(Material.LEAVES), -1, true)
+
+                .add(0.1, new ItemStack(Material.SAPLING), -1, false)
+
+                .add(0.05, new ItemStack(Material.WOOD), 0, false)
+                .add(0.10, new ItemStack(Material.WOOD), 1, false)
+                .add(0.15, new ItemStack(Material.WOOD), 2, false)
+                .add(0.2, new ItemStack(Material.WOOD), 3, false)
+
+
+                .add(0.07, new ItemStack(Material.APPLE), 0, false)
+                .add(0.1, new ItemStack(Material.APPLE), 1, false)
+                .add(0.15, new ItemStack(Material.APPLE), 2, false)
+                .add(0.2, new ItemStack(Material.APPLE), 3, false)
+
+                .add(0.007, new ItemStack(Material.GOLDEN_APPLE), 0, false)
+                .add(0.012, new ItemStack(Material.GOLDEN_APPLE), 1, false)
+                .add(0.018, new ItemStack(Material.GOLDEN_APPLE), 2, false)
+                .add(0.025, new ItemStack(Material.GOLDEN_APPLE), 3, false)
+
+                .add(0.0005, new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1), -1, false)
+                .add(0.2, new ItemStack(Material.GOLDEN_APPLE, 1, (short) 1), 32767, false)
+
         ));
         add(new BlockLootsItem(Collections.singletonList(Material.IRON_ORE), true, new Loots()
-                .add(0.15, new ItemStack(Material.IRON_INGOT, 2), 0, false)
-                .add(0.85, new ItemStack(Material.IRON_INGOT, 1), 0, false)
-                .add(0.20, new ItemStack(Material.IRON_INGOT, 3), 1, false)
-                .add(0.75, new ItemStack(Material.IRON_INGOT, 2), 1, false)
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 2), 0, false)
+                .add(0.95, new ItemStack(Material.IRON_INGOT, 1), 0, false)
+
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 3), 1, false)
+                .add(0.90, new ItemStack(Material.IRON_INGOT, 2), 1, false)
                 .add(0.05, new ItemStack(Material.IRON_INGOT, 1), 1, false)
-                .add(0.15, new ItemStack(Material.IRON_INGOT, 4), 2, false)
-                .add(0.75, new ItemStack(Material.IRON_INGOT, 3), 2, false)
-                .add(0.08, new ItemStack(Material.IRON_INGOT, 2), 2, false)
-                .add(0.02, new ItemStack(Material.IRON_INGOT, 1), 2, false)
-                .add(0.30, new ItemStack(Material.IRON_INGOT, 5), 3, false)
-                .add(0.45, new ItemStack(Material.IRON_INGOT, 4), 3, false)
-                .add(0.20, new ItemStack(Material.IRON_INGOT, 3), 3, false)
-                .add(0.05, new ItemStack(Material.IRON_INGOT, 2), 3, false)
-                .add(0.15, new CustomNBT(new ItemStack(Material.IRON_ORE, 2)).setBoolean(canInteractTag, false).build(), 0, true)
-                .add(0.85, new CustomNBT(new ItemStack(Material.IRON_ORE, 1)).setBoolean(canInteractTag, false).build(), 0, true)
-                .add(0.20, new CustomNBT(new ItemStack(Material.IRON_ORE, 3)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.75, new CustomNBT(new ItemStack(Material.IRON_ORE, 2)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.05, new CustomNBT(new ItemStack(Material.IRON_ORE, 1)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.15, new CustomNBT(new ItemStack(Material.IRON_ORE, 4)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.75, new CustomNBT(new ItemStack(Material.IRON_ORE, 3)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.08, new CustomNBT(new ItemStack(Material.IRON_ORE, 2)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.02, new CustomNBT(new ItemStack(Material.IRON_ORE, 1)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.40, new CustomNBT(new ItemStack(Material.IRON_ORE, 5)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.55, new CustomNBT(new ItemStack(Material.IRON_ORE, 4)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.20, new CustomNBT(new ItemStack(Material.IRON_ORE, 3)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.05, new CustomNBT(new ItemStack(Material.IRON_ORE, 2)).setBoolean(canInteractTag, false).build(), 3, true)
+
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 4), 2, false)
+                .add(0.90, new ItemStack(Material.IRON_INGOT, 3), 2, false)
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 2), 2, false)
+
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 5), 3, false)
+                .add(0.90, new ItemStack(Material.IRON_INGOT, 4), 3, false)
+                .add(0.05, new ItemStack(Material.IRON_INGOT, 3), 3, false)
+
+                .add(0.05, new ItemStack(Material.IRON_ORE, 2), 0, true)
+                .add(0.95, new ItemStack(Material.IRON_ORE, 1), 0, true)
+
+                .add(0.05, new ItemStack(Material.IRON_ORE, 3), 1, true)
+                .add(0.90, new ItemStack(Material.IRON_ORE, 2), 1, true)
+                .add(0.05, new ItemStack(Material.IRON_ORE, 1), 1, true)
+
+                .add(0.05, new ItemStack(Material.IRON_ORE, 4), 2, true)
+                .add(0.90, new ItemStack(Material.IRON_ORE, 3), 2, true)
+                .add(0.05, new ItemStack(Material.IRON_ORE, 2), 2, true)
+
+                .add(0.05, new ItemStack(Material.IRON_ORE, 5), 3, true)
+                .add(0.90, new ItemStack(Material.IRON_ORE, 4), 3, true)
+                .add(0.05, new ItemStack(Material.IRON_ORE, 3), 3, true)
         ));
         add(new BlockLootsItem(Collections.singletonList(Material.GOLD_ORE), true, new Loots()
-                .add(0.85, new ItemStack(Material.GOLD_INGOT, 1), 0, false)
-                .add(0.15, new ItemStack(Material.GOLD_INGOT, 2), 0, false)
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 2), 0, false)
+                .add(0.95, new ItemStack(Material.GOLD_INGOT, 1), 0, false)
+
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 3), 1, false)
+                .add(0.90, new ItemStack(Material.GOLD_INGOT, 2), 1, false)
                 .add(0.05, new ItemStack(Material.GOLD_INGOT, 1), 1, false)
-                .add(0.75, new ItemStack(Material.GOLD_INGOT, 2), 1, false)
-                .add(0.20, new ItemStack(Material.GOLD_INGOT, 3), 1, false)
-                .add(0.02, new ItemStack(Material.GOLD_INGOT, 1), 2, false)
-                .add(0.08, new ItemStack(Material.GOLD_INGOT, 2), 2, false)
-                .add(0.75, new ItemStack(Material.GOLD_INGOT, 3), 2, false)
-                .add(0.15, new ItemStack(Material.GOLD_INGOT, 4), 2, false)
-                .add(0.05, new ItemStack(Material.GOLD_INGOT, 1), 3, false)
-                .add(0.20, new ItemStack(Material.GOLD_INGOT, 2), 3, false)
-                .add(0.55, new ItemStack(Material.GOLD_INGOT, 3), 3, false)
-                .add(0.40, new ItemStack(Material.GOLD_INGOT, 4), 3, false)
-                .add(0.85, new CustomNBT(new ItemStack(Material.GOLD_ORE, 1)).setBoolean(canInteractTag, false).build(), 0, true)
-                .add(0.15, new CustomNBT(new ItemStack(Material.GOLD_ORE, 2)).setBoolean(canInteractTag, false).build(), 0, true)
-                .add(0.05, new CustomNBT(new ItemStack(Material.GOLD_ORE, 1)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.75, new CustomNBT(new ItemStack(Material.GOLD_ORE, 2)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.20, new CustomNBT(new ItemStack(Material.GOLD_ORE, 3)).setBoolean(canInteractTag, false).build(), 1, true)
-                .add(0.02, new CustomNBT(new ItemStack(Material.GOLD_ORE, 1)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.08, new CustomNBT(new ItemStack(Material.GOLD_ORE, 2)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.75, new CustomNBT(new ItemStack(Material.GOLD_ORE, 3)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.15, new CustomNBT(new ItemStack(Material.GOLD_ORE, 4)).setBoolean(canInteractTag, false).build(), 2, true)
-                .add(0.05, new CustomNBT(new ItemStack(Material.GOLD_ORE, 1)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.20, new CustomNBT(new ItemStack(Material.GOLD_ORE, 2)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.55, new CustomNBT(new ItemStack(Material.GOLD_ORE, 3)).setBoolean(canInteractTag, false).build(), 3, true)
-                .add(0.40, new CustomNBT(new ItemStack(Material.GOLD_ORE, 4)).setBoolean(canInteractTag, false).build(), 3, true)
+
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 4), 2, false)
+                .add(0.90, new ItemStack(Material.GOLD_INGOT, 3), 2, false)
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 2), 2, false)
+
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 5), 3, false)
+                .add(0.90, new ItemStack(Material.GOLD_INGOT, 4), 3, false)
+                .add(0.05, new ItemStack(Material.GOLD_INGOT, 3), 3, false)
+
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 2), 0, true)
+                .add(0.95, new ItemStack(Material.GOLD_ORE, 1), 0, true)
+
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 3), 1, true)
+                .add(0.90, new ItemStack(Material.GOLD_ORE, 2), 1, true)
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 1), 1, true)
+
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 4), 2, true)
+                .add(0.90, new ItemStack(Material.GOLD_ORE, 3), 2, true)
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 2), 2, true)
+
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 5), 3, true)
+                .add(0.90, new ItemStack(Material.GOLD_ORE, 4), 3, true)
+                .add(0.05, new ItemStack(Material.GOLD_ORE, 3), 3, true)
         ));
     }};
 
@@ -696,7 +734,7 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEntityDeath(EntityDeathEvent e) {
-        if (Main.customLootingSystem && !(e.getEntity() instanceof Player))
+        if (Main.customLootingMobsSystem && !(e.getEntity() instanceof Player))
             e.getDrops().clear();
     }
 

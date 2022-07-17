@@ -31,7 +31,7 @@ public class Main extends JavaPlugin implements Listener {
 
     public static Config.Globals globalConfig;
 
-    public static boolean customCrafts, customCraftingTable, customLootingSystem;
+    public static boolean customCrafts, customCraftingTable, customLootingBlocksSystem, customLootingMobsSystem;
 
     @Override
     public void onLoad() {
@@ -57,13 +57,15 @@ public class Main extends JavaPlugin implements Listener {
                         .setWorlds("world", "world_nether", "world_the_end", false)
                         .setCustomVanillaCraftsActivated(false, false)
                         .setCustomCraftingTableActivated(true, false)
-                        .setCustomLootingSystemActivated(true, false)
+                        .setCustomLootingBlocksSystemActivated(true, false)
+                        .setCustomLootingMobsSystemActivated(true, false)
                         .save()
                         .load(); // Reload the config for the next lines
 
                 customCrafts = globalConfig.isCustomVanillaCraftsActivated();
                 customCraftingTable = globalConfig.isCustomCraftingTableActivated();
-                customLootingSystem = globalConfig.isCustomLootingSystemActivated();
+                customLootingBlocksSystem = globalConfig.isCustomLootingBlocksSystemActivated();
+                customLootingMobsSystem = globalConfig.isCustomLootingMobsSystemActivated();
 
                 world = globalConfig.getOverworld();
                 nether = globalConfig.getNether();

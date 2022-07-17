@@ -16,7 +16,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class EntityDamageHandler implements Listener {
 
@@ -83,7 +82,7 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled() && Main.customLootingSystem && !entity.hasMetadata(FKTeam.GUARDIAN_TAG))
+                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(FKTeam.GUARDIAN_TAG))
                         Events.killMobLoots.forEach(loot -> {
                             if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
                                     && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))

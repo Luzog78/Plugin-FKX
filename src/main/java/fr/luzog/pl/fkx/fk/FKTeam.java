@@ -263,6 +263,22 @@ public class FKTeam {
                         }
     }
 
+    public void altar() {
+        spawn.getBlock().setType(Material.FENCE, true);
+        spawn.clone().add(0, 1, 0).getBlock().setType(Material.FENCE, true);
+        spawn.clone().add(0, 2, 0).getBlock().setType(Material.FENCE, true);
+        spawn.clone().add(0, 3, 0).getBlock().setType(Material.FENCE, true);
+
+        spawn.clone().add(1, 2, 0).getBlock().setType(Material.WOOL, true);
+        spawn.clone().add(1, 2, 0).getBlock().setData(Utils.chatToDataColor(color));
+        spawn.clone().add(1, 3, 0).getBlock().setType(Material.WOOL, true);
+        spawn.clone().add(1, 3, 0).getBlock().setData(Utils.chatToDataColor(color));
+        spawn.clone().add(-1, 2, 0).getBlock().setType(Material.WOOL, true);
+        spawn.clone().add(-1, 2, 0).getBlock().setData(Utils.chatToDataColor(color));
+        spawn.clone().add(-1, 3, 0).getBlock().setType(Material.WOOL, true);
+        spawn.clone().add(-1, 3, 0).getBlock().setData(Utils.chatToDataColor(color));
+    }
+
     public boolean isInside(Location loc) {
         Location l1 = getSpawn().clone(), l2 = getSpawn().clone();
         l1.setY(-1);

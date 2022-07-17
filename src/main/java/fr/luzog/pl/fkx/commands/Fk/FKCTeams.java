@@ -24,7 +24,7 @@ public class FKCTeams {
             syntaxe_team = "/fk teams <id> [help | info | list]"
                     + "\n§r/fk teams <id> [colorGui | playersGui [<page>] | (add | remove) <player>]"
                     + "\n§r/fk teams <id> [chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show)]"
-                    + "\n§r/fk teams <id> [wall [<height>] <material> | options [<args...>]]",
+                    + "\n§r/fk teams <id> [altar | wall [<height>] <material> | options [<args...>]]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
             syntaxe_opts = "Options:"
                     + "\n  > --d <displayName>"
@@ -192,6 +192,9 @@ public class FKCTeams {
                 } catch (FKException.PlayerDoesNotExistException e) {
                     u.err(CmdUtils.err_player_does_not_exist + " (" + args[3] + ")");
                 }
+            } else if (args[2].equalsIgnoreCase("altar")) {
+                t.altar();
+                u.succ("Vous avez invoqué l'§6Autel§r de la team §f" + t.getColor() + t.getName());
             } else if (args[2].equalsIgnoreCase("wall")) {
                 Material mat;
                 if (args.length == 3)
@@ -212,7 +215,7 @@ public class FKCTeams {
                         else {
                             t.wall(height, mat);
                             u.succ("Vous avez construit une muraille en §9" + mat.name().toLowerCase()
-                                    + "§r de §b" + height + " bloc" + (height > 1 ? "s" : "" )
+                                    + "§r de §b" + height + " bloc" + (height > 1 ? "s" : "")
                                     + "§r de haut pour la team " + t.getColor() + t.getName());
                         }
                     } catch (NumberFormatException e) {
@@ -535,6 +538,7 @@ public class FKCTeams {
                         add("add");
                         add("remove");
                         add("options");
+                        add("altar");
                         add("wall");
                         add("chestRoom");
                         add("guardian");
@@ -545,9 +549,9 @@ public class FKCTeams {
                         if (args.length == 4)
                             addAll(Utils.getAllPlayers());
                     } else if (args[2].equalsIgnoreCase("wall")) {
-                        if(args.length == 4)
+                        if (args.length == 4)
                             addAll(Arrays.asList("1", "2", "3", "5", "7", "8", "10", "15", "20", "30"));
-                        else if(args.length == 5)
+                        else if (args.length == 5)
                             addAll(Arrays.stream(Material.values()).map(m -> m.name().toLowerCase())
                                     .collect(Collectors.toList()));
                     } else if (args[2].equalsIgnoreCase("chestRoom")) {
