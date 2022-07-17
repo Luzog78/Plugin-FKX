@@ -337,7 +337,7 @@ public class FKCTeams {
         String s = base.substring(substring);
         if ((s.startsWith("\"") && s.endsWith("\"")) || (s.startsWith("'") && s.endsWith("'")))
             s = s.substring(1, s.length() - 1);
-        return s.replace("\\\"", "\"").replace("\\'", "'").replace("\\ ", " ").replace("\\\\", "\\");
+        return s.replace("\\\"", "\"").replace("\\'", "'").replace("\\ ", " ").replace("\\\\", "\\").replace("&", "§");
     }
 
     public static void handleOptions(CmdUtils u, FKTeam t, String[] arguments, int substring) {

@@ -141,11 +141,11 @@ public class GuiFK {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + (loc != null ? new DecimalFormat("0.00",
-                                DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+                        "  §8Distance : §6" + (loc != null ? from.getWorld().getUID().equals(loc.getWorld().getUID()) ?
+                                new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
                                 .format(from.distance(loc)) + "m  §7-  §6" + FKListener.getOrientationChar(
                                 from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ())
-                                : "§cAucune"),
+                                : "§dPas dans le même monde" : "§cAucune"),
                         " ",
                         "  §8Position :",
                         "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),

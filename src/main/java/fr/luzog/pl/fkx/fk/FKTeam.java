@@ -147,7 +147,7 @@ public class FKTeam {
                 Entity e = getArmorStand();
                 e.setCustomNameVisible(true);
 
-                if (!isEliminated && team.getPlayers().stream().anyMatch(p -> p.getPlayer() != null
+                if (!isEliminated && team.getPlayers().stream().allMatch(p -> p.getPlayer() != null
                         && p.getPlayer().getLocation().distance(chestsRoom) <= 5) && team.getId().equals(eliminators)
                         && getManager().getState() == FKManager.State.RUNNING)
                     if (eliminationCooldown < ELIMINATION_TIMEOUT) {
@@ -168,7 +168,7 @@ public class FKTeam {
                     e.setCustomName(getProgressBar());
                     e.setCustomNameVisible(false);
                     team.getPlayers().stream().map(FKPlayer::getPlayer).filter(Objects::nonNull).forEach(p -> {
-                        p.sendMessage("§cAssaut Annulé.\n§cPlus aucun joueur n'assaillit le §6Gardien des coffres§c.");
+                        p.sendMessage("§cAssaut Annulé.\n§cUne ou plusieurs personne de votre team a déserté le §6Gardien des coffres§c.");
                         p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
                     });
                     cancel();
@@ -342,6 +342,8 @@ public class FKTeam {
             e.setAdult();
             e.setAgeLock(true);
             e.setCanPickupItems(false);
+            e.setCustomName("Guardian");
+            e.setCustomNameVisible(false);
 //            e.setNoDamageTicks(Integer.MAX_VALUE);
             e.setRemoveWhenFarAway(false);
             ((CraftLivingEntity) e).getHandle().getDataWatcher().watch(15, (byte) 1); // NoGravity Option

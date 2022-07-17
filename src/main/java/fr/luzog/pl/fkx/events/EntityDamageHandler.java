@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.Broadcast;
+import fr.luzog.pl.fkx.utils.Loots;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -57,6 +58,8 @@ public class EntityDamageHandler implements Listener {
                 p.setHealth(p.getMaxHealth());
                 p.setFoodLevel(20);
                 p.setSaturation(20f);
+                p.setExp(0);
+                p.setTotalExperience(0);
                 p.teleport(p.getBedSpawnLocation() == null ?
                         fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
                                 fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
@@ -83,23 +86,37 @@ public class EntityDamageHandler implements Listener {
                 @Override
                 public void run() {
                     if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(FKTeam.GUARDIAN_TAG))
-                        Events.killMobLoots.forEach(loot -> {
-                            if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
-                                    && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))
-                                    || (entity instanceof Skeleton && ((Skeleton) entity).getSkeletonType() == (loot.getData() == Events.EntityData.SKELETON_WITHER ?
-                                    Skeleton.SkeletonType.WITHER : Skeleton.SkeletonType.NORMAL))))) {
-                                Location loc = entity.getLocation().clone().add(0, 0.3, 0);
-                                int chanceLvl = entity.hasMetadata(Events.lastDamageLootingLevelTag) ?
-                                        entity.getMetadata(Events.lastDamageLootingLevelTag).get(0).asInt() : 0;
-                                boolean silkTouch = entity.hasMetadata(Events.lastDamageSilkTouchTag) && entity.getMetadata(Events.lastDamageSilkTouchTag).get(0).asBoolean();
-                                if (loot.isExclusive()) {
-                                    ItemStack is = loot.getLoots().lootsExclusive(chanceLvl, silkTouch);
-                                    if (is.getType() != Material.AIR)
-                                        loc.getWorld().dropItemNaturally(loc, is);
-                                } else
-                                    loot.getLoots().lootsInclusive(chanceLvl, silkTouch).forEach(is -> loc.getWorld().dropItemNaturally(loc, is));
-                            }
-                        });
+                        if (entity instanceof Creeper) {
+                            if (((Creeper) entity).isPowered())
+                                new Loots()
+                                        .add(0.125, new ItemStack(Material.TNT))
+                                        .add(0.125, new ItemStack(Material.TNT))
+                                        .lootsInclusive()
+                                        .forEach(is -> entity.getWorld().dropItemNaturally(tempLoc, is));
+                            else
+                                new Loots()
+                                        .add(0.5, new ItemStack(Material.SULPHUR))
+                                        .add(0.5, new ItemStack(Material.SULPHUR))
+                                        .lootsInclusive()
+                                        .forEach(is -> entity.getWorld().dropItemNaturally(tempLoc, is));
+                        } else
+                            Events.killMobLoots.forEach(loot -> {
+                                if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
+                                        && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))
+                                        || (entity instanceof Skeleton && ((Skeleton) entity).getSkeletonType() == (loot.getData() == Events.EntityData.SKELETON_WITHER ?
+                                        Skeleton.SkeletonType.WITHER : Skeleton.SkeletonType.NORMAL))))) {
+                                    Location loc = entity.getLocation().clone().add(0, 0.3, 0);
+                                    int chanceLvl = entity.hasMetadata(Events.lastDamageLootingLevelTag) ?
+                                            entity.getMetadata(Events.lastDamageLootingLevelTag).get(0).asInt() : 0;
+                                    boolean silkTouch = entity.hasMetadata(Events.lastDamageSilkTouchTag) && entity.getMetadata(Events.lastDamageSilkTouchTag).get(0).asBoolean();
+                                    if (loot.isExclusive()) {
+                                        ItemStack is = loot.getLoots().lootsExclusive(chanceLvl, silkTouch);
+                                        if (is.getType() != Material.AIR)
+                                            loc.getWorld().dropItemNaturally(loc, is);
+                                    } else
+                                        loot.getLoots().lootsInclusive(chanceLvl, silkTouch).forEach(is -> loc.getWorld().dropItemNaturally(loc, is));
+                                }
+                            });
                 }
             }.runTask(Main.instance);
     }

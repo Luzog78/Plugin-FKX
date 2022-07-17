@@ -162,21 +162,24 @@ public class FKListener {
 //                  String directionalArrow = "§6" + new DecimalFormat("0.0").format(p.getLocation().distance(new Location(p.getWorld(), -256.5, p.getLocation().getY(), -143.5)))
 //                          + "m §e" + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), -256.5, -143.5);
                     long waitingAds;
-                    if (fkp.getCompass() != null && fkp.getCompass().getLocation() != null)
-                        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-                                new PacketPlayOutChat(new ChatComponentText(
-                                        (fkp.getCompass().getName() == null ? "§cnull" : "§6" + fkp.getCompass().getName())
-                                                + "  §7-  §6" + new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-                                                .format(p.getLocation().distance(fkp.getCompass().getLocation()))
-                                                + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
-                                                p.getLocation().getX(), p.getLocation().getZ(),
-                                                fkp.getCompass().getLocation().getX(), fkp.getCompass().getLocation().getZ())
-                                ), (byte) 2));
-                    else if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID)
-                            && (waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count()) > 0)
-                        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
-                                new PacketPlayOutChat(new ChatComponentText(
-                                        Ad.AD_PREFIX + "§f" + waitingAds + "§a ads en attente"), (byte) 2));
+                    try {
+                        if (fkp.getCompass() != null && fkp.getCompass().getLocation() != null)
+                            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+                                    new PacketPlayOutChat(new ChatComponentText(
+                                            (fkp.getCompass().getName() == null ? "§cnull" : "§6" + fkp.getCompass().getName())
+                                                    + "  §7-  §6" + new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+                                                    .format(p.getLocation().distance(fkp.getCompass().getLocation()))
+                                                    + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
+                                                    p.getLocation().getX(), p.getLocation().getZ(),
+                                                    fkp.getCompass().getLocation().getX(), fkp.getCompass().getLocation().getZ())
+                                    ), (byte) 2));
+                        else if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID)
+                                && (waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count()) > 0)
+                            ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+                                    new PacketPlayOutChat(new ChatComponentText(
+                                            Ad.AD_PREFIX + "§f" + waitingAds + "§a ads en attente"), (byte) 2));
+                    } catch (Exception e) {
+                    }
                 });
             }
 

@@ -40,9 +40,6 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
                 System.out.println(" ");
                 Color.sout(HEADER);
                 souf("         §fInitialisation des differentes composantes");
@@ -50,6 +47,13 @@ public class Main extends JavaPlugin implements Listener {
                 souf("");
                 souf("");
 
+                soufInstruction("§6Initialisation du module : §eListeners§6...");
+                getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
+                Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
                 soufInstruction("§6Initialisation du module : §eConfigurations§6...");
                 globalConfig = new Config.Globals("Globals.yml").load()
                         .setVersion(VERSION, true)
@@ -87,10 +91,6 @@ public class Main extends JavaPlugin implements Listener {
                 FKManager.initFromConfig(false);
                 if (FKManager.getCurrentGame() != null)
                     FKManager.getCurrentGame().getListener().scheduleTask();
-
-                soufInstruction("§6Initialisation du module : §eListeners§6...");
-                getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
-                Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));
 
                 soufInstruction("§6Initialisation du module : §eCrafts§6...");
                 Crafting.initCrafts();

@@ -11,6 +11,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -72,9 +73,9 @@ public class Events implements Listener {
             Material.REDSTONE_TORCH_OFF, Material.YELLOW_FLOWER, Material.RED_ROSE, Material.WHEAT, /*Material.HAY_BLOCK,*/
             Material.SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS, Material.CARROT, Material.CARROT_ITEM,
             Material.POTATO, Material.POTATO_ITEM, Material.FIRE, Material.FLINT_AND_STEEL, Material.BUCKET,
-            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET/*, Material.WORKBENCH,
-            Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE*/);
-    public static List<Material> unbreakableMat = new ArrayList<>();
+            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET, Material.WORKBENCH, Material.SIGN
+            /*Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE*/);
+    public static List<Material> unbreakableMat = Collections.singletonList(Material.MOB_SPAWNER);
     public static List<Material> unplaceableMat = new ArrayList<>();
 
     public static List<Material> diamond = Arrays.asList(Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE,
@@ -91,19 +92,19 @@ public class Events implements Listener {
             Material.STONE_PICKAXE, Material.STONE_SPADE, Material.STONE_HOE);
 
     public static List<BlockLootsItem> breakBlockLoots = new ArrayList<BlockLootsItem>() {{
-        add(new BlockLootsItem(Arrays.asList(Material.LOG, Material.LOG_2), false, new Loots().add(new ItemStack(Material.LOG))));
-        add(new BlockLootsItem(Collections.singletonList(Material.WOOD), false, new Loots().add(new ItemStack(Material.WOOD))));
-        add(new BlockLootsItem(Collections.singletonList(Material.STONE), false, new Loots()
-                .add(new ItemStack(Material.STONE), -1, true)
-                .add(new ItemStack(Material.COBBLESTONE), -1, false)
-        ));
-        add(new BlockLootsItem(Collections.singletonList(Material.COBBLESTONE), false, new Loots()
-                .add(new ItemStack(Material.STONE), -1, true)
-                .add(new ItemStack(Material.COBBLESTONE), -1, false)
-        ));
-        add(new BlockLootsItem(Collections.singletonList(Material.SAND), false, new Loots().add(new ItemStack(Material.SAND))));
-        add(new BlockLootsItem(Collections.singletonList(Material.SANDSTONE), false, new Loots().add(new ItemStack(Material.SANDSTONE))));
-        add(new BlockLootsItem(Collections.singletonList(Material.RED_SANDSTONE), false, new Loots().add(new ItemStack(Material.RED_SANDSTONE))));
+//        add(new BlockLootsItem(Arrays.asList(Material.LOG, Material.LOG_2), false, new Loots().add(new ItemStack(Material.LOG))));
+//        add(new BlockLootsItem(Collections.singletonList(Material.WOOD), false, new Loots().add(new ItemStack(Material.WOOD))));
+//        add(new BlockLootsItem(Collections.singletonList(Material.STONE), false, new Loots()
+//                .add(new ItemStack(Material.STONE), -1, true)
+//                .add(new ItemStack(Material.COBBLESTONE), -1, false)
+//        ));
+//        add(new BlockLootsItem(Collections.singletonList(Material.COBBLESTONE), false, new Loots()
+//                .add(new ItemStack(Material.STONE), -1, true)
+//                .add(new ItemStack(Material.COBBLESTONE), -1, false)
+//        ));
+//        add(new BlockLootsItem(Collections.singletonList(Material.SAND), false, new Loots().add(new ItemStack(Material.SAND))));
+//        add(new BlockLootsItem(Collections.singletonList(Material.SANDSTONE), false, new Loots().add(new ItemStack(Material.SANDSTONE))));
+//        add(new BlockLootsItem(Collections.singletonList(Material.RED_SANDSTONE), false, new Loots().add(new ItemStack(Material.RED_SANDSTONE))));
         add(new BlockLootsItem(Collections.singletonList(Material.GRAVEL), true, new Loots()
                 .add(0.05, new ItemStack(Material.FLINT, 2), 0, null)
                 .add(0.95, new ItemStack(Material.FLINT, 1), 0, null)
@@ -126,10 +127,10 @@ public class Events implements Listener {
 
                 .add(0.1, new ItemStack(Material.SAPLING), -1, false)
 
-                .add(0.05, new ItemStack(Material.WOOD), 0, false)
-                .add(0.10, new ItemStack(Material.WOOD), 1, false)
-                .add(0.15, new ItemStack(Material.WOOD), 2, false)
-                .add(0.2, new ItemStack(Material.WOOD), 3, false)
+//                .add(0.05, new ItemStack(Material.WOOD), 0, false)
+//                .add(0.10, new ItemStack(Material.WOOD), 1, false)
+//                .add(0.15, new ItemStack(Material.WOOD), 2, false)
+//                .add(0.2, new ItemStack(Material.WOOD), 3, false)
 
 
                 .add(0.07, new ItemStack(Material.APPLE), 0, false)
@@ -701,6 +702,9 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onSpawn(CreatureSpawnEvent e) {
+        if(e.getEntity().getType() == EntityType.CREEPER)
+            if(new Random().nextInt(5) == 0)
+                ((Creeper) e.getEntity()).setPowered(true);
     }
 
     @EventHandler
@@ -800,25 +804,25 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onItemSwap(PlayerItemHeldEvent e) {
-        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
-                || FKManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false) == null)
-            return;
-
-        ItemStack is = e.getPlayer().getInventory().getItem(e.getNewSlot());
-        if (is == null)
-            return;
-
-        Limits lim = FKManager.getCurrentGame().getLimits();
-        int d = Limits.diamondScore(e.getPlayer()), dd = diamond.contains(is.getType()) ? 1 : 0,
-                g = Limits.goldScore(e.getPlayer()), gg = gold.contains(is.getType()) ? 1 : 0,
-                i = Limits.ironScore(e.getPlayer()), ii = iron.contains(is.getType()) ? 1 : 0,
-                l = Limits.leatherScore(e.getPlayer()), ll = leather.contains(is.getType()) ? 1 : 0;
-
-        if ((dd == 1 && d + dd > lim.getWearingMaxDiamondPieces())
-                || (gg == 1 && g + gg > lim.getWearingMaxGoldPieces())
-                || (ii == 1 && i + ii > lim.getWearingMaxIronPieces())
-                || (ll == 1 && l + ll > lim.getWearingMaxLeatherPieces()))
-            e.setCancelled(true);
+//        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+//                || FKManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false) == null)
+//            return;
+//
+//        ItemStack is = e.getPlayer().getInventory().getItem(e.getNewSlot());
+//        if (is == null)
+//            return;
+//
+//        Limits lim = FKManager.getCurrentGame().getLimits();
+//        int d = Limits.diamondScore(e.getPlayer()), dd = diamond.contains(is.getType()) ? 1 : 0,
+//                g = Limits.goldScore(e.getPlayer()), gg = gold.contains(is.getType()) ? 1 : 0,
+//                i = Limits.ironScore(e.getPlayer()), ii = iron.contains(is.getType()) ? 1 : 0,
+//                l = Limits.leatherScore(e.getPlayer()), ll = leather.contains(is.getType()) ? 1 : 0;
+//
+//        if ((dd == 1 && d + dd > lim.getWearingMaxDiamondPieces())
+//                || (gg == 1 && g + gg > lim.getWearingMaxGoldPieces())
+//                || (ii == 1 && i + ii > lim.getWearingMaxIronPieces())
+//                || (ll == 1 && l + ll > lim.getWearingMaxLeatherPieces()))
+//            e.setCancelled(true);
     }
 
     @EventHandler

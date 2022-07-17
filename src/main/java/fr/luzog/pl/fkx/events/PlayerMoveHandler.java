@@ -22,7 +22,7 @@ public class PlayerMoveHandler implements Listener {
 
             if (p.getManager().getState() == FKManager.State.PAUSED && (p.getTeam() == null
                     || !p.getTeam().getId().equals(p.getManager().getGods().getId()))
-                    && (e.getFrom().getX() != e.getTo().getX() || e.getFrom().getY() != e.getTo().getY()
+                    && (e.getFrom().getX() != e.getTo().getX()
                     || e.getFrom().getZ() != e.getFrom().getZ())) {
                 e.getPlayer().teleport(e.getFrom());
                 return;

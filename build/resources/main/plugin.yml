@@ -19,7 +19,7 @@ main: fr.luzog.pl.fkx.Main
 prefix: FKX
 load: POSTWORLD # STARTUP / POSTWORLD
 depend: [ ]
-
+loadbefore: [ CutClean ]
 
 
 #############################

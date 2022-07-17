@@ -22,9 +22,9 @@ public class PlayerInteractAtEntityHandler implements Listener {
         if (Freeze.frozen.contains(p.getName()))
             return;
 
-        LivingEntity e = (LivingEntity) event.getRightClicked();
         if (!(event.getRightClicked() instanceof LivingEntity))
             return;
+        LivingEntity e = (LivingEntity) event.getRightClicked();
         DecimalFormat df = new DecimalFormat("0.0##");
 
 

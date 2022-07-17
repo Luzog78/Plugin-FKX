@@ -1,6 +1,5 @@
 package fr.luzog.pl.fkx.events;
 
-import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
@@ -14,16 +13,12 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class InventoryClickHandler implements Listener {
 
@@ -68,14 +63,16 @@ public class InventoryClickHandler implements Listener {
                     e.setCancelled(true);
                     return;
                 }
-            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantSpe().keySet())
-                for(Material mat : FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).keySet())
+            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantSpe().keySet()) {
+                System.out.println(ench.getName());
+                for (Material mat : FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).keySet())
                     if (e.getCurrentItem().getType() == mat && e.getCurrentItem().containsEnchantment(ench)
                             && e.getCurrentItem().getEnchantmentLevel(ench)
                             > FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).get(mat)) {
                         e.setCancelled(true);
                         return;
                     }
+            }
         }
 
         List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getWhoClicked().getName());

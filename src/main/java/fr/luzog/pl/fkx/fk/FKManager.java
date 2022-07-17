@@ -564,6 +564,8 @@ public class FKManager {
                             p.getPlayer().setFoodLevel(20);
                             p.getPlayer().setSaturation(20);
                             p.getPlayer().setFireTicks(0);
+                            p.getPlayer().setExp(0);
+                            p.getPlayer().setTotalExperience(0);
                             if (p.getTeam() != null)
                                 if (p.getTeam().getId().equals(FKTeam.GODS_ID)) {
                                     p.getPlayer().setGameMode(GameMode.CREATIVE);

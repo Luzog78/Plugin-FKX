@@ -346,8 +346,8 @@ public class GuiTeams {
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(
-                        "fk teams " + team.getId() + " guardian show\n" + refresh,
-                        "fk teams " + team.getId() + " guardian hide\n" + refresh
+                        "fk teams eliminate " + team.getId() + "\n" + refresh,
+                        "fk teams reintroduce " + team.getId() + "\n" + refresh
                 )
                 .build());
 
