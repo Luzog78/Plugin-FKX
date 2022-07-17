@@ -15,7 +15,7 @@ import java.util.UUID;
 public class FKPlayer {
 
     public void saveToConfig(String gameId, boolean soft) {
-        if(soft)
+        if (soft)
             return;
 
         getConfig(gameId)
@@ -23,6 +23,7 @@ public class FKPlayer {
 
                 .setLastUuid(lastUuid, true)
                 .setTeam(teamId, true)
+                .setCompass(compass, true)
                 .setStats(stats, true)
                 .setPermissions(personalPermissions, true)
 
@@ -33,10 +34,37 @@ public class FKPlayer {
         return new Config.Player("game-" + Objects.requireNonNull(gameId) + "/players/" + name + ".yml");
     }
 
+    public static class Compass {
+        private String name;
+        private Location location;
+
+        public Compass(String name, Location location) {
+            this.name = name;
+            this.location = location;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Location getLocation() {
+            return location;
+        }
+
+        public void setLocation(Location location) {
+            this.location = location;
+        }
+    }
+
     private String name;
     private UUID lastUuid;
 
     private String teamId;
+    private Compass compass;
 
     private PlayerStats stats;
 
@@ -45,6 +73,20 @@ public class FKPlayer {
     public FKPlayer(@Nullable String name, @Nullable PlayerStats stats, @Nullable FKPermissions personalPermissions) {
         this.name = name;
         this.lastUuid = null;
+
+        this.teamId = null;
+        this.compass = null;
+
+        this.stats = stats == null ? new PlayerStats() : stats;
+        this.personalPermissions = personalPermissions == null ? new FKPermissions(FKPermissions.Definition.DEFAULT) : personalPermissions;
+    }
+
+    public FKPlayer(String name, UUID lastUuid, String teamId, Compass compass, PlayerStats stats, FKPermissions personalPermissions) {
+        this.name = name;
+        this.lastUuid = lastUuid;
+
+        this.teamId = teamId;
+        this.compass = compass;
 
         this.stats = stats == null ? new PlayerStats() : stats;
         this.personalPermissions = personalPermissions == null ? new FKPermissions(FKPermissions.Definition.DEFAULT) : personalPermissions;
@@ -164,6 +206,19 @@ public class FKPlayer {
         }
     }
 
+    public Compass getCompass() {
+        return compass;
+    }
+
+    public void setCompass(Compass compass, boolean save) {
+        this.compass = compass;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setCompass(compass, true).save();
+        }
+    }
+
     public String getName() {
         return name;
     }
@@ -172,7 +227,7 @@ public class FKPlayer {
         if (renameFile && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" +  name + ".yml"));
+            getConfig(getManager().getId()).getFile().renameTo(new File(getConfig(getManager().getId()).getFile().getParentFile().getPath() + "/" + name + ".yml"));
         }
         this.name = name;
     }

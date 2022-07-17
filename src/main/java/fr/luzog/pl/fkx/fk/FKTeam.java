@@ -7,6 +7,7 @@ import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.EntityVillager;
 import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.ArmorStand;
@@ -22,10 +23,7 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -242,6 +240,27 @@ public class FKTeam {
                 + "\nDonc !" + count + " !joueurs sont de retour.");
         if (save && getManager() != null)
             saveToConfig(getManager().getId(), false);
+    }
+
+    public void wall(int height, Material material) {
+        List<Material> transparent = Arrays.asList(Material.AIR, Material.LONG_GRASS, Material.SNOW,
+                Material.LEAVES, Material.LEAVES_2, Material.SAPLING, Material.DEAD_BUSH,
+                Material.YELLOW_FLOWER, Material.RED_ROSE, Material.BROWN_MUSHROOM,
+                Material.RED_MUSHROOM, Material.DOUBLE_PLANT, Material.TORCH);
+        int minX = spawn.clone().subtract(radius, 0, 0).getBlockX(), maxX = spawn.clone().add(radius, 0, 0).getBlockX() - 1,
+                minZ = spawn.clone().subtract(0, 0, radius).getBlockZ(), maxZ = spawn.clone().add(0, 0, radius).getBlockZ() - 1;
+        for (int x = minX; x <= maxX; x++)
+            for (int z = minZ; z <= maxZ; z++)
+                if (x == minX || x == maxX || z == minZ || z == maxZ)
+                    for (int y = 254; y > 0; y--)
+                        if (!transparent.contains(spawn.getWorld().getBlockAt(x, y, z).getType())) {
+                            for (int i = height >= 0 ? 0 : -1; (height >= 0) == (i < height); i += height >= 0 ? 1 : -1)
+                                if(y + 1 + i < 256 && (height < 0 || transparent.contains(spawn.getWorld()
+                                        .getBlockAt(x, y + 1 + i, z).getType())))
+                                    spawn.getWorld().getBlockAt(x, y + 1 + i, z)
+                                            .setType(material, true);
+                            break;
+                        }
     }
 
     public boolean isInside(Location loc) {

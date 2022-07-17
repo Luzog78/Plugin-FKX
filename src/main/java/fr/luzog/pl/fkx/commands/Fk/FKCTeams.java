@@ -21,8 +21,10 @@ import java.util.stream.Collectors;
 public class FKCTeams {
     public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | clearEntities | page <page> | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
-            syntaxe_team = "/fk teams <id> [help | info | list | colorGui | playersGui [<page>] | (add | remove) <player>]"
-                    + "\n§r/fk teams <id> [chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show) | options ...]",
+            syntaxe_team = "/fk teams <id> [help | info | list]"
+                    + "\n§r/fk teams <id> [colorGui | playersGui [<page>] | (add | remove) <player>]"
+                    + "\n§r/fk teams <id> [chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show)]"
+                    + "\n§r/fk teams <id> [wall [<height>] <material> | options [<args...>]]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
             syntaxe_opts = "Options:"
                     + "\n  > --d <displayName>"
@@ -190,6 +192,33 @@ public class FKCTeams {
                 } catch (FKException.PlayerDoesNotExistException e) {
                     u.err(CmdUtils.err_player_does_not_exist + " (" + args[3] + ")");
                 }
+            } else if (args[2].equalsIgnoreCase("wall")) {
+                Material mat;
+                if (args.length == 3)
+                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "material"));
+                else if (args.length == 4)
+                    if ((mat = Material.matchMaterial(args[3])) == null)
+                        u.err("Materiau '" + args[3] + "' inconnu.");
+                    else {
+                        t.wall(1, mat);
+                        u.succ("Vous avez construit une muraille en §9" + mat.name().toLowerCase()
+                                + "§r de §b1 bloc§r de haut pour la team " + t.getColor() + t.getName());
+                    }
+                else
+                    try {
+                        int height = Integer.parseInt(args[3]);
+                        if ((mat = Material.matchMaterial(args[4])) == null)
+                            u.err("Materiau '" + args[4] + "' inconnu.");
+                        else {
+                            t.wall(height, mat);
+                            u.succ("Vous avez construit une muraille en §9" + mat.name().toLowerCase()
+                                    + "§r de §b" + height + " bloc" + (height > 1 ? "s" : "" )
+                                    + "§r de haut pour la team " + t.getColor() + t.getName());
+                        }
+                    } catch (NumberFormatException e) {
+                        u.err(CmdUtils.err_number_format + " (" + args[3] + ")");
+                    }
+
             } else if (args[2].equalsIgnoreCase("chestRoom")) {
                 if (t.getId().equals(FKTeam.GODS_ID) || t.getId().equals(FKTeam.SPECS_ID))
                     u.err("Cette équipe n'a pas de salle des coffres.");
@@ -506,6 +535,7 @@ public class FKCTeams {
                         add("add");
                         add("remove");
                         add("options");
+                        add("wall");
                         add("chestRoom");
                         add("guardian");
                         add("armorStand");
@@ -514,6 +544,12 @@ public class FKCTeams {
                     } else if (args[2].equalsIgnoreCase("add") || args[2].equalsIgnoreCase("remove")) {
                         if (args.length == 4)
                             addAll(Utils.getAllPlayers());
+                    } else if (args[2].equalsIgnoreCase("wall")) {
+                        if(args.length == 4)
+                            addAll(Arrays.asList("1", "2", "3", "5", "7", "8", "10", "15", "20", "30"));
+                        else if(args.length == 5)
+                            addAll(Arrays.stream(Material.values()).map(m -> m.name().toLowerCase())
+                                    .collect(Collectors.toList()));
                     } else if (args[2].equalsIgnoreCase("chestRoom")) {
                         DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
                         Block b = sender instanceof Player ? ((Player) sender).getTargetBlock(new HashSet<>(

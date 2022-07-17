@@ -24,7 +24,6 @@ public class EntityDamageHandler implements Listener {
     public static void onDamage(EntityDamageEvent e) {
         if (e.getEntity().getType() == EntityType.ARMOR_STAND)
             return;
-        System.out.println("onDamage " + e.getEntityType() + " " + e.getCause() + " " + e.getEntity().getLocation());
 
         if (!(e.getEntity() instanceof LivingEntity))
             return;

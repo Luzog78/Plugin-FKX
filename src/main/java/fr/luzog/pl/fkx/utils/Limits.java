@@ -15,20 +15,22 @@ public class Limits {
 
     private ArrayList<Material> craft;
     private HashMap<PotionEffectType, Integer> potion;
-    private HashMap<Enchantment, Integer> enchant;
+    private HashMap<Enchantment, Integer> enchantGlobal;
+    private HashMap<Enchantment, HashMap<Material, Integer>> enchantSpe;
     private int wearingMaxDiamondPieces, wearingMaxGoldPieces,
             wearingMaxIronPieces, wearingMaxLeatherPieces;
 
 
     public void saveToConfig(String gameId, boolean soft) {
-        if(soft)
+        if (soft)
             return;
 
         getConfig(gameId).load()
 
                 .setCraft(craft, true)
                 .setPotion(potion, true)
-                .setEnchant(enchant, true)
+                .setEnchantGlobal(enchantGlobal, true)
+                .setEnchantSpe(enchantSpe, true)
                 .setWearingMaxDiamondPieces(wearingMaxDiamondPieces, true)
                 .setWearingMaxGoldPieces(wearingMaxGoldPieces, true)
                 .setWearingMaxIronPieces(wearingMaxIronPieces, true)
@@ -44,20 +46,21 @@ public class Limits {
     public Limits() {
         this.craft = new ArrayList<>();
         this.potion = new HashMap<>();
-        this.enchant = new HashMap<>();
+        this.enchantGlobal = new HashMap<>();
+        this.enchantSpe = new HashMap<>();
         this.wearingMaxDiamondPieces = 5;
         this.wearingMaxGoldPieces = 5;
         this.wearingMaxIronPieces = 5;
         this.wearingMaxLeatherPieces = 5;
     }
 
-    public Limits(ArrayList<Material> craft, HashMap<PotionEffectType, Integer> potion,
-                  HashMap<Enchantment, Integer> enchant, HashMap<Material, Integer> holding,
-                  int wearingMaxDiamondPieces, int wearingMaxGoldPieces,
-                  int wearingMaxIronPieces, int wearingMaxLeatherPieces) {
+    public Limits(ArrayList<Material> craft, HashMap<PotionEffectType, Integer> potion, HashMap<Enchantment, Integer> enchantGlobal,
+                  HashMap<Enchantment, HashMap<Material, Integer>> enchantSpe, HashMap<Material, Integer> holding,
+                  int wearingMaxDiamondPieces, int wearingMaxGoldPieces, int wearingMaxIronPieces, int wearingMaxLeatherPieces) {
         this.craft = craft;
         this.potion = potion;
-        this.enchant = enchant;
+        this.enchantGlobal = enchantGlobal;
+        this.enchantSpe = enchantSpe;
         this.wearingMaxDiamondPieces = wearingMaxDiamondPieces;
         this.wearingMaxGoldPieces = wearingMaxGoldPieces;
         this.wearingMaxIronPieces = wearingMaxIronPieces;
@@ -66,8 +69,8 @@ public class Limits {
 
     public static int wearingScore(List<Material> mat, HumanEntity p) {
         int i = p.getItemInHand() != null && mat.contains(p.getItemInHand().getType()) ? 1 : 0;
-        for(ItemStack is : p.getInventory().getArmorContents())
-            if(is != null && mat.contains(is.getType()))
+        for (ItemStack is : p.getInventory().getArmorContents())
+            if (is != null && mat.contains(is.getType()))
                 i++;
         return i;
     }
@@ -104,12 +107,20 @@ public class Limits {
         this.potion = potion;
     }
 
-    public HashMap<Enchantment, Integer> getEnchant() {
-        return enchant;
+    public HashMap<Enchantment, Integer> getEnchantGlobal() {
+        return enchantGlobal;
     }
 
-    public void setEnchant(HashMap<Enchantment, Integer> enchant) {
-        this.enchant = enchant;
+    public void setEnchantGlobal(HashMap<Enchantment, Integer> enchantGlobal) {
+        this.enchantGlobal = enchantGlobal;
+    }
+
+    public HashMap<Enchantment, HashMap<Material, Integer>> getEnchantSpe() {
+        return enchantSpe;
+    }
+
+    public void setEnchantSpe(HashMap<Enchantment, HashMap<Material, Integer>> enchantSpe) {
+        this.enchantSpe = enchantSpe;
     }
 
     public int getWearingMaxDiamondPieces() {

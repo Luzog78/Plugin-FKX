@@ -37,10 +37,10 @@ public class BlockPlaceHandler implements Listener {
 
             if (fp.getTeam() != null && fp.getTeam().isInside(e.getBlock().getLocation())
                     && (e.getBlock().getType() == Material.CHEST || e.getBlock().getType() == Material.TRAPPED_CHEST)
-                    && (e.getBlock().getLocation().getBlockY() > fp.getTeam().getSpawn().getBlockY() + 5
+                    && (e.getBlock().getLocation().getBlockY() > fp.getTeam().getSpawn().getBlockY() + 20
                     || e.getBlock().getLocation().getBlockY() < fp.getTeam().getSpawn().getBlockY() - 20)) {
                 e.setCancelled(true);
-                e.getPlayer().sendMessage("§cVous ne pouvez placer de coffre qu'entre Y +5 et Y -20 blocks"
+                e.getPlayer().sendMessage("§cVous ne pouvez placer de coffre qu'entre Y +20 et Y -20 blocks"
                         + " dans votre base par rapport à votre spawn.");
                 return;
             }

@@ -6,6 +6,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Limits;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -57,6 +58,24 @@ public class InventoryClickHandler implements Listener {
                     e.setCancelled(true);
                     return;
                 }
+        }
+
+        if (FKManager.getCurrentGame() != null && e.getInventory().getType() == InventoryType.ANVIL
+                && e.getRawSlot() == 2 && e.getCurrentItem() != null) {
+            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantGlobal().keySet())
+                if (e.getCurrentItem().containsEnchantment(ench) && e.getCurrentItem().getEnchantmentLevel(ench)
+                        > FKManager.getCurrentGame().getLimits().getEnchantGlobal().get(ench)) {
+                    e.setCancelled(true);
+                    return;
+                }
+            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantSpe().keySet())
+                for(Material mat : FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).keySet())
+                    if (e.getCurrentItem().getType() == mat && e.getCurrentItem().containsEnchantment(ench)
+                            && e.getCurrentItem().getEnchantmentLevel(ench)
+                            > FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).get(mat)) {
+                        e.setCancelled(true);
+                        return;
+                    }
         }
 
         List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getWhoClicked().getName());

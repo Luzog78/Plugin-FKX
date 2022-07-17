@@ -158,7 +158,9 @@ public class GuiTeams {
         Inventory inv = Guis.getBaseInventory("§6Équipe §7-§b" + team.getId(), 54, back,
                 getMainItem(null, "null"), null);
 
-        inv.setItem(Utils.posOf(4, 1), getTeamItem(team, "Clic pour rafraîchir", refresh));
+        inv.setItem(Utils.posOf(4, 1), Items.builder(getTeamItem(team, "Clic pour rafraîchir", "null"))
+                .addLore("§7Clic Droit pour prendre la bannière").setCantClickOn(true)
+                .setLeftRightCommandOnClick(refresh, "fk banner " + team.getColor().name()).build());
         inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(team.getId(),
                 "Clic pour voir les joueurs", "fk teams " + team.getId() + " playersGui",
                 team.getPlayers().size(), (int) team.getPlayers().stream().filter(p ->
@@ -235,6 +237,8 @@ public class GuiTeams {
                         "§7 (Shift pour augmenter de 1)",
                         "§7Clic Droit pour diminuer de 0.5",
                         "§7 (Shift pour diminuer de 1)",
+                        "§7Clic Molette pour créer le mur",
+                        "§7 > Pose une couche de §8Cobble",
                         "§7Commande :",
                         "§7/fk teams " + team.getId() + " options --r <radius>"
                 )
@@ -245,6 +249,7 @@ public class GuiTeams {
                         "fk teams " + team.getId() + " options --r " + (team.getRadius() > 0.5 ? team.getRadius() - 0.5 : 0) + "\n" + refresh,
                         "fk teams " + team.getId() + " options --r " + (team.getRadius() > 1 ? team.getRadius() - 1 : 0) + "\n" + refresh
                 )
+                .setMiddleCommandOnClick("fk teams " + team.getId() + " wall 1 cobblestone")
                 .build());
 
 

@@ -19,6 +19,7 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,6 +140,12 @@ public class FKListener {
 
                     if (fkp.getTeam() == null)
                         displayName = "§z§8§l[§4" + SpecialChars.ATOM + "§8§l]§8 » " + displayName;
+                    else if (fkp.getTeam().getId().equals(FKTeam.GODS_ID))
+                        displayName = "§a§r" + displayName;
+                    else if (fkp.getTeam().getId().equals(FKTeam.SPECS_ID))
+                        displayName = "§c§r" + displayName;
+                    else
+                        displayName = "§b§r" + displayName;
 
                     if (Vanish.vanished.contains(p.getName()))
                         if (Vanish.isPrefix)
@@ -154,8 +161,19 @@ public class FKListener {
 
 //                  String directionalArrow = "§6" + new DecimalFormat("0.0").format(p.getLocation().distance(new Location(p.getWorld(), -256.5, p.getLocation().getY(), -143.5)))
 //                          + "m §e" + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), -256.5, -143.5);
-                    long waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count();
-                    if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID) && waitingAds > 0)
+                    long waitingAds;
+                    if (fkp.getCompass() != null && fkp.getCompass().getLocation() != null)
+                        ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
+                                new PacketPlayOutChat(new ChatComponentText(
+                                        (fkp.getCompass().getName() == null ? "§cnull" : "§6" + fkp.getCompass().getName())
+                                                + "  §7-  §6" + new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+                                                .format(p.getLocation().distance(fkp.getCompass().getLocation()))
+                                                + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
+                                                p.getLocation().getX(), p.getLocation().getZ(),
+                                                fkp.getCompass().getLocation().getX(), fkp.getCompass().getLocation().getZ())
+                                ), (byte) 2));
+                    else if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID)
+                            && (waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count()) > 0)
                         ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
                                 new PacketPlayOutChat(new ChatComponentText(
                                         Ad.AD_PREFIX + "§f" + waitingAds + "§a ads en attente"), (byte) 2));
@@ -231,7 +249,8 @@ public class FKListener {
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
         h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Builder : §f" + "Isumaki" + "§9  ||  Developpeur : §f" + "Luzog78");
+        h.add("§9Builder : §f" + "Isumaki");
+        h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§3Bienvenue à toi cher §9" + (fp == null ? p.getDisplayName() : fp.getDisplayName()) + "§3,");
         h.add("§3l'équipe souhaite une bonne aventure !");
@@ -253,7 +272,7 @@ public class FKListener {
         try {
             f.add(fp == null || fp.getTeam() == null ? no_team
                     : fp.getTeam().getName() + "§7 - §6" +
-                    (!p.getWorld().getName().equals(fp.getTeam().getSpawn().getWorld().getName()) ?
+                    (!Objects.equals(p.getWorld(), fp.getTeam().getSpawn().getWorld()) ?
                             "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
                             : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
                             + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
@@ -266,32 +285,35 @@ public class FKListener {
             System.out.println(Color.RESET);
         }
         f.add(" ");
-        f.add("§7§nÉquipes :§r");
-        f.add(" ");
-        ArrayList<String> a1 = new ArrayList<>(), a2 = new ArrayList<>();
-        manager.getParticipantsTeams().stream().filter(t -> !t.isEliminated()).forEach(t -> {
-            String s = "";
-            if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
-                    || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
-                s = t.getName() + "§7 » §6" + df.format(t.getSpawn().getX())
-                        + " " + df.format(t.getSpawn().getZ()); // p.getLocation().distance(t.getSpawn())
-            if (!s.equals(""))
-                if (!t.isEliminated()) { // Always false but.. it's wrote so.. I let it here.
-                    if (!a1.isEmpty() && a1.size() % 3 == 0)
-                        s = "\n" + s;
-                    a1.add(s);
-                } else {
-                    if (!a2.isEmpty() && a2.size() % 3 == 0)
-                        s = "\n" + s;
-                    a2.add(s);
-                }
-        });
-        for (String s : String.join("\uffff", a1).replace("\uffff\n", "\n").split("\n"))
-            f.add(s.replace("\uffff", "§r  §b||  §r"));
-        if (a2.isEmpty())
-            f.add(" ");
-        for (String s : String.join("\uffff", a2).replace("\uffff\n", "\n").split("\n"))
-            f.add(s.replace("\uffff", "§r  §b||  §r"));
+//        Note : 100% Working Code
+//        f.add("§7§nÉquipes :§r");
+//        f.add(" ");
+//        ArrayList<String> a1 = new ArrayList<>(), a2 = new ArrayList<>();
+//        manager.getParticipantsTeams().stream().filter(t -> !t.isEliminated()).forEach(t -> {
+//            String s = "";
+//            if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
+//                    || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
+//                s = t.getName() + "§7 » §6" + df.format(t.getSpawn().getX())
+//                        + " " + df.format(t.getSpawn().getZ()); // p.getLocation().distance(t.getSpawn())
+//            if (!s.equals(""))
+//                if (!t.isEliminated()) { // Always false but.. it's wrote so.. I let it here.
+//                    if (!a1.isEmpty() && a1.size() % 3 == 0)
+//                        s = "\n" + s;
+//                    a1.add(s);
+//                } else {
+//                    if (!a2.isEmpty() && a2.size() % 3 == 0)
+//                        s = "\n" + s;
+//                    a2.add(s);
+//                }
+//        });
+//        for (String s : String.join("\uffff", a1).replace("\uffff\n", "\n").split("\n"))
+//            f.add(s.replace("\uffff", "§r  §b||  §r"));
+//        if (a2.isEmpty())
+//            f.add(" ");
+//        for (String s : String.join("\uffff", a2).replace("\uffff\n", "\n").split("\n"))
+//            f.add(s.replace("\uffff", "§r  §b||  §r"));
+
+//        Old Code :/ But works pretty well I think
 //        manager.getParticipantsTeams().forEach(t -> {
 //            if (manager.getPlayer(p.getName(), false) == null || manager.getPlayer(p.getName(), false).getTeam() == null
 //                    || !manager.getPlayer(p.getName(), false).getTeam().equals(t))
@@ -303,8 +325,7 @@ public class FKListener {
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
-                + (Bukkit.getServer().getIp().equals("") ? "play.azion.fr:25580" : Bukkit.getServer().getIp()));
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr:25580");
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
@@ -314,7 +335,8 @@ public class FKListener {
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
         h.add(" ");
         h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Builder : §f" + "Isumaki" + "§9  ||  Developpeur : §f" + "Luzog78");
+        h.add("§9Builder : §f" + "Isumaki");
+        h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
         h.add("§cMalheureusement, tu n'es actuellement");
@@ -330,8 +352,7 @@ public class FKListener {
         f.add("§7---");
         f.add(" ");
         f.add(" ");
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip : §a"
-                + (Bukkit.getServer().getIp().equals("") ? "play.azion.fr:25580" : Bukkit.getServer().getIp()));
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr:25580");
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
@@ -355,7 +376,7 @@ public class FKListener {
      * @luzog Copyrights
      */
     public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ) {
-        if (Math.abs(fromX - toX) < 3 && Math.abs(fromZ - toZ) < 3)
+        if (Math.abs(fromX - toX) < 5 && Math.abs(fromZ - toZ) < 5)
             return a[10];
 
         double y = (yaw >= 0 ? yaw : 360 + yaw) * Math.PI / 180;

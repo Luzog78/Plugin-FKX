@@ -19,6 +19,7 @@ public class FKCHelp {
         u.send("", "§a > §6/fk activations §7- §eModifie les options du FK");
         u.send("", "§a > §6/fk banner §7- §eDonne les bannières du Jeu");
         u.send("", "§a > §6/fk (bc || broadcast) §7- §eEnvoie un message à tous les joueurs");
+        u.send("", "§a > §6/fk compass §7- §eModifie la direction suivie par le joueur");
         u.send("", "§a > §6/fk date §7- §eGère la date, le temps, et la météo");
         u.send("", "§a > §6/fk game §7- §eManage les différentes parties");
         u.send("", "§a > §6/fk locks §7- §eCréé des coffres crochetables");

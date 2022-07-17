@@ -209,7 +209,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
         if (FKManager.getCurrentGame() != null)
             FKManager.getCurrentGame().getGods().getPlayers().forEach(p -> {
                 if (p.getPlayer() != null) {
-                    p.getPlayer().sendMessage(AD_PREFIX + "§aRequêtes disponibles pour les grands maîtres...");
+                    p.getPlayer().sendMessage(AD_PREFIX + "§aRequêtes disponibles pour les grands maîtres de la part de §6"
+                            + ad.getSender() + "...");
                     p.getPlayer().sendMessage(AD_PREFIX + "§7Un petit §8/ad help§7 pourrais vous être util. ^^");
                     List<Sound> sounds = Arrays.asList(Sound.GHAST_CHARGE, /* Sound.GHAST_DEATH, Sound.GHAST_FIREBALL, */
                             Sound.GHAST_MOAN, Sound.GHAST_SCREAM, Sound.GHAST_SCREAM2);

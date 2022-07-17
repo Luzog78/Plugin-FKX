@@ -75,8 +75,8 @@ public class Events implements Listener {
             Material.POTATO, Material.POTATO_ITEM, Material.FIRE, Material.FLINT_AND_STEEL, Material.BUCKET,
             Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET/*, Material.WORKBENCH,
             Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE*/);
-    public static List<Material> unbreakableMat = Arrays.asList(Material.MOB_SPAWNER, Material.WOOL);
-    public static List<Material> unplaceableMat = Arrays.asList(Material.WOOL);
+    public static List<Material> unbreakableMat = new ArrayList<>();
+    public static List<Material> unplaceableMat = new ArrayList<>();
 
     public static List<Material> diamond = Arrays.asList(Material.DIAMOND_HELMET, Material.DIAMOND_CHESTPLATE,
             Material.DIAMOND_LEGGINGS, Material.DIAMOND_BOOTS, Material.DIAMOND_SWORD, Material.DIAMOND_AXE,
@@ -738,8 +738,12 @@ public class Events implements Listener {
         Limits lim = FKManager.getCurrentGame().getLimits();
 
         for (Enchantment enchant : e.getEnchantsToAdd().keySet())
-            if (lim.getEnchant().containsKey(enchant)
-                    && e.getEnchantsToAdd().get(enchant) > lim.getEnchant().get(enchant))
+            if (lim.getEnchantSpe().containsKey(enchant)
+                    && lim.getEnchantSpe().get(enchant).containsKey(e.getItem().getType())
+                    && e.getEnchantsToAdd().get(enchant) > lim.getEnchantSpe().get(enchant).get(e.getItem().getType()))
+                e.setCancelled(true);
+            else if (lim.getEnchantGlobal().containsKey(enchant)
+                    && e.getEnchantsToAdd().get(enchant) > lim.getEnchantGlobal().get(enchant))
                 e.setCancelled(true);
     }
 

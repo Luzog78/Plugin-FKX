@@ -77,6 +77,17 @@ FK:
     - /fk (bc || broadcast) help
     - /fk (bc || broadcast) <type> <message...>
     - Type: [normal, succ, err, log, info, announcement, event, warn, sys_succ, sys_err]
+  - Compass:
+    - /fk compass
+    - /fk compass help
+    - /fk compass nothing
+    - /fk compass lobby
+    - /fk compass spawn
+    - /fk compass nether
+    - /fk compass end
+    - /fk compass team <teamId>
+    - /fk compass zone <zoneId>
+    - /fk compass page <page>
   - Date:
     - /fk date
     - /fk date help
@@ -232,6 +243,8 @@ FK:
     - /fk teams <id> chestRoom <x> <y> <z> <world>
     - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi>
     - /fk teams <id> chestRoom <x> <y> <z> <yw> <pi> <world>
+    - /fk teams <id> wall <material>
+    - /fk teams <id> wall <height> <material>
     - /fk teams <id> options help
     - /fk teams <id> options list
     - /fk teams <id> options <options...>

@@ -40,71 +40,69 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        System.out.println(" ");
-        Color.sout(HEADER);
-        souf("         §fInitialisation des differentes composantes");
-        souf("           §fdu plugin de §bFallen Kingdom X§f...");
-        souf("");
-        souf("");
-
-        soufInstruction("§6Initialisation du module : §eConfigurations§6...");
-        globalConfig = new Config.Globals("Globals.yml").load()
-                .setVersion(VERSION, true)
-                .setLang("fr-FR", false)
-                .setWorlds("world", "world_nether", "world_the_end", false)
-                .setCustomVanillaCraftsActivated(false, false)
-                .setCustomCraftingTableActivated(true, false)
-                .setCustomLootingSystemActivated(true, false)
-                .save()
-                .load(); // Reload the config for the next lines
-
-        customCrafts = globalConfig.isCustomVanillaCraftsActivated();
-        customCraftingTable = globalConfig.isCustomCraftingTableActivated();
-        customLootingSystem = globalConfig.isCustomLootingSystemActivated();
-
         new BukkitRunnable() {
             @Override
             public void run() {
+                System.out.println(" ");
+                Color.sout(HEADER);
+                souf("         §fInitialisation des differentes composantes");
+                souf("           §fdu plugin de §bFallen Kingdom X§f...");
+                souf("");
+                souf("");
+
+                soufInstruction("§6Initialisation du module : §eConfigurations§6...");
+                globalConfig = new Config.Globals("Globals.yml").load()
+                        .setVersion(VERSION, true)
+                        .setLang("fr-FR", false)
+                        .setWorlds("world", "world_nether", "world_the_end", false)
+                        .setCustomVanillaCraftsActivated(false, false)
+                        .setCustomCraftingTableActivated(true, false)
+                        .setCustomLootingSystemActivated(true, false)
+                        .save()
+                        .load(); // Reload the config for the next lines
+
+                customCrafts = globalConfig.isCustomVanillaCraftsActivated();
+                customCraftingTable = globalConfig.isCustomCraftingTableActivated();
+                customLootingSystem = globalConfig.isCustomLootingSystemActivated();
+
                 world = globalConfig.getOverworld();
                 nether = globalConfig.getNether();
                 end = globalConfig.getEnd();
-            }
-        }.runTask(this);
 
-        soufInstruction("§6Initialisation du module : §eVanish§6...");
-        Vanish.initFromConfig();
+                soufInstruction("§6Initialisation du module : §eVanish§6...");
+                Vanish.initFromConfig();
 
-        soufInstruction("§6Initialisation du module : §eCommandes§6...");
-        CommandManager.init();
+                soufInstruction("§6Initialisation du module : §eCommandes§6...");
+                CommandManager.init();
 
-        soufInstruction("§6Initialisation du module : §eAd§6...");
-        Ad.initFromConfig();
+                soufInstruction("§6Initialisation du module : §eAd§6...");
+                Ad.initFromConfig();
 
-        soufInstruction("§6Initialisation du module : §eRunnable§6...");
-        FKListener.scheduleMainTask();
+                soufInstruction("§6Initialisation du module : §eRunnable§6...");
+                FKListener.scheduleMainTask();
 
-        soufInstruction("§6Initialisation du module : §eFKManager§6...");
-        FKManager.initFromConfig(false);
-        if (FKManager.getCurrentGame() != null)
-            FKManager.getCurrentGame().getListener().scheduleTask();
+                soufInstruction("§6Initialisation du module : §eFKManager§6...");
+                FKManager.initFromConfig(false);
+                if (FKManager.getCurrentGame() != null)
+                    FKManager.getCurrentGame().getListener().scheduleTask();
 
-        soufInstruction("§6Initialisation du module : §eListeners§6...");
-        getServer().getPluginManager().registerEvents(this, this);
-        Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, this));
+                soufInstruction("§6Initialisation du module : §eListeners§6...");
+                getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
+                Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));
 
-        soufInstruction("§6Initialisation du module : §eCrafts§6...");
-        Crafting.initCrafts();
+                soufInstruction("§6Initialisation du module : §eCrafts§6...");
+                Crafting.initCrafts();
 
-        String last = globalConfig.getLastGame() == null ? FKManager.registered.isEmpty() ? null : FKManager.registered.get(0).getId() : globalConfig.getLastGame();
-        soufInstruction("§6Set de la derniere partie : " + (last != null ? "§a" + last : "§cAucune"));
-        FKManager.currentGameId = last;
+                String last = globalConfig.getLastGame() == null ? FKManager.registered.isEmpty() ? null : FKManager.registered.get(0).getId() : globalConfig.getLastGame();
+                soufInstruction("§6Set de la derniere partie : " + (last != null ? "§a" + last : "§cAucune"));
+                FKManager.currentGameId = last;
 
-        souf("");
-        soufInstruction("§aInitialisations terminees !");
+                souf("");
+                soufInstruction("§aInitialisations terminees !");
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
 //                FKManager man = new FKManager("null", FKManager.State.WAITING, 1, FKManager.Weather.CLEAR, 0, true,
 //                        new FKOptions(
 //                                new FKOptions.FKOption("PvP", 2, false),
@@ -179,17 +177,19 @@ public class Main extends JavaPlugin implements Listener {
 //                } catch (NullPointerException ignored) {
 //                }
 
-                saveAll(true);
-            }
-        }.runTaskLater(this, 10);
+                        saveAll(true);
+                    }
+                }.runTaskLater(Main.instance, 10);
 
-        souf("");
-        souf("");
-        souf("       §fTous les modules ont etes initialise, le plugin");
-        souf("         §fest maintenant pret. §aBon jeu a §2tous §a!");
-        soufDate();
-        Color.sout(FOOTER);
-        System.out.println(" ");
+                souf("");
+                souf("");
+                souf("       §fTous les modules ont etes initialise, le plugin");
+                souf("         §fest maintenant pret. §aBon jeu a §2tous §a!");
+                soufDate();
+                Color.sout(FOOTER);
+                System.out.println(" ");
+            }
+        }.runTask(this);
     }
 
     @Override

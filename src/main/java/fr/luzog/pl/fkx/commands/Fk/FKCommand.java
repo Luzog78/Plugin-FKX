@@ -14,7 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCommand implements CommandExecutor, TabCompleter {
-    public static final String syntaxe = "/fk [(? || help) | activations | banner | (bc || broadcast) | date | locks | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
+    public static final String syntaxe = "/fk [(? || help) | activations | banner | (bc || broadcast) | compass | date "
+            + "| locks | game | (perm || permissions) | players | portal | stats | teams | title | warp | zone] [<args...>]";
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -45,6 +46,10 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "broadcast":
                     if (hasPerm(sender, true, true))
                         FKCBroadcast.onCommand(sender, command, msg, args);
+                    break;
+                case "compass":
+                    if (isNotNull(sender, true))
+                        FKCCompass.onCommand(sender, command, msg, args);
                     break;
                 case "date":
                     if (hasPerm(sender, true, true) && isNotNull(sender, true))
@@ -78,7 +83,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                         FKCStats.onCommand(sender, command, msg, args);
                     break;
                 case "teams":
-                    if (hasPerm(sender, true, true) && isNotNull(sender, true))
+                    if ((hasPerm(sender, true, true) || sender.isOp()) && isNotNull(sender, true))
                         FKCTeams.onCommand(sender, command, msg, args);
                     break;
                 case "title":
@@ -140,6 +145,8 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 temp.add("bc");
             if (hasPerm(sender, true, false))
                 temp.add("broadcast");
+            if (isNotNull(sender, false))
+                temp.add("compass");
             if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("date");
             if (sender.isOp())
@@ -156,7 +163,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 temp.add("portal");
             if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("stats");
-            if (hasPerm(sender, true, false) && isNotNull(sender, false))
+            if ((hasPerm(sender, true, false) || sender.isOp()) && isNotNull(sender, false))
                 temp.add("teams");
             if (hasPerm(sender, false, false))
                 temp.add("title");
@@ -182,6 +189,10 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 case "broadcast":
                     if (hasPerm(sender, true, false))
                         temp.addAll(FKCBroadcast.onTabComplete(sender, command, msg, args));
+                    break;
+                case "compass":
+                    if (isNotNull(sender, false))
+                        temp.addAll(FKCCompass.onTabComplete(sender, command, msg, args));
                     break;
                 case "date":
                     if (hasPerm(sender, true, false) && isNotNull(sender, false))
@@ -213,7 +224,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                         temp.addAll(FKCStats.onTabComplete(sender, command, msg, args));
                     break;
                 case "teams":
-                    if (hasPerm(sender, true, false) && isNotNull(sender, false))
+                    if ((hasPerm(sender, true, false) || sender.isOp()) && isNotNull(sender, false))
                         temp.addAll(FKCTeams.onTabComplete(sender, command, msg, args));
                     break;
                 case "title":

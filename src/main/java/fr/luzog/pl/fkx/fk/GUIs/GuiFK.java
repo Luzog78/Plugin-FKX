@@ -141,24 +141,26 @@ public class GuiFK {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
+                        "  §8Distance : §6" + (loc != null ? new DecimalFormat("0.00",
+                                DecimalFormatSymbols.getInstance(Locale.ENGLISH))
                                 .format(from.distance(loc)) + "m  §7-  §6" + FKListener.getOrientationChar(
-                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()),
+                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ())
+                                : "§cAucune"),
                         " ",
                         "  §8Position :",
-                        "  §8  > X : §f" + loc.getX(),
-                        "  §8  > Y : §f" + loc.getY(),
-                        "  §8  > Z : §f" + loc.getZ(),
-                        "  §8  > Yaw : §f" + loc.getYaw(),
-                        "  §8  > Pitch : §f" + loc.getPitch(),
-                        "  §8  > Pitch : §f" + loc.getPitch(),
-                        "  §8  > World : §f" + Utils.getFormattedWorld(loc.getWorld().getName()),
+                        "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),
+                        "  §8  > Y : §f" + (loc == null ? "§cnull" : loc.getY()),
+                        "  §8  > Z : §f" + (loc == null ? "§cnull" : loc.getZ()),
+                        "  §8  > Yaw : §f" + (loc == null ? "§cnull" : loc.getYaw()),
+                        "  §8  > Pitch : §f" + (loc == null ? "§cnull" : loc.getPitch()),
+                        "  §8  > Pitch : §f" + (loc == null ? "§cnull" : loc.getPitch()),
+                        "  §8  > Monde : §f" + (loc == null ? "§cnull" : Utils.getFormattedWorld(loc.getWorld().getName())),
                         " ",
                         "§8" + Guis.loreSeparator,
                         "§7Clique pour aller à §f" + name
                 )
                 .setCantClickOn(true)
-                .setGlobalCommandOnClick("tp " + loc.getX() + " " + loc.getY() + " " + loc.getZ()
+                .setGlobalCommandOnClick(loc == null ? "" : "tp " + loc.getX() + " " + loc.getY() + " " + loc.getZ()
                         + " " + loc.getYaw() + " " + loc.getPitch() + " " + loc.getWorld().getName())
                 .build();
     }
@@ -167,7 +169,7 @@ public class GuiFK {
         if (fk == null)
             return Guis.getErrorInventory("Game null", back);
         return Guis.getPagedInventory("§fWarps", 54, back,
-                null, null,
+                getWarpsMainItem(fk, "Clic pour rafraîchir", navigationBaseCommand + " " + page), null,
                 navigationBaseCommand, page, new ArrayList<ItemStack>() {{
                     add(getWarpItem(new ItemStack(Material.GOLD_BLOCK), "§6Lobby", from, fk.getLobby().getSpawn()));
                     add(getWarpItem(new ItemStack(Material.REDSTONE_BLOCK), "§4Spawn", from, fk.getSpawn().getSpawn()));

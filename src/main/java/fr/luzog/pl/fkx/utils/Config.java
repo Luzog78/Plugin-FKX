@@ -573,7 +573,7 @@ public class Config {
     public static class Team extends Config {
         public static final String NAME = "name", PREFIX = "prefix", ELIMINATED = "eliminated",
                 ELIMINATORS = "eliminators", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
-                GUARDIAN = "chests-room.guardian-uuid",  ARMOR_STAND = "chests-room.armor-stand-uuid",
+                GUARDIAN = "chests-room.guardian-uuid", ARMOR_STAND = "chests-room.armor-stand-uuid",
                 RADIUS = "radius", OLD_PLAYERS = "old-players",
                 SPAWN = "spawn", PERMISSIONS = "permissions";
 
@@ -711,7 +711,8 @@ public class Config {
     }
 
     public static class Player extends Config {
-        public static final String LAST_UUID = "last-uuid", TEAM = "team", STATS = "stats", PERMISSIONS = "permissions";
+        public static final String LAST_UUID = "last-uuid", TEAM = "team", COMPASS = "compass",
+                STATS = "stats", PERMISSIONS = "permissions";
 
         public Player(@Nonnull String path) {
             super(path, true);
@@ -751,6 +752,23 @@ public class Config {
             return this;
         }
 
+        public FKPlayer.Compass getCompass() {
+            if (contains(COMPASS) && contains(COMPASS + ".location"))
+                return new FKPlayer.Compass(getStr(COMPASS + ".name"), super.getLoc(COMPASS + ".location"));
+            else
+                return null;
+        }
+
+        public Player setCompass(FKPlayer.Compass compass, boolean force) {
+            if (compass == null)
+                super.set(COMPASS, null, force);
+            else {
+                super.set(COMPASS + ".name", compass.getName(), force);
+                super.setLoc(COMPASS + ".location", compass.getLocation(), force);
+            }
+            return this;
+        }
+
         public PlayerStats getStats() {
             return super.getStats(STATS);
         }
@@ -771,9 +789,10 @@ public class Config {
     }
 
     public static class Limits extends Config {
-        public static final String CRAFT = "craft", POTION = "potion", ENCHANT = "enchant", HOLDING = "holding", WEARING_TIP = "wearing.tip",
-                WEARING_MAX_DIAMOND_PIECES = "wearing.max-pieces-of.diamond", WEARING_MAX_GOLD_PIECES = "wearing.max-pieces-of.gold",
-                WEARING_MAX_IRON_PIECES = "wearing.max-pieces-of.iron", WEARING_MAX_LEATHER_PIECES = "wearing.max-pieces-of.leather";
+        public static final String CRAFT = "craft", POTION = "potion", ENCHANT = "enchant.global", ENCHANT_SPE = "enchant.spe",
+                HOLDING = "holding", WEARING_TIP = "wearing.tip", WEARING_MAX_DIAMOND_PIECES = "wearing.max-pieces-of.diamond",
+                WEARING_MAX_GOLD_PIECES = "wearing.max-pieces-of.gold", WEARING_MAX_IRON_PIECES = "wearing.max-pieces-of.iron",
+                WEARING_MAX_LEATHER_PIECES = "wearing.max-pieces-of.leather";
 
         public Limits(@Nonnull String path) {
             super(path, true);
@@ -785,6 +804,7 @@ public class Config {
             set(CRAFT, new ArrayList<>(), false);
             set(POTION, new HashMap<>(), false);
             set(ENCHANT, new HashMap<>(), false);
+            set(ENCHANT_SPE, new HashMap<>(), false);
             set(HOLDING, new HashMap<>(), false);
             set(WEARING_TIP, Arrays.asList("<Max pieces of> section includes armor pieces AND sword",
                     new LinkedHashMap<Object, Object>() {{
@@ -833,7 +853,7 @@ public class Config {
             return this;
         }
 
-        public HashMap<Enchantment, Integer> getEnchant() {
+        public HashMap<Enchantment, Integer> getEnchantGlobal() {
             return new HashMap<Enchantment, Integer>() {{
                 if (contains(ENCHANT))
                     for (String k : getKeys(ENCHANT, false))
@@ -846,8 +866,36 @@ public class Config {
             }};
         }
 
-        public Limits setEnchant(HashMap<Enchantment, Integer> enchant, boolean force) {
+        public Limits setEnchantGlobal(HashMap<Enchantment, Integer> enchant, boolean force) {
             enchant.forEach((e, i) -> set(ENCHANT + "." + e.getName(), i, force));
+            return this;
+        }
+
+        public HashMap<Enchantment, HashMap<Material, Integer>> getEnchantSpe() {
+            return new HashMap<Enchantment, HashMap<Material, Integer>>() {{
+                if (contains(ENCHANT_SPE))
+                    for (String k : getKeys(ENCHANT_SPE, false))
+                        if (k != null)
+                            try {
+                                if (Enchantment.getByName(k.toUpperCase()) != null) {
+                                    HashMap<Material, Integer> v = new HashMap<>();
+                                    for (String kk : getKeys(ENCHANT_SPE + "." + k, false))
+                                        if (Material.getMaterial(kk) != null)
+                                            try {
+                                                v.put(Material.getMaterial(kk), getInt(ENCHANT_SPE + "." + k + "." + kk));
+                                            } catch (NumberFormatException ignore) {
+                                            }
+                                    if (!v.isEmpty())
+                                        put(Enchantment.getByName(k.toUpperCase()), v);
+                                }
+                            } catch (Exception ignore) {
+                            }
+            }};
+        }
+
+        public Limits setEnchantSpe(HashMap<Enchantment, HashMap<Material, Integer>> enchant, boolean force) {
+            enchant.forEach((e, k) -> k.forEach((m, i) ->
+                    set(ENCHANT_SPE + "." + e.getName() + "." + m.name(), i, force)));
             return this;
         }
 

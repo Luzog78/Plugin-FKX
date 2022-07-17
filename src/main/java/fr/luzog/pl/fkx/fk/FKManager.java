@@ -16,6 +16,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
+import java.security.Permission;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -108,7 +109,8 @@ public class FKManager {
                             Limits lim = new Limits();
                             Utils.tryTo(printStackTrace, () -> lim.setCraft(c.getCraft()));
                             Utils.tryTo(printStackTrace, () -> lim.setPotion(c.getPotion()));
-                            Utils.tryTo(printStackTrace, () -> lim.setEnchant(c.getEnchant()));
+                            Utils.tryTo(printStackTrace, () -> lim.setEnchantGlobal(c.getEnchantGlobal()));
+                            Utils.tryTo(printStackTrace, () -> lim.setEnchantSpe(c.getEnchantSpe()));
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxDiamondPieces(c.getWearingMaxDiamondPieces()));
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxGoldPieces(c.getWearingMaxGoldPieces()));
                             Utils.tryTo(printStackTrace, () -> lim.setWearingMaxIronPieces(c.getWearingMaxIronPieces()));
@@ -131,7 +133,8 @@ public class FKManager {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
                             if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
                                 Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
-                                FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null, null, null, null, null);
+                                FKZone zone = new FKZone(fff.getName().substring(0, fff.getName().length() - 4), null,
+                                        new Location(Main.world, 0, 0, 0), null, null, new FKPermissions(FKPermissions.Definition.DEFAULT));
 
                                 Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn()), false));
@@ -139,12 +142,17 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions()), false));
 
-                                if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE))
+                                if (fff.getName().equalsIgnoreCase(FKZone.LOBBY_FILE)) {
+                                    zone.setType(FKZone.Type.LOBBY, false);
                                     manager.setLobby(zone, false);
-                                else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE))
+                                } else if (fff.getName().equalsIgnoreCase(FKZone.SPAWN_FILE)) {
+                                    zone.setType(FKZone.Type.SPAWN, false);
                                     manager.setSpawn(zone, false);
-                                else
+                                } else {
+                                    if (zone.getType() == null)
+                                        zone.setType(FKZone.Type.ZONE, false);
                                     manager.getNormalZones().add(zone);
+                                }
                             }
                     } else if (ff.getName().equalsIgnoreCase("teams")) {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
@@ -175,7 +183,7 @@ public class FKManager {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        if(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID))
+                                        if (team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID))
                                             return;
                                         team.setChestsRoom(team.getChestsRoom() == null ? team.getSpawn()
                                                 : team.getChestsRoom(), true, false);
@@ -191,6 +199,7 @@ public class FKManager {
 
                                     Utils.tryTo(printStackTrace, () -> player.setLastUuid(Objects.requireNonNull(pc.getLastUuid()), false));
                                     Utils.tryTo(printStackTrace, () -> player.setTeam(Objects.requireNonNull(pc.getTeam()), false));
+                                    Utils.tryTo(printStackTrace, () -> player.setCompass(pc.getCompass(), false));
                                     Utils.tryTo(printStackTrace, () -> player.setStats(Objects.requireNonNull(pc.getStats()), false));
                                     Utils.tryTo(printStackTrace, () -> player.setPersonalPermissions(Objects.requireNonNull(pc.getPermissions()), false));
 
@@ -626,13 +635,13 @@ public class FKManager {
                 p.getPlayer().setFoodLevel(20);
                 p.getPlayer().setSaturation(20);
                 p.getPlayer().teleport(getLobby().getSpawn());
-                if(winners.contains(p) || (p.getTeam() != null && p.getTeam().getId().equals(FKTeam.GODS_ID))) {
+                if (winners.contains(p) || (p.getTeam() != null && p.getTeam().getId().equals(FKTeam.GODS_ID))) {
                     p.getPlayer().setGameMode(GameMode.CREATIVE);
                     p.getPlayer().setFlying(true);
                 } else {
                     p.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
-                if(p.getTeam() == null || !p.getTeam().getId().equals(FKTeam.GODS_ID)) {
+                if (p.getTeam() == null || !p.getTeam().getId().equals(FKTeam.GODS_ID)) {
                     p.getPlayer().getInventory().clear();
                     p.getPlayer().getInventory().setArmorContents(null);
                 }
@@ -651,7 +660,7 @@ public class FKManager {
                             p.sendMessage(Main.PREFIX + (c ? a1 : b1));
                             p.sendMessage(Main.PREFIX + (c ? a2 : b2));
                         });
-                if(!c)
+                if (!c)
                     cancel();
                 c = false;
             }
