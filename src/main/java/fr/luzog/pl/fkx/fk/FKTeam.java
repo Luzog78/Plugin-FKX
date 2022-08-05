@@ -3,17 +3,12 @@ package fr.luzog.pl.fkx.fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Config;
+import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
-import net.minecraft.server.v1_8_R3.EntityVillager;
-import net.minecraft.server.v1_8_R3.World;
 import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Villager;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.NameTagVisibility;
@@ -21,16 +16,13 @@ import org.bukkit.scoreboard.Team;
 
 import javax.annotation.Nonnull;
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FKTeam {
 
     public static final String GODS_ID = "gods", GODS_FILE = "Gods.yml",
-            SPECS_ID = "specs", SPECS_FILE = "Specs.yml", GUARDIAN_TAG = "FKGuardian";
+            SPECS_ID = "specs", SPECS_FILE = "Specs.yml", PLUNDER_STAND_TAG = "FKPlunderStand";
     public static final long ELIMINATION_TIMEOUT = 2000;
 
     public void saveToConfig(String gameId, boolean soft) {
@@ -48,8 +40,7 @@ public class FKTeam {
                 .setOldPlayers(oldPlayers, true)
                 .setEliminated(isEliminated, true)
                 .setSpawn(spawn, true)
-                .setChestsRoom(chestsRoom, true)
-                .setGuardian(guardian, true)
+                .setPlunderLoc(plunderLoc, true)
                 .setPermissions(permissions, true)
 
                 .save();
@@ -61,8 +52,7 @@ public class FKTeam {
 
     private String id, name, prefix, eliminators;
     private ChatColor color;
-    private Location spawn, chestsRoom;
-    private UUID guardian, armorStand;
+    private Location spawn, plunderLoc;
     private double radius;
     private ArrayList<String> oldPlayers;
     private boolean isEliminated;
@@ -79,9 +69,10 @@ public class FKTeam {
         this.eliminators = null;
         this.color = ChatColor.WHITE;
         this.spawn = new Location(Main.world, 0, 0, 0);
-        this.chestsRoom = new Location(Main.world, 0, 0, 0);
-        this.guardian = null;
-        this.armorStand = null;
+//        this.chestsRoom = new Location(Main.world, 0, 0, 0);
+//        this.guardian = null;
+//        this.armorStand = null;
+        this.plunderLoc = null;
         this.radius = 0;
         this.oldPlayers = new ArrayList<>();
         this.isEliminated = false;
@@ -92,17 +83,18 @@ public class FKTeam {
     }
 
     public FKTeam(String id, String name, String prefix, String eliminators, ChatColor color, Location spawn,
-                  Location chestsRoom, UUID guardian, UUID armorStand, double radius, ArrayList<String> oldPlayers,
-                  boolean isEliminated, long eliminationCooldown, FKPermissions permissions) {
+                  Location plunderLoc, double radius, ArrayList<String> oldPlayers, boolean isEliminated,
+                  long eliminationCooldown, FKPermissions permissions) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
         this.eliminators = eliminators;
         this.color = color;
         this.spawn = spawn;
-        this.chestsRoom = chestsRoom;
-        this.guardian = guardian;
-        this.armorStand = armorStand;
+//        this.chestsRoom = chestsRoom;
+//        this.guardian = guardian;
+//        this.armorStand = armorStand;
+        this.plunderLoc = plunderLoc;
         this.radius = radius;
         this.oldPlayers = oldPlayers == null ? new ArrayList<>() : oldPlayers;
         this.isEliminated = isEliminated;
@@ -126,33 +118,57 @@ public class FKTeam {
                     (float) ((eliminationCooldown * 1.0) / ELIMINATION_TIMEOUT), "§a{p.}% {b}");
     }
 
+    public boolean everyoneIsNearOf(Location loc) {
+        return getPlayers().stream().allMatch(p -> {
+            Double d;
+            return getManager().getState() == FKManager.State.RUNNING
+                    && (p.getPlayer() == null || ((d = Utils.safeDistance(p.getPlayer().getLocation(),
+                    loc, true)) != null && d <= 5.5));
+        });
+    }
+
     public boolean isEliminating() {
         return eliminationCooldown > 0;
     }
 
-    public void tryToEliminate(FKTeam team) {
+    public void tryToEliminate(FKTeam team, Location plunderLocation) {
+        eliminationCooldown = ELIMINATION_TIMEOUT;
         eliminators = team.getId();
-        getGuardian().setCustomNameVisible(true);
+        plunderLoc = plunderLocation;
+        updateArmorStand();
+//        getGuardian().setCustomNameVisible(true);
+
+        Broadcast.log(SpecialChars.WARNING + " L'équipe §l" + getColor() + getName()
+                + "§r se fait !assaillir par les §l" + team.getColor() + team.getName() + "§r ! (Plus que !"
+                + ((int) (eliminationCooldown / 20)) + " sec)");
 
         team.getPlayers().stream().map(FKPlayer::getPlayer).filter(Objects::nonNull).forEach(p -> {
-            p.sendMessage("§aVous essayez d'assaillir le §6Guardien des Coffres§a de l'équipe " + color + name + "§a !"
-                    + "\n§aVous avez §c100 secondes§a à tenir à moins de §c5 blocs§a du §6Gardien§a... Courage !");
+            p.sendMessage("§aVous essayez d'assaillir l'équipe " + color + name + "§a !"
+                    + "\n§aVous avez §c" + ((int) (eliminationCooldown / 20))
+                    + " secondes§a à tenir à moins de §c5 blocs§a du coffre§a... Courage !");
             p.playSound(p.getLocation(), Sound.VILLAGER_IDLE, Float.MAX_VALUE, 1);
         });
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                getGuardian();
-                Entity e = getArmorStand();
-                e.setCustomNameVisible(true);
+//                getGuardian();
+//                Entity e = getArmorStand();
+//                e.setCustomNameVisible(true);
 
-                if (!isEliminated && team.getPlayers().stream().allMatch(p -> p.getPlayer() != null
-                        && p.getPlayer().getLocation().distance(chestsRoom) <= 5) && team.getId().equals(eliminators)
-                        && getManager().getState() == FKManager.State.RUNNING)
-                    if (eliminationCooldown < ELIMINATION_TIMEOUT) {
-                        eliminationCooldown++;
-                        e.setCustomName(getProgressBar());
+                if (!isEliminated && Objects.equals(team.getId(), eliminators) && team.everyoneIsNearOf(plunderLoc))
+                    if (eliminationCooldown > 0) {
+                        eliminationCooldown--;
+                        updateArmorStand();
+                        if(eliminationCooldown == (long) (ELIMINATION_TIMEOUT / 2))
+                            Broadcast.log(SpecialChars.WARNING + " " + SpecialChars.WARNING + " L'équipe §l"
+                                    + getColor() + getName() + "§r va bientôt se faire !éliminer par les §l"
+                                    + team.getColor() + team.getName() + "§r ! (Plus que !"
+                                    + ((int) (eliminationCooldown / 20)) + " sec)");
+                        else if(eliminationCooldown == 10 * 20)
+                            Broadcast.err(SpecialChars.WARNING + " " + SpecialChars.WARNING + " " + SpecialChars.WARNING
+                                    + " L'équipe §l" + getColor() + getName() + "§r n'a plus que !10 sec avant de !périr par les §l"
+                                    + team.getColor() + team.getName() + "§r !");
                     } else {
                         setEliminators(eliminators, true);
                         eliminate(true, true, true);
@@ -165,10 +181,12 @@ public class FKTeam {
                 else {
                     eliminationCooldown = 0;
                     eliminators = null;
-                    e.setCustomName(getProgressBar());
-                    e.setCustomNameVisible(false);
+                    plunderLoc = null;
+                    killArmorStand();
+//                    e.setCustomName(getProgressBar());
+//                    e.setCustomNameVisible(false);
                     team.getPlayers().stream().map(FKPlayer::getPlayer).filter(Objects::nonNull).forEach(p -> {
-                        p.sendMessage("§cAssaut Annulé.\n§cUne ou plusieurs personne de votre team a déserté le §6Gardien des coffres§c.");
+                        p.sendMessage("§cAssaut Annulé.\n§cUne ou plusieurs personne de votre team a déserté le lieu du pillage.");
                         p.playSound(p.getLocation(), Sound.ANVIL_LAND, 1, 1);
                     });
                     cancel();
@@ -181,9 +199,9 @@ public class FKTeam {
     public void eliminate(boolean broadcast, boolean checkForTheOther, boolean save) {
         isEliminated = true;
         eliminationCooldown = 0;
-        Entity e = getArmorStand();
-        e.setCustomName(getProgressBar());
-        e.setCustomNameVisible(isEliminated);
+//        Entity e = getArmorStand();
+//        e.setCustomName(getProgressBar());
+//        e.setCustomNameVisible(isEliminated);
         getPlayers().forEach(p -> {
             oldPlayers.add(p.getName());
             if (broadcast && p.getPlayer() != null)
@@ -198,7 +216,7 @@ public class FKTeam {
                     p.getPlayer().teleport(getManager().getLobby().getSpawn());
             }
         });
-        Broadcast.announcement(Main.PREFIX + "§r§lLa team " + name + " a été !éliminée de la partie."
+        Broadcast.announcement(Main.PREFIX + "§r§lLa team " + name + " a été !éliminée §lde la partie."
                 + "\nDonc !" + oldPlayers.size() + " !joueurs ont été éliminés.");
         if (save && getManager() != null)
             saveToConfig(getManager().getId(), false);
@@ -215,9 +233,9 @@ public class FKTeam {
     public void reintroduce(boolean broadcast, boolean save) {
         isEliminated = false;
         eliminationCooldown = 0;
-        Entity e = getArmorStand();
-        e.setCustomName(getProgressBar());
-        e.setCustomNameVisible(isEliminated);
+//        Entity e = getArmorStand();
+//        e.setCustomName(getProgressBar());
+//        e.setCustomNameVisible(isEliminated);
         int count = oldPlayers.size();
         oldPlayers.forEach(pName -> {
             FKPlayer p = getManager().getPlayer(pName, true);
@@ -255,7 +273,7 @@ public class FKTeam {
                     for (int y = 254; y > 0; y--)
                         if (!transparent.contains(spawn.getWorld().getBlockAt(x, y, z).getType())) {
                             for (int i = height >= 0 ? 0 : -1; (height >= 0) == (i < height); i += height >= 0 ? 1 : -1)
-                                if(y + 1 + i < 256 && (height < 0 || transparent.contains(spawn.getWorld()
+                                if (y + 1 + i < 256 && (height < 0 || transparent.contains(spawn.getWorld()
                                         .getBlockAt(x, y + 1 + i, z).getType())))
                                     spawn.getWorld().getBlockAt(x, y + 1 + i, z)
                                             .setType(material, true);
@@ -264,8 +282,9 @@ public class FKTeam {
     }
 
     public void altar() {
-        spawn.getBlock().setType(Material.FENCE, true);
-        spawn.clone().add(0, 1, 0).getBlock().setType(Material.FENCE, true);
+//        It jams the players.. :/
+//        spawn.getBlock().setType(Material.FENCE, true);
+//        spawn.clone().add(0, 1, 0).getBlock().setType(Material.FENCE, true);
         spawn.clone().add(0, 2, 0).getBlock().setType(Material.FENCE, true);
         spawn.clone().add(0, 3, 0).getBlock().setType(Material.FENCE, true);
 
@@ -316,93 +335,100 @@ public class FKTeam {
         scoreboardTeam.setAllowFriendlyFire(true);
     }
 
-    public Entity getGuardian() {
+//    public Entity getGuardian() {
+//        if (id.equalsIgnoreCase(GODS_ID) || id.equalsIgnoreCase(SPECS_ID))
+//            return null;
+//        if (chestsRoom == null)
+//            setChestsRoom(spawn.clone(), false, true);
+//        Villager e = null;
+//        for (Entity ee : chestsRoom.getWorld().getEntities())
+//            if (ee.getUniqueId().equals(guardian)) {
+//                e = (Villager) ee;
+//                break;
+//            }
+//        if (e == null) {
+////            EntityVillager vil = new EntityVillager(((CraftWorld) chestsRoom.getWorld()).getHandle()) {
+////                public String t() {
+////                    return "";
+////                }
+////            };
+////
+////            vil.spawnIn(((CraftWorld) chestsRoom.getWorld()).getHandle());
+////            vil.teleportTo(chestsRoom, false);
+////            e = (Villager) vil.getBukkitEntity();
+//
+//            e = (Villager) Main.world.spawnEntity(chestsRoom, EntityType.VILLAGER);
+//            e.setAdult();
+//            e.setAgeLock(true);
+//            e.setCanPickupItems(false);
+//            e.setCustomName("Guardian");
+//            e.setCustomNameVisible(false);
+////            e.setNoDamageTicks(Integer.MAX_VALUE);
+//            e.setRemoveWhenFarAway(false);
+//            ((CraftLivingEntity) e).getHandle().getDataWatcher().watch(15, (byte) 1); // NoGravity Option
+////            EntityLiving nms = ((CraftLivingEntity) e).getHandle();
+////            NBTTagCompound nbt = nms.getNBTTag();
+////
+////            nbt.setByte("NoAI", (byte) 1);
+////            nbt.setByte("NoGravity", (byte) 1);
+////
+////            nms.f(nbt);
+//            e.setMetadata(GUARDIAN_TAG, new FixedMetadataValue(Main.instance, id));
+//            setGuardianUuid(e.getUniqueId(), true);
+//        }
+//        return e;
+//    }
+//
+//    public void killGuardian() {
+//        if (guardian != null)
+//            Main.world.getEntities().stream().filter(e -> e.getUniqueId().equals(guardian)).forEach(Entity::remove);
+//        setGuardianUuid(null, true);
+//    }
+
+    public Entity updateArmorStand() {
         if (id.equalsIgnoreCase(GODS_ID) || id.equalsIgnoreCase(SPECS_ID))
             return null;
-        if (chestsRoom == null)
-            setChestsRoom(spawn.clone(), false, true);
-        Villager e = null;
-        for (Entity ee : chestsRoom.getWorld().getEntities())
-            if (ee.getUniqueId().equals(guardian)) {
-                e = (Villager) ee;
-                break;
-            }
-        if (e == null) {
-//            EntityVillager vil = new EntityVillager(((CraftWorld) chestsRoom.getWorld()).getHandle()) {
-//                public String t() {
-//                    return "";
-//                }
-//            };
-//
-//            vil.spawnIn(((CraftWorld) chestsRoom.getWorld()).getHandle());
-//            vil.teleportTo(chestsRoom, false);
-//            e = (Villager) vil.getBukkitEntity();
-
-            e = (Villager) Main.world.spawnEntity(chestsRoom, EntityType.VILLAGER);
-            e.setAdult();
-            e.setAgeLock(true);
-            e.setCanPickupItems(false);
-            e.setCustomName("Guardian");
-            e.setCustomNameVisible(false);
-//            e.setNoDamageTicks(Integer.MAX_VALUE);
-            e.setRemoveWhenFarAway(false);
-            ((CraftLivingEntity) e).getHandle().getDataWatcher().watch(15, (byte) 1); // NoGravity Option
-//            EntityLiving nms = ((CraftLivingEntity) e).getHandle();
-//            NBTTagCompound nbt = nms.getNBTTag();
-//
-//            nbt.setByte("NoAI", (byte) 1);
-//            nbt.setByte("NoGravity", (byte) 1);
-//
-//            nms.f(nbt);
-            e.setMetadata(GUARDIAN_TAG, new FixedMetadataValue(Main.instance, id));
-            setGuardianUuid(e.getUniqueId(), true);
-        }
-        return e;
-    }
-
-    public void killGuardian() {
-        if (guardian != null)
-            Main.world.getEntities().stream().filter(e -> e.getUniqueId().equals(guardian)).forEach(Entity::remove);
-        setGuardianUuid(null, true);
-    }
-
-    public Entity getArmorStand() {
-        if (id.equalsIgnoreCase(GODS_ID) || id.equalsIgnoreCase(SPECS_ID))
+        if (plunderLoc == null) {
+            killArmorStand();
             return null;
-        if (chestsRoom == null)
-            setChestsRoom(spawn.clone(), false, true);
-        ArmorStand e = null;
-        for (Entity ee : chestsRoom.getWorld().getEntities())
-            if (ee.getUniqueId().equals(armorStand)) {
-                e = (ArmorStand) ee;
-                break;
+        } else {
+            ArmorStand e = null;
+            List<Entity> l = new ArrayList<>();
+            Bukkit.getWorlds().forEach(w -> l.addAll(w.getEntities().stream().filter(ee ->
+                    ee.hasMetadata(PLUNDER_STAND_TAG) && ee.getMetadata(PLUNDER_STAND_TAG).get(0)
+                            .asString().equalsIgnoreCase(id)).collect(Collectors.toList())));
+            if (l.size() > 0)
+                e = (ArmorStand) l.get(0);
+            if (l.size() > 1)
+                l.subList(1, l.size()).forEach(Entity::remove);
+            if (e == null) {
+                e = (ArmorStand) plunderLoc.getWorld().spawnEntity(plunderLoc.clone()
+                        .subtract(0, 1.45, 0), EntityType.ARMOR_STAND);
+                e.setVisible(false);
+                e.setGravity(false);
+                e.setCanPickupItems(false);
+                e.setSmall(false);
+                e.setBasePlate(false);
+                e.setRemoveWhenFarAway(false);
+                e.setNoDamageTicks(Integer.MAX_VALUE); // ~3.4 years of god mod
+                e.setMetadata(PLUNDER_STAND_TAG, new FixedMetadataValue(Main.instance, id));
             }
-        if (e == null) {
-            e = (ArmorStand) Main.world.spawnEntity(chestsRoom.clone().add(0, 1, 0), EntityType.ARMOR_STAND);
-            e.setCustomName(getProgressBar());
-            e.setCustomNameVisible(isEliminating() || isEliminated);
-            e.setVisible(false);
-            e.setGravity(false);
-            e.setCanPickupItems(false);
-            e.setSmall(true);
-            e.setBasePlate(false);
-            e.setRemoveWhenFarAway(false);
-            e.setNoDamageTicks(Integer.MAX_VALUE); // ~3.4 years of god mod
-            setArmorStandUuid(e.getUniqueId(), true);
-            e.setMetadata(GUARDIAN_TAG, new FixedMetadataValue(Main.instance, id));
+            e.setCustomNameVisible(true);
+            e.setCustomName(FKPickableLocks.getProgressBar(ELIMINATION_TIMEOUT, eliminationCooldown));
+            return e;
         }
-        return e;
     }
 
     public void killArmorStand() {
-        if (armorStand != null)
-            Main.world.getEntities().stream().filter(e -> e.getUniqueId().equals(armorStand)).forEach(Entity::remove);
-        setArmorStandUuid(null, true);
+        Bukkit.getWorlds().forEach(w -> w.getEntities().stream().filter(e -> e.hasMetadata(PLUNDER_STAND_TAG)
+                        && e.getMetadata(PLUNDER_STAND_TAG).get(0).asString().equalsIgnoreCase(id))
+                .forEach(Entity::remove));
     }
 
-    public static int killAllChestRoomEntities() {
-        List<Entity> l = Main.world.getEntities().stream().filter(e ->
-                e.hasMetadata(GUARDIAN_TAG)).collect(Collectors.toList());
+    public static int killAllArmorStands() {
+        List<Entity> l = new ArrayList<>();
+        Bukkit.getWorlds().forEach(w -> l.addAll(w.getEntities().stream().filter(e ->
+                e.hasMetadata(PLUNDER_STAND_TAG)).collect(Collectors.toList())));
         l.forEach(Entity::remove);
         return l.size();
     }
@@ -503,46 +529,18 @@ public class FKTeam {
         }
     }
 
-    public Location getChestsRoom() {
-        return chestsRoom;
+//    public Location get
+
+    public Location getPlunderLoc() {
+        return plunderLoc;
     }
 
-    public void setChestsRoom(Location chestsRoom, boolean tpGuardian, boolean save) {
-        this.chestsRoom = chestsRoom;
-        if (tpGuardian) {
-            getGuardian().teleport(chestsRoom);
-            getArmorStand().teleport(chestsRoom.clone().add(0, 1, 0));
-        }
+    public void setPlunderLoc(Location plunderLoc, boolean save) {
+        this.plunderLoc = plunderLoc;
         if (save && getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).load().setChestsRoom(chestsRoom, true).save();
-        }
-    }
-
-    public UUID getGuardianUuid() {
-        return guardian;
-    }
-
-    public void setGuardianUuid(UUID guardian, boolean save) {
-        this.guardian = guardian;
-        if (save && getManager() != null) {
-            if (!getConfig(getManager().getId()).exists())
-                saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).load().setGuardian(guardian, true).save();
-        }
-    }
-
-    public UUID getArmorStandUuid() {
-        return armorStand;
-    }
-
-    public void setArmorStandUuid(UUID armorStand, boolean save) {
-        this.armorStand = armorStand;
-        if (save && getManager() != null) {
-            if (!getConfig(getManager().getId()).exists())
-                saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).load().setArmorStand(armorStand, true).save();
+            getConfig(getManager().getId()).load().setPlunderLoc(plunderLoc, true).save();
         }
     }
 
@@ -576,7 +574,7 @@ public class FKTeam {
         ArrayList<FKPlayer> ps = new ArrayList<>();
         if (getManager() != null)
             ps.addAll(getManager().getPlayers());
-        ps.removeIf(p -> p.getTeam() == null || !p.getTeamId().equals(id));
+        ps.removeIf(p -> p.getTeam() == null || !Objects.equals(p.getTeamId(), id));
         return ps;
     }
 

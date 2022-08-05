@@ -583,10 +583,8 @@ public class Config {
 
     public static class Team extends Config {
         public static final String NAME = "name", PREFIX = "prefix", ELIMINATED = "eliminated",
-                ELIMINATORS = "eliminators", COLOR = "color", CHESTS_ROOM = "chests-room.loc",
-                GUARDIAN = "chests-room.guardian-uuid", ARMOR_STAND = "chests-room.armor-stand-uuid",
-                RADIUS = "radius", OLD_PLAYERS = "old-players",
-                SPAWN = "spawn", PERMISSIONS = "permissions";
+                ELIMINATORS = "eliminators", COLOR = "color", RADIUS = "radius", OLD_PLAYERS = "old-players",
+                SPAWN = "spawn", PLUNDER_LOC = "plunder", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
             super(path, true);
@@ -649,41 +647,6 @@ public class Config {
             return this;
         }
 
-        public Location getChestsRoom() {
-            return super.getLoc(CHESTS_ROOM);
-        }
-
-        public Team setChestsRoom(Location chestsRoom, boolean force) {
-            super.setLoc(CHESTS_ROOM, chestsRoom, force);
-            return this;
-        }
-
-        public UUID getGuardian() {
-            try {
-                return UUID.fromString(getStr(GUARDIAN));
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
-
-        public Team setGuardian(UUID guardian, boolean force) {
-            super.set(GUARDIAN, guardian + "", force);
-            return this;
-        }
-
-        public UUID getArmorStand() {
-            try {
-                return UUID.fromString(getStr(ARMOR_STAND));
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
-        }
-
-        public Team setArmorStand(UUID armorStand, boolean force) {
-            super.set(ARMOR_STAND, armorStand + "", force);
-            return this;
-        }
-
         public double getRadius() {
             return super.getDouble(RADIUS);
         }
@@ -708,6 +671,15 @@ public class Config {
 
         public Team setSpawn(Location spawn, boolean force) {
             super.setLoc(SPAWN, spawn, force);
+            return this;
+        }
+
+        public Location getPlunderLoc() {
+            return super.getLoc(PLUNDER_LOC);
+        }
+
+        public Team setPlunderLoc(Location plunder, boolean force) {
+            super.setLoc(PLUNDER_LOC, plunder, force);
             return this;
         }
 

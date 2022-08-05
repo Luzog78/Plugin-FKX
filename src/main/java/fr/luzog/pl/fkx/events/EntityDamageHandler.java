@@ -31,7 +31,7 @@ public class EntityDamageHandler implements Listener {
         LivingEntity entity = (LivingEntity) e.getEntity();
         Location tempLoc = entity.getLocation().add(0, 0.5, 0);
 
-        if (FKManager.getCurrentGame() != null && entity.hasMetadata(FKTeam.GUARDIAN_TAG)
+        if (FKManager.getCurrentGame() != null && entity.hasMetadata(FKTeam.PLUNDER_STAND_TAG)
                 && e.getDamage() < 1_000_000_000_000_000_000_000.0
                 && e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             e.setCancelled(true);
@@ -85,12 +85,12 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(FKTeam.GUARDIAN_TAG))
+                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(FKTeam.PLUNDER_STAND_TAG))
                         if (entity instanceof Creeper) {
                             if (((Creeper) entity).isPowered())
                                 new Loots()
-                                        .add(0.125, new ItemStack(Material.TNT))
-                                        .add(0.125, new ItemStack(Material.TNT))
+                                        .add(0.333, new ItemStack(Material.TNT))
+                                        .add(0.333, new ItemStack(Material.TNT))
                                         .lootsInclusive()
                                         .forEach(is -> entity.getWorld().dropItemNaturally(tempLoc, is));
                             else

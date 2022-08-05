@@ -62,11 +62,13 @@ public class Portal {
     public Location nextSpawn(Location loc) {
         if (loc == null)
             return null;
-        if (overPortal1 != null && overPortal2 != null && loc.getWorld().getName().equals(overPortal1.getWorld().getName()) && loc.getWorld().getName().equals(overPortal2.getWorld().getName()))
+        if (overPortal1 != null && overPortal2 != null && overPortal1.getWorld() != null && overPortal2.getWorld() != null && loc.getWorld() != null
+                && Objects.equals(loc.getWorld().getName(), overPortal1.getWorld().getName()) && Objects.equals(loc.getWorld().getName(), overPortal2.getWorld().getName()))
             for (Block b : Utils.getBlocksIn(overPortal1, overPortal2))
                 if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return dimSpawn;
-        if (dimPortal1 != null && dimPortal2 != null && loc.getWorld().getName().equals(dimPortal1.getWorld().getName()) && loc.getWorld().getName().equals(dimPortal2.getWorld().getName()))
+        if (dimPortal1 != null && dimPortal2 != null && dimPortal1.getWorld() != null && dimPortal2.getWorld() != null && loc.getWorld() != null
+                && Objects.equals(loc.getWorld().getName(), dimPortal1.getWorld().getName()) && Objects.equals(loc.getWorld().getName(), dimPortal2.getWorld().getName()))
             for (Block b : Utils.getBlocksIn(dimPortal1, dimPortal2))
                 if (loc.distance(Utils.normalize(b.getLocation(), false)) < 0.95)
                     return overSpawn;

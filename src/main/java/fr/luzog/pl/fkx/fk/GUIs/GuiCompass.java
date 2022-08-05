@@ -71,11 +71,9 @@ public class GuiCompass {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + (loc != null ? new DecimalFormat("0.00",
-                                DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-                                .format(from.distance(loc)) + "m  §7-  §e" + FKListener.getOrientationChar(
-                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ())
-                                : "§cAucune"),
+                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2)
+                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(
+                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()))),
                         " ",
                         "  §8Position :",
                         "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),
@@ -104,8 +102,8 @@ public class GuiCompass {
                     add(getCompassItem(new ItemStack(Material.REDSTONE_BLOCK), "§4Spawn", "spawn",
                             from, FKManager.getCurrentGame().getSpawn().getSpawn()));
                     addAll(FKManager.getCurrentGame().getTeams().stream().map(t ->
-                            getCompassItem(FKManager.getBanner(t.getColor()), t.getColor() + t.getName(),
-                                    "team " + t.getId(), from, t.getSpawn()))
+                                    getCompassItem(FKManager.getBanner(t.getColor()), t.getColor() + t.getName(),
+                                            "team " + t.getId(), from, t.getSpawn()))
                             .collect(Collectors.toList()));
                     add(getCompassItem(new ItemStack(Material.OBSIDIAN), "§bPortails du Nether", "nether",
                             from, FKManager.getCurrentGame().getNether().getOverSpawn()));

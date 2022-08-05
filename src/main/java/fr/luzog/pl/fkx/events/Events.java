@@ -702,8 +702,8 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onSpawn(CreatureSpawnEvent e) {
-        if(e.getEntity().getType() == EntityType.CREEPER)
-            if(new Random().nextInt(5) == 0)
+        if (e.getEntity().getType() == EntityType.CREEPER)
+            if (new Random().nextInt(4) == 0)
                 ((Creeper) e.getEntity()).setPowered(true);
     }
 

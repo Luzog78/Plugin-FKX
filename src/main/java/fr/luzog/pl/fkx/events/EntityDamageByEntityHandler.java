@@ -13,8 +13,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
-import java.util.List;
-
 public class EntityDamageByEntityHandler implements Listener {
 
     @EventHandler
@@ -51,9 +49,9 @@ public class EntityDamageByEntityHandler implements Listener {
                     return;
                 }
             } else {
-                if ((event.getEntity().hasMetadata(FKTeam.GUARDIAN_TAG) && ((fp == null && !p.isOp())
+                if ((event.getEntity().hasMetadata(FKTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
                         || (fp != null && (fp.getTeam() == null || !fp.getTeam().getId().equals(FKTeam.GODS_ID)))))
-                        || (!event.getEntity().hasMetadata(FKTeam.GUARDIAN_TAG) && ((fp == null && !p.isOp())
+                        || (!event.getEntity().hasMetadata(FKTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
                         || (fp != null && !fp.hasPermission(FKPermissions.Type.MOBS,
                         event.getEntity().getLocation()))))) {
                     event.setCancelled(true);

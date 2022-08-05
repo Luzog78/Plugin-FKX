@@ -19,7 +19,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Beta 1.1";
+    public static final Object VERSION = "Beta 1.5";
 
     public static final String SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
     public static final String PREFIX = "§8§l[§6FKX§8§l] >> §7";

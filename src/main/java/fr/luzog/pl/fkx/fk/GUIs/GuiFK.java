@@ -74,13 +74,13 @@ public class GuiFK {
                 .build());
         inv.setItem(Utils.posOf(3, 2), Items.builder(Material.GLOWSTONE_DUST)
                 .setName("§a" + FKManager.State.RUNNING.name())
-                .setLore(ended ? no : base)
+                .setLore(base)
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, fk.getState() == FKManager.State.RUNNING ? 0 : null)
                 .setCantClickOn(true)
                 .setCloseOnClick(true)
                 .setGlobalCommandOnClick(fk.getState() == FKManager.State.WAITING ? "fk game start" :
-                        fk.getState() == FKManager.State.PAUSED ? "fk game resume" : "null")
+                        fk.getState() == FKManager.State.PAUSED || fk.getState() == FKManager.State.ENDED ? "fk game resume" : "null")
                 .build());
         inv.setItem(Utils.posOf(5, 2), Items.builder(Material.REDSTONE)
                 .setName("§a" + FKManager.State.PAUSED.name())
@@ -141,11 +141,9 @@ public class GuiFK {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + (loc != null ? from.getWorld().getUID().equals(loc.getWorld().getUID()) ?
-                                new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-                                .format(from.distance(loc)) + "m  §7-  §6" + FKListener.getOrientationChar(
-                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ())
-                                : "§dPas dans le même monde" : "§cAucune"),
+                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2)
+                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(
+                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()))),
                         " ",
                         "  §8Position :",
                         "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),

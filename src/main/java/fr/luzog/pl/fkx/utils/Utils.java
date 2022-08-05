@@ -241,6 +241,42 @@ public class Utils {
     }
 
     /**
+     * It returns the distance between two locations. (null if one of the locations is null)
+     *
+     * @param a             The first location
+     * @param b             The second location
+     * @param considerWorld If true, the method will return null if the two locations are in different worlds.
+     *
+     * @return The exact distance between the two locations.
+     */
+    public static Double safeDistance(Location a, Location b, boolean considerWorld) {
+        if (a == null && b == null)
+            return 0d;
+        if (a == null || b == null)
+            return null;
+        double d = Math.sqrt(Math.pow(a.getX() - b.getX(), 2) + Math.pow(a.getY() - b.getY(), 2) + Math.pow(a.getZ() - b.getZ(), 2));
+        return !considerWorld || (a.getWorld() != null && b.getWorld() != null
+                && Objects.equals(a.getWorld().getName(), b.getWorld().getName())) ? d : null;
+    }
+
+    /**
+     * It returns the distance between two locations, or "x" if the locations are in different worlds
+     *
+     * @param a             The first location
+     * @param b             The location to compare to.
+     * @param considerWorld If true, the distance will be calculated between the two locations, even if they are in
+     *                      different worlds.
+     * @param precision     The number of decimal places to round to (0 to get an int).
+     *
+     * @return The formatted distance between two locations.
+     */
+    public static String safeDistance(Location a, Location b, boolean considerWorld, int precision) {
+        Double d = safeDistance(a, b, considerWorld);
+        String s = precision <= 0 ? d == null ? "00" : Math.round(d) + "" : String.format("%." + precision + "f", d);
+        return (d == null ? s.replace("0", "x") : s).replace(",", ".");
+    }
+
+    /**
      * It takes a list of strings and returns a packet that will set the header and footer of the tab list
      *
      * @param header The header of the tab list.

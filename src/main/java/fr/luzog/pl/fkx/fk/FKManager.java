@@ -3,8 +3,6 @@ package fr.luzog.pl.fkx.fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.*;
-import org.bukkit.block.Banner;
-import org.bukkit.block.Block;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Entity;
@@ -166,9 +164,7 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setEliminators(tc.getEliminators(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
-                                Utils.tryTo(printStackTrace, () -> team.setChestsRoom(Objects.requireNonNull(tc.getChestsRoom()), false, false));
-                                Utils.tryTo(printStackTrace, () -> team.setGuardianUuid(Objects.requireNonNull(tc.getGuardian()), false));
-                                Utils.tryTo(printStackTrace, () -> team.setArmorStandUuid(Objects.requireNonNull(tc.getArmorStand()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setPlunderLoc(Objects.requireNonNull(tc.getPlunderLoc()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setEliminated(tc.isEliminated(), false));
@@ -180,16 +176,6 @@ public class FKManager {
                                     manager.setSpecs(team, false);
                                 else
                                     manager.addTeam(team);
-
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        if (team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID))
-                                            return;
-                                        team.setChestsRoom(team.getChestsRoom() == null ? team.getSpawn()
-                                                : team.getChestsRoom(), true, false);
-                                    }
-                                }.runTask(Main.instance);
                             }
                     } else if (ff.getName().equalsIgnoreCase("players")) {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
@@ -380,9 +366,9 @@ public class FKManager {
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", null, ChatColor.DARK_RED,
-                loc, loc, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+                loc, loc, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
         setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", null, ChatColor.GRAY,
-                loc, loc, null, null, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+                loc, loc, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),
@@ -582,18 +568,13 @@ public class FKManager {
                                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
                                 }
                             p.getPlayer().teleport(p.getTeam() == null ? getLobby().getSpawn()
-                                    : p.getTeamId().equals(FKTeam.GODS_ID) || p.getTeamId().equals(FKTeam.SPECS_ID) ?
+                                    : Objects.equals(p.getTeamId(), FKTeam.GODS_ID) || Objects.equals(p.getTeamId(), FKTeam.SPECS_ID) ?
                                     getSpawn().getSpawn() : p.getTeam().getSpawn());
                         }
                     });
                     setPriority(new FKPermissions(FKPermissions.Definition.DEFAULT), true);
-                    getParticipantsTeams().forEach(t -> {
-                        t.killGuardian();
-                        t.killArmorStand();
-                        t.getGuardian();
-                        t.getArmorStand();
-                    });
                     setState(State.RUNNING, true);
+                    FKTeam.killAllArmorStands();
                 });
     }
 

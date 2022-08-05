@@ -44,7 +44,7 @@ public class FKListener {
                     if (FKManager.getCurrentGame() != null)
                         removeIf(p -> FKManager.getCurrentGame().getPlayer(p.getName(), false) != null);
                 }}.forEach(p -> {
-                    p.setPlayerListName("§z§8§l[§2" + SpecialChars.LYS + "§8§l]§8 » " + p.getName());
+                    p.setPlayerListName("§8§l[§2" + SpecialChars.LYS + "§8§l]§8 » " + p.getName());
                     p.setScoreboard(Bukkit.getScoreboardManager().getMainScoreboard());
                     ((CraftPlayer) p).getHandle().playerConnection.sendPacket(getDefaultTHF(p));
                 });
@@ -139,13 +139,7 @@ public class FKListener {
                     p.setDisplayName(displayName);
 
                     if (fkp.getTeam() == null)
-                        displayName = "§z§8§l[§4" + SpecialChars.ATOM + "§8§l]§8 » " + displayName;
-                    else if (fkp.getTeam().getId().equals(FKTeam.GODS_ID))
-                        displayName = "§a§r" + displayName;
-                    else if (fkp.getTeam().getId().equals(FKTeam.SPECS_ID))
-                        displayName = "§c§r" + displayName;
-                    else
-                        displayName = "§b§r" + displayName;
+                        displayName = "§8§l[§4" + SpecialChars.ATOM + "§8§l]§8 » " + displayName;
 
                     if (Vanish.vanished.contains(p.getName()))
                         if (Vanish.isPrefix)
@@ -167,8 +161,7 @@ public class FKListener {
                             ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
                                     new PacketPlayOutChat(new ChatComponentText(
                                             (fkp.getCompass().getName() == null ? "§cnull" : "§6" + fkp.getCompass().getName())
-                                                    + "  §7-  §6" + new DecimalFormat("0.0", DecimalFormatSymbols.getInstance(Locale.ENGLISH))
-                                                    .format(p.getLocation().distance(fkp.getCompass().getLocation()))
+                                                    + "  §7-  §6" + Utils.safeDistance(p.getLocation(), fkp.getCompass().getLocation(), true, 1)
                                                     + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
                                                     p.getLocation().getX(), p.getLocation().getZ(),
                                                     fkp.getCompass().getLocation().getX(), fkp.getCompass().getLocation().getZ())
@@ -271,16 +264,15 @@ public class FKListener {
 //                    : n + " §7§o(Jour " + (o.getActivationDay() == -1 ? deactivated
 //                    : o.getActivationDay() + ")")) + "    ");
 //        });
-        DecimalFormat df = new DecimalFormat("0.0");
+        String formatted;
         try {
             f.add(fp == null || fp.getTeam() == null ? no_team
-                    : fp.getTeam().getName() + "§7 - §6" +
-                    (!Objects.equals(p.getWorld(), fp.getTeam().getSpawn().getWorld()) ?
-                            "xxx,x §e" + getOrientationChar(0, 0, 0, 0, 0)
-                            : df.format(p.getLocation().distance(manager.getPlayer(p.getName(), false).getTeam().getSpawn()))
-                            + "§e " + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
-                            manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
-                                    false).getTeam().getSpawn().getZ())));
+                    : fp.getTeam().getName() + "§7 - §6" + (formatted = Utils.safeDistance(p.getLocation(),
+                    manager.getPlayer(p.getName(), false).getTeam().getSpawn(), false, 1)) + "§e "
+                    + (formatted.toLowerCase().contains("x") ? getOrientationChar(0, 0, 0, 0, 0)
+                    : getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
+                    manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
+                            false).getTeam().getSpawn().getZ())));
         } catch (Exception e) {
             f.add("§cErreur...");
             System.out.print(Color.RED);

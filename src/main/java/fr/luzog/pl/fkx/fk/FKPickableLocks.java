@@ -297,7 +297,7 @@ public class FKPickableLocks {
             FKPlayer fkp;
 
             if (!(a == RIGHT_CLICK_BLOCK || a == Action.LEFT_CLICK_BLOCK) || b == null || FKManager.getCurrentGame() == null
-                    || (fkp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) == null)
+                    || (fkp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) == null || e.isCancelled())
                 return;
 
             FKPickableLocks pickableLocks = fkp.getManager().getPickableLocks();
@@ -460,7 +460,8 @@ public class FKPickableLocks {
     }
 
     public static boolean verifyDistance(Location lock, Location picking) {
-        return Utils.normalize(lock, true).distance(picking) <= maxDistance;
+        Double d = Utils.safeDistance(Utils.normalize(lock, true), picking, false);
+        return d != null && d <= maxDistance;
     }
 
     public static String getProgressBar(long originalCountDown, long currentCoolDown) {

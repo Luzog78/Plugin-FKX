@@ -65,8 +65,6 @@ public class GuiTeams {
                         " ",
                         "  §6Rayon : §f" + team.getRadius() + " blocks",
                         "  §6Spawn : §f" + Utils.locToString(team.getSpawn(), true, true, true),
-                        "  §6Salle des coffres : §f" + Utils.locToString(team.getChestsRoom(),
-                                false, false, true),
                         " ",
                         "§8" + Guis.loreSeparator
                                 + (lastLoreLine == null ? "" : "\n§7" + lastLoreLine)
@@ -258,55 +256,7 @@ public class GuiTeams {
 
         inv.setItem(Utils.posOf(7, 2), GuiPerm.getPermsItem(team.getPermissions(), Material.IRON_SWORD,
                 "Permissions", "Clic pour voir les permissions", "fk perm team " + team.getId()));
-        inv.setItem(Utils.posOf(6, 2), Items.builder(Material.CHEST)
-                .setName("§6Salle des coffres")
-                .setLore(
-                        "§8" + Guis.loreSeparator,
-                        (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ? " "
-                                + "\n  §8> X : §f" + team.getSpawn().getX()
-                                + "\n  §8> Y : §f" + team.getSpawn().getY()
-                                + "\n  §8> Z : §f" + team.getSpawn().getZ()
-                                + "\n  §8> Yaw : §f" + team.getSpawn().getYaw()
-                                + "\n  §8> Pitch : §f" + team.getSpawn().getPitch()
-                                + "\n  §8> Monde : §f" + team.getSpawn().getWorld().getName()
-                                + "\n "
-                                + "\n§8" + Guis.loreSeparator
-                                + "\n§7Clic Gauche pour se téléporter"
-                                + "\n§7Clic Droit pour redéfinir ici"
-                                : " \n  §cCette équipe n'a pas de salle des coffres...\n \n§8" + Guis.loreSeparator),
-                        "§7Commande :",
-                        "§7/fk teams " + team.getId() + " chestRoom <x> <y> <z> <yaw> [<pitch>] [<world>]"
-                )
-                .setCantClickOn(true)
-                .setLeftRightCommandOnClick(
-                        "tp " + team.getChestsRoom().getX() + " " + team.getChestsRoom().getY() + " " + team.getChestsRoom().getZ()
-                                + " " + team.getChestsRoom().getYaw() + " " + team.getChestsRoom().getPitch()
-                                + " " + team.getChestsRoom().getWorld().getName() + "\n" + refresh,
-                        "fk teams " + team.getId() + " chestRoom " + seer.getLocation().getX()
-                                + " " + seer.getLocation().getY() + " " + seer.getLocation().getZ()
-                                + " " + seer.getLocation().getYaw() + " " + seer.getLocation().getPitch()
-                                + " " + seer.getWorld().getName() + "\n" + refresh
-                )
-                .build());
-        inv.setItem(Utils.posOf(6, 3), Items.builder(Material.MONSTER_EGG)
-                .setDurability((short) 68)
-                .setName("§6Gardien des coffres")
-                .setLore(
-                        "§8" + Guis.loreSeparator,
-                        (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ?
-                                "§7Clic Gauche pour le faire Spawn"
-                                        + "\n§7Clic Droit pour le tuer"
-                                : " \n  §cCette équipe n'a pas de gardien des coffres...\n \n§8" + Guis.loreSeparator),
-                        "§7Commande :",
-                        "§7/fk teams " + team.getId() + " guardian (kill | spawn)"
-                )
-                .setCantClickOn(true)
-                .setLeftRightCommandOnClick(
-                        "fk teams " + team.getId() + " guardian spawn\n" + refresh,
-                        "fk teams " + team.getId() + " guardian kill\n" + refresh
-                )
-                .build());
-        inv.setItem(Utils.posOf(6, 4), Items.builder(Material.ARMOR_STAND)
+        inv.setItem(Utils.posOf(6, 3), Items.builder(Material.ARMOR_STAND)
                 .setName("§6ArmorStands")
                 .setLore(
                         "§8" + Guis.loreSeparator,

@@ -52,8 +52,6 @@ public class FKOptions {
             public void onActivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.announcement("Les !Assauts sont activés.");
-                manager.getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.ON);
-                manager.getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON);
                 manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
 
@@ -61,8 +59,6 @@ public class FKOptions {
             public void onDeactivate(boolean broadcast) {
                 if (broadcast)
                     Broadcast.warn("Les !Assauts sont désactivés.");
-                manager.getGlobal().setPermission(FKPermissions.Type.PLACESPE, FKPermissions.Definition.OFF);
-                manager.getGlobal().setPermission(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.OFF);
                 manager.getConfig().load().setGlobalPermissions(manager.getGlobal(), true).save();
             }
         });

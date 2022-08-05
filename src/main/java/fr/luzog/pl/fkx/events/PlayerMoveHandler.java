@@ -1,9 +1,9 @@
 package fr.luzog.pl.fkx.events;
 
-import fr.luzog.pl.fkx.fk.FKException;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -29,7 +29,7 @@ public class PlayerMoveHandler implements Listener {
             }
 
             if (!e.isCancelled()) {
-                p.getStats().increaseTraveledDistance(e.getTo().distance(e.getFrom()));
+                p.getStats().increaseTraveledDistance(Utils.safeDistance(e.getFrom(), e.getTo(), false));
                 if (e.getFrom().getY() + 0.419 < e.getTo().getY())
                     p.getStats().increaseJumps();
             }
@@ -49,8 +49,8 @@ public class PlayerMoveHandler implements Listener {
 
             else if (from != null && !from.getId().equals(to.getId()))
                 e.getPlayer().sendMessage("§aVous sortez "
-                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a !"
-                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a !"
+                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a "
+                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a "
                         : "de la zone §f" + from.getId()) + "§a pour entrer dans "
                         + (to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
                         : to.getId().equals(FKZone.SPAWN_ID) ? "le §4Spawn§a !"

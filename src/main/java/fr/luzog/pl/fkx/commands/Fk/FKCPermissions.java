@@ -185,15 +185,15 @@ public class FKCPermissions {
                                 FKPermissions.Definition def = FKPermissions.Definition.valueOf(args[3].toUpperCase());
                                 perm.setPermission(type, def);
                                 if (args[1].equalsIgnoreCase("global"))
-                                    FKManager.getCurrentGame().getConfig().load().setGlobalPermissions(perm, true);
+                                    FKManager.getCurrentGame().getConfig().load().setGlobalPermissions(perm, true).save();
                                 else if (args[1].equalsIgnoreCase("neutral"))
-                                    FKManager.getCurrentGame().getConfig().load().setNeutralPermissions(perm, true);
+                                    FKManager.getCurrentGame().getConfig().load().setNeutralPermissions(perm, true).save();
                                 else if (args[1].equalsIgnoreCase("friendly"))
-                                    FKManager.getCurrentGame().getConfig().load().setFriendlyPermissions(perm, true);
+                                    FKManager.getCurrentGame().getConfig().load().setFriendlyPermissions(perm, true).save();
                                 else if (args[1].equalsIgnoreCase("hostile"))
-                                    FKManager.getCurrentGame().getConfig().load().setHostilePermissions(perm, true);
+                                    FKManager.getCurrentGame().getConfig().load().setHostilePermissions(perm, true).save();
                                 else if (args[1].equalsIgnoreCase("priority"))
-                                    FKManager.getCurrentGame().getConfig().load().setPriorityPermissions(perm, true);
+                                    FKManager.getCurrentGame().getConfig().load().setPriorityPermissions(perm, true).save();
                             } catch (IllegalArgumentException ee) {
                                 u.err("Définition inconnue. (" + args[3] + ")");
                             }

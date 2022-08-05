@@ -10,20 +10,17 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCTeams {
     public static final String syntaxe = "/fk teams [help | list | create <id> [<options>] | (eliminate | reintroduce | delete) <id> | clearEntities | page <page> | <id> ...]",
             syntaxe_create = "/fk teams create <id> [<options>]",
-            syntaxe_team = "/fk teams <id> [help | info | list]"
+            syntaxe_team = "/fk teams <id> [help | info | list | armorStand (hide | show)]"
                     + "\n§r/fk teams <id> [colorGui | playersGui [<page>] | (add | remove) <player>]"
-                    + "\n§r/fk teams <id> [chestRoom <x> <y> <z> [<yw> <pi>] [<world>] | guardian (kill | spawn) | armorStand (hide | show)]"
                     + "\n§r/fk teams <id> [altar | wall [<height>] <material> | options [<args...>]]",
             syntaxe_team_options = "/fk teams <id>  options [help | list | <options>]",
             syntaxe_opts = "Options:"
@@ -32,7 +29,7 @@ public class FKCTeams {
                     + "\n  > --c <color>"
                     + "\n  > --r <radius>"
                     + "\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Spawn§r"
-                    + "\n  > --g <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Guardian§r";
+                    /*+ "\n  > --g <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Guardian§r"*/;
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -61,7 +58,7 @@ public class FKCTeams {
             else
                 u.err(CmdUtils.err_not_player);
         } else if (args[1].equalsIgnoreCase("clearEntities")) {
-            u.succ("Vous venez de supprimer §c" + FKTeam.killAllChestRoomEntities() + "§r entités !");
+            u.succ("Vous venez de supprimer §c" + FKTeam.killAllArmorStands() + "§r entités !");
         } else if (args[1].equalsIgnoreCase("create")) {
             u.setSyntaxe(syntaxe_create + "\n" + syntaxe_opts);
             if (args.length < 3)
@@ -222,7 +219,7 @@ public class FKCTeams {
                         u.err(CmdUtils.err_number_format + " (" + args[3] + ")");
                     }
 
-            } else if (args[2].equalsIgnoreCase("chestRoom")) {
+            }/* else if (args[2].equalsIgnoreCase("chestRoom")) {
                 if (t.getId().equals(FKTeam.GODS_ID) || t.getId().equals(FKTeam.SPECS_ID))
                     u.err("Cette équipe n'a pas de salle des coffres.");
                 else if (args.length == 3)
@@ -286,33 +283,14 @@ public class FKCTeams {
                                 + Utils.locToString(loc, true, orientation, true));
                     }
                 }
-            } else if (args[2].equalsIgnoreCase("guardian")) {
-                if (t.getId().equals(FKTeam.GODS_ID) || t.getId().equals(FKTeam.SPECS_ID))
-                    u.err("Cette équipe n'a pas de §6Gardien§r.");
-                else if (args.length == 3)
-                    u.err(CmdUtils.err_missing_arg.replace("%ARG%", "kill | spawn"));
-                else if (args[3].equalsIgnoreCase("spawn")) {
-                    t.getGuardian();
-                    t.getArmorStand();
-                    u.succ("Le §6Gardien§r de l'équipe §f" + t.getColor() + t.getName() + "§r est revenu parmi nous !");
-                } else if (args[3].equalsIgnoreCase("kill")) {
-                    t.killGuardian();
-                    t.killArmorStand();
-                    u.succ("Le §6Gardien§r de l'équipe §f" + t.getColor() + t.getName() + "§r est mort !");
-                } else
-                    u.err("Argument '" + args[3] + "' invalide.");
-            } else if (args[2].equalsIgnoreCase("armorStand")) {
+            }*/ else if (args[2].equalsIgnoreCase("armorStand")) {
                 if (args.length == 3)
                     u.err(CmdUtils.err_missing_arg.replace("%ARG%", "show | hide"));
                 else if (args[3].equalsIgnoreCase("show")) {
-                    Entity e = t.getArmorStand();
-                    e.setCustomName(t.getProgressBar());
-                    e.setCustomNameVisible(true);
+                    t.updateArmorStand();
                     u.succ("ArmorStand de l'équipe §f" + t.getColor() + t.getName() + "§r visible.");
                 } else if (args[3].equalsIgnoreCase("hide")) {
-                    Entity e = t.getArmorStand();
-                    e.setCustomName(t.getProgressBar());
-                    e.setCustomNameVisible(false);
+                    t.killArmorStand();
                     u.succ("ArmorStand de l'équipe §f" + t.getColor() + t.getName() + "§r caché.");
                 } else
                     u.err("Argument '" + args[3] + "' invalide.");
@@ -320,7 +298,9 @@ public class FKCTeams {
                 u.setSyntaxe(syntaxe_team_options + "\n" + syntaxe_opts);
                 if (args.length == 3)
                     u.succ("TODO -> Team Options GUIs");
-                else if (args[3].equalsIgnoreCase("help") || args[3].equals("?") || args[3].equalsIgnoreCase("-h") || args[3].equalsIgnoreCase("-help"))
+                else if (args[3].equalsIgnoreCase("help") || args[3].equals("?")
+                        || args[3].equalsIgnoreCase("-h") || args[3].equalsIgnoreCase("-help")
+                        || args[3].equalsIgnoreCase("--h") || args[3].equalsIgnoreCase("--help"))
                     u.synt();
                 else
                     handleOptions(u, t, args, 3);
@@ -540,8 +520,6 @@ public class FKCTeams {
                         add("options");
                         add("altar");
                         add("wall");
-                        add("chestRoom");
-                        add("guardian");
                         add("armorStand");
                         add("playersGui");
                         add("colorGui");
@@ -554,7 +532,7 @@ public class FKCTeams {
                         else if (args.length == 5)
                             addAll(Arrays.stream(Material.values()).map(m -> m.name().toLowerCase())
                                     .collect(Collectors.toList()));
-                    } else if (args[2].equalsIgnoreCase("chestRoom")) {
+                    }/* else if (args[2].equalsIgnoreCase("chestRoom")) {
                         DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
                         Block b = sender instanceof Player ? ((Player) sender).getTargetBlock(new HashSet<>(
                                 Collections.singletonList(Material.AIR)), 7) : null;
@@ -593,12 +571,7 @@ public class FKCTeams {
                         } else if (args.length == 9) {
                             Bukkit.getWorlds().stream().map(World::getName).forEach(this::add);
                         }
-                    } else if (args[2].equalsIgnoreCase("guardian")) {
-                        if (args.length == 4) {
-                            add("kill");
-                            add("spawn");
-                        }
-                    } else if (args[2].equalsIgnoreCase("armorStand")) {
+                    }*/ else if (args[2].equalsIgnoreCase("armorStand")) {
                         if (args.length == 4) {
                             add("hide");
                             add("show");

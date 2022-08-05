@@ -5,7 +5,6 @@ import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.CustomNBT;
-import org.bukkit.entity.Creeper;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,12 +41,13 @@ public class PlayerInteractAtEntityHandler implements Listener {
             return;
         }
 
+        /* Deprecated. To be removed.
         FKPlayer fp;
         FKTeam t;
-        if (FKManager.getCurrentGame() != null && e.hasMetadata(FKTeam.GUARDIAN_TAG)
+        if (FKManager.getCurrentGame() != null && e.hasMetadata(FKTeam.PLUNDER_STAND_TAG)
                 && (fp = FKManager.getCurrentGame().getPlayer(p.getName(), false)) != null
                 && fp.getTeam() != null && (t = FKManager.getCurrentGame().getTeam(
-                e.getMetadata(FKTeam.GUARDIAN_TAG).get(0).asString())) != null) {
+                e.getMetadata(FKTeam.PLUNDER_STAND_TAG).get(0).asString())) != null) {
             if (fp.getTeam().getId().equals(t.getId())) {
                 p.sendMessage("§aVoici votre §6Gardien des Coffres§a. Durant l'aventure, vous devrez partir en exploration"
                         + " et en guerre contre les autres joueurs pour obtenir des ressources. Avec celles-ci, vous"
@@ -56,8 +56,8 @@ public class PlayerInteractAtEntityHandler implements Listener {
                         + " votre  §6Gardien§a, §c100 secondes§a suffisent... alors allez le cacher plus en profondeurs"
                         + " dans votre salle des coffres protégée."
                         + "\n§7 > Clic Droit pour avoir des info."
-                        /*+ "\n§7 > Sneak + Clic Gauche pour réinitialiser la position."
-                        + "\n§7 > Sneak + Clic Droit pour redéfinir sa position. (Se tp à l'invocateur)"*/
+                        //+ "\n§7 > Sneak + Clic Gauche pour réinitialiser la position."
+                        //+ "\n§7 > Sneak + Clic Droit pour redéfinir sa position. (Se tp à l'invocateur)"
                         + "\n§7 > Pour changer sa position, appelez un §f" + FKManager.getCurrentGame().getGods().getColor()
                         + FKManager.getCurrentGame().getGods().getName() + "§a.");
             } else {
@@ -74,9 +74,9 @@ public class PlayerInteractAtEntityHandler implements Listener {
             }
             event.setCancelled(true);
             return;
-        }
+        }*/
 
-        if (e.hasMetadata(FKTeam.GUARDIAN_TAG)) {
+        if (e.hasMetadata(FKTeam.PLUNDER_STAND_TAG)) {
             event.setCancelled(true);
             return;
         }
