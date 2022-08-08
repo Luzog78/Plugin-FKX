@@ -141,16 +141,15 @@ public class GuiFK {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2)
-                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(
-                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()))),
+                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2, 1)
+                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(from.getYaw(),
+                                from.getX(), from.getZ(), loc.getX(), loc.getZ(), 1))),
                         " ",
                         "  §8Position :",
                         "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),
                         "  §8  > Y : §f" + (loc == null ? "§cnull" : loc.getY()),
                         "  §8  > Z : §f" + (loc == null ? "§cnull" : loc.getZ()),
                         "  §8  > Yaw : §f" + (loc == null ? "§cnull" : loc.getYaw()),
-                        "  §8  > Pitch : §f" + (loc == null ? "§cnull" : loc.getPitch()),
                         "  §8  > Pitch : §f" + (loc == null ? "§cnull" : loc.getPitch()),
                         "  §8  > Monde : §f" + (loc == null ? "§cnull" : Utils.getFormattedWorld(loc.getWorld().getName())),
                         " ",
@@ -201,6 +200,7 @@ public class GuiFK {
         inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null, "Clic pour voir plus", "fk players",
                 l.size(), (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
         inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem("Clic pour voir plus", "fk teams"));
+        inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem("Clic pour voir plus", "fk locks"));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())

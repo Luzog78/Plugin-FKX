@@ -24,6 +24,7 @@ public class FKTeam {
     public static final String GODS_ID = "gods", GODS_FILE = "Gods.yml",
             SPECS_ID = "specs", SPECS_FILE = "Specs.yml", PLUNDER_STAND_TAG = "FKPlunderStand";
     public static final long ELIMINATION_TIMEOUT = 2000;
+    public static double TEAM_RADIUS = 8;
 
     public void saveToConfig(String gameId, boolean soft) {
         if (soft)

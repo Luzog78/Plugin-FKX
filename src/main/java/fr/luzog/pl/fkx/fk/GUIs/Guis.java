@@ -256,7 +256,8 @@ public class Guis {
             int i = 0;
             while (i < isPerPage) {
                 try {
-                    inv.addItem(new ArrayList<>(content).get(page * isPerPage + i));
+                    inv.setItem(Utils.posOf((i % 7) + 1, (i / 7) + 1),
+                            new ArrayList<>(content).get(page * isPerPage + i));
                 } catch (IndexOutOfBoundsException ignore) {
                 }
                 i++;

@@ -1,8 +1,8 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
-import fr.luzog.pl.fkx.fk.FKListener;
-import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.Items;
+import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.Item;
 import org.bukkit.Location;
@@ -65,21 +65,21 @@ public class GuiCompass {
                 .build();
     }
 
-    public static ItemStack getCompassItem(ItemStack base, String name, String commandArgs, Location from, Location loc) {
+    public static ItemStack getCompassItem(ItemStack base, String name, String commandArgs, Location from, Location loc,
+                                           boolean showPosXZ, boolean showPosY, double radius) {
         return Items.builder(base)
                 .setName("§f" + name)
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
-                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2)
-                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(
-                                from.getYaw(), from.getX(), from.getZ(), loc.getX(), loc.getZ()))),
-                        " ",
-                        "  §8Position :",
-                        "  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()),
-//                        "  §8  > Y : §f" + (loc == null ? "§cnull" : loc.getY()),
-                        "  §8  > Z : §f" + (loc == null ? "§cnull" : loc.getZ()),
-                        " ",
+                        "  §8Distance : §6" + (Utils.safeDistance(from, loc, true, 2, radius)
+                                + "m  §7-  §e" + (from == null ? "" : FKListener.getOrientationChar(from.getYaw(),
+                                from.getX(), from.getZ(), loc.getX(), loc.getZ(), radius))),
+                        " " + (showPosXZ || showPosY ? "\n  §8Position :" : "")
+                                + (showPosXZ ? "\n  §8  > X : §f" + (loc == null ? "§cnull" : loc.getX()) : "")
+                                + (showPosY ? "\n  §8  > Y : §f" + (loc == null ? "§cnull" : loc.getY()) : "")
+                                + (showPosXZ ? "\n  §8  > Z : §f" + (loc == null ? "§cnull" : loc.getZ()) : "")
+                                + (showPosXZ || showPosY ? "\n " : ""),
                         "  §8Monde : §f" + (loc == null ? "§cnull" : Utils.getFormattedWorld(loc.getWorld().getName())),
                         " ",
                         "§8" + Guis.loreSeparator,
@@ -98,20 +98,27 @@ public class GuiCompass {
                 getNothingItem(),
                 navigationBaseCommand, page, new ArrayList<ItemStack>() {{
                     add(getCompassItem(new ItemStack(Material.GOLD_BLOCK), "§6Lobby", "lobby",
-                            from, FKManager.getCurrentGame().getLobby().getSpawn()));
+                            from, FKManager.getCurrentGame().getLobby().getSpawn(), true, true, FKZone.LOBBY_RADIUS));
                     add(getCompassItem(new ItemStack(Material.REDSTONE_BLOCK), "§4Spawn", "spawn",
-                            from, FKManager.getCurrentGame().getSpawn().getSpawn()));
+                            from, FKManager.getCurrentGame().getSpawn().getSpawn(), true, true, FKZone.SPAWN_RADIUS));
                     addAll(FKManager.getCurrentGame().getTeams().stream().map(t ->
                                     getCompassItem(FKManager.getBanner(t.getColor()), t.getColor() + t.getName(),
-                                            "team " + t.getId(), from, t.getSpawn()))
+                                            "team " + t.getId(), from, t.getSpawn(), true,
+                                            false, FKTeam.TEAM_RADIUS))
                             .collect(Collectors.toList()));
                     add(getCompassItem(new ItemStack(Material.OBSIDIAN), "§bPortails du Nether", "nether",
-                            from, FKManager.getCurrentGame().getNether().getOverSpawn()));
+                            from, FKManager.getCurrentGame().getNether().getOverSpawn(), true, false, Portal.RADIUS));
                     add(getCompassItem(new ItemStack(Material.ENDER_PORTAL_FRAME), "§5Portails de l'End", "end",
-                            from, FKManager.getCurrentGame().getEnd().getOverSpawn()));
+                            from, FKManager.getCurrentGame().getEnd().getOverSpawn(), true, false, Portal.RADIUS));
                     addAll(FKManager.getCurrentGame().getNormalZones().stream().map(z -> getCompassItem(
-                            new ItemStack(Material.LONG_GRASS, 1, (short) 2), "§2" + z.getId(),
-                            "zone " + z.getId(), from, z.getSpawn())).collect(Collectors.toList()));
+                                    new ItemStack(Material.LONG_GRASS, 1, (short) 2), "§2" + z.getId(),
+                                    "zone " + z.getId(), from, z.getSpawn(), true, false, FKZone.ZONE_RADIUS))
+                            .collect(Collectors.toList()));
+                    addAll(FKManager.getCurrentGame().getPickableLocks().getPickableLocks().stream().map(l ->
+                                    getCompassItem(GuiLocks.getLockItem(l, from, null, "null"),
+                                            "§9Coffre crochetable : §a" + l.getId(), "lock " + l.getId(),
+                                            from, l.getLocation(), false, false, FKPickableLocks.RADIUS))
+                            .collect(Collectors.toList()));
                 }});
     }
 

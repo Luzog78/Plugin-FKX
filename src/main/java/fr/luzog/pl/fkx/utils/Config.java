@@ -737,7 +737,9 @@ public class Config {
 
         public FKPlayer.Compass getCompass() {
             if (contains(COMPASS) && contains(COMPASS + ".location"))
-                return new FKPlayer.Compass(getStr(COMPASS + ".name"), super.getLoc(COMPASS + ".location"));
+                return new FKPlayer.Compass(getStr(COMPASS + ".name"),
+                        getDouble(COMPASS + ".radius"),
+                        super.getLoc(COMPASS + ".location"));
             else
                 return null;
         }
@@ -747,6 +749,7 @@ public class Config {
                 super.set(COMPASS, null, force);
             else {
                 super.set(COMPASS + ".name", compass.getName(), force);
+                super.set(COMPASS + ".radius", compass.getRadius(), force);
                 super.setLoc(COMPASS + ".location", compass.getLocation(), force);
             }
             return this;

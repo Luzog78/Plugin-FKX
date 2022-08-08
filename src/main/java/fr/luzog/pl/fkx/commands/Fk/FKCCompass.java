@@ -1,11 +1,9 @@
 package fr.luzog.pl.fkx.commands.Fk;
 
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
-import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.fk.GUIs.GuiCompass;
 import fr.luzog.pl.fkx.utils.CmdUtils;
+import fr.luzog.pl.fkx.utils.Portal;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -17,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCCompass {
-    public static final String syntaxe = "/fk compass [help | nothing | lobby | spawn | nether | end | team <id> | zone <id> | page <page>]";
+    public static final String syntaxe = "/fk compass [help | nothing | lobby | spawn | nether | end | team <id> | zone <id> | lock <id> | page <page>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -58,28 +56,34 @@ public class FKCCompass {
             }
             Location loc = null;
             String name = null;
+            double radius = 0;
             switch (args[1].toLowerCase()) {
                 case "lobby":
                     loc = fk.getLobby().getSpawn();
                     name = "Lobby";
+                    radius = FKZone.LOBBY_RADIUS;
                     break;
                 case "spawn":
                     loc = fk.getSpawn().getSpawn();
                     name = "Spawn";
+                    radius = FKZone.SPAWN_RADIUS;
                     break;
                 case "nether":
                     loc = fk.getNether().getDimSpawn();
                     name = fk.getNether().getName();
+                    radius = Portal.RADIUS;
                     break;
                 case "end":
                     loc = fk.getEnd().getDimSpawn();
                     name = fk.getEnd().getName();
+                    radius = Portal.RADIUS;
                     break;
                 case "team":
                     if (args.length > 2)
                         if (fk.getTeam(args[2]) != null) {
                             loc = fk.getTeam(args[2]).getSpawn();
                             name = fk.getTeam(args[2]).getColor() + fk.getTeam(args[2]).getName();
+                            radius = FKTeam.TEAM_RADIUS;
                         } else
                             u.err(CmdUtils.err_team_not_found + " (" + args[2] + ")");
                     break;
@@ -88,15 +92,25 @@ public class FKCCompass {
                         if (fk.getZone(args[2]) != null) {
                             loc = fk.getZone(args[2]).getSpawn();
                             name = fk.getZone(args[2]).getId();
+                            radius = FKZone.ZONE_RADIUS;
                         } else
                             u.err("Zone introuvable (" + args[2] + ")");
+                    break;
+                case "lock":
+                    if (args.length > 2)
+                        if (fk.getPickableLocks().getLock(args[2]) != null) {
+                            loc = fk.getPickableLocks().getLock(args[2]).getLocation();
+                            name = "Coffre " + fk.getPickableLocks().getLock(args[2]).getId();
+                            radius = FKPickableLocks.RADIUS;
+                        } else
+                            u.err("Coffre introuvable (" + args[2] + ")");
                     break;
             }
             if (loc == null && !args[1].equalsIgnoreCase("nothing")) {
                 u.err("Warp inconnu.");
                 return false;
             }
-            fp.setCompass(new FKPlayer.Compass(name, loc), true);
+            fp.setCompass(new FKPlayer.Compass(name, radius, loc), true);
         }
 
         return false;
@@ -117,6 +131,7 @@ public class FKCCompass {
                     add("end");
                     add("team");
                     add("zone");
+                    add("lock");
                     add("page");
                 } else if (args[1].equalsIgnoreCase("lobby") || args[1].equalsIgnoreCase("spawn")
                         || args[1].equalsIgnoreCase("nether") || args[1].equalsIgnoreCase("end")) {
@@ -127,6 +142,10 @@ public class FKCCompass {
                 } else if (args[1].equalsIgnoreCase("zone")) {
                     if (args.length == 3)
                         addAll(fk.getZones().stream().map(FKZone::getId).collect(Collectors.toList()));
+                } else if (args[1].equalsIgnoreCase("lock")) {
+                    if (args.length == 3)
+                        addAll(fk.getPickableLocks().getPickableLocks().stream()
+                                .map(FKPickableLocks.Lock::getId).collect(Collectors.toList()));
                 }
         }};
     }

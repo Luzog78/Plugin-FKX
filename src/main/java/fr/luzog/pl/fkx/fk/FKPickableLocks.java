@@ -35,6 +35,7 @@ public class FKPickableLocks {
 
     public static final String LOCK_KEY = "§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-", LOCK_ID_TAG = "fkxLockIdTag", RARITY_TAG = "fkxRarityTag";
     public static final int maxDistance = 4;
+    public static double RADIUS = 15;
 
     public static class Lock {
         private String id;

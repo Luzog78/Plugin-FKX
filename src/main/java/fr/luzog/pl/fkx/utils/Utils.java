@@ -267,13 +267,15 @@ public class Utils {
      * @param considerWorld If true, the distance will be calculated between the two locations, even if they are in
      *                      different worlds.
      * @param precision     The number of decimal places to round to (0 to get an int).
+     * @param radius        If distance <= radius, the distance will be xx.x
      *
      * @return The formatted distance between two locations.
      */
-    public static String safeDistance(Location a, Location b, boolean considerWorld, int precision) {
+    public static String safeDistance(Location a, Location b, boolean considerWorld, int precision, double radius) {
         Double d = safeDistance(a, b, considerWorld);
-        String s = precision <= 0 ? d == null ? "00" : Math.round(d) + "" : String.format("%." + precision + "f", d);
-        return (d == null ? s.replace("0", "x") : s).replace(",", ".");
+        String s = precision <= 0 ? d == null || d <= radius ? "00" : Math.round(d) + ""
+                : String.format("%." + precision + "f", d == null || d <= radius ? 0.0 : d);
+        return (d == null || d <= radius ? s.replace("0", "x") : s).replace(",", ".");
     }
 
     /**
@@ -836,6 +838,9 @@ public class Utils {
         return out.equals("") ? millis ? "0ms" : "0s" : out.substring(0, out.length() - 1);
     }
 
+    /**
+     * Pair is a generic class that holds two objects of any type.
+     */
     public static class Pair<A, B> {
         private A a;
         private B b;
@@ -860,5 +865,21 @@ public class Utils {
         public void setValue(B b) {
             this.b = b;
         }
+    }
+
+    /**
+     * It takes a string, hash it, and returns a long
+     *
+     * @param s The string to hash.
+     *
+     * @return A hash of the string.
+     */
+    public static long hashStringToSeed(String s) {
+        if (s == null)
+            return 0;
+        long hash = 0;
+        for (char c : s.toCharArray())
+            hash = 31L * hash + c;
+        return hash;
     }
 }

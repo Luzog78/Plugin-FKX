@@ -3,6 +3,9 @@ package fr.luzog.pl.fkx.commands.Fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPickableLocks;
+import fr.luzog.pl.fkx.fk.GUIs.GuiDate;
+import fr.luzog.pl.fkx.fk.GUIs.GuiLocks;
+import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -22,8 +25,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCLocks {
-    public static final String syntaxe = "/fk locks [help | list | tool | create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
-    public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock]"
+    public static final String syntaxe = "/fk locks [help | list | tool | page <page>]"
+            + "\n§rou /fk locks [create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
+    public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock | broadcast]"
             + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level>]"
             + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
 
@@ -34,10 +38,32 @@ public class FKCLocks {
             return false;
 
         else if (args.length == 1)
-            u.succ("TODO -> Event GUIs");
+            Bukkit.dispatchCommand(sender, "fk locks page 0");
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
+
+        else if (args[1].equalsIgnoreCase("page"))
+            if (args.length == 2)
+                Bukkit.dispatchCommand(sender, "fk locks page 0");
+            else
+                try {
+                    if (sender instanceof Player) {
+                        Block b = u.getPlayer().getTargetBlock(new HashSet<Material>() {{
+                            add(Material.AIR);
+                            add(Material.WATER);
+                            add(Material.STATIONARY_WATER);
+                            add(Material.LAVA);
+                            add(Material.STATIONARY_LAVA);
+                        }}, 16);
+                        u.getPlayer().openInventory(GuiLocks.getMainInventory(u.getPlayer().getLocation(),
+                                b == null ? null : b.getLocation(), "fk",
+                                "fk locks page", Integer.parseInt(args[2])));
+                    } else
+                        u.err(CmdUtils.err_not_player);
+                } catch (NumberFormatException e) {
+                    u.err(CmdUtils.err_number_format);
+                }
 
         else if (args[1].equalsIgnoreCase("list")) {
             u.succ("Coffres crochetables (§f" + FKManager.getCurrentGame().getPickableLocks().getPickableLocks().size() + "§r) :");
@@ -112,7 +138,7 @@ public class FKCLocks {
                             if (te != null)
                                 if (!FKManager.getCurrentGame().getPickableLocks().isPickableLock(loc)) {
                                     FKManager.getCurrentGame().getPickableLocks().addLock(
-                                            new FKPickableLocks.Lock(id, level, true, 1L, loc));
+                                            new FKPickableLocks.Lock(id, level, true, 300L, loc));
                                     u.succ("Coffre crochetable §b" + id + "§r de niveau §f" + level
                                             + "§r créé avec les paramètres par défaut !");
                                     FKManager.getCurrentGame().savePickableLocks();
@@ -143,7 +169,10 @@ public class FKCLocks {
             }
 
             if (args.length == 2)
-                u.succ("TODO -> Event GUI");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiLocks.getLockInventory(l, u.getPlayer().getLocation(), "fk locks"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("info")) {
                 u.succ("Coffre crochetable :");
                 u.succ(" - Id : §b" + l.getId());
@@ -165,6 +194,16 @@ public class FKCLocks {
                 l.unlock();
                 u.succ("Vous avez déverrouillé le coffre §b" + l.getId() + "§r.");
                 FKManager.getCurrentGame().savePickableLocks();
+            } else if (args[2].equalsIgnoreCase("broadcast")) {
+                Random rand = new Random();
+                rand.setSeed(Utils.hashStringToSeed(l.getId()));
+                double x = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1),
+                        z = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1);
+                Location loc = l.getLocation().clone().add(x, 0, z);
+                Broadcast.event(String.format("Chers joueurs et joueuses de Fallen Kingdoms,"
+                        + " nous vous informons que le coffre crochetable !%s, de niveau §f%d§r est présent"
+                        + " non loins des coordonnées  X: !%.2f  Z: !%.2f  !",
+                        l.getId(), l.getLevel(), loc.getX(), loc.getZ()));
             } else if (args[2].equalsIgnoreCase("pickable")) {
                 if (args.length >= 4)
                     if (args[3].equalsIgnoreCase("true")) {
@@ -235,23 +274,31 @@ public class FKCLocks {
             FKPickableLocks.Lock l = null;
             if (m != null)
                 if (args.length == 2) {
+                    Block bb = sender instanceof Player ? ((Player) sender).getTargetBlock(
+                            new HashSet<Material>() {{
+                                add(Material.AIR);
+                                add(Material.WATER);
+                                add(Material.STATIONARY_WATER);
+                                add(Material.LAVA);
+                                add(Material.STATIONARY_LAVA);
+                            }}, 16) : null;
+                    addAll(m.getPickableLocks().getPickableLocks().stream()
+                            .filter(lock -> bb != null && containers.contains(bb.getType())
+                                    && bb.getLocation().getBlockX() == lock.getLocation().getBlockX()
+                                    && bb.getLocation().getBlockY() == lock.getLocation().getBlockY()
+                                    && bb.getLocation().getBlockZ() == lock.getLocation().getBlockZ())
+                            .map(FKPickableLocks.Lock::getId)
+                            .collect(Collectors.toList()));
                     add("help");
                     add("list");
                     add("tool");
                     add("create");
+                    add("page");
                     addAll(m.getPickableLocks().getPickableLocks().stream()
-                            .sorted((a, b) -> {
-                                if (sender instanceof Player) {
-                                    Block bb = ((Player) sender).getTargetBlock(
-                                            new HashSet<>(Collections.singletonList(Material.AIR)), 200);
-                                    if (bb != null && containers.contains(bb.getType())
-                                            && bb.getLocation().getBlockX() == a.getLocation().getBlockX()
-                                            && bb.getLocation().getBlockY() == a.getLocation().getBlockY()
-                                            && bb.getLocation().getBlockZ() == a.getLocation().getBlockZ())
-                                        return -1;
-                                }
-                                return 0;
-                            })
+                            .filter(lock -> !(bb != null && containers.contains(bb.getType())
+                                    && bb.getLocation().getBlockX() == lock.getLocation().getBlockX()
+                                    && bb.getLocation().getBlockY() == lock.getLocation().getBlockY()
+                                    && bb.getLocation().getBlockZ() == lock.getLocation().getBlockZ()))
                             .map(FKPickableLocks.Lock::getId)
                             .collect(Collectors.toList()));
                 } else if (args[1].equalsIgnoreCase("create")) {
@@ -308,6 +355,7 @@ public class FKCLocks {
                         add("destroy");
                         add("lock");
                         add("unlock");
+                        add("broadcast");
                         add("cooldown");
                         add("level");
                         add("pickable");

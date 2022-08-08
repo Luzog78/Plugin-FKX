@@ -13,6 +13,7 @@ public class FKZone {
 
     public static final String LOBBY_ID = "lobby", LOBBY_FILE = "Lobby.yml",
             SPAWN_ID = "spawn", SPAWN_FILE = "Spawn.yml";
+    public static double LOBBY_RADIUS = 15, SPAWN_RADIUS = 1, ZONE_RADIUS = 5;
 
     public void saveToConfig(String gameId, boolean soft) {
         if(soft)

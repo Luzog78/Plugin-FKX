@@ -36,10 +36,12 @@ public class FKPlayer {
 
     public static class Compass {
         private String name;
+        private double radius;
         private Location location;
 
-        public Compass(String name, Location location) {
+        public Compass(String name, double radius, Location location) {
             this.name = name;
+            this.radius = radius;
             this.location = location;
         }
 
@@ -49,6 +51,14 @@ public class FKPlayer {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public double getRadius() {
+            return radius;
+        }
+
+        public void setRadius(double radius) {
+            this.radius = radius;
         }
 
         public Location getLocation() {

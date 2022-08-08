@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
@@ -15,6 +16,7 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -88,26 +90,62 @@ public class InventoryClickHandler implements Listener {
                     e.getWhoClicked().closeInventory();
                 if (nbt.hasKey(Events.cantClickOnTag) && nbt.getBoolean(Events.cantClickOnTag))
                     e.setCancelled(true);
+                int i = 0;
                 if (e.getClick() == ClickType.LEFT && nbt.hasKey(Events.exeLeftTag) && nbt.getString(Events.exeLeftTag) != null)
-                    for (String s : nbt.getString(Events.exeLeftTag).split("\n"))
-                        if (!s.equalsIgnoreCase("null"))
-                            ((Player) e.getWhoClicked()).performCommand(s);
+                    for (String s : nbt.getString(Events.exeLeftTag).split("\n")) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!s.equalsIgnoreCase("null"))
+                                    ((Player) e.getWhoClicked()).performCommand(s);
+                            }
+                        }.runTaskLater(Main.instance, i);
+                        i++;
+                    }
                 if (e.getClick() == ClickType.SHIFT_LEFT && nbt.hasKey(Events.exeShiftLeftTag) && nbt.getString(Events.exeShiftLeftTag) != null)
-                    for (String s : nbt.getString(Events.exeShiftLeftTag).split("\n"))
-                        if (!s.equalsIgnoreCase("null"))
-                            ((Player) e.getWhoClicked()).performCommand(s);
+                    for (String s : nbt.getString(Events.exeShiftLeftTag).split("\n")) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!s.equalsIgnoreCase("null"))
+                                    ((Player) e.getWhoClicked()).performCommand(s);
+                            }
+                        }.runTaskLater(Main.instance, i);
+                        i++;
+                    }
                 if (e.getClick() == ClickType.RIGHT && nbt.hasKey(Events.exeRightTag) && nbt.getString(Events.exeRightTag) != null)
-                    for (String s : nbt.getString(Events.exeRightTag).split("\n"))
-                        if (!s.equalsIgnoreCase("null"))
-                            ((Player) e.getWhoClicked()).performCommand(s);
+                    for (String s : nbt.getString(Events.exeRightTag).split("\n")) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!s.equalsIgnoreCase("null"))
+                                    ((Player) e.getWhoClicked()).performCommand(s);
+                            }
+                        }.runTaskLater(Main.instance, i);
+                        i++;
+                    }
                 if (e.getClick() == ClickType.SHIFT_RIGHT && nbt.hasKey(Events.exeShiftRightTag) && nbt.getString(Events.exeShiftRightTag) != null)
-                    for (String s : nbt.getString(Events.exeShiftRightTag).split("\n"))
-                        if (!s.equalsIgnoreCase("null"))
-                            ((Player) e.getWhoClicked()).performCommand(s);
+                    for (String s : nbt.getString(Events.exeShiftRightTag).split("\n")) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!s.equalsIgnoreCase("null"))
+                                    ((Player) e.getWhoClicked()).performCommand(s);
+                            }
+                        }.runTaskLater(Main.instance, i);
+                        i++;
+                    }
                 if (e.getClick() == ClickType.MIDDLE && nbt.hasKey(Events.exeMiddleTag) && nbt.getString(Events.exeMiddleTag) != null)
-                    for (String s : nbt.getString(Events.exeMiddleTag).split("\n"))
-                        if (!s.equalsIgnoreCase("null"))
-                            ((Player) e.getWhoClicked()).performCommand(s);
+                    for (String s : nbt.getString(Events.exeMiddleTag).split("\n")) {
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                if (!s.equalsIgnoreCase("null"))
+                                    ((Player) e.getWhoClicked()).performCommand(s);
+                            }
+                        }.runTaskLater(Main.instance, i);
+                        i++;
+                    }
             }
 
 //      TODO : there is a problem of duplication :

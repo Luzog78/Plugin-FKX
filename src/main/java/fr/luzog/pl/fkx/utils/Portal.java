@@ -12,6 +12,8 @@ import java.util.*;
 
 public class Portal {
 
+    public static double RADIUS = 3;
+
     private String name;
     private boolean opened;
     private long coolDown;

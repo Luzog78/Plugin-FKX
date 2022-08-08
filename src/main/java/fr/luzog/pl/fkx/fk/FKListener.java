@@ -161,10 +161,14 @@ public class FKListener {
                             ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
                                     new PacketPlayOutChat(new ChatComponentText(
                                             (fkp.getCompass().getName() == null ? "§cnull" : "§6" + fkp.getCompass().getName())
-                                                    + "  §7-  §6" + Utils.safeDistance(p.getLocation(), fkp.getCompass().getLocation(), true, 1)
+                                                    + "  §7-  §6" + Utils.safeDistance(p.getLocation(),
+                                                    fkp.getCompass().getLocation(), true, 1,
+                                                    fkp.getCompass().getRadius())
                                                     + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
                                                     p.getLocation().getX(), p.getLocation().getZ(),
-                                                    fkp.getCompass().getLocation().getX(), fkp.getCompass().getLocation().getZ())
+                                                    fkp.getCompass().getLocation().getX(),
+                                                    fkp.getCompass().getLocation().getZ(),
+                                                    fkp.getCompass().getRadius())
                                     ), (byte) 2));
                         else if (fkp.getTeam() != null && fkp.getTeam().getId().equals(FKTeam.GODS_ID)
                                 && (waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count()) > 0)
@@ -268,11 +272,12 @@ public class FKListener {
         try {
             f.add(fp == null || fp.getTeam() == null ? no_team
                     : fp.getTeam().getName() + "§7 - §6" + (formatted = Utils.safeDistance(p.getLocation(),
-                    manager.getPlayer(p.getName(), false).getTeam().getSpawn(), false, 1)) + "§e "
-                    + (formatted.toLowerCase().contains("x") ? getOrientationChar(0, 0, 0, 0, 0)
+                    manager.getPlayer(p.getName(), false).getTeam().getSpawn(), false, 1,
+                    FKTeam.TEAM_RADIUS)) + "§e " + (formatted.toLowerCase().contains("x") ?
+                    getOrientationChar(0, 0, 0, 0, 0, 0)
                     : getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(),
                     manager.getPlayer(p.getName(), false).getTeam().getSpawn().getX(), manager.getPlayer(p.getName(),
-                            false).getTeam().getSpawn().getZ())));
+                            false).getTeam().getSpawn().getZ(), FKTeam.TEAM_RADIUS)));
         } catch (Exception e) {
             f.add("§cErreur...");
             System.out.print(Color.RED);
@@ -360,18 +365,20 @@ public class FKListener {
      *
      * <br>
      *
-     * @param yaw   Yaw orientation in degrees (yaw ∈ [-360 ; 360])
-     * @param fromX Position X of Object A (Player position)
-     * @param fromZ Position Z of Object A (Player position)
-     * @param toX   Position X of Object B (Targeted Object position)
-     * @param toZ   Position Z of Object B (Targeted Object position)
+     * @param yaw    Yaw orientation in degrees (yaw ∈ [-360 ; 360])
+     * @param fromX  Position X of Object A (Player position)
+     * @param fromZ  Position Z of Object A (Player position)
+     * @param toX    Position X of Object B (Targeted Object position)
+     * @param toZ    Position Z of Object B (Targeted Object position)
+     * @param radius Radius. If distance is less than radius, orientation is NULL.
+     *               &nbsp; <i>(5 is a good value)</i>
      *
      * @return Indication Arrow
      *
      * @luzog Copyrights
      */
-    public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ) {
-        if (Math.abs(fromX - toX) < 5 && Math.abs(fromZ - toZ) < 5)
+    public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ, double radius) {
+        if (Math.abs(fromX - toX) <= radius && Math.abs(fromZ - toZ) <= radius)
             return a[10];
 
         double y = (yaw >= 0 ? yaw : 360 + yaw) * Math.PI / 180;
