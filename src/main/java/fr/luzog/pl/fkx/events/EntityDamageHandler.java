@@ -6,6 +6,7 @@ import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Loots;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -58,8 +59,10 @@ public class EntityDamageHandler implements Listener {
                 p.setHealth(p.getMaxHealth());
                 p.setFoodLevel(20);
                 p.setSaturation(20f);
+                ((ExperienceOrb) p.getWorld().spawnEntity(p.getLocation(), EntityType.EXPERIENCE_ORB))
+                        .setExperience((int) (Utils.lvlToExp(p.getLevel() + p.getExp()) * 0.75));
+                p.setLevel(0);
                 p.setExp(0);
-                p.setTotalExperience(0);
                 p.teleport(p.getBedSpawnLocation() == null ?
                         fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
                                 fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?

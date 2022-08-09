@@ -921,4 +921,41 @@ public class Utils {
             hash = 31L * hash + c;
         return hash;
     }
+
+    /**
+     * Calculates the total EXP needed to reach the given level.
+     *
+     * @param lvl The level you want to calculate the experience for.
+     * @return The amount of experience needed to reach a certain level.
+     */
+    public static long lvlToExp(double lvl) {
+        return (long) (((int) lvl <= 16 ? Math.pow((int) lvl, 2) + 6L * (int) lvl
+                : (int) lvl <= 31 ? 2.5 * Math.pow((int) lvl, 2) - 40.5 * (int) lvl + 360
+                : 4.5 * Math.pow((int) lvl, 2) - 162.5 * (int) lvl + 2220)
+                + expToLvlUpAt((int) lvl) * (lvl - (int) lvl));
+    }
+
+    /**
+     * Calculs the amount of exp needed to level up at a certain level.
+     *
+     * @param lvl The level of the player.
+     * @return The amount of experience needed to level up at the given level.
+     */
+    public static long expToLvlUpAt(int lvl) {
+        return lvl <= 15 ? 2L * lvl + 7
+                : lvl <= 30 ? 5L * lvl - 38
+                : 9L * lvl - 158;
+    }
+
+    /**
+     * Converts experience to level.
+     *
+     * @param exp The amount of experience you want to convert.
+     * @return The level of a player based on the amount of experience.
+     */
+    public static double expToLvl(long exp) {
+        return exp <= 352 ? Math.sqrt(exp + 9) - 3
+                : exp <= 1507 ? 81.0 / 10.0 + Math.sqrt(2.0 / 5.0 * (exp - 7839.0 / 40.0))
+                : 325.0 / 18.0 + Math.sqrt(2.0 / 9.0 * (exp - 54215.0 / 72.0));
+    }
 }
