@@ -4,6 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.commands.Other.Ad;
+import fr.luzog.pl.fkx.commands.Utils.InputText;
 import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPickableLocks;
@@ -40,6 +41,7 @@ public class Events implements Listener {
         add(new Crafting());
         add(new Ad());
         add(new FKPickableLocks.Listener());
+        add(new InputText());
 
         /* *** - Raw Listeners - *** */
         add(new Events());

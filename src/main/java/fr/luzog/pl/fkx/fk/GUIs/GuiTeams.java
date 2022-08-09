@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
 import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.fk.FKPickableLocks;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.*;
@@ -140,7 +141,32 @@ public class GuiTeams {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("§cAucune partie en cours", back);
         return Guis.getPagedInventory("§6Équipes", 54, back,
-                getMainItem("Clic pour rafraîchir", navigationBaseCommand + " " + page), null,
+                getMainItem("Clic pour rafraîchir", navigationBaseCommand + " " + page),
+                Items.builder(Material.NETHER_STAR)
+                        .setName("§6Créer une équipe")
+                        .setLore(
+                                "§8" + Guis.loreSeparator,
+                                " ",
+                                "  §6Vous pouvez dès maintenant",
+                                "  §6 créer une équipe en cliquant",
+                                "  §6 sur cet item.",
+                                " ",
+                                "  §6Notez bien que vous devrez",
+                                "  §6 indiquer au moins l'ID de l'équipe.",
+                                "  §6Si vous ne souhaitez pas préciser",
+                                "  §6 le 2nd paramètre, notez juste \".\"",
+                                " ",
+                                "§8" + Guis.loreSeparator,
+                                "§7Clic Gauche pour créer une équipe",
+                                "§7Commande :",
+                                "§7/fk teams create §f<id> [<options>]"
+                        )
+                        .setLeftRightCommandOnClick(
+                                "input 2 fk teams create %s %s%nfk teams",
+                                "fk teams"
+                        )
+                        .setCantClickOn(true)
+                        .build(),
                 navigationBaseCommand, page, FKManager.getCurrentGame().getTeams().stream().map(t ->
                         getTeamItem(t, "Clic pour voir les options",
                                 "fk teams " + t.getId())).collect(Collectors.toList()));
@@ -168,9 +194,13 @@ public class GuiTeams {
                 .setName("§6Nom : §f" + team.getColor() + team.getName())
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Vous pouvez changer le nom",
-                        "§7 avec la commande :",
-                        "§f/fk teams " + team.getId() + " options --d §7<displayName>"
+                        "§7Clic Gauche pour changer le nom",
+                        "§7Commande :",
+                        "§7/fk teams " + team.getId() + " options --d §f<displayName>"
+                )
+                .setLeftRightCommandOnClick(
+                        "input 1 fk teams " + team.getId() + " options --d %s%nfk teams " + team.getId(),
+                        "fk teams " + team.getId()
                 )
                 .setCantClickOn(true)
                 .build());
@@ -178,9 +208,13 @@ public class GuiTeams {
                 .setName("§6Préfixe : §7'§f" + team.getColor() + team.getPrefix() + "§7'")
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Vous pouvez changer le préfixe",
-                        "§7 avec la commande :",
-                        "§f/fk teams " + team.getId() + " options --p §7<prefix>"
+                        "§7Clic Gauche pour changer le préfixe",
+                        "§7Commande :",
+                        "§7/fk teams " + team.getId() + " options --p §f<prefix>"
+                )
+                .setLeftRightCommandOnClick(
+                        "input 1 fk teams " + team.getId() + " options --p %s%nfk teams " + team.getId(),
+                        "fk teams " + team.getId()
                 )
                 .setCantClickOn(true)
                 .build());

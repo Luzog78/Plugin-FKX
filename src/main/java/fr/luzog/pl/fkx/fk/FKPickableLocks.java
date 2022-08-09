@@ -560,7 +560,11 @@ public class FKPickableLocks {
         TileEntity te = ((CraftWorld) location.getWorld()).getTileEntityAt(location.getBlockX(), location.getBlockY(), location.getBlockZ());
         if (te == null)
             return false;
-        return location.getBlock().hasMetadata(LOCK_ID_TAG) && getLock(location.getBlock().getMetadata(LOCK_ID_TAG).get(0).asString()) != null;
+//        return location.getBlock().hasMetadata(LOCK_ID_TAG) && getLock(location.getBlock().getMetadata(LOCK_ID_TAG).get(0).asString()) != null;
+        for (Lock l : pickableLocks)
+            if (l.getLocation().getBlock().getLocation().equals(location.getBlock().getLocation()))
+                return true;
+        return false;
     }
 
     public boolean isLocked(Location location) {
@@ -576,6 +580,13 @@ public class FKPickableLocks {
     public Lock getLock(String id) {
         for (Lock lock : pickableLocks)
             if (lock.getId().equals(id))
+                return lock;
+        return null;
+    }
+
+    public Lock getLock(Location loc) {
+        for (Lock lock : pickableLocks)
+            if (lock.getLocation().getBlock().getLocation().equals(loc.getBlock().getLocation()))
                 return lock;
         return null;
     }

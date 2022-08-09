@@ -4,10 +4,14 @@ import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.fk.GUIs.GuiCompass;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Portal;
+import fr.luzog.pl.fkx.utils.Utils;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -15,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FKCCompass {
-    public static final String syntaxe = "/fk compass [help | nothing | lobby | spawn | nether | end | team <id> | zone <id> | lock <id> | page <page>]";
+    public static final String syntaxe = "/fk compass [help | nothing | lobby | spawn | nether | end | team <id> | zone <id> | lock <id> | custom <x> <y> <z> | page <page>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -105,12 +109,29 @@ public class FKCCompass {
                         } else
                             u.err("Coffre introuvable (" + args[2] + ")");
                     break;
+                case "custom":
+                    if (args.length > 4)
+                        try {
+                            double x = Double.parseDouble(args[2]), y = Double.parseDouble(args[3]), z = Double.parseDouble(args[4]);
+                            loc = new Location(u.getPlayer().getWorld(), x, y, z);
+                            name = String.format("Custom (%.2f %.2f %.2f)", x, y, z);
+                            radius = 0.1;
+                        } catch (NumberFormatException e) {
+                            u.err(CmdUtils.err_number_format + " (" + args[2] + ", " + args[3] + ", " + args[4] + ")");
+                        }
+                    else
+                        u.err("Vous devez spécifier un <x>, un <y> et un <z>.");
+                    break;
             }
             if (loc == null && !args[1].equalsIgnoreCase("nothing")) {
                 u.err("Warp inconnu.");
                 return false;
             }
             fp.setCompass(new FKPlayer.Compass(name, radius, loc), true);
+
+            if(args[1].equalsIgnoreCase("nothing"))
+                ((CraftPlayer) u.getPlayer()).getHandle().playerConnection.sendPacket(
+                        new PacketPlayOutChat(new ChatComponentText("§7---"), (byte) 2));
         }
 
         return false;

@@ -182,6 +182,9 @@ commands:
   craft:
     description: Open the Workbench
     permission: fkx.utils.craft
+  input:
+    description: Open the Input GUI
+    permission: fkx.utils.input
   trash:
     description: Open the Trash
     permission: fkx.utils.trash

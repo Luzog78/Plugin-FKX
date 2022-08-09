@@ -45,7 +45,7 @@ public class GuiCompass {
 
     public static ItemStack getNothingItem() {
         return Items.builder(Material.BARRIER)
-                .setName("§cCompass")
+                .setName("§cReset Compass")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
@@ -93,7 +93,7 @@ public class GuiCompass {
     public static Inventory getInventory(Location from, String back, String navigationBaseCommand, int page) {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("No game running", back);
-        return Guis.getPagedInventory("§6§lCustom Compass", 54, back,
+        Inventory inv = Guis.getPagedInventory("§6§lCustom Compass", 54, back,
                 getMainItem("Clic pour rafraîchir", navigationBaseCommand + " " + page),
                 getNothingItem(),
                 navigationBaseCommand, page, new ArrayList<ItemStack>() {{
@@ -114,12 +114,36 @@ public class GuiCompass {
                                     new ItemStack(Material.LONG_GRASS, 1, (short) 2), "§2" + z.getId(),
                                     "zone " + z.getId(), from, z.getSpawn(), true, false, FKZone.ZONE_RADIUS))
                             .collect(Collectors.toList()));
-                    addAll(FKManager.getCurrentGame().getPickableLocks().getPickableLocks().stream().map(l ->
+                    addAll(FKManager.getCurrentGame().getPickableLocks().getPickableLocks().stream()
+                            .filter(l -> l.getLocation() != null && l.isPickable() && !l.isPicked())
+                            .map(l ->
                                     getCompassItem(GuiLocks.getLockItem(l, from, null, "null"),
-                                            "§9Coffre crochetable : §a" + l.getId(), "lock " + l.getId(),
+                                            "§9Coffre §b" + l.getId(), "lock " + l.getId(),
                                             from, l.getLocation(), false, false, FKPickableLocks.RADIUS))
                             .collect(Collectors.toList()));
                 }});
+        inv.setItem(Utils.posOf(5, 5), Items.builder(Material.COMPASS)
+                .setName("§aCompass Custom")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        " ",
+                        "  §aVous pouvez suivre une direction",
+                        "  §a complètement personnalisée.",
+                        "  §aPour cela, cliquez sur le compas",
+                        "  §a et indiquez les 3 coordonnées",
+                        "  §a auxquelles vous souhaitez vous",
+                        "  §a rendre.",
+                        " ",
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour définir un compas perso"
+                )
+                .setLeftRightCommandOnClick(
+                        "input 3 fk compass custom %s %s %s%nfk compass",
+                        "fk compass"
+                )
+                .setCantClickOn(true)
+                .build());
+        return inv;
     }
 
 }

@@ -28,7 +28,7 @@ public class FKCLocks {
     public static final String syntaxe = "/fk locks [help | list | tool | page <page>]"
             + "\n§rou /fk locks [create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
     public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock | broadcast]"
-            + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level>]"
+            + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level> | id <newId>]"
             + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
@@ -201,8 +201,8 @@ public class FKCLocks {
                         z = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1);
                 Location loc = l.getLocation().clone().add(x, 0, z);
                 Broadcast.event(String.format("Chers joueurs et joueuses de Fallen Kingdoms,"
-                        + " nous vous informons que le coffre crochetable !%s, de niveau §f%d§r est présent"
-                        + " non loins des coordonnées  X: !%.2f  Z: !%.2f  !",
+                                + " nous vous informons que le coffre crochetable !%s, de niveau §f%d§r est présent"
+                                + " non loins des coordonnées  X: !%.2f  Z: !%.2f  !",
                         l.getId(), l.getLevel(), loc.getX(), loc.getZ()));
             } else if (args[2].equalsIgnoreCase("pickable")) {
                 if (args.length >= 4)
@@ -257,6 +257,21 @@ public class FKCLocks {
                     }
                 else
                     u.err("Vous devez préciser le niveau du coffre.");
+            } else if (args[2].equalsIgnoreCase("id")) {
+                if (args.length >= 4)
+                    if (FKManager.getCurrentGame().getPickableLocks().getLock(args[3]) == null)
+                        try {
+                            String old = l.getId();
+                            l.setId(args[3]);
+                            u.succ("Le coffre §c" + old + "§r est désormais d'identifiant : §b" + l.getId() + "§r !");
+                            FKManager.getCurrentGame().savePickableLocks();
+                        } catch (NumberFormatException e) {
+                            u.err("Niveau invalide. (" + args[3] + ")");
+                        }
+                    else
+                        u.err("Ce coffre existe déjà.");
+                else
+                    u.err("Vous devez préciser le nouvel identifiant.");
             } else
                 u.synt();
         }

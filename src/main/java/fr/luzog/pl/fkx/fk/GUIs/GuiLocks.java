@@ -113,8 +113,14 @@ public class GuiLocks {
 
         inv.setItem(Utils.posOf(2, 2), Items.builder(Material.NAME_TAG)
                 .setName("§9Identifiant : §b" + lock.getId())
-                .setLore("§8" + Guis.loreSeparator)
-                .setGlobalCommandOnClick("fk locks " + lock.getId())
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic Gauche pour modifier"
+                )
+                .setLeftRightCommandOnClick(
+                        "input 1 fk locks " + lock.getId() + " id %s%nfk locks",
+                        "fk locks " + lock.getId()
+                )
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(4, 3), Items.builder(Material.TRIPWIRE_HOOK)
@@ -126,6 +132,7 @@ public class GuiLocks {
                         "§7Clic pour " + (lock.isPicked() ? "verrouiller" : "déverrouiller")
                 )
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, lock.isPicked() ? null : 1)
+                .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .setGlobalCommandOnClick("fk locks " + lock.getId() + " " + (lock.isPicked() ? "lock" : "unlock")
                         + "\nfk locks " + lock.getId())
                 .setCantClickOn(true)
@@ -264,8 +271,7 @@ public class GuiLocks {
         if (targetIs == null) {
             assert target != null;
             FKPickableLocks.Lock lock = FKManager.getCurrentGame().getPickableLocks().isPickableLock(target) ?
-                    FKManager.getCurrentGame().getPickableLocks().getLock(target.getBlock()
-                            .getMetadata(FKPickableLocks.LOCK_ID_TAG).get(0).asString()) : null;
+                    FKManager.getCurrentGame().getPickableLocks().getLock(target) : null;
             TileEntity te = ((CraftWorld) target.getWorld()).getTileEntityAt(target.getBlockX(),
                     target.getBlockY(), target.getBlockZ());
             targetIs = lock == null ? Items.builder(target.getBlock().getType())
