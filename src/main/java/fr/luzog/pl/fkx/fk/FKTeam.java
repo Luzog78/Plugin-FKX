@@ -161,12 +161,12 @@ public class FKTeam {
                     if (eliminationCooldown > 0) {
                         eliminationCooldown--;
                         updateArmorStand();
-                        if(eliminationCooldown == (long) (ELIMINATION_TIMEOUT / 2))
+                        if (eliminationCooldown == (long) (ELIMINATION_TIMEOUT / 2))
                             Broadcast.log(SpecialChars.WARNING + " " + SpecialChars.WARNING + " L'équipe §l"
                                     + getColor() + getName() + "§r va bientôt se faire !éliminer par les §l"
                                     + team.getColor() + team.getName() + "§r ! (Plus que !"
                                     + ((int) (eliminationCooldown / 20)) + " sec)");
-                        else if(eliminationCooldown == 10 * 20)
+                        else if (eliminationCooldown == 10 * 20)
                             Broadcast.err(SpecialChars.WARNING + " " + SpecialChars.WARNING + " " + SpecialChars.WARNING
                                     + " L'équipe §l" + getColor() + getName() + "§r n'a plus que !10 sec avant de !périr par les §l"
                                     + team.getColor() + team.getName() + "§r !");
@@ -300,15 +300,26 @@ public class FKTeam {
     }
 
     public boolean isInside(Location loc) {
+        return isInside(loc, 0);
+    }
+
+    public boolean isInside(Location loc, int incrementTeamRadius) {
         Location l1 = getSpawn().clone(), l2 = getSpawn().clone();
         l1.setY(-1);
         l2.setY(256);
-        return Utils.isInside(loc, l1.add(radius, 0, radius), l2.subtract(radius, 0, radius));
+        return Utils.isInside(loc, l1.add(radius + incrementTeamRadius, 0, radius + incrementTeamRadius),
+                l2.subtract(radius + incrementTeamRadius, 0, radius + incrementTeamRadius));
     }
 
     public FKZone getZone(boolean friendly) {
+        return getZone(friendly, 0);
+    }
+
+    public FKZone getZone(boolean friendly, int incrementTeamRadius) {
         return new FKZone(getId(), friendly ? FKZone.Type.FRIENDLY : FKZone.Type.HOSTILE, getSpawn().clone(),
-                getSpawn().clone().subtract(radius, radius, radius), getSpawn().clone().add(radius, radius, radius), getPermissions());
+                getSpawn().clone().subtract(radius + incrementTeamRadius, radius + incrementTeamRadius,
+                        radius + incrementTeamRadius), getSpawn().clone().add(radius + incrementTeamRadius,
+                radius + incrementTeamRadius, radius + incrementTeamRadius), getPermissions());
     }
 
     public FKManager getManager() {

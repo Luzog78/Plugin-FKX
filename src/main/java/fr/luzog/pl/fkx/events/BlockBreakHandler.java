@@ -38,7 +38,8 @@ public class BlockBreakHandler implements Listener {
         }
 
         if (!fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(e.getBlock().getLocation()))) {
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK,
+                Utils.normalize(e.getBlock().getLocation()), 10)) {
             e.setCancelled(true);
             return;
         }

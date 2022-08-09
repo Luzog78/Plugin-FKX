@@ -107,14 +107,18 @@ public class FKPlayer {
     }
 
     public boolean hasPermission(FKPermissions.Type permissionType, Location loc) {
+        return hasPermission(permissionType, loc, 0);
+    }
+
+    public boolean hasPermission(FKPermissions.Type permissionType, Location loc, int incrementTeamRadius) {
         if (personalPermissions.getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return personalPermissions.getPermission(permissionType) == FKPermissions.Definition.ON;
-        if (getTeam() != null && getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
-            return getTeam().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getManager().getPriority().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return getManager().getPriority().getPermission(permissionType) == FKPermissions.Definition.ON;
-        if (getZone(loc) != null)
-            switch (getZone(loc).getType()) {
+        if (getTeam() != null && getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return getTeam().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
+        if (getZone(loc, incrementTeamRadius) != null)
+            switch (getZone(loc, incrementTeamRadius).getType()) {
                 case LOBBY:
                     if (getManager().getLobby().getPermissions().getPermission(permissionType) == FKPermissions.Definition.DEFAULT)
                         break;
@@ -158,15 +162,19 @@ public class FKPlayer {
     }
 
     public FKZone getZone(Location loc) {
+        return getZone(loc, 0);
+    }
+
+    public FKZone getZone(Location loc, int incrementTeamRadius) {
         if (getManager().getLobby().isInside(loc))
             return getManager().getLobby();
         if (getManager().getSpawn().isInside(loc))
             return getManager().getSpawn();
-        if (getTeam() != null && getTeam().isInside(loc))
-            return getTeam().getZone(true);
+        if (getTeam() != null && getTeam().isInside(loc, incrementTeamRadius))
+            return getTeam().getZone(true, incrementTeamRadius);
         for (FKTeam team : getManager().getTeams())
-            if (team.isInside(loc))
-                return team.getZone(false);
+            if (team.isInside(loc, incrementTeamRadius))
+                return team.getZone(false, incrementTeamRadius);
         for (FKZone zone : getManager().getNormalZones())
             if (zone.isInside(loc))
                 return zone;
