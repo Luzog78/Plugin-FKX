@@ -29,7 +29,7 @@ public class FKCLocks {
             + "\n§rou /fk locks [create <level> [<id>] <x> <y> <z> [<world>] | <id> [<args...>]]";
     public static final String synt_lock = "/fk locks <id> [help | info | destroy | lock | unlock | broadcast]"
             + "\n§rou /fk locks <id> [cooldown <cooldown> | level <level> | id <newId>]"
-            + "\n§rou /fk locks <id> [pickable (true | false) | armorStands (hide | show)]";
+            + "\n§rou /fk locks <id> [pickable (true | false) | auto-bc (true | false) | armorStands (hide | show)]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -195,15 +195,7 @@ public class FKCLocks {
                 u.succ("Vous avez déverrouillé le coffre §b" + l.getId() + "§r.");
                 FKManager.getCurrentGame().savePickableLocks();
             } else if (args[2].equalsIgnoreCase("broadcast")) {
-                Random rand = new Random();
-                rand.setSeed(Utils.hashStringToSeed(l.getId()));
-                double x = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1),
-                        z = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1);
-                Location loc = l.getLocation().clone().add(x, 0, z);
-                Broadcast.event(String.format("Chers joueurs et joueuses de Fallen Kingdoms,"
-                                + " nous vous informons que le coffre crochetable !%s, de niveau §f%d§r est présent"
-                                + " non loins des coordonnées  X: !%.2f  Z: !%.2f  !",
-                        l.getId(), l.getLevel(), loc.getX(), loc.getZ()));
+                l.broadcast();
             } else if (args[2].equalsIgnoreCase("pickable")) {
                 if (args.length >= 4)
                     if (args[3].equalsIgnoreCase("true")) {
@@ -218,6 +210,20 @@ public class FKCLocks {
                         u.err("Argument invalide. (" + args[3] + ")");
                 else
                     u.err("Vous devez préciser si le coffre est accessible ou non.");
+            } else if (args[2].equalsIgnoreCase("auto-bc")) {
+                if (args.length >= 4)
+                    if (args[3].equalsIgnoreCase("true")) {
+                        l.setAutoBC(true);
+                        u.succ("Le coffre §b" + l.getId() + "§r déclenchera un broadcast dès lors que le jour de sont crochetage est atteint.");
+                        FKManager.getCurrentGame().savePickableLocks();
+                    } else if (args[3].equalsIgnoreCase("false")) {
+                        l.setAutoBC(false);
+                        u.succ("Le coffre §b" + l.getId() + "§r ne déclenchera aucun broadcast.");
+                        FKManager.getCurrentGame().savePickableLocks();
+                    } else
+                        u.err("Argument invalide. (" + args[3] + ")");
+                else
+                    u.err("Vous devez préciser une valeur booléenne.");
             } else if (args[2].equalsIgnoreCase("armorStands")) {
                 if (args.length >= 4)
                     if (args[3].equalsIgnoreCase("hide")) {
@@ -374,6 +380,7 @@ public class FKCLocks {
                         add("cooldown");
                         add("level");
                         add("pickable");
+                        add("auto-bc");
                         add("armorStands");
                     } else if (args.length == 4) {
                         if (args[2].equalsIgnoreCase("cooldown")) {
@@ -392,7 +399,7 @@ public class FKCLocks {
                             add((m.getDay() + 3) + "");
                             add((m.getDay() + 4) + "");
                             add((m.getDay() + 5) + "");
-                        } else if (args[2].equalsIgnoreCase("pickable")) {
+                        } else if (args[2].equalsIgnoreCase("pickable") || args[2].equalsIgnoreCase("auto-bc")) {
                             add("true");
                             add("false");
                         } else if (args[2].equalsIgnoreCase("armorStands")) {

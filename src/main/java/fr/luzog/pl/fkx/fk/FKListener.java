@@ -109,6 +109,9 @@ public class FKListener {
                         Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
                         manager.checkActivations(false);
                         manager.saveManager(false);
+                        for(FKPickableLocks.Lock lock : manager.getPickableLocks().getPickableLocks())
+                            if(lock.getLevel() == manager.getDay())
+                                lock.broadcast();
                     } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
                         Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
                     else if (manager.getTime() == 24000 - 200)

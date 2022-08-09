@@ -964,7 +964,7 @@ public class Config {
             try {
                 Map<?, ?> coolMap, locMap;
                 if (map.containsKey("id") && map.containsKey("level")
-                        && map.containsKey("pickable") && map.containsKey("picked")
+                        && map.containsKey("pickable") && map.containsKey("picked") && map.containsKey("auto-bc")
                         && map.containsKey("cooldown") && (coolMap = (Map<?, ?>) map.get("cooldown")) != null
                         && coolMap.containsKey("original")
                         && (locMap = (Map<?, ?>) map.get("location")) != null
@@ -979,6 +979,7 @@ public class Config {
                     return new FKPickableLocks.Lock(map.get("id") + "", Integer.parseInt(map.get("level") + ""),
                             Boolean.parseBoolean(map.get("pickable") + ""),
                             Boolean.parseBoolean(map.get("picked") + ""),
+                            Boolean.parseBoolean(map.get("auto-bc") + ""),
                             Long.parseLong(coolMap.get("original") + ""),
                             Long.parseLong(coolMap.get(coolMap.containsKey("current") ? "current" : "original") + ""),
                             loc,
@@ -1007,6 +1008,7 @@ public class Config {
                 put("level", lock.getLevel());
                 put("pickable", lock.isPickable());
                 put("picked", lock.isPicked());
+                put("auto-bc", lock.isAutoBC());
                 put("cooldown", coolMap);
                 put("location", locMap);
                 put("picker", lock.getPicker());

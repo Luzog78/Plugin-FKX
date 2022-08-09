@@ -33,14 +33,15 @@ import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
 
 public class FKPickableLocks {
 
-    public static final String LOCK_KEY = "§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-", LOCK_ID_TAG = "fkxLockIdTag", RARITY_TAG = "fkxRarityTag";
+    public static final String LOCK_KEY = "§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-",
+            LOCK_ID_TAG = "fkxLockIdTag", RARITY_TAG = "fkxRarityTag";
     public static final int maxDistance = 4;
     public static double RADIUS = 15;
 
     public static class Lock {
         private String id;
         private int level;
-        private boolean pickable, picked;
+        private boolean pickable, picked, autoBC;
         private long originalCoolDown, coolDown;
         private Location location;
         private String picker;
@@ -51,6 +52,7 @@ public class FKPickableLocks {
             this.level = level;
             this.pickable = pickable;
             this.picked = false;
+            this.autoBC = false;
             this.originalCoolDown = originalCoolDown;
             this.coolDown = originalCoolDown;
             this.location = location;
@@ -59,12 +61,13 @@ public class FKPickableLocks {
             this.armorStand2 = null;
         }
 
-        public Lock(String id, int level, boolean pickable, boolean picked, long originalCoolDown, long coolDown,
-                    Location location, String picker, UUID armorStand1, UUID armorStand2) {
+        public Lock(String id, int level, boolean pickable, boolean picked, boolean autoBC, long originalCoolDown,
+                    long coolDown, Location location, String picker, UUID armorStand1, UUID armorStand2) {
             this.id = id;
             this.level = level;
             this.pickable = pickable;
             this.picked = picked;
+            this.autoBC = autoBC;
             this.originalCoolDown = originalCoolDown;
             this.coolDown = coolDown;
             this.location = location;
@@ -117,6 +120,18 @@ public class FKPickableLocks {
                 });
         }
 
+        public void broadcast() {
+            Random rand = new Random();
+            rand.setSeed(Utils.hashStringToSeed(id));
+            double x = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1),
+                    z = rand.nextDouble() * FKPickableLocks.RADIUS * (rand.nextBoolean() ? 1 : -1);
+            Location loc = location.clone().add(x, 0, z);
+            Broadcast.event(String.format("Chers joueurs et joueuses de Fallen Kingdoms,"
+                            + " nous vous informons que le coffre crochetable !%s, de niveau §f%d§r est présent"
+                            + " non loins des coordonnées  X: !%.2f  Z: !%.2f  !",
+                    id, level, loc.getX(), loc.getZ()));
+        }
+
         public String getId() {
             return id;
         }
@@ -147,6 +162,14 @@ public class FKPickableLocks {
 
         public void setPicked(boolean picked) {
             this.picked = picked;
+        }
+
+        public boolean isAutoBC() {
+            return autoBC;
+        }
+
+        public void setAutoBC(boolean autoBC) {
+            this.autoBC = autoBC;
         }
 
         public long getOriginalCoolDown() {

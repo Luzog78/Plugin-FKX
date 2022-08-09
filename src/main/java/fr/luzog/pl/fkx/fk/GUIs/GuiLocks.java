@@ -63,6 +63,9 @@ public class GuiLocks {
                         "  §9Niveau : §f" + lock.getLevel(),
                         "  §9Status : §f" + (lock.isPickable() ? lock.isPicked() ? "§cCrocheté" : "§aCrochetable" : "§4Inaccessible"),
                         "  §9CoolDown : §7" + (lock.getOriginalCoolDown() / 20.0) + "s",
+                        "  §9Broadcast : §7" + (lock.isAutoBC() ?
+                                "§2§l" + SpecialChars.YES + "§2 Activé §7§o(Jour " + lock.getLevel() + ")"
+                                : "§4§l" + SpecialChars.NO + "§4 Désactivé"),
                         " ",
                         "  §9---",
                         " ",
@@ -99,13 +102,16 @@ public class GuiLocks {
                 .setName("")
                 .addLore(
                         "§7Clic Gauche pour se téléporter",
+                        "§7Clic Droit pour " + (lock.isAutoBC() ? "§cdésactiver" : "§aactiver")
+                                + "\n§7 l'Auto Broadcast (message auto)",
                         "§7Clic Molette pour broadcast"
                 )
                 .setLeftRightCommandOnClick(
                         "tp " + lock.getLocation().getX()
                                 + " " + lock.getLocation().getY() + " " + lock.getLocation().getZ()
                                 + " " + lock.getLocation().getWorld().getName() + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId()
+                        "fk locks " + lock.getId() + " auto-bc " + (lock.isAutoBC() ? "false" : "true")
+                                + "\nfk locks " + lock.getId()
                 )
                 .setMiddleCommandOnClick("fk locks " + lock.getId() + " broadcast" + "\nfk locks " + lock.getId())
                 .setCantClickOn(true)
