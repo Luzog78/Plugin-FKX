@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -84,7 +85,7 @@ public class InCaseThereIsAProblem {
 
     public static class Listener implements org.bukkit.event.Listener {
 
-        @EventHandler(priority = EventPriority.LOWEST)
+        @EventHandler(priority = EventPriority.HIGHEST)
         public static void onBreakBlock(BlockBreakEvent e) {
             if (breakWhitelist.contains(e.getBlock().getType())) {
                 e.setCancelled(false);
@@ -93,8 +94,8 @@ public class InCaseThereIsAProblem {
             }
         }
 
-        @EventHandler(priority = EventPriority.LOWEST)
-        public static void onPlaceBlock(BlockBreakEvent e) {
+        @EventHandler(priority = EventPriority.HIGHEST)
+        public static void onPlaceBlock(BlockPlaceEvent e) {
             if (placeWhitelist.contains(e.getBlock().getType())) {
                 e.setCancelled(false);
             } else if (placeBlacklist.contains(e.getBlock().getType())) {
