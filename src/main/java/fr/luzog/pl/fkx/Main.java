@@ -47,6 +47,8 @@ public class Main extends JavaPlugin implements Listener {
                 souf("");
                 souf("");
 
+                InCaseThereIsAProblem.init();
+
                 soufInstruction("§6Initialisation du module : §eListeners§6...");
                 getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
                 Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));

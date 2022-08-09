@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
+import fr.luzog.pl.fkx.InCaseThereIsAProblem;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
@@ -42,6 +43,7 @@ public class Events implements Listener {
         add(new Ad());
         add(new FKPickableLocks.Listener());
         add(new InputText());
+        add(new InCaseThereIsAProblem.Listener());
 
         /* *** - Raw Listeners - *** */
         add(new Events());
