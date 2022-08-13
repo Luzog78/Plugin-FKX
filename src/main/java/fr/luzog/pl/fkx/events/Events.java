@@ -10,12 +10,14 @@ import fr.luzog.pl.fkx.fk.FKPermissions;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPickableLocks;
 import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.fk.GUIs.Guis;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -24,7 +26,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -77,7 +81,8 @@ public class Events implements Listener {
             Material.REDSTONE_TORCH_OFF, Material.YELLOW_FLOWER, Material.RED_ROSE, Material.WHEAT, /*Material.HAY_BLOCK,*/
             Material.SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS, Material.CARROT, Material.CARROT_ITEM,
             Material.POTATO, Material.POTATO_ITEM, Material.FIRE, Material.FLINT_AND_STEEL, Material.BUCKET,
-            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET, Material.WORKBENCH, Material.SIGN
+            Material.WATER, Material.WATER_BUCKET, Material.LAVA, Material.LAVA_BUCKET, Material.WORKBENCH,
+            Material.SIGN, Material.SIGN_POST, Material.WALL_SIGN, Material.SOIL
             /*Material.FURNACE, Material.ANVIL, Material.ENCHANTMENT_TABLE*/);
     public static List<Material> unbreakableMat = Collections.singletonList(Material.MOB_SPAWNER);
     public static List<Material> unplaceableMat = new ArrayList<>();
@@ -851,6 +856,31 @@ public class Events implements Listener {
                 e.setCancelled(true);
                 return;
             }
+    }
+
+    @EventHandler
+    public static void onCraft(CraftItemEvent e) {
+        if (Arrays.asList(Material.WOOD_HOE, Material.STONE_HOE, Material.IRON_HOE, Material.GOLD_HOE, Material.DIAMOND_HOE)
+                .contains(e.getRecipe().getResult().getType())) {
+            e.setResult(Event.Result.ALLOW);
+            e.setCurrentItem(Items.builder(e.getRecipe().getResult().getType())
+                    .setName("§bHoue Sacrée")
+                    .setLore(
+                            "§8" + Guis.loreSeparator,
+                            " ",
+                            "  §8Un grand merci au §dBêta Testeur",
+                            "  §f Maxtriller§8 d'avoir aidé à la",
+                            "  §8 recherche de bugs.",
+                            " ",
+                            "  §8C'est grâce à sa personne que",
+                            "  §8 vous pouvez utiliser cette houe.",
+                            "  §8Alors prenez-en bien soin !",
+                            " ",
+                            "§8" + Guis.loreSeparator
+                    )
+                    .addEnchant(Enchantment.DIG_SPEED, 10)
+                    .build());
+        }
     }
 
 }

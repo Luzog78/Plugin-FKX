@@ -24,7 +24,7 @@ public class Main extends JavaPlugin implements Listener {
     public static final String SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
     public static final String PREFIX = "§8§l[§6FK-XI§8§l] >> §7";
     public static final String HEADER = "§9--------------------------- §8[ §6FK-XI §8] §9---------------------------§r";
-    public static final String FOOTER = "§9---------------------------------------------------------------§r";
+    public static final String FOOTER = "§9-----------------------------------------------------------------§r";
     public static final String REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\nReconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
     public static Main instance = null;
     public static World world = null, nether = null, end = null;
@@ -42,8 +42,8 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
                 System.out.println(" ");
                 Color.sout(HEADER);
-                souf("         §fInitialisation des differentes composantes");
-                souf("           §fdu plugin de §bFallen Kingdom XI§f...");
+                souf("          §fInitialisation des differentes composantes");
+                souf("            §fdu plugin de §bFallen Kingdom XI§f...");
                 souf("");
                 souf("");
 
@@ -187,8 +187,8 @@ public class Main extends JavaPlugin implements Listener {
 
                 souf("");
                 souf("");
-                souf("       §fTous les modules ont etes initialise, le plugin");
-                souf("         §fest maintenant pret. §aBon jeu a §2tous §a!");
+                souf("        §fTous les modules ont etes initialise, le plugin");
+                souf("          §fest maintenant pret. §aBon jeu a §2tous §a!");
                 soufDate();
                 Color.sout(FOOTER);
                 System.out.println(" ");
@@ -200,7 +200,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onDisable() {
         System.out.println(" ");
         Color.sout(HEADER);
-        souf("       §4Nettoyage des donnees caches du plugin...");
+        souf("        §4Nettoyage des donnees caches du plugin...");
         souf("");
         souf("");
 
@@ -229,8 +229,8 @@ public class Main extends JavaPlugin implements Listener {
 
         souf("");
         souf("");
-        souf("             §4Dechargement du plugin termine.");
-        souf("                §4Le plugin peut s'arreter.");
+        souf("              §4Dechargement du plugin termine.");
+        souf("                 §4Le plugin peut s'arreter.");
         soufDate();
         Color.sout(FOOTER);
         System.out.println(" ");
@@ -240,8 +240,8 @@ public class Main extends JavaPlugin implements Listener {
         if (headerAndFooter) {
             System.out.println(" ");
             Color.sout(HEADER);
-            souf("       §dSauvegarde generale de toutes les donnees du");
-            souf("          §dserveur, des joueurs, et des jeux...");
+            souf("        §dSauvegarde generale de toutes les donnees du");
+            souf("           §dserveur, des joueurs, et des jeux...");
             souf("");
             souf("");
         }
@@ -271,7 +271,7 @@ public class Main extends JavaPlugin implements Listener {
 
             souf("");
             souf("");
-            souf("            §dDonnees sauvegardees avec succes.");
+            souf("             §dDonnees sauvegardees avec succes.");
             soufDate();
             Color.sout(FOOTER);
             System.out.println(" ");
@@ -279,7 +279,7 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public static void souf(String msg) {
-        System.out.println(String.format(Color.convert("§9|%-" + (61 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
+        System.out.println(String.format(Color.convert("§9|%-" + (63 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
     }
 
     public static void soufInstruction(String msg) {
@@ -289,7 +289,7 @@ public class Main extends JavaPlugin implements Listener {
     public static void soufDate() {
         souf("");
         String msg = "§7- " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.FRENCH).format(new Date()) + " | " + DateFormat.getTimeInstance(DateFormat.FULL, Locale.ENGLISH).format(new Date()) + "  ";
-        System.out.println(String.format(Color.convert("§9|%" + (61 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
+        System.out.println(String.format(Color.convert("§9|%" + (63 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
     }
 
     public static void clearLag(boolean soft) {
