@@ -70,7 +70,7 @@ public class FKListener {
     private Objective objective;
     private Map<String, Integer> l; // ScoreBoard List
     private Map<Integer, String> al; // Ancian ScoreBoard List -> to up to date
-    private String scoreName = "FKX" /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
+    private String scoreName = "FK-XI" /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
 
     public FKListener(long savingTimeOut) {
 
@@ -201,7 +201,7 @@ public class FKListener {
     }
 
     public void refreshScoreName() {
-        scoreName = "FALLEN KINGDOM X";
+        scoreName = "FALLEN KINGDOM XI";
         int index = (int) (manager.getTime() / 5 % scoreName.length());
         scoreName = "§6§l" + scoreName.substring(0, index) + "§f§l" + scoreName.charAt(index) + "§6§l" + scoreName.substring(index + 1);
     }
@@ -249,10 +249,9 @@ public class FKListener {
     public PacketPlayOutPlayerListHeaderFooter getTHF(Player p) {
         FKPlayer fp = manager.getPlayer(p.getName(), false);
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
-        h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
+        h.add("§c======= §9§l-=[ §6§lFallen Kingdom XI §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Builder : §f" + "Isumaki");
+        h.add("§9Organisateurs : §f" + "Mathis_Bruel");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§3Bienvenue à toi cher §9" + (fp == null ? p.getDisplayName() : fp.getDisplayName()) + "§3,");
@@ -335,16 +334,15 @@ public class FKListener {
 
     public static PacketPlayOutPlayerListHeaderFooter getDefaultTHF(Player p) {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
-        h.add("§c======= §9§l-=[ §6§lFallen Kingdom X §9§l]=- §c=======");
+        h.add("§c======= §9§l-=[ §6§lFallen Kingdom XI §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateurs : §f" + "Mathis_Bruel§9, §f Le_Corrompu");
-        h.add("§9Builder : §f" + "Isumaki");
+        h.add("§9Organisateurs : §f" + "Mathis_Bruel");
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
         h.add("§cMalheureusement, tu n'es actuellement");
         h.add("§cpas un participant de la partie actuelle");
-        h.add("§cde §9§l[ §6Fallen Kingdom §lX §9§l]§c.");
+        h.add("§cde §9§l[ §6Fallen Kingdom §lXI §9§l]§c.");
         h.add("§cDemande à un §4Administrateur de");
         h.add("§ct'ajouter à la partie ou patiente");
         h.add("§cquelques instants...");

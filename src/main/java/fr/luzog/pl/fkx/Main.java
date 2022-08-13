@@ -22,8 +22,8 @@ public class Main extends JavaPlugin implements Listener {
     public static final Object VERSION = "Beta 1.6";
 
     public static final String SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
-    public static final String PREFIX = "§8§l[§6FKX§8§l] >> §7";
-    public static final String HEADER = "§9--------------------------- §8[ §6FKX §8] §9---------------------------§r";
+    public static final String PREFIX = "§8§l[§6FK-XI§8§l] >> §7";
+    public static final String HEADER = "§9--------------------------- §8[ §6FK-XI §8] §9---------------------------§r";
     public static final String FOOTER = "§9---------------------------------------------------------------§r";
     public static final String REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\nReconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
     public static Main instance = null;
@@ -43,7 +43,7 @@ public class Main extends JavaPlugin implements Listener {
                 System.out.println(" ");
                 Color.sout(HEADER);
                 souf("         §fInitialisation des differentes composantes");
-                souf("           §fdu plugin de §bFallen Kingdom X§f...");
+                souf("           §fdu plugin de §bFallen Kingdom XI§f...");
                 souf("");
                 souf("");
 

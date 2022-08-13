@@ -186,7 +186,7 @@ public class GuiFK {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("No game running", back);
         FKManager fk = FKManager.getCurrentGame();
-        Inventory inv = Guis.getBaseInventory("§bFallen Kingdom X§f - §6" + fk.getId(), 54, back,
+        Inventory inv = Guis.getBaseInventory("§bFallen Kingdom XI§f - §6" + fk.getId(), 54, back,
                 getMainItem(fk, "Clic pour rafraichir", "fk"),
                 GuiPlayers.getHead(opener == null ? null : opener.getName(), "Clic pour voir plus",
                         "fk players " + (opener == null ? null : opener.getName())));
