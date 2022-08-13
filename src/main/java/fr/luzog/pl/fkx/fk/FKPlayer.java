@@ -113,10 +113,10 @@ public class FKPlayer {
     public boolean hasPermission(FKPermissions.Type permissionType, Location loc, int incrementTeamRadius) {
         if (personalPermissions.getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return personalPermissions.getPermission(permissionType) == FKPermissions.Definition.ON;
-        if (getManager().getPriority().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
-            return getManager().getPriority().getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getTeam() != null && getTeam().getPermissions().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
             return getTeam().getPermissions().getPermission(permissionType) == FKPermissions.Definition.ON;
+        if (getManager().getPriority().getPermission(permissionType) != FKPermissions.Definition.DEFAULT)
+            return getManager().getPriority().getPermission(permissionType) == FKPermissions.Definition.ON;
         if (getZone(loc, incrementTeamRadius) != null)
             switch (getZone(loc, incrementTeamRadius).getType()) {
                 case LOBBY:
