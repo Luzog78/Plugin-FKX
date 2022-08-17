@@ -591,8 +591,9 @@ public class Config {
     }
 
     public static class Team extends Config {
-        public static final String NAME = "name", PREFIX = "prefix", ELIMINATED = "eliminated",
-                ELIMINATORS = "eliminators", COLOR = "color", RADIUS = "radius", OLD_PLAYERS = "old-players",
+        public static final String NAME = "name", PREFIX = "prefix", COLOR = "color", RADIUS = "radius",
+                ELIMINATED = "elimination.eliminated", ELIMINATORS = "elimination.eliminators",
+                TIMEOUT = "elimination.default-timeout", OLD_PLAYERS = "old-players",
                 SPAWN = "spawn", PLUNDER_LOC = "plunder", PERMISSIONS = "permissions";
 
         public Team(@Nonnull String path) {
@@ -644,6 +645,15 @@ public class Config {
 
         public Team setEliminators(String eliminators, boolean force) {
             super.set(ELIMINATORS, eliminators, force);
+            return this;
+        }
+
+        public long getTimeout() {
+            return super.getLong(TIMEOUT);
+        }
+
+        public Team setTimeout(long timeout, boolean force) {
+            super.set(TIMEOUT, timeout, force);
             return this;
         }
 
@@ -1172,36 +1182,52 @@ public class Config {
     }
 
     public boolean getBool(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return config.getBoolean(path);
     }
 
     public byte getByte(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return Byte.parseByte(config.get(path) + "");
     }
 
     public short getShort(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return Short.parseShort(config.get(path) + "");
     }
 
     public char getChar(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         if ((config.get(path) + "").length() != 1)
             throw new RuntimeException("Invalid char");
         return (config.get(path) + "").charAt(0);
     }
 
     public int getInt(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return config.getInt(path);
     }
 
     public long getLong(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return config.getLong(path);
     }
 
     public double getDouble(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return config.getDouble(path);
     }
 
     public float getFloat(String path) {
+        if(isNull(path))
+            throw new NumberFormatException("The path '" + path + "' is null");
         return Float.parseFloat(config.get(path) + "");
     }
 

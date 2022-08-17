@@ -56,7 +56,20 @@ public class PlayerInteractHandler implements Listener {
 
                 for (FKTeam t : FKManager.getCurrentGame().getTeams())
                     if (t.isInside(b.getLocation()))
-                        if (!FKManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
+                        if (Objects.equals(fp.getTeamId(), t.getId())) {
+                            break;
+                        } else if (Objects.equals(fp.getTeamId(), FKTeam.GODS_ID)) {
+                            if (sneak) {
+                                if (t.isEliminated())
+                                    p.sendMessage("§cÉquipe déjà en éliminée.");
+                                else if (t.isEliminating())
+                                    p.sendMessage("§cÉquipe déjà en élimination.");
+                                else
+                                    t.tryToEliminate(fp.getTeam(), l);
+                                e.setCancelled(true);
+                            }
+                            break;
+                        } else if (!FKManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
                             p.sendMessage("§7§oVous ouvrez un coffre §6" + t.getColor() + t.getName()
                                     + "§7§o, prenez garde avant le début des assauts...");
                             break;

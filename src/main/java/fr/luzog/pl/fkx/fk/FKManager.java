@@ -162,12 +162,13 @@ public class FKManager {
                                 Utils.tryTo(printStackTrace, () -> team.setName(Objects.requireNonNull(tc.getName()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setColor(Objects.requireNonNull(tc.getColor()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPrefix(Objects.requireNonNull(tc.getPrefix()), false));
+                                Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setEliminated(tc.isEliminated(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setEliminators(tc.getEliminators(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setDefaultEliminationCooldown(tc.getTimeout(), false));
+                                Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setSpawn(Objects.requireNonNull(tc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPlunderLoc(Objects.requireNonNull(tc.getPlunderLoc()), false));
-                                Utils.tryTo(printStackTrace, () -> team.setRadius(tc.getRadius(), false));
-                                Utils.tryTo(printStackTrace, () -> team.setOldPlayers(tc.getOldPlayers(), false));
-                                Utils.tryTo(printStackTrace, () -> team.setEliminated(tc.isEliminated(), false));
                                 Utils.tryTo(printStackTrace, () -> team.setPermissions(Objects.requireNonNull(tc.getPermissions()), false));
 
                                 if (fff.getName().equalsIgnoreCase(FKTeam.GODS_FILE))
@@ -366,9 +367,9 @@ public class FKManager {
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new FKTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", null, ChatColor.DARK_RED,
-                loc, loc, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
+                loc, loc, 0, new ArrayList<>(), false, 0, 0, new FKPermissions(FKPermissions.Definition.ON)), false);
         setSpecs(new FKTeam("specs", "Specs", SpecialChars.FLOWER_3 + " Spec ||  ", null, ChatColor.GRAY,
-                loc, loc, 0, new ArrayList<>(), false, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
+                loc, loc, 0, new ArrayList<>(), false, 0, 0, new FKPermissions(FKPermissions.Definition.OFF)), false);
         setParticipantsTeams(new ArrayList<>(), false);
         setGlobal(new FKPermissions(FKPermissions.Definition.OFF,
                 new FKPermissions.Item(FKPermissions.Type.BREAKSPE, FKPermissions.Definition.ON),

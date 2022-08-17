@@ -23,7 +23,6 @@ public class FKTeam {
 
     public static final String GODS_ID = "gods", GODS_FILE = "Gods.yml",
             SPECS_ID = "specs", SPECS_FILE = "Specs.yml", PLUNDER_STAND_TAG = "FKPlunderStand";
-    public static final long ELIMINATION_TIMEOUT = 2000;
     public static double TEAM_RADIUS = 8;
 
     public void saveToConfig(String gameId, boolean soft) {
@@ -36,10 +35,11 @@ public class FKTeam {
                 .setName(name, true)
                 .setPrefix(prefix, true)
                 .setColor(color.name(), true)
-                .setEliminators(eliminators, true)
                 .setRadius(radius, true)
-                .setOldPlayers(oldPlayers, true)
                 .setEliminated(isEliminated, true)
+                .setEliminators(eliminators, true)
+                .setTimeout(defaultEliminationCooldown, true)
+                .setOldPlayers(oldPlayers, true)
                 .setSpawn(spawn, true)
                 .setPlunderLoc(plunderLoc, true)
                 .setPermissions(permissions, true)
@@ -57,7 +57,7 @@ public class FKTeam {
     private double radius;
     private ArrayList<String> oldPlayers;
     private boolean isEliminated;
-    private long eliminationCooldown;
+    private long defaultEliminationCooldown, eliminationCooldown;
 
     private Team scoreboardTeam;
 
@@ -77,6 +77,7 @@ public class FKTeam {
         this.radius = 0;
         this.oldPlayers = new ArrayList<>();
         this.isEliminated = false;
+        this.defaultEliminationCooldown = 2000;
         this.eliminationCooldown = 0;
         this.permissions = new FKPermissions(FKPermissions.Definition.DEFAULT);
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
@@ -85,7 +86,7 @@ public class FKTeam {
 
     public FKTeam(String id, String name, String prefix, String eliminators, ChatColor color, Location spawn,
                   Location plunderLoc, double radius, ArrayList<String> oldPlayers, boolean isEliminated,
-                  long eliminationCooldown, FKPermissions permissions) {
+                  long defaultEliminationCooldown, long eliminationCooldown, FKPermissions permissions) {
         this.id = id;
         this.name = name;
         this.prefix = prefix;
@@ -99,6 +100,7 @@ public class FKTeam {
         this.radius = radius;
         this.oldPlayers = oldPlayers == null ? new ArrayList<>() : oldPlayers;
         this.isEliminated = isEliminated;
+        this.defaultEliminationCooldown = defaultEliminationCooldown;
         this.eliminationCooldown = eliminationCooldown;
         this.permissions = permissions;
         scoreboardTeam = Bukkit.getScoreboardManager().getMainScoreboard().registerNewTeam("fkt" + UUID.randomUUID().toString().substring(0, 4) + ":" + id);
@@ -116,7 +118,7 @@ public class FKTeam {
                             "§e|", "§e|", "§e|", "§e|", "§a|", "§a|", "§a|", "§a|", "§a|", "§a|",
                             "§a|", "§a|", "§a|", "§a|", "§2|", "§2|", "§2|", "§6|", "§c|", "§4|"
                     }, "§7|", "§2|", "§c|", 32,
-                    (float) ((eliminationCooldown * 1.0) / ELIMINATION_TIMEOUT), "§a{p.}% {b}");
+                    (float) ((eliminationCooldown * 1.0) / defaultEliminationCooldown), "§a{p.}% {b}");
     }
 
     public boolean everyoneIsNearOf(Location loc) {
@@ -133,7 +135,7 @@ public class FKTeam {
     }
 
     public void tryToEliminate(FKTeam team, Location plunderLocation) {
-        eliminationCooldown = ELIMINATION_TIMEOUT;
+        eliminationCooldown = defaultEliminationCooldown;
         eliminators = team.getId();
         plunderLoc = plunderLocation;
         updateArmorStand();
@@ -161,7 +163,7 @@ public class FKTeam {
                     if (eliminationCooldown > 0) {
                         eliminationCooldown--;
                         updateArmorStand();
-                        if (eliminationCooldown == (long) (ELIMINATION_TIMEOUT / 2))
+                        if (eliminationCooldown == (long) (defaultEliminationCooldown / 2))
                             Broadcast.log(SpecialChars.WARNING + " " + SpecialChars.WARNING + " L'équipe §l"
                                     + getColor() + getName() + "§r va bientôt se faire !éliminer par les §l"
                                     + team.getColor() + team.getName() + "§r ! (Plus que !"
@@ -426,7 +428,7 @@ public class FKTeam {
                 e.setMetadata(PLUNDER_STAND_TAG, new FixedMetadataValue(Main.instance, id));
             }
             e.setCustomNameVisible(true);
-            e.setCustomName(FKPickableLocks.getProgressBar(ELIMINATION_TIMEOUT, eliminationCooldown));
+            e.setCustomName(FKPickableLocks.getProgressBar(defaultEliminationCooldown, eliminationCooldown));
             return e;
         }
     }
@@ -566,6 +568,19 @@ public class FKTeam {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setRadius(radius, true).save();
+        }
+    }
+
+    public long getDefaultEliminationCooldown() {
+        return defaultEliminationCooldown;
+    }
+
+    public void setDefaultEliminationCooldown(long defaultEliminationCooldown, boolean save) {
+        this.defaultEliminationCooldown = defaultEliminationCooldown;
+        if (save && getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setTimeout(defaultEliminationCooldown, true).save();
         }
     }
 

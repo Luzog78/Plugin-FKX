@@ -83,7 +83,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                         FKCStats.onCommand(sender, command, msg, args);
                     break;
                 case "teams":
-                    if ((hasPerm(sender, true, true) || sender.isOp()) && isNotNull(sender, true))
+                    if (hasPerm(sender, true, true) && isNotNull(sender, true))
                         FKCTeams.onCommand(sender, command, msg, args);
                     break;
                 case "title":
@@ -118,7 +118,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
     }
 
     public static boolean hasPerm(CommandSender sender, boolean god, boolean out) {
-        boolean r = !(sender instanceof Player) || (FKManager.getCurrentGame() == null && sender.isOp())
+        boolean r = !(sender instanceof Player) || sender.isOp()
                 || (FKManager.getCurrentGame() != null && FKManager.getCurrentGame()
                 .getPlayer(sender.getName(), false) != null && FKManager.getCurrentGame()
                 .getPlayer(sender.getName(), false).getTeam() != null && (FKManager.getCurrentGame()
@@ -163,7 +163,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                 temp.add("portal");
             if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("stats");
-            if ((hasPerm(sender, true, false) || sender.isOp()) && isNotNull(sender, false))
+            if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("teams");
             if (hasPerm(sender, false, false))
                 temp.add("title");
@@ -224,7 +224,7 @@ public class FKCommand implements CommandExecutor, TabCompleter {
                         temp.addAll(FKCStats.onTabComplete(sender, command, msg, args));
                     break;
                 case "teams":
-                    if ((hasPerm(sender, true, false) || sender.isOp()) && isNotNull(sender, false))
+                    if (hasPerm(sender, true, false) && isNotNull(sender, false))
                         temp.addAll(FKCTeams.onTabComplete(sender, command, msg, args));
                     break;
                 case "title":
