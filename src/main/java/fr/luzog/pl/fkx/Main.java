@@ -19,13 +19,11 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Beta 1.6";
+    public static final Object VERSION = "Beta 1.7";
 
-    public static final String SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
-    public static final String PREFIX = "§8§l[§6FK-XI§8§l] >> §7";
-    public static final String HEADER = "§9--------------------------- §8[ §6FK-XI §8] §9---------------------------§r";
-    public static final String FOOTER = "§9-----------------------------------------------------------------§r";
-    public static final String REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\nReconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
+    private static int sideLength = 27, centerLength;
+
+    public static String FK_SEASON, SYS_PREFIX, PREFIX, HEADER, FOOTER, REBOOT_KICK_MESSAGE;
     public static Main instance = null;
     public static World world = null, nether = null, end = null;
 
@@ -40,33 +38,47 @@ public class Main extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-                System.out.println(" ");
-                Color.sout(HEADER);
-                souf("          §fInitialisation des differentes composantes");
-                souf("            §fdu plugin de §bFallen Kingdom XI§f...");
-                souf("");
-                souf("");
+        globalConfig = new Config.Globals("Globals.yml").load()
+                .setVersion(VERSION, true)
+                .setLang("fr-FR", false)
+                .setSeason("X", false)
+                .setWorlds("world", "world_nether", "world_the_end", false)
+                .setCustomVanillaCraftsActivated(false, false)
+                .setCustomCraftingTableActivated(true, false)
+                .setCustomLootingBlocksSystemActivated(true, false)
+                .setCustomLootingMobsSystemActivated(true, false)
+                .save()
+                .load(); // Reload the config for the next lines
 
-                InCaseThereIsAProblem.init();
+        FK_SEASON = globalConfig.getSeason().replace(" ", "").toUpperCase();
+        centerLength = 9 + FK_SEASON.length();
 
-                soufInstruction("§6Initialisation du module : §eListeners§6...");
-                getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
-                Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));
+        SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
+        PREFIX = "§8§l[§6FK-" + FK_SEASON + "§8§l] >> §7";
+
+        String side = String.format("%" + sideLength + "s", "").replace(" ", "-");
+        HEADER = "§9" + side + " §8[ §6FK-" + FK_SEASON + " §8] §9" + side + "§r";
+        FOOTER = String.format("§9%" + (63 + FK_SEASON.length()) + "s§r", "").replace(" ", "-");
+
+        REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\n§6Reconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
+
+        System.out.println(" ");
+        Color.sout(HEADER);
+        souf("          §fInitialisation des differentes composantes");
+        souf("              §fdu plugin de §bFallen Kingdom " + FK_SEASON + "§f...");
+        souf("");
+        souf("");
+
+        InCaseThereIsAProblem.init();
+
+        soufInstruction("§6Initialisation du module : §eListeners§6...");
+        getServer().getPluginManager().registerEvents(Main.instance, Main.instance);
+        Events.events.forEach(e -> getServer().getPluginManager().registerEvents(e, Main.instance));
 
         new BukkitRunnable() {
             @Override
             public void run() {
                 soufInstruction("§6Initialisation du module : §eConfigurations§6...");
-                globalConfig = new Config.Globals("Globals.yml").load()
-                        .setVersion(VERSION, true)
-                        .setLang("fr-FR", false)
-                        .setWorlds("world", "world_nether", "world_the_end", false)
-                        .setCustomVanillaCraftsActivated(false, false)
-                        .setCustomCraftingTableActivated(true, false)
-                        .setCustomLootingBlocksSystemActivated(true, false)
-                        .setCustomLootingMobsSystemActivated(true, false)
-                        .save()
-                        .load(); // Reload the config for the next lines
 
                 customCrafts = globalConfig.isCustomVanillaCraftsActivated();
                 customCraftingTable = globalConfig.isCustomCraftingTableActivated();
@@ -279,7 +291,9 @@ public class Main extends JavaPlugin implements Listener {
     }
 
     public static void souf(String msg) {
-        System.out.println(String.format(Color.convert("§9|%-" + (63 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
+        System.out.println(String.format(Color.convert("§9|%-" + (centerLength + sideLength * 2 - 2
+                        + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"),
+                Color.convert(msg)));
     }
 
     public static void soufInstruction(String msg) {
@@ -288,8 +302,12 @@ public class Main extends JavaPlugin implements Listener {
 
     public static void soufDate() {
         souf("");
-        String msg = "§7- " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.FRENCH).format(new Date()) + " | " + DateFormat.getTimeInstance(DateFormat.FULL, Locale.ENGLISH).format(new Date()) + "  ";
-        System.out.println(String.format(Color.convert("§9|%" + (63 + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"), Color.convert(msg)));
+        String msg = "§7- " + DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.FRENCH)
+                .format(new Date()) + " | " + DateFormat.getTimeInstance(DateFormat.FULL,
+                Locale.ENGLISH).format(new Date()) + "  ";
+        System.out.println(String.format(Color.convert("§9|%" + (centerLength + sideLength * 2 - 2
+                        + Color.convert(msg).length() - ChatColor.stripColor(msg).length()) + "s§9|"),
+                Color.convert(msg)));
     }
 
     public static void clearLag(boolean soft) {

@@ -451,7 +451,7 @@ public class FKManager {
     public static ItemStack getBanner() {
         ItemStack banner = new ItemStack(Material.BANNER, 1, (short) 15);
         BannerMeta meta = (BannerMeta) banner.getItemMeta();
-        meta.setDisplayName("§9§l-=[ §6Fallen Kingdoms XI §9§l]=-");
+        meta.setDisplayName("§9§l-=[ §6Fallen Kingdoms " + Main.FK_SEASON + " §9§l]=-");
         meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS_MIDDLE));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CURLY_BORDER));
         meta.addPattern(new Pattern(DyeColor.ORANGE, PatternType.CIRCLE_MIDDLE));

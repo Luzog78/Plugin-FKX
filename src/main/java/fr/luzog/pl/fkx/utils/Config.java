@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class Config {
 
     public static class Globals extends Config {
-        public static final String VERSION = "version", LANG = "lang", OVERWORLD = "worlds.over",
+        public static final String VERSION = "version", LANG = "lang", SEASON = "season", OVERWORLD = "worlds.over",
                 NETHER = "worlds.nether", END = "worlds.end", CUSTOM_CRAFTS = "custom-options.vanilla-crafts",
                 CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table",
                 CUSTOM_LOOTING_BLOCKS = "custom-options.block-looting-system",
@@ -49,6 +49,10 @@ public class Config {
 
         public String getLang() {
             return super.getStr(LANG);
+        }
+
+        public String getSeason() {
+            return super.getStr(SEASON);
         }
 
         public World getOverworld() {
@@ -134,6 +138,11 @@ public class Config {
 
         public Globals setLang(String lang, boolean force) {
             super.set(LANG, lang, force);
+            return this;
+        }
+
+        public Globals setSeason(String season, boolean force) {
+            super.set(SEASON, season, force);
             return this;
         }
 
