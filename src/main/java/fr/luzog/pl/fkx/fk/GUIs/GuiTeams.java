@@ -54,6 +54,7 @@ public class GuiTeams {
                         "  §6Nom : §f" + team.getColor() + team.getName(),
                         "  §6Préfixe : §f§7'" + team.getColor() + team.getPrefix() + "§7'",
                         "  §6Couleur : §f" + team.getColor() + team.getColor().name(),
+                        "  §6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20) + "s",
                         "  §6Éliminée : §f" + (team.isEliminated() ? "§2" + SpecialChars.YES + "Oui" : "§4" + SpecialChars.NO + "Non"),
                         "  §8  > Éliminateurs : §6" + (team.getEliminators() == null ? "§cnull"
                                 : FKManager.getCurrentGame().getTeam(team.getEliminators()) == null ? team.getEliminators()
@@ -182,11 +183,21 @@ public class GuiTeams {
         Inventory inv = Guis.getBaseInventory("§6Équipe §7-§b" + team.getId(), 54, back,
                 getMainItem(null, "null"), null);
 
-        inv.setItem(Utils.posOf(4, 1), Items.builder(getTeamItem(team, "Clic pour rafraîchir", "null"))
-                .addLore("§7Clic Droit pour prendre la bannière").setCantClickOn(true)
-                .setLeftRightCommandOnClick(refresh, "fk banner " + team.getColor().name()).build());
+        inv.setItem(Utils.posOf(4, 1), Items.builder(
+                        getTeamItem(team, "Clic pour rafraîchir", "null"))
+                .addLore(
+                        "§7Clic Droit pour prendre la bannière",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk banner " + team.getColor() + team.getColor().name()
+                )
+                .setCantClickOn(true)
+                .setLeftRightCommandOnClick(refresh, "fk banner " + team.getColor().name())
+                .build());
+
         inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(team.getId(),
-                "Clic pour voir les joueurs", "fk teams " + team.getId() + " playersGui",
+                "Clic pour voir les joueurs\n \n§7Commande:\n§7/fk teams " + team.getId() + " playersGui",
+                "fk teams " + team.getId() + " playersGui",
                 team.getPlayers().size(), (int) team.getPlayers().stream().filter(p ->
                         p.getPlayer() != null).count(), -1));
 
@@ -195,12 +206,13 @@ public class GuiTeams {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour changer le nom",
+                        " ",
                         "§7Commande :",
                         "§7/fk teams " + team.getId() + " options --d §f<displayName>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 1 fk teams " + team.getId() + " options --d %s%nfk teams " + team.getId(),
-                        "fk teams " + team.getId()
+                        "input 1 fk teams " + team.getId() + " options --d %s%n" + refresh,
+                        refresh
                 )
                 .setCantClickOn(true)
                 .build());
@@ -209,12 +221,13 @@ public class GuiTeams {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour changer le préfixe",
+                        " ",
                         "§7Commande :",
                         "§7/fk teams " + team.getId() + " options --p §f<prefix>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 1 fk teams " + team.getId() + " options --p %s%nfk teams " + team.getId(),
-                        "fk teams " + team.getId()
+                        "input 1 fk teams " + team.getId() + " options --p %s%n" + refresh,
+                        refresh
                 )
                 .setCantClickOn(true)
                 .build());
@@ -224,9 +237,10 @@ public class GuiTeams {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic pour voir plus",
+                        " ",
                         "§7Commandes :",
                         "§7/fk teams " + team.getId() + " colorGui",
-                        "§7/fk teams " + team.getId() + " options --c <color>"
+                        "§7/fk teams " + team.getId() + " options --c §f<color>"
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk teams " + team.getId() + " colorGui")
@@ -246,11 +260,11 @@ public class GuiTeams {
                         " ",
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour se téléporter",
-                        "§7Clic Droit pour redéfinir ici",
-                        "§7Clic molette pour invoquer l'Autel",
-                        "§7Commandes :",
-                        "§7/fk teams " + team.getId() + " altar",
-                        "§7/fk teams " + team.getId() + " options --s <x> <y> <z> <yaw> [<pitch>] [<world>]"
+                        "§7Clic Droit pour définir ici",
+                        "§7Clic Molette pour §fdéfinir",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk teams " + team.getId() + " options --s §f<x> <y> <z> §8[§f<yaw> <pitch>§8] [§f<world>§8]"
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(
@@ -262,44 +276,94 @@ public class GuiTeams {
                                 + " " + nLoc.getYaw() + " " + nLoc.getPitch()
                                 + " " + seer.getWorld().getName() + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("fk teams " + team.getId() + " altar")
+                .setMiddleCommandOnClick("input 6 fk teams " + team.getId() + " options --s %s %s %s %s %s %s%n" + refresh)
                 .build());
         inv.setItem(Utils.posOf(1, 4), Items.builder(Material.FENCE)
                 .setName("§6Rayon : §f" + team.getRadius())
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Gauche pour augmenter de 0.5",
-                        "§7 (Shift pour augmenter de 1)",
-                        "§7Clic Droit pour diminuer de 0.5",
-                        "§7 (Shift pour diminuer de 1)",
-                        "§7Clic Molette pour créer le mur",
-                        "§7 > Pose une couche de §8Cobble",
+                        "§7Clic Gauche pour §2 + 1",
+                        "§7Clic Droit pour §4 - 1",
+                        "§7Clic Molette pour §fdéfinir",
+                        " ",
                         "§7Commande :",
-                        "§7/fk teams " + team.getId() + " options --r <radius>"
+                        "§7/fk teams " + team.getId() + " options --r §f<radius>"
                 )
                 .setCantClickOn(true)
-                .setLeftRightShiftCommandOnClick(
-                        "fk teams " + team.getId() + " options --r " + (team.getRadius() + 0.5) + "\n" + refresh,
-                        "fk teams " + team.getId() + " options --r " + (team.getRadius() + 1) + "\n" + refresh,
-                        "fk teams " + team.getId() + " options --r " + (team.getRadius() > 0.5 ? team.getRadius() - 0.5 : 0) + "\n" + refresh,
-                        "fk teams " + team.getId() + " options --r " + (team.getRadius() > 1 ? team.getRadius() - 1 : 0) + "\n" + refresh
+                .setLeftRightCommandOnClick(
+                        "fk teams " + team.getId() + " options --r " + (team.getRadius() == 0 ? 0.5 : team.getRadius() + 1) + "\n" + refresh,
+                        "fk teams " + team.getId() + " options --r " + (team.getRadius() > 0.5 ? team.getRadius() - 1 : 0) + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("fk teams " + team.getId() + " wall 1 cobblestone")
+                .setMiddleCommandOnClick("input 1 fk teams " + team.getId() + " options --r %s%n" + refresh)
                 .build());
 
 
         inv.setItem(Utils.posOf(7, 2), GuiPerm.getPermsItem(team.getPermissions(), Material.IRON_SWORD,
-                "Permissions", "Clic pour voir les permissions", "fk perm team " + team.getId()));
-        inv.setItem(Utils.posOf(6, 3), Items.builder(Material.ARMOR_STAND)
-                .setName("§6ArmorStands")
+                "§fPermissions", "Clic pour voir les permissions\n \n§7Commande:\n§7/fk perm team "
+                        + team.getId(), "fk perm team " + team.getId()));
+        inv.setItem(Utils.posOf(6, 2), Items.builder(Material.WATCH)
+                .setName("§6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20) + "s")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ?
-                                "§7Clic Gauche pour le montrer"
-                                        + "\n§7Clic Droit pour le cacher"
-                                : " \n  §cCette équipe n'a pas d'armor stand...\n \n§8" + Guis.loreSeparator),
+                                "§7Clic Gauche pour §2 + 1s"
+                                        + "\n§7  (Shift pour §2 + 5s§7)"
+                                        + "\n§7Clic Droit pour §4 - 1s"
+                                        + "\n§7  (Shift pour §4 - 5s§7)"
+                                        + "\n§7Clic Molette pour §fdéfinir"
+                                : " \n  §cCette équipe n'est pas éliminable...\n \n§8" + Guis.loreSeparator),
+                        " ",
                         "§7Commande :",
-                        "§7/fk teams " + team.getId() + " armorStand (hide | show)"
+                        "§7/fk teams " + team.getId() + " options --e §f<delay>"
+                )
+                .setCantClickOn(true)
+                .setLeftRightShiftCommandOnClick(
+                        "fk teams " + team.getId() + " options --e " + ((team
+                                .getDefaultEliminationCooldown() / 20) + 1) + "\n" + refresh,
+                        "fk teams " + team.getId() + " options --e " + ((team
+                                .getDefaultEliminationCooldown() / 20) + 5) + "\n" + refresh,
+                        "fk teams " + team.getId() + " options --e " + ((team
+                                .getDefaultEliminationCooldown() / 20) - 1 < 0 ? 0 : (team
+                                .getDefaultEliminationCooldown() / 20) - 1) + "\n" + refresh,
+                        "fk teams " + team.getId() + " options --e " + ((team
+                                .getDefaultEliminationCooldown() / 20) - 5 < 0 ? 0 : (team
+                                .getDefaultEliminationCooldown() / 20) - 5) + "\n" + refresh
+                )
+                .setMiddleCommandOnClick("input 1 fk teams " + team.getId() + " options --e %s%n" + refresh)
+                .build());
+        inv.setItem(Utils.posOf(6, 3), Items.builder(Material.BRICK)
+                .setName("§6Constructions")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ?
+                                "§7Clic Gauche pour créer l'Autel"
+                                        + "\n§7Clic Droit pour poser §f1 §7couche de §8Cobble"
+                                        + "\n§7  (Shift pour poser §fX §7couches de §8Y§7)"
+                                : " \n  §cCette équipe n'a pas d'armor stand...\n \n§8" + Guis.loreSeparator),
+                        " ",
+                        "§7Commande :",
+                        "§7/fk teams " + team.getId() + " altar",
+                        "§7/fk teams " + team.getId() + " wall §f1 §8cobblestone"
+                )
+                .setCantClickOn(true)
+                .setLeftRightShiftCommandOnClick(
+                        "fk teams " + team.getId() + " altar\n" + refresh,
+                        refresh,
+                        "fk teams " + team.getId() + " wall 1 cobblestone\n" + refresh,
+                        "input 2 fk teams " + team.getId() + " wall %s %s%n" + refresh
+                )
+                .build());
+        inv.setItem(Utils.posOf(6, 4), Items.builder(Material.ARMOR_STAND)
+                .setName("§6ArmorStand")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ?
+                                "§7Clic Gauche pour le §2montrer"
+                                        + "\n§7Clic Droit pour le §4cacher"
+                                : " \n  §cCette équipe n'a pas d'armor stand...\n \n§8" + Guis.loreSeparator),
+                        " ",
+                        "§7Commande :",
+                        "§7/fk teams " + team.getId() + " armorStand §8(§2show §8| §4hide§8)"
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(
@@ -323,14 +387,17 @@ public class GuiTeams {
                                 : "§6" + team.getEliminators()),
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Shift Clic Gauche pour le éliminer",
-                        "§7Shift Clic Droit pour réintroduire",
+                        "§7Shift Clic Gauche pour §4éliminer",
+                        "§7Shift Clic Droit pour §2réintroduire",
+                        " ",
                         "§7Commande :",
-                        "§7/fk teams (eliminate | reintroduce) " + team.getId()
+                        "§7/fk teams §8(§4eliminate §8| §2reintroduce§8)§7 " + team.getId()
                 )
                 .setCantClickOn(true)
-                .setLeftRightCommandOnClick(
+                .setLeftRightShiftCommandOnClick(
+                        refresh,
                         "fk teams eliminate " + team.getId() + "\n" + refresh,
+                        refresh,
                         "fk teams reintroduce " + team.getId() + "\n" + refresh
                 )
                 .build());

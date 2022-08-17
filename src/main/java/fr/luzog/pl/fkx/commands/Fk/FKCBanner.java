@@ -37,7 +37,7 @@ public class FKCBanner {
                     u.getPlayer().getInventory().addItem(FKManager.getBanner(c));
                 else
                     u.err(CmdUtils.err_not_player);
-            } catch (IllegalStateException e) {
+            } catch (IllegalArgumentException e) {
                 u.err("Couleur '" + args[1] + "' inconnue.");
             }
 

@@ -28,6 +28,7 @@ public class FKCTeams {
                     + "\n  > --p <prefix>"
                     + "\n  > --c <color>"
                     + "\n  > --r <radius>"
+                    + "\n  > --e <eliminationDelay>"
                     + "\n  > --s <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Spawn§r"
                     /*+ "\n  > --g <x> <y> <z> [<yw> <pi>] [<world>]  §7||>> Guardian§r"*/;
 
@@ -369,6 +370,18 @@ public class FKCTeams {
                         u.succ(" - Rayon : §f" + t.getRadius());
                     } catch (NumberFormatException e) {
                         u.err(" - Rayon '" + handleString(arg, 2) + "' invalide.");
+                    }
+                }
+            } else if (arg.toLowerCase().equals("e") || arg.toLowerCase().startsWith("e ")) {
+                if (isEmpty)
+                    u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "eliminationDelay"));
+                else {
+                    try {
+                        t.setDefaultEliminationCooldown((long) (Double.parseDouble(
+                                handleString(arg, 2)) * 20), true);
+                        u.succ(" - Délai d'élimination : §7" + (t.getDefaultEliminationCooldown() / 20) + "s");
+                    } catch (NumberFormatException e) {
+                        u.err(" - Délai d'élimination '" + handleString(arg, 2) + "' invalide.");
                     }
                 }
             } else if (arg.toLowerCase().equals("s") || arg.toLowerCase().startsWith("s ")) {

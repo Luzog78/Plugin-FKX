@@ -241,10 +241,10 @@ public class FKCLocks {
             } else if (args[2].equalsIgnoreCase("cooldown")) {
                 if (args.length >= 4)
                     try {
-                        l.setOriginalCoolDown(Long.parseLong(args[3]));
+                        l.setOriginalCoolDown((long) (Double.parseDouble(args[3]) * 20));
                         l.resetCoolDown();
-                        u.succ("Le cooldown du coffre §b" + l.getId() + "§r est désormais de §f"
-                                + l.getOriginalCoolDown() + " ticks§r.");
+                        u.succ("Le cooldown du coffre §b" + l.getId() + "§r est désormais de §7"
+                                + (l.getOriginalCoolDown() / 20) + "s§r.");
                         FKManager.getCurrentGame().savePickableLocks();
                     } catch (NumberFormatException e) {
                         u.err(CmdUtils.err_number_format + " (" + args[3] + ")");
@@ -384,14 +384,14 @@ public class FKCLocks {
                         add("armorStands");
                     } else if (args.length == 4) {
                         if (args[2].equalsIgnoreCase("cooldown")) {
-                            add("100");
-                            add("200");
-                            add("400");
-                            add("600");
-                            add("1200");
-                            add("2400");
-                            add("3600");
-                            add("6000");
+                            add("5");
+                            add("10");
+                            add("20");
+                            add("30");
+                            add("60");
+                            add("120");
+                            add("240");
+                            add("300");
                         } else if (args[2].equalsIgnoreCase("level")) {
                             add("0");
                             add((m.getDay() + 1) + "");
