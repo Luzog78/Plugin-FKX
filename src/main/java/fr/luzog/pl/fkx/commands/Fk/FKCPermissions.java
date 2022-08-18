@@ -88,10 +88,10 @@ public class FKCPermissions {
                     if (args.length == 3)
                         if (sender instanceof Player)
                             u.getPlayer().openInventory(GuiPerm.getPermsInv(z.getPermissions(),
-                                    GuiZones.getZoneItem(z),
+                                    GuiZones.getZoneItem(z, null, "null"),
                                     GuiPerm.getPermsItem(z.getPermissions(), Material.IRON_SWORD,
                                             "§fPermissions de Zone", null, "null"),
-                                    "zone " + z.getId(), "fk zones " + z.getId()));
+                                    "zone " + z.getId(), "fk zone " + z.getId()));
                         else
                             u.succ(CmdUtils.err_not_player);
                     else if (args[3].equalsIgnoreCase("info")) {

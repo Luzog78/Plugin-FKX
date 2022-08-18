@@ -379,7 +379,7 @@ public class FKListener {
      * @luzog Copyrights
      */
     public static String getOrientationChar(double yaw, double fromX, double fromZ, double toX, double toZ, double radius) {
-        if (Math.abs(fromX - toX) <= radius && Math.abs(fromZ - toZ) <= radius)
+        if (Math.sqrt(Math.pow(fromX - toX, 2) + Math.pow(fromZ - toZ, 2)) <= radius)
             return a[10];
 
         double y = (yaw >= 0 ? yaw : 360 + yaw) * Math.PI / 180;

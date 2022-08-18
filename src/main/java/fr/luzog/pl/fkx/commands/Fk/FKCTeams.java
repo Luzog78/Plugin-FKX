@@ -379,7 +379,7 @@ public class FKCTeams {
                     try {
                         t.setDefaultEliminationCooldown((long) (Double.parseDouble(
                                 handleString(arg, 2)) * 20), true);
-                        u.succ(" - Délai d'élimination : §7" + (t.getDefaultEliminationCooldown() / 20) + "s");
+                        u.succ(" - Délai d'élimination : §7" + (t.getDefaultEliminationCooldown() / 20.0) + "s");
                     } catch (NumberFormatException e) {
                         u.err(" - Délai d'élimination '" + handleString(arg, 2) + "' invalide.");
                     }

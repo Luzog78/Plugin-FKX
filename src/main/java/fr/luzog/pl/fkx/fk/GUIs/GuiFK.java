@@ -223,10 +223,12 @@ public class GuiFK {
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk players", "fk players",
                 l.size(), (int) l.stream().filter(p ->
                         Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
-        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
-                "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
         inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk locks", "fk locks"));
+        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
+        inv.setItem(Utils.posOf(7, 4), GuiZones.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk zone", "fk zone"));
 
         inv.setItem(Utils.posOf(1, 1), GuiAd.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/ad", "ad"));

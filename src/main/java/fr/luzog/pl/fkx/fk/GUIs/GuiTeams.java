@@ -53,7 +53,7 @@ public class GuiTeams {
                         "  §6Nom : §f" + team.getColor() + team.getName(),
                         "  §6Préfixe : §f§7'" + team.getColor() + team.getPrefix() + "§7'",
                         "  §6Couleur : §f" + team.getColor() + team.getColor().name(),
-                        "  §6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20) + "s",
+                        "  §6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20.0) + "s",
                         "  §6Éliminée : §f" + (team.isEliminated() ? "§2" + SpecialChars.YES + "Oui" : "§4" + SpecialChars.NO + "Non"),
                         "  §8  > Éliminateurs : §6" + (team.getEliminators() == null ? "§cnull"
                                 : FKManager.getCurrentGame().getTeam(team.getEliminators()) == null ? team.getEliminators()
@@ -306,7 +306,7 @@ public class GuiTeams {
                 "§fPermissions", "Clic pour voir les permissions\n \n§7Commande:\n§7/fk perm team "
                         + team.getId(), "fk perm team " + team.getId()));
         inv.setItem(Utils.posOf(6, 2), Items.builder(Material.WATCH)
-                .setName("§6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20) + "s")
+                .setName("§6Délai d'élimination : §7" + (team.getDefaultEliminationCooldown() / 20.0) + "s")
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         (!(team.getId().equals(FKTeam.GODS_ID) || team.getId().equals(FKTeam.SPECS_ID)) ?
@@ -323,15 +323,15 @@ public class GuiTeams {
                 .setCantClickOn(true)
                 .setLeftRightShiftCommandOnClick(
                         "fk teams " + team.getId() + " options --e " + ((team
-                                .getDefaultEliminationCooldown() / 20) + 1) + "\n" + refresh,
+                                .getDefaultEliminationCooldown() / 20.0) + 1) + "\n" + refresh,
                         "fk teams " + team.getId() + " options --e " + ((team
-                                .getDefaultEliminationCooldown() / 20) + 5) + "\n" + refresh,
+                                .getDefaultEliminationCooldown() / 20.0) + 5) + "\n" + refresh,
                         "fk teams " + team.getId() + " options --e " + ((team
-                                .getDefaultEliminationCooldown() / 20) - 1 < 0 ? 0 : (team
-                                .getDefaultEliminationCooldown() / 20) - 1) + "\n" + refresh,
+                                .getDefaultEliminationCooldown() / 20.0) - 1 < 0 ? 0 : (team
+                                .getDefaultEliminationCooldown() / 20.0) - 1) + "\n" + refresh,
                         "fk teams " + team.getId() + " options --e " + ((team
-                                .getDefaultEliminationCooldown() / 20) - 5 < 0 ? 0 : (team
-                                .getDefaultEliminationCooldown() / 20) - 5) + "\n" + refresh
+                                .getDefaultEliminationCooldown() / 20.0) - 5 < 0 ? 0 : (team
+                                .getDefaultEliminationCooldown() / 20.0) - 5) + "\n" + refresh
                 )
                 .setMiddleCommandOnClick("input 1 fk teams " + team.getId() + " options --e %s%n" + refresh)
                 .build());

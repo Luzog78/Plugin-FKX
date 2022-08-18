@@ -244,7 +244,7 @@ public class FKCLocks {
                         l.setOriginalCoolDown((long) (Double.parseDouble(args[3]) * 20));
                         l.resetCoolDown();
                         u.succ("Le cooldown du coffre §b" + l.getId() + "§r est désormais de §7"
-                                + (l.getOriginalCoolDown() / 20) + "s§r.");
+                                + (l.getOriginalCoolDown() / 20.0) + "s§r.");
                         FKManager.getCurrentGame().savePickableLocks();
                     } catch (NumberFormatException e) {
                         u.err(CmdUtils.err_number_format + " (" + args[3] + ")");

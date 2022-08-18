@@ -102,9 +102,13 @@ public class GuiLocks {
                 .setName("")
                 .addLore(
                         "§7Clic Gauche pour se téléporter",
-                        "§7Clic Droit pour " + (lock.isAutoBC() ? "§cdésactiver" : "§aactiver")
-                                + "\n§7 l'Auto Broadcast (message auto)",
-                        "§7Clic Molette pour broadcast"
+                        "§7Clic Droit pour " + (lock.isAutoBC() ? "§cdésactiver" : "§aactiver"),
+                        "§7 l'Auto Broadcast (message auto)",
+                        "§7Clic Molette pour broadcast",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " auto-bc §8(§atrue §8|§c false§8)",
+                        "§7/fk locks " + lock.getId() + " broadcast"
                 )
                 .setLeftRightCommandOnClick(
                         "tp " + lock.getLocation().getX()
@@ -121,7 +125,10 @@ public class GuiLocks {
                 .setName("§9Identifiant : §b" + lock.getId())
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Gauche pour modifier"
+                        "§7Clic Gauche pour modifier",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " id §f<id>"
                 )
                 .setLeftRightCommandOnClick(
                         "input 1 fk locks " + lock.getId() + " id %s%nfk locks",
@@ -135,7 +142,10 @@ public class GuiLocks {
                         : "§4§l" + SpecialChars.NO + "§4 Verrouillé"))
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour " + (lock.isPicked() ? "verrouiller" : "déverrouiller")
+                        "§7Clic pour " + (lock.isPicked() ? "§4verrouiller" : "§2déverrouiller"),
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " §8(§4lock §8|§2 unlock§8)"
                 )
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, lock.isPicked() ? null : 1)
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
@@ -150,7 +160,10 @@ public class GuiLocks {
                         : "§4§l" + SpecialChars.NO + "§4 Inaccessible"))
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour rendre " + (lock.isPickable() ? "inaccessible" : "accessible")
+                        "§7Clic pour rendre " + (lock.isPickable() ? "§4inaccessible" : "§2accessible"),
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " pickable §8(§4false §8|§2 true§8)"
                 )
                 .setGlobalCommandOnClick("fk locks " + lock.getId() + " pickable " + (lock.isPickable() ? "false" : "true")
                         + "\nfk locks " + lock.getId())
@@ -165,7 +178,10 @@ public class GuiLocks {
                         "§7Clic Gauche pour niv §4- 1",
                         "§7Clic Droit pour niv §4- 2",
                         "§7  (Shift + Gauche pour niv §4- 5§7)",
-                        "§7  (Shift + Droit pour niv §4- 10§7)"
+                        "§7  (Shift + Droit pour niv §4- 10§7)",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " level §f<niveau>"
                 )
                 .setLeftRightShiftCommandOnClick(
                         "fk locks " + lock.getId() + " level " + Math.max(lock.getLevel() - 1, 0) + "\nfk locks " + lock.getId(),
@@ -177,8 +193,14 @@ public class GuiLocks {
                 .build());
         inv.setItem(Utils.posOf(2, 4), Items.builder(Material.NETHER_STAR)
                 .setName("§9Niveau : §f" + lock.getLevel())
-                .setLore("§8" + Guis.loreSeparator)
-                .setGlobalCommandOnClick("fk locks " + lock.getId())
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour §fdéfinir§7 le niveau",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " level §f<niveau>"
+                )
+                .setGlobalCommandOnClick("input 1 fk locks " + lock.getId() + " level %s%nfk locks " + lock.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(3, 4), Items.builder(Material.STAINED_GLASS_PANE)
@@ -189,7 +211,10 @@ public class GuiLocks {
                         "§7Clic Gauche pour niv §2+ 1",
                         "§7Clic Droit pour niv §2+ 2",
                         "§7  (Shift + Gauche pour niv §2+ 5§7)",
-                        "§7  (Shift + Droit pour niv §2+ 10§7)"
+                        "§7  (Shift + Droit pour niv §2+ 10§7)",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " level §f<niveau>"
                 )
                 .setLeftRightShiftCommandOnClick(
                         "fk locks " + lock.getId() + " level " + (lock.getLevel() + 1) + "\nfk locks " + lock.getId(),
@@ -208,20 +233,33 @@ public class GuiLocks {
                         "§7Clic Gauche pour délai §4- 1 §7sec",
                         "§7Clic Droit pour délai §4- 5 §7sec",
                         "§7  (Shift + Gauche pour délai §4- 10 §7sec)",
-                        "§7  (Shift + Droit pour délai §4- 15 §7sec)"
+                        "§7  (Shift + Droit pour délai §4- 15 §7sec)",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " cooldown §f<délai>"
                 )
                 .setLeftRightShiftCommandOnClick(
-                        "fk locks " + lock.getId() + " cooldown " + Math.max(lock.getOriginalCoolDown() - 20, 0) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + Math.max(lock.getOriginalCoolDown() - 200, 0) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + Math.max(lock.getOriginalCoolDown() - 100, 0) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + Math.max(lock.getOriginalCoolDown() - 300, 0) + "\nfk locks " + lock.getId()
+                        "fk locks " + lock.getId() + " cooldown "
+                                + Math.max((lock.getOriginalCoolDown() / 20.0) - 1, 0.05) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + Math.max((lock.getOriginalCoolDown() / 20.0) - 10, 0.05) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + Math.max((lock.getOriginalCoolDown() / 20.0) - 5, 0.05) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + Math.max((lock.getOriginalCoolDown() / 20.0) - 15, 0.05) + "\nfk locks " + lock.getId()
                 )
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(6, 4), Items.builder(Material.WATCH)
                 .setName("§9Délai : §7" + (lock.getOriginalCoolDown() / 20.0) + "s")
-                .setLore("§8" + Guis.loreSeparator)
-                .setGlobalCommandOnClick("fk locks " + lock.getId())
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour §fdéfinir§7 le délai",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " cooldown §f<délai>"
+                )
+                .setGlobalCommandOnClick("input 1 fk locks " + lock.getId() + " cooldown %s%nfk locks " + lock.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(7, 4), Items.builder(Material.STAINED_GLASS_PANE)
@@ -232,13 +270,20 @@ public class GuiLocks {
                         "§7Clic Gauche pour délai §2+ 1 §7sec",
                         "§7Clic Droit pour délai §2+ 5 §7sec",
                         "§7  (Shift + Gauche pour délai §2+ 10 §7sec)",
-                        "§7  (Shift + Droit pour délai §2+ 15 §7sec)"
+                        "§7  (Shift + Droit pour délai §2+ 15 §7sec)",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " cooldown §f<délai>"
                 )
                 .setLeftRightShiftCommandOnClick(
-                        "fk locks " + lock.getId() + " cooldown " + (lock.getOriginalCoolDown() + 20) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + (lock.getOriginalCoolDown() + 200) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + (lock.getOriginalCoolDown() + 100) + "\nfk locks " + lock.getId(),
-                        "fk locks " + lock.getId() + " cooldown " + (lock.getOriginalCoolDown() + 300) + "\nfk locks " + lock.getId()
+                        "fk locks " + lock.getId() + " cooldown "
+                                + ((lock.getOriginalCoolDown() / 20.0) + 1) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + ((lock.getOriginalCoolDown() / 20.0) + 10) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + ((lock.getOriginalCoolDown() / 20.0) + 5) + "\nfk locks " + lock.getId(),
+                        "fk locks " + lock.getId() + " cooldown "
+                                + ((lock.getOriginalCoolDown() / 20.0) + 15) + "\nfk locks " + lock.getId()
                 )
                 .setCantClickOn(true)
                 .build());
@@ -255,7 +300,10 @@ public class GuiLocks {
                         "  §c les données du coffre \"pillable\".",
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Molette pour supprimer le coffre"
+                        "§7Clic Molette pour supprimer le coffre",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks " + lock.getId() + " destroy"
                 )
                 .setMiddleCommandOnClick("fk locks " + lock.getId() + " destroy\n" + back)
                 .setCloseOnClick(true)
@@ -294,7 +342,10 @@ public class GuiLocks {
                                     + Utils.getFormattedWorld(target.getWorld().getName()),
                             " ",
                             "§8" + Guis.loreSeparator,
-                            (te == null ? "§cImpossible de créer un Lock" : "§7Clic pour créer un Lock")
+                            (te == null ? "§cImpossible de créer un Lock" : "§7Clic pour créer un Lock"
+                                    + "\n \n§7Commande :\n§7/fk locks create 0\n§7 " + target.getBlock().getX()
+                                    + " " + target.getBlock().getY() + " " + target.getBlock().getZ()
+                                    + " " + target.getWorld().getName())
                     )
                     .setGlobalCommandOnClick(
                             te == null ? "null" : "fk locks create 0 " + target.getBlock().getX()
@@ -302,20 +353,24 @@ public class GuiLocks {
                                     + " " + target.getWorld().getName() + "\n" + navigationBaseCommand + " " + page
                     )
                     .setCantClickOn(true)
-                    .build() : getLockItem(lock, from, "Clic pour voir plus", "fk locks " + lock.getId());
+                    .build() : getLockItem(lock, from, "Clic pour voir plus\n \n§7Commande :\n§7/fk locks "
+                    + lock.getId(), "fk locks " + lock.getId());
         }
 
         Inventory inv = Guis.getPagedInventory("§9Coffres Crochetables", 54, back,
                 getMainItem("Clic pour rafraîchir", navigationBaseCommand + " " + page),
                 targetIs, navigationBaseCommand, page, FKManager.getCurrentGame().getPickableLocks()
                         .getPickableLocks().stream().map(l ->
-                                getLockItem(l, from, "Clic pour voir plus",
-                                        "fk locks " + l.getId())).collect(Collectors.toList()));
+                                getLockItem(l, from, "Clic pour voir plus\n \n§7Commande :\n§7/fk locks "
+                                        + l.getId(), "fk locks " + l.getId())).collect(Collectors.toList()));
         inv.setItem(Utils.posOf(5, 5), Items.builder(FKPickableLocks.getMasterKey())
                 .addLore(
                         "§8" + Guis.loreSeparator,
                         "§7Dans l'inventaire :",
-                        "§7Clic pour donner la clé"
+                        "§7Clic pour donner la clé",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk locks tool"
                 )
                 .setGlobalCommandOnClick("fk locks tool")
                 .setCantClickOn(true)

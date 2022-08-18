@@ -4,16 +4,12 @@ import fr.luzog.pl.fkx.fk.*;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.Utils;
-import net.minecraft.server.v1_8_R3.Item;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class GuiCompass {
@@ -58,7 +54,10 @@ public class GuiCompass {
                         "  §c vous ête au bon endroit !",
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour réinitialiser le compas"
+                        "§7Clic pour réinitialiser le compas",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk compass nothing"
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk compass nothing")
@@ -83,7 +82,10 @@ public class GuiCompass {
                         "  §8Monde : §f" + (loc == null ? "§cnull" : Utils.getFormattedWorld(loc.getWorld().getName())),
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clique pour suivre §f" + name
+                        "§7Clique pour suivre §f" + name,
+                        " ",
+                        "§7Commande :",
+                        "§7/fk compass " + commandArgs
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(loc == null ? "" : "fk compass " + commandArgs)
@@ -135,7 +137,10 @@ public class GuiCompass {
                         "  §a rendre.",
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour définir un compas perso"
+                        "§7Clic pour §fdéfinir§7 un compas perso",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk compass §f<x> <y> <z>"
                 )
                 .setLeftRightCommandOnClick(
                         "input 3 fk compass custom %s %s %s%nfk compass",

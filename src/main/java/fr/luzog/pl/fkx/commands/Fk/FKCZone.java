@@ -3,10 +3,9 @@ package fr.luzog.pl.fkx.commands.Fk;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.fk.GUIs.GuiZones;
 import fr.luzog.pl.fkx.utils.CmdUtils;
-import fr.luzog.pl.fkx.utils.Portal;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -14,13 +13,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FKCZone {
-    public static final String syntaxe = "/fk zone [help | list | (info | gui | remove) <id> | (create | options) <id> [<args...>]]";
-    public static final String opts = "Arguments:" +
+    public static final String syntaxe_all = "/fk zone [help | list | create <id> [<opts...>] | page <page>]";
+    public static final String syntaxe_zone = "/fk zone <id> [help | info | remove | options <opts...> | id <newId>]";
+    public static final String opts = "Options :" +
+            "\n§r > --t <type>" +
             "\n§r > --s <x> <y> <z> [<yw> <pi>] [<world>]" +
             "\n§r > --pos1 <x> <y> <z> [<world>]" +
             "\n§r > --pos2 <x> <y> <z> [<world>]";
@@ -30,21 +30,30 @@ public class FKCZone {
             "celui d'une team ou compris dans : " + Arrays.stream(illegalIds).collect(Collectors.toList());
 
     public static boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
-        CmdUtils u = new CmdUtils(sender, cmd, msg, args, syntaxe + "\n§r" + opts + "\n§r" + compl);
+        CmdUtils u = new CmdUtils(sender, cmd, msg, args, syntaxe_all + "\n§r" + opts + "\n§r" + compl);
 
         if (args.length == 0)
             return false;
 
         else if (args.length == 1)
-            if (sender instanceof Player)
-                u.succ("TODO -> Zones GUIs");
-            else
-                u.err(CmdUtils.err_not_player);
+            Bukkit.dispatchCommand(sender, "fk zone page 0");
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
 
-        else if (args[1].equalsIgnoreCase("list")) {
+        else if (args[1].equalsIgnoreCase("page")) {
+            if (args.length == 2)
+                Bukkit.dispatchCommand(sender, "fk zone page 0");
+            else if (sender instanceof Player)
+                try {
+                    u.getPlayer().openInventory(GuiZones.getMainInventory(
+                            "fk", "fk zone page", Integer.parseInt(args[2])));
+                } catch (NumberFormatException e) {
+                    Bukkit.dispatchCommand(sender, "fk zone page 0");
+                }
+            else
+                u.err(CmdUtils.err_not_player);
+        } else if (args[1].equalsIgnoreCase("list")) {
             u.succ("Zones :");
             FKManager.getCurrentGame().getZones().forEach(z ->
                     u.succ(" - §6" + z.getId() + " §7(" + z.getType() + ")§r : §f" + (z.getSpawn() == null ?
@@ -68,13 +77,20 @@ public class FKCZone {
                     u.err("La zone " + args[2] + " existe déjà.");
             } else
                 u.synt();
-        } else if (args.length >= 3) {
-            FKZone z = FKManager.getCurrentGame().getZone(args[2]);
-            if (z == null) {
+        } else {
+            FKZone z = FKManager.getCurrentGame().getZone(args[1]);
+            u.setSyntaxe(syntaxe_zone);
+            if (z == null)
                 u.err("Zone non trouvée.");
-                return false;
-            }
-            if (args[1].equalsIgnoreCase("info")) {
+            else if (args.length == 2) {
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiZones.getZoneInventory(
+                            z, u.getPlayer().getLocation(), "fk zone"));
+                else
+                    u.err(CmdUtils.err_not_player);
+            } else if (args[2].equals("?") || args[2].equalsIgnoreCase("help")) {
+                u.synt();
+            } else if (args[2].equalsIgnoreCase("info")) {
                 u.succ("Zone :");
                 u.succ(" > ID : §6" + z.getId());
                 u.succ(" > Type : §7" + z.getType());
@@ -82,20 +98,32 @@ public class FKCZone {
                 u.succ("   - Spawn : §f" + Utils.locToString(z.getSpawn(), true, true, true));
                 u.succ("   - Position 1 : §f" + Utils.locToString(z.getPos1(), true, false, true));
                 u.succ("   - Position 2 : §f" + Utils.locToString(z.getPos2(), true, false, true));
-            } else if (args[1].equalsIgnoreCase("gui")) {
-                if (sender instanceof Player)
-                    u.succ("TODO -> Zone GUI");
-                else
-                    u.err(CmdUtils.err_not_player);
-            } else if (args[1].equalsIgnoreCase("remove")) {
+            } else if (args[2].equalsIgnoreCase("remove")) {
                 z.delete(FKManager.getCurrentGame().getId());
                 u.succ("Zone " + z.getId() + " supprimée.");
-            } else if (args[1].equalsIgnoreCase("options")) {
+            } else if (args[2].equalsIgnoreCase("options")) {
                 handleOptions(u, z, args, 3);
+            } else if (args[2].equalsIgnoreCase("id")) {
+                if (args.length == 3)
+                    u.err("Il manque le nouvel id de la zone.");
+                else {
+                    for (String id : illegalIds)
+                        if (args[3].equalsIgnoreCase(id)) {
+                            u.err("Il est impossible de créer une zone avec un id correspondant à " +
+                                    "celui d'une team ou compris dans : "
+                                    + Arrays.stream(illegalIds).collect(Collectors.toList()));
+                            return false;
+                        }
+                    if (FKManager.getCurrentGame().getZone(args[3]) == null) {
+                        String oldId = z.getId();
+                        z.setId(args[3], true);
+                        u.succ("Id de la zone modifié. (§7" + oldId + "§f - §6" + z.getId() + "§r)");
+                    } else
+                        u.err("La zone '" + args[3] + "' existe déjà.");
+                }
             } else
                 u.synt();
-        } else
-            u.synt();
+        }
 
         return false;
     }
@@ -118,7 +146,21 @@ public class FKCZone {
                 continue;
             hasAnyOption = true;
             boolean isEmpty = arg.length() < 3 || arg.replace(" ", "").length() == 0;
-            if (arg.equalsIgnoreCase("s") || arg.toLowerCase().startsWith("s ")) {
+            if (arg.equalsIgnoreCase("t") || arg.toLowerCase().startsWith("t ")) {
+                String handled = handleString(arg, 2);
+
+                if (isEmpty)
+                    u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "<type>"));
+                else {
+                    try {
+                        FKZone.Type type = FKZone.Type.valueOf(handled.split(" ")[0].toUpperCase());
+                        zone.setType(type, true);
+                        u.succ(" - Type : §7" + type.name());
+                    } catch (IllegalArgumentException ignored) {
+                        u.err(" - Erreur avec le paramètre : type.");
+                    }
+                }
+            } else if (arg.equalsIgnoreCase("s") || arg.toLowerCase().startsWith("s ")) {
                 String handled = handleString(arg, 2);
 
                 if (isEmpty)
@@ -314,6 +356,10 @@ public class FKCZone {
             u.err(" - " + CmdUtils.err_unknown);
     }
 
+    /**
+     * Doesn't work 100% yet
+     */
+    @Deprecated
     public static ArrayList<String> completeOptions(CommandSender sender, String[] args) {
         try {
             if ((args[args.length - 2].equalsIgnoreCase("--s")
@@ -372,20 +418,30 @@ public class FKCZone {
             if (args.length == 2) {
                 add("help");
                 add("list");
-                add("info");
-                add("gui");
-                add("remove");
                 add("create");
-                add("options");
-            } else if (args[1].equalsIgnoreCase("info") || args[1].equalsIgnoreCase("gui") || args[1].equalsIgnoreCase("remove")) {
-                addAll(FKManager.getCurrentGame().getZones().stream().map(FKZone::getId).collect(Collectors.toList()));
-            } else if (args[1].equalsIgnoreCase("create") && args.length >= 5) {
-                addAll(completeOptions(sender, args));
-            } else if (args[1].equalsIgnoreCase("options")) {
-                if (args.length == 4)
-                    addAll(FKManager.getCurrentGame().getZones().stream().map(FKZone::getId).collect(Collectors.toList()));
-                else
-                    addAll(completeOptions(sender, args));
+                addAll(FKManager.getCurrentGame().getZones().stream()
+                        .map(FKZone::getId).collect(Collectors.toList()));
+            } else if (args[1].equalsIgnoreCase("create")) {
+                if (args.length >= 4) {
+                    add("--t");
+                    add("--s");
+                    add("--pos1");
+                    add("--pos2");
+                }
+            } else if (FKManager.getCurrentGame().getZones().stream()
+                    .anyMatch(z -> z.getId().equalsIgnoreCase(args[1]))) {
+                if (args.length == 3) {
+                    add("help");
+                    add("info");
+                    add("remove");
+                    add("options");
+                    add("id");
+                } else if (args[2].equalsIgnoreCase("options")) {
+                    add("--t");
+                    add("--s");
+                    add("--pos1");
+                    add("--pos2");
+                }
             }
         }};
     }
