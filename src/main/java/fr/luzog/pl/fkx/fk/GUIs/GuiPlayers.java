@@ -111,26 +111,31 @@ public class GuiPlayers {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("§cAucune partie en cours", back);
         FKPlayer fkp = FKManager.getCurrentGame().getPlayer(player, false);
-        return Guis.getPagedInventory("§6Équipes", 54, back,
+        return Guis.getPagedInventory("§aJoueurs §f-§e " + player + "§f » §6Équipes", 54, back,
                 getHead(player, "Clic pour rafraîchir", navigationBaseCommand + " " + page),
-                GuiTeams.getTeamItem(fkp == null ? null : fkp.getTeam(), null, "null"),
+                GuiTeams.getTeamItem(fkp == null ? null : fkp.getTeam(), fkp == null ? null
+                        : "Clic pour voir plus", fkp == null ? "null" : "fk players " + fkp.getName() + " team"),
                 navigationBaseCommand, page, FKManager.getCurrentGame().getTeams().stream().map(t ->
-                    Items.builder(GuiTeams.getTeamItem(t, null, "null"))
-                            .addLore(
-                                    "§7Clic Gauche pour ajouter à l'équipe",
-                                    "§7Clic Droit pour supprimer de l'équipe",
-                                    "§7Clic molette pour voir l'équipe"
-                            )
-                            .setCantClickOn(true)
-                            .setLeftRightCommandOnClick(
-                                    (fkp == null ? "fk players " + player + " init\n"
-                                            : fkp.getTeam() != null ? "fk teams " + fkp.getTeam().getId() + " remove " + player + "\n" : "")
-                                            + "fk teams " + t.getId() + " add " + player + "\n" + navigationBaseCommand + " " + page,
-                                    (fkp != null && fkp.getTeam() != null && fkp.getTeam().getId().equals(t.getId()) ?
-                                            "fk teams " + t.getId() + " remove " + player + "\n" : "") + navigationBaseCommand + " " + page
-                            )
-                            .setMiddleCommandOnClick("fk teams " + t.getId())
-                            .build()).collect(Collectors.toList()));
+                        Items.builder(GuiTeams.getTeamItem(t, null, "null"))
+                                .addLore(
+                                        "§7Clic Gauche pour ajouter à l'équipe",
+                                        "§7Clic Droit pour supprimer de l'équipe",
+                                        "§7Clic Molette pour voir l'équipe",
+                                        " ",
+                                        "§7Commandes :",
+                                        "§7/fk teams " + t.getId(),
+                                        "§7/fk teams " + t.getId() + " §8(§7add §8|§7 remove§8)§7 " + player
+                                )
+                                .setCantClickOn(true)
+                                .setLeftRightCommandOnClick(
+                                        (fkp == null ? "fk players " + player + " init\n"
+                                                : fkp.getTeam() != null ? "fk teams " + fkp.getTeam().getId() + " remove " + player + "\n" : "")
+                                                + "fk teams " + t.getId() + " add " + player + "\n" + navigationBaseCommand + " " + page,
+                                        (fkp != null && fkp.getTeam() != null && fkp.getTeam().getId().equals(t.getId()) ?
+                                                "fk teams " + t.getId() + " remove " + player + "\n" : "") + navigationBaseCommand + " " + page
+                                )
+                                .setMiddleCommandOnClick("fk teams " + t.getId())
+                                .build()).collect(Collectors.toList()));
     }
 
     public static Inventory getPlayersInventory(String back, String navigationBaseCommand, int page) {
@@ -138,42 +143,57 @@ public class GuiPlayers {
             addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
             addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
         }});
-        return Guis.getPagedInventory("FirstPaged", 54, back,
+        return Guis.getPagedInventory("§aJoueurs", 54, back,
                 GuiPlayers.getMain(null, "Clic pour rafraîchir",
                         navigationBaseCommand + " " + page, l.size(),
                         (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(),
                         Bukkit.getMaxPlayers()), null, navigationBaseCommand,
                 page, l.stream().map(p ->
-                        GuiPlayers.getHead(p, "Clic pour voir plus",
-                                "fk players " + p)).collect(Collectors.toList()));
+                        GuiPlayers.getHead(p, "Clic pour voir plus\n \n§7Commande :\n§7/fk players "
+                                + p, "fk players " + p)).collect(Collectors.toList()));
     }
 
     public static Inventory getPlayerInventory(String player, @Nonnull Player opener, String back) {
         if (player == null)
             return Guis.getErrorInventory("Joueur Nul.", back);
+
         OfflinePlayer op = Bukkit.getOfflinePlayer(player);
         FKPlayer fkp = FKManager.getCurrentGame().getPlayer(player, false);
-        Inventory inv = Guis.getBaseInventory("", 54, back, getSimplifiedMain("Clic pour rafraichir", "fk players " + player), null);
-        inv.setItem(Utils.posOf(4, 1), getHead(player, "§7Cliquez pour rafraichir", "fk players " + player));
+        Inventory inv = Guis.getBaseInventory("§aJoueurs §f- §e" + player, 54, back,
+                getSimplifiedMain(null, "null"), null);
+
+        inv.setItem(Utils.posOf(4, 1), getHead(player,
+                "§7Cliquez pour rafraichir", "fk players " + player));
 
         inv.setItem(Utils.posOf(3, 2), GuiPerm.getPermsItem(fkp == null ? null : fkp.getPersonalPermissions(),
-                Material.IRON_SWORD, "§fPermissions Personnelles", "§7Clic pour voir plus", "fk perm player " + player));
+                Material.IRON_SWORD, "§fPermissions Personnelles",
+                "§7Clic pour voir plus\n \n§7Commande :\n§7/fk perm player " + player,
+                "fk perm player " + player));
         inv.setItem(Utils.posOf(4, 2), Items.builder(GuiTeams.getTeamItem(fkp == null ? null
                         : fkp.getTeam(), null, "null"))
                 .addLore(
                         fkp == null || fkp.getTeam() == null ?
                                 "§7Clic pour changer l'équipe"
+                                        + "\n "
+                                        + "\n§7Commande :"
+                                        + "\n§7/fk players " + player + " teams"
                                 : "§7Clic Gauche pour voir plus"
                                 + "\n§7Clic Droit pour changer l'équipe"
+                                + "\n "
+                                + "\n§7Commandes :"
+                                + "\n§7/fk players " + player + " team"
+                                + "\n§7/fk players " + player + " teams"
                 )
                 .setLeftRightCommandOnClick(
                         fkp == null || fkp.getTeam() == null ?
-                                "fk players " + player + " team"
-                                : "fk teams " + fkp.getTeam().getId(),
-                        "fk players " + player + " team"
+                                "fk players " + player + " teams"
+                                : "fk players " + player + " team",
+                        "fk players " + player + " teams"
                 )
-                .setCantClickOn(true).build());
-        inv.setItem(Utils.posOf(5, 2), getStats(fkp, "§7Cliquez pour rafraichir", "fk players " + player));
+                .setCantClickOn(true)
+                .build());
+        inv.setItem(Utils.posOf(5, 2), getStats(fkp,
+                "§7Cliquez pour rafraichir", "fk players " + player));
 
         inv.setItem(Utils.posOf(6, 3), Guis.tp(false, "tp " + player));
         inv.setItem(Utils.posOf(7, 3), Guis.tp(true, "tp " + player + " " + opener.getName()));
@@ -183,12 +203,21 @@ public class GuiPlayers {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic gauche pour Expulser",
+                        "§7  (Shift pour préciser la raison)",
                         "§7Clic droit pour Bannir",
-                        "§7Clic molette pour Bannir l'IP"
+                        "§7  (Shift pour préciser la raison)",
+                        "§7Clic molette pour Bannir l'IP",
+                        " ",
+                        "§7Commandes :",
+                        "§7/kick " + player + " §8[§f<raison>§8]",
+                        "§7/ban " + player + " §8[§f<raison>§8]",
+                        "§7/ban-ip " + player + " §8[§f<raison>§8]"
                 )
                 .setCantClickOn(true)
-                .setLeftRightCommandOnClick("kick " + player, "ban " + player)
-                .setMiddleCommandOnClick("ban-ip " + player)
+                .setLeftRightShiftCommandOnClick(
+                        "kick " + player, "input 1 kick " + player + " %s%nfk players " + player,
+                        "ban " + player, "input 1 ban " + player + " %s%nfk players " + player)
+                .setMiddleCommandOnClick("input 1 ban-ip " + player + " %s%nfk players " + player)
                 .build());
         inv.setItem(Utils.posOf(2, 3), Items.builder(Material.GHAST_TEAR)
                 .setName("§6Warn")
@@ -215,7 +244,11 @@ public class GuiPlayers {
                         " ",
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour se téléporter",
-                        "§7Clic Droit pour redéfinir"
+                        "§7Clic Droit pour redéfinir ici",
+                        "§7Clic Molette pour §fdéfinir",
+                        " ",
+                        "§7Commande :",
+                        "§7/spawnpoint " + player + " §f<x> <y> <z> §8[§f<world>§8]"
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(op.getBedSpawnLocation() == null ? "null" : "tp " + opener.getName()
@@ -224,6 +257,7 @@ public class GuiPlayers {
                         "spawnpoint " + player + " " + opener.getLocation().getX() + " "
                                 + opener.getLocation().getY() + " " + opener.getLocation().getZ()
                                 + " " + opener.getLocation().getWorld().getName() + "\nfk players " + player)
+                .setMiddleCommandOnClick("input 4 spawnpoint " + player + " %s %s %s %s%nfk players " + player)
                 .build());
         inv.setItem(Utils.posOf(2, 4), Items.builder(Material.COOKED_BEEF)
                 .setName("§2Nourriture")
@@ -235,7 +269,11 @@ public class GuiPlayers {
                         " ",
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour le nourrir",
-                        "§7Clic Droit pour l'affamer"
+                        "§7Clic Droit pour l'affamer",
+                        " ",
+                        "§7Commandes :",
+                        "§7/feed " + player,
+                        "§7/effect " + player + " hunger 3 255 true"
                 )
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick("feed " + player, "effect " + player + " hunger 3 255 true")
@@ -252,8 +290,13 @@ public class GuiPlayers {
                         "§7Clic Gauche pour le guérir",
                         "  §7(Shift pour gapple)",
                         "§7Clic Droit pour le blesser",
-                        "  §7(Shift pour -3.0 hp)",
-                        "§7Clic Molette pour le tuer"
+                        "  §7(Shift pour  §4-3.0 hp§7)",
+                        "§7Clic Molette pour le tuer",
+                        " ",
+                        "§7Commandes :",
+                        "§7/heal " + player,
+                        "§7/damage " + player + " §f<hp>",
+                        "§7/kill " + player
                 )
                 .setCantClickOn(true)
                 .setCompleteCommandOnClick("heal " + player, "effect " + player + " absorption 120 1\neffect " + player + " regeneration 5 1",
@@ -264,24 +307,36 @@ public class GuiPlayers {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic Gauche pour le voir",
-                        "§7Clic Droit pour voir l'armure",
-                        "§7Shift Clic Gauche pour mélanger la hotbar",
-                        "§7Shift Clic Droit pour mélanger tout",
-                        "§7Clic Molette pour le supprimer"
+                        "§7  (Shift pour mélanger la hotbar)",
+                        "§7Clic Droit pour voir l'EnderChest",
+                        "§7  (Shift pour mélanger tout)",
+                        "§7Clic Molette pour le supprimer",
+                        " ",
+                        "§7Commandes :",
+                        "§7/invsee " + player,
+                        "§7/shuffle hotbar " + player,
+                        "§7/ec " + player,
+                        "§7/shuffle inv " + player,
+                        "§7/clear " + player
                 )
                 .setCantClickOn(true)
                 .setCompleteCommandOnClick("invsee " + player, "shuffle hotbar " + player,
-                        "invsee armor " + player, "shuffle inv " + player, "clear " + player)
+                        "ec " + player, "shuffle inv " + player, "clear " + player)
                 .build());
         inv.setItem(Utils.posOf(5, 4), Items.builder(Material.BLAZE_POWDER)
                 .setName("§cBrûlure")
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Gauche pour brûler 10 secondes",
-                        "  §7(Shift pour 30 secondes)",
-                        "§7Clic Droit pour foudroyer 1 fois",
-                        "  §7(Shift pour 10 fois - 10 secondes)",
-                        "§7Clic Molette pour arrêter le feu"
+                        "§7Clic Gauche pour brûler §c10 secondes",
+                        "  §7(Shift pour §c30 secondes§7)",
+                        "§7Clic Droit pour foudroyer §91 fois",
+                        "  §7(Shift pour §910 fois§7 - 10 secondes)",
+                        "§7Clic Molette pour §6arrêter§7 le feu",
+                        " ",
+                        "§7Commandes :",
+                        "§7/burn " + player + " §f<seconds>",
+                        "§7/lightning " + player + " §f<times>",
+                        "§7/burn " + player + " stop"
                 )
                 .setCantClickOn(true)
                 .setCompleteCommandOnClick("burn " + player + " 10", "burn " + player + " 30",
@@ -291,10 +346,19 @@ public class GuiPlayers {
                 .setName("§aBounce")
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour faire voler le joueur"
+                        "§7Clic Gauche pour faire voler le joueur",
+                        "§7  (§7Vélocité de §f0.0 50.0 0.0§7)",
+                        "§7Clic Droit pour lui appliquer une vélocité",
+                        " ",
+                        "§7Commandes :",
+                        "§7/bounce " + player,
+                        "§7/bounce -v §f<dx> <dy> <dz>§7 " + player
                 )
                 .setCantClickOn(true)
-                .setGlobalCommandOnClick("bounce " + player)
+                .setLeftRightCommandOnClick(
+                        "bounce " + player,
+                        "input 3 bounce -v %s %s %s " + player + "%nfk players " + player
+                )
                 .build());
         inv.setItem(Utils.posOf(7, 4), Items.builder(Freeze.isFrozen(player) ? Material.PACKED_ICE : Material.ICE)
                 .setName("§9Freeze")
@@ -305,7 +369,10 @@ public class GuiPlayers {
                         "  §9Nombre de refroidis : §f" + Freeze.frozen.size(),
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour " + (Freeze.isFrozen(player) ? "§9décongeler" : "§1congeler")
+                        "§7Clic pour " + (Freeze.isFrozen(player) ? "§9décongeler" : "§1congeler"),
+                        " ",
+                        "§7Commande :",
+                        "§7/freeze " + player + " §8[(§7on §8|§7 off§8)]"
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("freeze " + player + "\nfk players " + player)

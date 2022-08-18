@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FKCPlayers {
-    public static final String syntaxe = "/fk players [help | list | <player> [info | init | team [<page>]] | page <page>]";
+    public static final String syntaxe = "/fk players [help | list | <player> [info | init | team | teams [<page>]] | page <page>]";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -79,15 +79,23 @@ public class FKCPlayers {
                         u.err("Joueur déjà créé : §f" + fkp.getDisplayName());
                     }
                 } else if (args[2].equalsIgnoreCase("team")) {
+                    if (fkp == null || fkp.getTeam() == null)
+                        u.err("Le joueur n'a pas de team");
+                    else if (sender instanceof Player)
+                            u.getPlayer().openInventory(GuiTeams.getTeamInventory(u.getPlayer(), fkp.getTeam(),
+                                    "fk players " + u.getPlayer().getName()));
+                    else
+                        u.err(CmdUtils.err_not_player);
+                } else if (args[2].equalsIgnoreCase("teams")) {
                     if (args.length == 3)
-                        Bukkit.dispatchCommand(sender, "fk players " + args[1] + " team 0");
+                        Bukkit.dispatchCommand(sender, "fk players " + args[1] + " teams 0");
                     else if (sender instanceof Player)
                         try {
                             u.getPlayer().openInventory(GuiPlayers.getPlayerChangeTeamInventory(args[1],
-                                    "fk players " + args[1], "fk players " + args[1] + " team",
+                                    "fk players " + args[1], "fk players " + args[1] + " teams",
                                     Integer.parseInt(args[3])));
                         } catch (NumberFormatException e) {
-                            Bukkit.dispatchCommand(sender, "fk players " + args[1] + " team 0");
+                            Bukkit.dispatchCommand(sender, "fk players " + args[1] + " teams 0");
                         }
                     else
                         u.err(CmdUtils.err_not_player);

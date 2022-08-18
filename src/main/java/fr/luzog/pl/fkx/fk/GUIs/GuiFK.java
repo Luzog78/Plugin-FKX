@@ -17,8 +17,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,7 +44,7 @@ public class GuiFK {
                 .build();
     }
 
-    public static Inventory getStateInventory(Player player, String back) {
+    public static Inventory getStateInventory(String back) {
         if (FKManager.getCurrentGame() == null)
             return Guis.getErrorInventory("No game running", back);
         FKManager fk = FKManager.getCurrentGame();
@@ -55,50 +53,57 @@ public class GuiFK {
 
         inv.setItem(Utils.posOf(4, 1), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())
-                .setLore(new ArrayList<>())
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour rafraîchir"
+                )
                 .setCantClickOn(true)
+                .setGlobalCommandOnClick("fk game state")
                 .build());
 
         boolean started = fk.getState() != FKManager.State.WAITING,
                 ended = fk.getState() == FKManager.State.ENDED;
-        ArrayList<String> no = new ArrayList<>(Arrays.asList("§8" + Guis.loreSeparator, "§cImpossible de revenir", "§c dans cet état.")),
-                base = new ArrayList<>(Collections.singletonList("§8" + Guis.loreSeparator));
+        String no = "§8" + Guis.loreSeparator + "\n§cImpossible de revenir\n§c dans cet état.\n \n§7Commande :\n§7/",
+                already = "§8" + Guis.loreSeparator + "\n§aVous êtes déjà dans\n§a cet état.\n \n§7Commande :\n§7/",
+                base = "§8" + Guis.loreSeparator + "\n§7Clic pour changer d'état\n \n§7Commande :\n§7/";
 
         inv.setItem(Utils.posOf(2, 1), Items.builder(Material.SUGAR)
                 .setName("§a" + FKManager.State.WAITING.name())
-                .setLore(started && !ended ? no : base)
+                .setLore((!started ? already : !ended ? no : base) + "fk game reboot")
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, fk.getState() == FKManager.State.WAITING ? 0 : null)
                 .setCantClickOn(true)
-                .setCloseOnClick(true)
-                .setGlobalCommandOnClick(ended ? "fk game reboot" : "null")
+                .setCloseOnClick(started && !ended)
+                .setGlobalCommandOnClick(started && ended ? "fk game reboot" : "null")
                 .build());
         inv.setItem(Utils.posOf(3, 2), Items.builder(Material.GLOWSTONE_DUST)
                 .setName("§a" + FKManager.State.RUNNING.name())
-                .setLore(base)
+                .setLore((fk.getState() == FKManager.State.RUNNING ? already : base)
+                        + (fk.getState() == FKManager.State.WAITING ? "fk game start" : "fk game resume"))
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, fk.getState() == FKManager.State.RUNNING ? 0 : null)
                 .setCantClickOn(true)
-                .setCloseOnClick(true)
+                .setCloseOnClick(fk.getState() != FKManager.State.RUNNING)
                 .setGlobalCommandOnClick(fk.getState() == FKManager.State.WAITING ? "fk game start" :
                         fk.getState() == FKManager.State.PAUSED || fk.getState() == FKManager.State.ENDED ? "fk game resume" : "null")
                 .build());
         inv.setItem(Utils.posOf(5, 2), Items.builder(Material.REDSTONE)
                 .setName("§a" + FKManager.State.PAUSED.name())
-                .setLore(ended || !started ? no : base)
+                .setLore((fk.getState() == FKManager.State.PAUSED ? already
+                        : fk.getState() != FKManager.State.RUNNING ? no : base) + "fk game pause")
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, fk.getState() == FKManager.State.PAUSED ? 0 : null)
                 .setCantClickOn(true)
-                .setCloseOnClick(true)
+                .setCloseOnClick(fk.getState() == FKManager.State.RUNNING)
                 .setGlobalCommandOnClick(fk.getState() == FKManager.State.RUNNING ? "fk game pause" : "null")
                 .build());
         inv.setItem(Utils.posOf(6, 1), Items.builder(Material.SULPHUR)
                 .setName("§a" + FKManager.State.ENDED.name())
-                .setLore(!started ? no : base)
+                .setLore((ended ? already : !started ? no : base) + "fk game end")
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, fk.getState() == FKManager.State.ENDED ? 0 : null)
                 .setCantClickOn(true)
-                .setCloseOnClick(true)
+                .setCloseOnClick(started && !ended)
                 .setGlobalCommandOnClick(started && !ended ? "fk game end" : "null")
                 .build());
 
@@ -189,28 +194,41 @@ public class GuiFK {
         FKManager fk = FKManager.getCurrentGame();
         Inventory inv = Guis.getBaseInventory("§bFallen Kingdom " + Main.FK_SEASON + "§f - §6" + fk.getId(), 54, back,
                 getMainItem(fk, "Clic pour rafraichir", "fk"),
-                GuiPlayers.getHead(opener == null ? null : opener.getName(), "Clic pour voir plus",
+                GuiPlayers.getHead(opener == null ? null : opener.getName(),
+                        "Clic pour voir plus\n \n§7Commande :\n§7/fk players " + (opener == null ? null : opener.getName()),
                         "fk players " + (opener == null ? null : opener.getName())));
         ArrayList<String> l = new ArrayList<>(new HashSet<String>() {{
             addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
             addAll(FKManager.getCurrentGame().getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
         }});
 
-        inv.setItem(Utils.posOf(1, 4), GuiPerm.getMainItem("Clic pour voir plus", "fk perm"));
-        inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem("Clic pour voir plus", "fk date"));
-        inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null, "Clic pour voir plus", "fk players",
-                l.size(), (int) l.stream().filter(p -> Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
-        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem("Clic pour voir plus", "fk teams"));
-        inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem("Clic pour voir plus", "fk locks"));
+        inv.setItem(Utils.posOf(1, 4), GuiPerm.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk perm", "fk perm"));
+        inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk date", "fk date"));
+        inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null,
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk players", "fk players",
+                l.size(), (int) l.stream().filter(p ->
+                        Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
+        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
+        inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk locks", "fk locks"));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())
-                .setLore("§8" + Guis.loreSeparator, "§7Clic pour voir plus")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour voir plus",
+                        " ",
+                        "§7Commande :",
+                        "§7/fk game state"
+                )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk game state")
                 .build());
         inv.setItem(Utils.posOf(7, 1), getWarpsMainItem(FKManager.getCurrentGame(),
-                "Clic pour voir plus", "fk warp"));
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk warp", "fk warp"));
 
         return inv;
     }

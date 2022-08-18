@@ -1,7 +1,6 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
 import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPickableLocks;
 import fr.luzog.pl.fkx.fk.FKPlayer;
 import fr.luzog.pl.fkx.fk.FKTeam;
 import fr.luzog.pl.fkx.utils.*;
@@ -83,7 +82,7 @@ public class GuiTeams {
             return Guis.getErrorInventory("§cÉquipe introuvable", back);
         String refresh = "fk teams " + team.getId() + " colorGui";
 
-        Inventory inv = Guis.getBaseInventory("§6Équipe §7-§b" + team.getId() + "§7 » §dCouleur", 54, back,
+        Inventory inv = Guis.getBaseInventory("§6Équipe §f-§b " + team.getId() + "§f » §dCouleur", 54, back,
                 getMainItem(null, "null"), null);
 
         inv.setItem(Utils.posOf(6, 2), getTeamItem(team, "Clic pour rafraîchir", refresh));
@@ -93,9 +92,10 @@ public class GuiTeams {
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         "§7Clic pour rafraîchir",
+                        " ",
                         "§7Commandes :",
                         "§7/fk teams " + team.getId() + " colorGui",
-                        "§7/fk teams " + team.getId() + " options --c <color>"
+                        "§7/fk teams " + team.getId() + " options --c §f<color>"
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(refresh)
@@ -112,8 +112,9 @@ public class GuiTeams {
                             .setLore(
                                     "§8" + Guis.loreSeparator,
                                     "§7Clic pour redéfinir la couleur",
+                                    " ",
                                     "§7Commande :",
-                                    "§7/fk teams " + team.getId() + " options --c " + c.name()
+                                    "§7/fk teams " + team.getId() + " options --c " + c + c.name()
                             )
                             .setCantClickOn(true)
                             .setGlobalCommandOnClick("fk teams " + team.getId() + " options --c " + c.name() + "\n" + refresh)
@@ -128,13 +129,15 @@ public class GuiTeams {
             return Guis.getErrorInventory("§cAucune partie en cours", back);
         if (team == null)
             return Guis.getErrorInventory("§cÉquipe introuvable", back);
-        return Guis.getPagedInventory("§6Équipe §7-§b" + team.getId() + "§7 » §eJoueurs", 54, back,
+        return Guis.getPagedInventory("§6Équipe §f-§b " + team.getId() + "§f » §eJoueurs", 54, back,
                 GuiPlayers.getMain(team.getId(), "Clic pour rafraîchir",
                         navigationBaseCommand + " " + page, team.getPlayers().size(),
                         (int) team.getPlayers().stream().filter(p -> p.getPlayer() != null).count(), -1),
                 getTeamItem(team, "Clic pour rafraîchir", navigationBaseCommand + " " + page),
                 navigationBaseCommand, page, team.getPlayers().stream().map(p ->
-                                GuiPlayers.getHead(p.getName(), "Clic pour voir plus", "fk players " + p.getName()))
+                                GuiPlayers.getHead(p.getName(),
+                                        "Clic pour voir plus\n \n§7Commande :\n§7/fk players " + p.getName(),
+                                        "fk players " + p.getName()))
                         .collect(Collectors.toList()));
     }
 
@@ -159,8 +162,9 @@ public class GuiTeams {
                                 " ",
                                 "§8" + Guis.loreSeparator,
                                 "§7Clic Gauche pour créer une équipe",
+                                " ",
                                 "§7Commande :",
-                                "§7/fk teams create §f<id> [<options>]"
+                                "§7/fk teams create §f<id> §8[§f<options>§8]"
                         )
                         .setLeftRightCommandOnClick(
                                 "input 2 fk teams create %s %s%nfk teams",
@@ -169,8 +173,8 @@ public class GuiTeams {
                         .setCantClickOn(true)
                         .build(),
                 navigationBaseCommand, page, FKManager.getCurrentGame().getTeams().stream().map(t ->
-                        getTeamItem(t, "Clic pour voir les options",
-                                "fk teams " + t.getId())).collect(Collectors.toList()));
+                        getTeamItem(t, "Clic pour voir les options\n \n§7Commande :\n§7/fk teams "
+                                + t.getId(), "fk teams " + t.getId())).collect(Collectors.toList()));
     }
 
     public static Inventory getTeamInventory(Player seer, FKTeam team, String back) {
@@ -180,7 +184,7 @@ public class GuiTeams {
             return Guis.getErrorInventory("§cÉquipe introuvable", back);
         String refresh = "fk teams " + team.getId();
 
-        Inventory inv = Guis.getBaseInventory("§6Équipe §7-§b" + team.getId(), 54, back,
+        Inventory inv = Guis.getBaseInventory("§6Équipe §f-§b " + team.getId(), 54, back,
                 getMainItem(null, "null"), null);
 
         inv.setItem(Utils.posOf(4, 1), Items.builder(

@@ -86,7 +86,7 @@ public class FKCGame {
 
         else if (args[1].equalsIgnoreCase("state"))
             if (sender instanceof Player)
-                u.getPlayer().openInventory(GuiFK.getStateInventory(u.getPlayer(), "fk"));
+                u.getPlayer().openInventory(GuiFK.getStateInventory("fk"));
             else
                 u.err(CmdUtils.err_not_player);
 

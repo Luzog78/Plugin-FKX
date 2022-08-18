@@ -28,7 +28,7 @@ public class Guis {
     public static ItemStack close() {
         return Items.builder(Material.BARRIER)
                 .setName("§cFermer")
-                .setLore("§8" + loreSeparator, "§7Cliquez pour fermer l'inventaire.")
+                .setLore("§8" + loreSeparator, "§7Clic pour fermer l'inv")
                 .setCantClickOn(true)
                 .setCloseOnClick(true)
                 .build();
@@ -45,7 +45,13 @@ public class Guis {
     public static ItemStack back(String command) {
         return Items.builder(Material.ARROW)
                 .setName("§7Retour")
-                .setLore("§8" + loreSeparator, "§7Cliquez pour retourner à", "§7 l'inventaire précédent.", " ", "§7Commande:", "§7" + command)
+                .setLore(
+                        "§8" + loreSeparator,
+                        "§7Clic pour retourner",
+                        "§7 à l'inv précédent.",
+                        " ",
+                        "§7Commande :",
+                        "§7/" + command)
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(command)
                 .build();
@@ -63,7 +69,13 @@ public class Guis {
     public static ItemStack tp(boolean here, String command) {
         return Items.builder(here ? Material.ENDER_PEARL : Material.EYE_OF_ENDER)
                 .setName(here ? "§5Téléporter ici" : "§dSe téléporter")
-                .setLore("§8" + loreSeparator, "§7Cliquez pour " + (here ? "téléporter ici" : "se téléporter"))
+                .setLore(
+                        "§8" + loreSeparator,
+                        "§7Clic pour " + (here ? "téléporter ici" : "se téléporter"),
+                        " ",
+                        "§7Commande :",
+                        "§7/" + command
+                )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(command)
                 .build();
@@ -82,8 +94,12 @@ public class Guis {
     public static ItemStack navigationFeather(int page, int maxPage, int pageSize) {
         return Items.builder(Material.FEATHER)
                 .setName("§fNavigation")
-                .setLore("§8" + loreSeparator, "§8Avec " + pageSize + " item/page", " ", "§8Page :  §f"
-                        + (page + (maxPage == 0 ? 0 : 1)) + "§7/" + maxPage)
+                .setLore(
+                        "§8" + loreSeparator,
+                        "§8Avec " + pageSize + " item/page",
+                        " ",
+                        "§8Page :  §f" + (page + (maxPage == 0 ? 0 : 1)) + "§7/" + maxPage
+                )
                 .setCantClickOn(true)
                 .build();
     }
@@ -103,12 +119,18 @@ public class Guis {
                 .setName(previous ? "§fPage Précédente" : "§fPage Suivante")
                 .setLore(
                         "§8" + loreSeparator,
-                        "§7Click pour aller à §f" + (page + (previous ? -1 : 1) + 1) + "§7/" + maxPage,
-                        "§7Shift Click pour aller à §f" + (previous ? 1 : maxPage) + "§7/" + maxPage
+                        "§7Clic pour aller à  §f" + (page + (previous ? -1 : 1) + 1) + "§8/" + maxPage,
+                        "§7  (Shift pour aller à  §f" + (previous ? 1 : maxPage) + "§8/" + maxPage + "§7)",
+                        " ",
+                        "§7Commandes :",
+                        "§7/" + baseCommand + " " + (page + (previous ? -1 : 1)),
+                        "§7/" + baseCommand + " " + (previous ? 0 : maxPage - 1)
                 )
                 .setCantClickOn(true)
-                .setShiftCommandOnClick(baseCommand + " " + (page + (previous ? -1 : 1)),
-                        baseCommand + " " + (previous ? 0 : maxPage - 1))
+                .setShiftCommandOnClick(
+                        baseCommand + " " + (page + (previous ? -1 : 1)),
+                        baseCommand + " " + (previous ? 0 : maxPage - 1)
+                )
                 .build();
     }
 
@@ -150,9 +172,13 @@ public class Guis {
         Inventory inv = Bukkit.createInventory(null, 27, "§cErreur");
         Utils.fill(inv, 0, 26, Items.builder(Material.DEAD_BUSH)
                 .setName("§4§l" + SpecialChars.NO + " Erreur " + SpecialChars.NO)
-                .setLore("§8" + loreSeparator, " ",
+                .setLore(
+                        "§8" + loreSeparator,
+                        " ",
                         "§c" + (error == null ? "Erreur non reconnue.\n§cRessayez plus tard." : error),
-                        " ", "§8" + loreSeparator, "§7Cliquez pour " + (back == null ? "fermer" : "retourner à\n§7l'inventaire précédent") + ".")
+                        " ",
+                        "§8" + loreSeparator,
+                        "§7Clic pour " + (back == null ? "fermer" : "retourner à\n§7l'inventaire précédent") + ".")
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick(back)
                 .build());
