@@ -51,36 +51,40 @@ public class GuiAd {
     }
 
     public static ItemStack getFilterItem(SortType sorted, boolean reversed, String navigationBaseCommand, int page) {
-        String shiftCmd = navigationBaseCommand + " " + (reversed ? "+" : "-") + sorted.name() + " " + page;
+        String c1 = navigationBaseCommand + " " + (reversed ? "-" : "+") + (sorted.ordinal() == SortType.values().length - 1 ?
+                SortType.values()[0].name() : SortType.values()[sorted.ordinal() + 1].name()) + " " + page,
+                c2 = navigationBaseCommand + " " + (reversed ? "-" : "+") + (sorted.ordinal() == 0 ?
+                        SortType.values()[SortType.values().length - 1].name()
+                        : SortType.values()[sorted.ordinal() - 1].name()) + " " + page,
+                c3 = navigationBaseCommand + " " + (reversed ? "+" : "-") + sorted.name() + " " + page;
         return Items.builder(Material.EMERALD_BLOCK)
-                .setName("§7Trier par : §d" + (reversed ? "-" : "+") + " " + sorted.name())
+                .setName("§7Tri : §8[" + Arrays.stream(SortType.values())
+                        .map(t -> (t.equals(sorted) ? "§f§l" : "§8") + t.name())
+                        .collect(Collectors.joining("§8, ")) + "§8]")
                 .setLore(
+                        "§7Ordre : §d" + (reversed ? "Inversé" : "Naturel"),
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Gauche pour trier par : " + (sorted.ordinal() == SortType.values().length - 1 ?
-                                SortType.values()[0].name() : SortType.values()[sorted.ordinal() + 1].name()),
-                        "§7Clic Droit pour trier par : " + (sorted.ordinal() == 0 ?
-                                SortType.values()[SortType.values().length - 1].name()
-                                : SortType.values()[sorted.ordinal() - 1].name()),
-                        "§7Shift Clic pour inverser l'ordre"
+                        "§7Clic Gauche pour trier par le suivant",
+                        "§7Clic Droit pour trier par le précédent",
+                        "§7Clic Molette pour inverser l'ordre",
+                        " ",
+                        "§7Commande :",
+                        "§7/" + c1,
+                        "§7/" + c2,
+                        "§7/" + c3
                 )
                 .addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 0)
                 .addFlag(ItemFlag.HIDE_ENCHANTS)
                 .setCantClickOn(true)
-                .setLeftRightShiftCommandOnClick(
-                        navigationBaseCommand + " " + (reversed ? "-" : "+") + (sorted.ordinal() == SortType.values().length - 1 ?
-                                SortType.values()[0].name() : SortType.values()[sorted.ordinal() + 1].name()) + " " + page,
-                        shiftCmd,
-                        navigationBaseCommand + " " + (reversed ? "-" : "+") + (sorted.ordinal() == 0 ?
-                                SortType.values()[SortType.values().length - 1].name()
-                                : SortType.values()[sorted.ordinal() - 1].name()) + " " + page,
-                        shiftCmd
-                )
+                .setLeftRightCommandOnClick(c1, c2)
+                .setMiddleCommandOnClick(c3)
                 .build();
     }
 
-    public static ItemStack getAdItem(int id, Ad.Item ad, String command) {
-        return Items.builder(/* Material.EMERALD */ Heads.getSkullOf(Ad.SYS_NAME.equals(ad.getSender()) ? "Microsoft" : ad.getSender()))
-                .setName("§2§lAD : §3#" + Ad.df.format(id))
+    public static ItemStack getAdItem(Ad.Item ad, String command) {
+        return Items.builder(/* Material.EMERALD */ Heads.getSkullOf(
+                Ad.SYS_NAME.equals(ad.getSender()) ? "Microsoft" : ad.getSender()))
+                .setName("§2§lAD : §3#" + Ad.df.format(ad.getId()))
                 .setLore(
                         "§8" + Guis.loreSeparator,
                         " ",
@@ -104,16 +108,26 @@ public class GuiAd {
                         "  §2Description : §f" + (ad.getMessage() == null ? "§cnull" : ad.getMessage()),
                         " ",
                         "§8" + Guis.loreSeparator,
-                        "§7Clic Gauche pour " + (ad.getState() == Ad.State.ACCEPTED ? "fermer" : "accepter"),
-                        "§7Clic Droit pour " + (ad.getState() == Ad.State.IGNORED ? "mettre en attente" : "ignorer"),
-                        "§7Clic Molette pour se tp"
+                        "§7Clic Gauche pour " + (ad.getState() == Ad.State.ACCEPTED ? "§4fermer" : "§2accepter"),
+                        "§7  (Shift pour " + (ad.getState() != Ad.State.ACCEPTED ? "§4fermer" : "§2accepter") + "§7)",
+                        "§7Clic Droit pour " + (ad.getState() == Ad.State.IGNORED ? "§lmettre en attente" : "§8ignorer"),
+                        "§7  (Shift pour " + (ad.getState() != Ad.State.IGNORED ? "§lattente" : "§8ignorer") + "§7)",
+                        "§7Clic Molette pour se tp",
+                        " ",
+                        "§7Commande :",
+                        "§7/ad §8(§2accept §8|§4 close§8)§7 " + Ad.df.format(ad.getId()),
+                        "§7/ad §8(§7§lwaiting §8|§8§l ignore§8)§7 " + Ad.df.format(ad.getId())
                 )
                 .setCantClickOn(true)
-                .setLeftRightCommandOnClick(
-                        ad.getState() == Ad.State.ACCEPTED ? "ad close " + id + "\n" + command
-                                : "ad accept " + id + "\n" + command,
-                        ad.getState() == Ad.State.IGNORED ? "ad waiting " + id + "\n" + command
-                                : "ad ignore " + id + "\n" + command
+                .setLeftRightShiftCommandOnClick(
+                        ad.getState() == Ad.State.ACCEPTED ? "ad close " + ad.getId() + "\n" + command
+                                : "ad accept " + ad.getId() + "\n" + command,
+                        ad.getState() != Ad.State.ACCEPTED ? "ad close " + ad.getId() + "\n" + command
+                                : "ad accept " + ad.getId() + "\n" + command,
+                        ad.getState() == Ad.State.IGNORED ? "ad waiting " + ad.getId() + "\n" + command
+                                : "ad ignore " + ad.getId() + "\n" + command,
+                        ad.getState() != Ad.State.IGNORED ? "ad waiting " + ad.getId() + "\n" + command
+                                : "ad ignore " + ad.getId() + "\n" + command
                 )
                 .setMiddleCommandOnClick("tp " + ad.getSender())
                 .build();
@@ -133,14 +147,15 @@ public class GuiAd {
                     Ad.ads.stream().filter(ad -> ad.getState() == Ad.State.IGNORED).collect(Collectors.toList())
             )) {{
                 forEach(l -> {
-                    if (!l.isEmpty()) {
-                        if (indexOf(l) != 0) {
-                            for (int i = 0; i < 8; i++) {
-                                ads.add(null);
-                            }
-                        }
-                        ads.addAll(l);
-                    }
+                    for (int i = 0; i < l.size() / 28; i++)
+                        for (int j = 0; j < 28; j++)
+                            ads.add(l.get(i * 28 + j));
+
+                    for (int i = 0; i < l.size() % 28; i++)
+//                        ads.add(l.get(l.size() - i - 1));
+                        ads.add(l.get(((int) (l.size() / 28) * 28) + i));
+                    for (int i = 0; i < 28 - l.size() % 28; i++)
+                        ads.add(null);
                 });
             }};
         } else if (sorted == SortType.INSISTENCE) {
@@ -153,8 +168,8 @@ public class GuiAd {
             ads.addAll(Ad.ads.stream().sorted(Comparator.comparing(ad -> ad.getMessage() == null ? "\uffff" : ad.getMessage())).collect(Collectors.toList()));
         }
 
-        ArrayList<ItemStack> items = ads.stream().map(ad -> ad == null ? null : getAdItem(Ad.ads.indexOf(ad),
-                        ad, navigationBaseCommand + " " + (reversed ? "-" : "+") + sorted.name() + " " + page))
+        ArrayList<ItemStack> items = ads.stream().map(ad -> ad == null ? null : getAdItem(ad,
+                        navigationBaseCommand + " " + (reversed ? "-" : "+") + sorted.name() + " " + page))
                 .collect(Collectors.toCollection(ArrayList::new));
         items.replaceAll(item -> item == null ? new CustomNBT(Items.black())
                 .setString("nonStackable", UUID.randomUUID().toString()).build() : item);
@@ -162,7 +177,7 @@ public class GuiAd {
         if (reversed)
             Collections.reverse(items);
 
-        return Guis.getPagedInventory(Ad.AD_PREFIX + "§List", 54, back,
+        return Guis.getPagedInventory(Ad.AD_PREFIX + "§lList", 54, back,
                 getMainItem("Clic pour rafraîchir", navigationBaseCommand + " "
                         + (reversed ? "-" : "+") + sorted.name() + " " + page),
                 getFilterItem(sorted, reversed, navigationBaseCommand, page),

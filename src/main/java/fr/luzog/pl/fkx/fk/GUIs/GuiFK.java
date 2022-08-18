@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.fk.GUIs;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.fk.FKListener;
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKPlayer;
@@ -204,18 +205,7 @@ public class GuiFK {
 
         inv.setItem(Utils.posOf(1, 4), GuiPerm.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk perm", "fk perm"));
-        inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem(
-                "Clic pour voir plus\n \n§7Commande :\n§7/fk date", "fk date"));
-        inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null,
-                "Clic pour voir plus\n \n§7Commande :\n§7/fk players", "fk players",
-                l.size(), (int) l.stream().filter(p ->
-                        Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
-        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
-                "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
-        inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem(
-                "Clic pour voir plus\n \n§7Commande :\n§7/fk locks", "fk locks"));
-
-        inv.setItem(Utils.posOf(1, 1), Items.builder(Heads.CHAR_P.getSkull())
+        inv.setItem(Utils.posOf(2, 3), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())
                 .setLore(
                         "§8" + Guis.loreSeparator,
@@ -227,6 +217,19 @@ public class GuiFK {
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("fk game state")
                 .build());
+        inv.setItem(Utils.posOf(3, 2), GuiDate.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk date", "fk date"));
+        inv.setItem(Utils.posOf(4, 3), GuiPlayers.getMain(null,
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk players", "fk players",
+                l.size(), (int) l.stream().filter(p ->
+                        Bukkit.getOfflinePlayer(p).isOnline()).count(), Bukkit.getMaxPlayers()));
+        inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
+        inv.setItem(Utils.posOf(5, 2), GuiLocks.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk locks", "fk locks"));
+
+        inv.setItem(Utils.posOf(1, 1), GuiAd.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/ad", "ad"));
         inv.setItem(Utils.posOf(7, 1), getWarpsMainItem(FKManager.getCurrentGame(),
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk warp", "fk warp"));
 

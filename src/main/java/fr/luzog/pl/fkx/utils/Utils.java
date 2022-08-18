@@ -828,11 +828,14 @@ public class Utils {
      */
     public static String compareDate(Date from, Date to, boolean millis) {
         long diff = to.getTime() - from.getTime();
-        int days = (int) (diff / (1000 * 60 * 60 * 24));
-        int hours = (int) ((diff - (1000 * 60 * 60 * 24 * days)) / (1000 * 60 * 60));
-        int minutes = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours)) / (1000 * 60));
-        int seconds = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours) - (1000 * 60 * minutes)) / 1000);
-        int milliseconds = (int) ((diff - (1000 * 60 * 60 * 24 * days) - (1000 * 60 * 60 * hours) - (1000 * 60 * minutes) - (1000 * seconds)));
+        int milliseconds = (int) (diff % 1000);
+        int seconds = (int) (diff / 1000);
+        int minutes = seconds / 60;
+        int hours = minutes / 60;
+        int days = hours / 24;
+        seconds %= 60;
+        minutes %= 60;
+        hours %= 24;
         String out = (days == 0 ? "" : days + "d ") + (hours == 0 ? "" : hours + "h ") + (minutes == 0 ? "" : minutes + "m ")
                 + (seconds == 0 ? "" : seconds + "s ") + (millis && milliseconds != 0 ? milliseconds + "ms " : "");
         return out.equals("") ? millis ? "0ms" : "0s" : out.substring(0, out.length() - 1);

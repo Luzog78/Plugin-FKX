@@ -42,6 +42,12 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     public static void initFromConfig() {
         getConfig().load().save().getMapList("ads").forEach(map -> {
             Item i = new Item(null, null, null);
+            if (map.containsKey("id"))
+                try {
+                    i.setId(Integer.parseInt(map.get("id") + ""));
+                } catch (NumberFormatException e) {
+                    i.setId(null);
+                }
             if (map.containsKey("sender"))
                 i.setSender(map.get("sender") == null ? null : map.get("sender") + "");
             if (map.containsKey("admin"))
@@ -67,12 +73,14 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             if (i.getSender() != null && i.getDate() != null && i.getState() != null)
                 ads.add(i);
         });
+        sortAds();
     }
 
     public static void saveToConfig() {
         ArrayList<HashMap<String, Object>> a = new ArrayList<>();
 
         ads.forEach(ad -> a.add(new HashMap<String, Object>() {{
+            put("id", ad.getId());
             put("sender", ad.getSender());
             put("admin", ad.getAdmin());
             put("message", ad.getMessage());
@@ -87,12 +95,15 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     public static enum State {WAITING, ACCEPTED, CLOSED, IGNORED}
 
     public static class Item {
+        private Integer id;
         private String sender, admin, message;
         private int insistence;
         private State state;
         private Date date;
 
-        public Item(String sender, String admin, String message, int insistence, State state, Date date) {
+        public Item(int id, String sender, String admin, String message, int insistence, State state, Date date) {
+            this.id = id;
+
             this.sender = sender;
             this.admin = admin;
             this.message = message;
@@ -103,6 +114,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
         }
 
         public Item(String sender, String admin, String message) {
+            this.id = null;
+
             this.sender = sender;
             this.admin = admin;
             this.message = message;
@@ -118,8 +131,17 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 return false;
             Item o = (Item) other;
             return Objects.equals(sender, o.getSender())
+                    && (id == null || o.getId() == null || Objects.equals(id, o.getId()))
                     && (message == null || o.getMessage() == null || Objects.equals(message, o.getMessage()))
                     && Objects.equals(state, o.getState());
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        public void setId(Integer id) {
+            this.id = id;
         }
 
         public String getSender() {
@@ -179,6 +201,27 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
         }
     }
 
+    public static void sortAds() {
+        ArrayList<Integer> ids = new ArrayList<>();
+        for (Item ad : ads)
+            if (ad.getId() != null)
+                if (!ids.contains(ad.getId()))
+                    ids.add(ad.getId());
+                else
+                    ad.setId(null);
+        for (int i = 0; i < ads.size(); i++)
+            if (ads.get(i).getId() == null)
+                ads.get(i).setId(ads.stream().map(Item::getId)
+                        .filter(Objects::nonNull)
+                        .max(Integer::compare)
+                        .orElse(-1) + 1);
+        ads.sort(Comparator.comparingInt(Item::getId));
+    }
+
+    public static Item get(int id) {
+        return ads.stream().filter(ad -> ad.getId() == id).findFirst().orElse(null);
+    }
+
     public static Item get(Item ad) {
         ArrayList<Item> tempAds = new ArrayList<>(ads);
         Collections.reverse(tempAds);
@@ -217,6 +260,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                     p.getPlayer().playSound(p.getPlayer().getLocation(), sounds.get(new Random().nextInt(sounds.size())), 1, 1);
                 }
             });
+        sortAds();
         saveToConfig();
     }
 
@@ -297,7 +341,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                     String arg = args[1].startsWith("-") || args[1].startsWith("+") ? args[1].substring(1) : args[1];
                     if (sender instanceof Player)
                         u.getPlayer().openInventory(GuiAd.getAdsInventory(GuiAd.SortType.valueOf(arg.toUpperCase()),
-                                args[1].startsWith("-"), null, "ad page", Integer.parseInt(args[2])));
+                                args[1].startsWith("-"), FKManager.getCurrentGame() == null ? null : "fk",
+                                "ad page", Integer.parseInt(args[2])));
                     else
                         u.err(CmdUtils.err_not_player);
                 } catch (NumberFormatException e) {
