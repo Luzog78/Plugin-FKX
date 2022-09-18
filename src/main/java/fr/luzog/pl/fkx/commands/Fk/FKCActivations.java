@@ -2,10 +2,12 @@ package fr.luzog.pl.fkx.commands.Fk;
 
 import fr.luzog.pl.fkx.fk.FKManager;
 import fr.luzog.pl.fkx.fk.FKOptions;
+import fr.luzog.pl.fkx.fk.GUIs.GuiActivations;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.SpecialChars;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +22,10 @@ public class FKCActivations {
             return false;
 
         if (args.length == 1)
-            u.succ("TODO -> Activations GUIs");
+            if (sender instanceof Player)
+                u.getPlayer().openInventory(GuiActivations.getMainInventory("fk"));
+            else
+                u.err(CmdUtils.err_not_player);
 
         else if (args[1].equalsIgnoreCase("help") || args[1].equals("?"))
             u.synt();
@@ -37,15 +42,22 @@ public class FKCActivations {
                 u.succ(" - " + format(opt));
         } else {
             FKOptions.FKOption opt = args[1].equalsIgnoreCase("pvp") ? FKManager.getCurrentGame().getOptions().getPvp()
-                    : args[1].equalsIgnoreCase("assauts") ? FKManager.getCurrentGame().getOptions().getAssaults()
                     : args[1].equalsIgnoreCase("nether") ? FKManager.getCurrentGame().getOptions().getNether()
+                    : args[1].equalsIgnoreCase("assauts") ? FKManager.getCurrentGame().getOptions().getAssaults()
                     : args[1].equalsIgnoreCase("end") ? FKManager.getCurrentGame().getOptions().getEnd() : null;
-            if (opt == null) {
+            GuiActivations.OptionType optType = args[1].equalsIgnoreCase("pvp") ? GuiActivations.OptionType.PVP
+                    : args[1].equalsIgnoreCase("nether") ? GuiActivations.OptionType.NETHER
+                    : args[1].equalsIgnoreCase("assauts") ? GuiActivations.OptionType.ASSAULTS
+                    : args[1].equalsIgnoreCase("end") ? GuiActivations.OptionType.END : null;
+            if (opt == null || optType == null) {
                 u.err("Cette activation n'existe pas.");
                 return false;
             }
             if (args.length == 2)
-                u.succ("TODO -> Activation GUI");
+                if (sender instanceof Player)
+                    u.getPlayer().openInventory(GuiActivations.getOptionInventory(optType.getMaterial(), opt, "fk activations"));
+                else
+                    u.err(CmdUtils.err_not_player);
             else if (args[2].equalsIgnoreCase("get"))
                 u.succ("Activation :\n§r - " + format(opt));
             else if (args.length >= 4 && args[2].equalsIgnoreCase("set")) {

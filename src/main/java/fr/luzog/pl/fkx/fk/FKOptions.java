@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.fk;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.Broadcast;
+import fr.luzog.pl.fkx.utils.SpecialChars;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Arrays;
@@ -93,19 +94,21 @@ public class FKOptions {
     }
 
     public static class FKOption {
-        private String name;
+        private String id, name;
         private int activationDay;
         private boolean activated;
         private FKOptionListener optionListener;
 
-        public FKOption(String name, int activationDay, boolean activated) {
+        public FKOption(String id, String name, int activationDay, boolean activated) {
+            this.id = id;
             this.name = name;
             this.activationDay = activationDay;
             this.activated = activated;
             optionListener = null;
         }
 
-        public FKOption(String name, int activationDay, boolean activated, FKOptionListener optionListener) {
+        public FKOption(String id, String name, int activationDay, boolean activated, FKOptionListener optionListener) {
+            this.id = id;
             this.name = name;
             this.activationDay = activationDay;
             this.activated = activated;
@@ -113,19 +116,32 @@ public class FKOptions {
         }
 
         public static FKOption getDefaultOptionPvP() {
-            return new FKOptions.FKOption("PvP", 2, false);
+            return new FKOptions.FKOption("pvp", "PvP", 2, false);
         }
 
         public static FKOption getDefaultOptionNether() {
-            return new FKOptions.FKOption("Nether", 4, false);
+            return new FKOptions.FKOption("nether", "Nether", 4, false);
         }
 
         public static FKOption getDefaultOptionAssaults() {
-            return new FKOptions.FKOption("Assauts", 6, false);
+            return new FKOptions.FKOption("assaults", "Assauts", 6, false);
         }
 
         public static FKOption getDefaultOptionEnd() {
-            return new FKOptions.FKOption("End", 6, false);
+            return new FKOptions.FKOption("end", "End", 6, false);
+        }
+
+        public String getFormattedActivation() {
+            return activated ? "§2§l" + SpecialChars.YES : "§4§l" + SpecialChars.NO
+                    + (activationDay == -1 ? "" : "§7§o (J " + activationDay + ")");
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
 
         public String getName() {

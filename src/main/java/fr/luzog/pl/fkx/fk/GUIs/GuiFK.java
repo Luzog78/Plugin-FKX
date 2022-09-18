@@ -205,6 +205,8 @@ public class GuiFK {
 
         inv.setItem(Utils.posOf(1, 4), GuiPerm.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk perm", "fk perm"));
+        inv.setItem(Utils.posOf(2, 4), GuiActivations.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk activations", "fk activations"));
         inv.setItem(Utils.posOf(2, 3), Items.builder(Heads.CHAR_P.getSkull())
                 .setName("§bStatus : §a" + fk.getState().name())
                 .setLore(
@@ -227,6 +229,8 @@ public class GuiFK {
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk locks", "fk locks"));
         inv.setItem(Utils.posOf(6, 3), GuiTeams.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk teams", "fk teams"));
+        inv.setItem(Utils.posOf(6, 4), GuiPortals.getMainItem(
+                "Clic pour voir plus\n \n§7Commande :\n§7/fk portal", "fk portal"));
         inv.setItem(Utils.posOf(7, 4), GuiZones.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/fk zone", "fk zone"));
 

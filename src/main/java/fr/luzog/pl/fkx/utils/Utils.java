@@ -337,15 +337,26 @@ public class Utils {
                 : world;
     }
 
+    /**
+     * It returns a formatted / user-friendly string of a location.
+     *
+     * @param loc     The location you want to convert to a string.
+     * @param decimal Whether to use decimals.
+     * @param ywPi    Yaw and Pitch included
+     * @param world   If true, the world name will be added to the end of the string.
+     *
+     * @return A string with the location of the player.
+     */
     public static String locToString(Location loc, boolean decimal, boolean ywPi, boolean world) {
         DecimalFormat df = new DecimalFormat(decimal ? "0.00" : "#");
-        // Formatting the location of the player to a string.
-        return (df.format(loc.getX()) + "  " + df.format(loc.getY()) + "  " + df.format(loc.getZ())
+        return loc == null ? "§cnull"
+                : (df.format(loc.getX()) + "  " + df.format(loc.getY()) + "  " + df.format(loc.getZ())
                 + (ywPi ? "  (" + df.format(loc.getYaw()) + "  " + df.format(loc.getPitch()) + ")" : "")
-                + (world ? "  " + (loc.getWorld().getName().equalsIgnoreCase("world") ? "§aOverWorld"
+                + (world ? "  " + (loc.getWorld() == null ? "§cnull"
+                : (loc.getWorld().getName().equalsIgnoreCase("world") ? "§aOverWorld"
                 : loc.getWorld().getName().equalsIgnoreCase("world_nether") ? "§dNether"
                 : loc.getWorld().getName().equalsIgnoreCase("world_the_end") ? "§5End"
-                : loc.getWorld().getName().equalsIgnoreCase("world")) : "") + "§r").replace(",", ".");
+                : loc.getWorld().getName().equalsIgnoreCase("world"))) : "") + "§r").replace(",", ".");
     }
 
     public static UUID parseUUID(String uuid) {
@@ -929,6 +940,7 @@ public class Utils {
      * Calculates the total EXP needed to reach the given level.
      *
      * @param lvl The level you want to calculate the experience for.
+     *
      * @return The amount of experience needed to reach a certain level.
      */
     public static long lvlToExp(double lvl) {
@@ -942,6 +954,7 @@ public class Utils {
      * Calculs the amount of exp needed to level up at a certain level.
      *
      * @param lvl The level of the player.
+     *
      * @return The amount of experience needed to level up at the given level.
      */
     public static long expToLvlUpAt(int lvl) {
@@ -954,6 +967,7 @@ public class Utils {
      * Converts experience to level.
      *
      * @param exp The amount of experience you want to convert.
+     *
      * @return The level of a player based on the amount of experience.
      */
     public static double expToLvl(long exp) {
