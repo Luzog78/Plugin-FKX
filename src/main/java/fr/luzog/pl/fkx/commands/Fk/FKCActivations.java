@@ -43,11 +43,11 @@ public class FKCActivations {
         } else {
             FKOptions.FKOption opt = args[1].equalsIgnoreCase("pvp") ? FKManager.getCurrentGame().getOptions().getPvp()
                     : args[1].equalsIgnoreCase("nether") ? FKManager.getCurrentGame().getOptions().getNether()
-                    : args[1].equalsIgnoreCase("assauts") ? FKManager.getCurrentGame().getOptions().getAssaults()
+                    : args[1].equalsIgnoreCase("assaults") ? FKManager.getCurrentGame().getOptions().getAssaults()
                     : args[1].equalsIgnoreCase("end") ? FKManager.getCurrentGame().getOptions().getEnd() : null;
             GuiActivations.OptionType optType = args[1].equalsIgnoreCase("pvp") ? GuiActivations.OptionType.PVP
                     : args[1].equalsIgnoreCase("nether") ? GuiActivations.OptionType.NETHER
-                    : args[1].equalsIgnoreCase("assauts") ? GuiActivations.OptionType.ASSAULTS
+                    : args[1].equalsIgnoreCase("assaults") ? GuiActivations.OptionType.ASSAULTS
                     : args[1].equalsIgnoreCase("end") ? GuiActivations.OptionType.END : null;
             if (opt == null || optType == null) {
                 u.err("Cette activation n'existe pas.");
@@ -91,7 +91,7 @@ public class FKCActivations {
             if (args.length == 2) {
                 add("list");
                 add("pvp");
-                add("assauts");
+                add("assaults");
                 add("nether");
                 add("end");
             } else if (args.length == 3) {
