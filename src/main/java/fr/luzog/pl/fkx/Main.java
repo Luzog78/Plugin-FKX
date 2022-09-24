@@ -23,7 +23,8 @@ public class Main extends JavaPlugin implements Listener {
 
     private static int sideLength = 27, centerLength;
 
-    public static String FK_SEASON, SYS_PREFIX, PREFIX, HEADER, FOOTER, REBOOT_KICK_MESSAGE;
+    public static String FK_SEASON, IP, SYS_PREFIX, PREFIX, HEADER, FOOTER, REBOOT_KICK_MESSAGE;
+    public static ArrayList<String> ORGA;
     public static Main instance = null;
     public static World world = null, nether = null, end = null;
 
@@ -42,6 +43,8 @@ public class Main extends JavaPlugin implements Listener {
                 .setVersion(VERSION, true)
                 .setLang("fr-FR", false)
                 .setSeason("X", false)
+                .setIp("play.azion.fr", false)
+                .setOrga(Arrays.asList("Mathis_Bruel", "Luzog78"), false)
                 .setWorlds("world", "world_nether", "world_the_end", false)
                 .setCustomVanillaCraftsActivated(false, false)
                 .setCustomCraftingTableActivated(true, false)
@@ -51,6 +54,8 @@ public class Main extends JavaPlugin implements Listener {
                 .load(); // Reload the config for the next lines
 
         FK_SEASON = globalConfig.getSeason().replace(" ", "").toUpperCase();
+        IP = globalConfig.getIp();
+        ORGA = new ArrayList<>(globalConfig.getOrga());
         centerLength = 9 + FK_SEASON.length();
 
         SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";

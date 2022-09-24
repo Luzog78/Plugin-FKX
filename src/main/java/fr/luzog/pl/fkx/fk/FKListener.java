@@ -251,7 +251,8 @@ public class FKListener {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom " + Main.FK_SEASON + " §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateurs : §f" + "Mathis_Bruel");
+        if (Main.ORGA != null && !Main.ORGA.isEmpty())
+            h.add("§9Organisateurs : §f" + String.join("§9, §f", Main.ORGA));
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§3Bienvenue à toi cher §9" + (fp == null ? p.getDisplayName() : fp.getDisplayName()) + "§3,");
@@ -327,7 +328,7 @@ public class FKListener {
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr");
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a " + Main.IP);
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
@@ -336,7 +337,8 @@ public class FKListener {
         List<String> h = new ArrayList<>(), f = new ArrayList<>();
         h.add("§c======= §9§l-=[ §6§lFallen Kingdom " + Main.FK_SEASON + " §9§l]=- §c=======");
         h.add(" ");
-        h.add("§9Organisateurs : §f" + "Mathis_Bruel");
+        if (Main.ORGA != null && !Main.ORGA.isEmpty())
+            h.add("§9Organisateurs : §f" + String.join("§9, §f", Main.ORGA));
         h.add("§9Developpeur : §f" + "Luzog78");
         h.add(" ");
         h.add("§cBienvenue à toi cher §f" + p.getDisplayName() + "§c,");
@@ -353,7 +355,7 @@ public class FKListener {
         f.add("§7---");
         f.add(" ");
         f.add(" ");
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr");
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a " + Main.IP);
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
