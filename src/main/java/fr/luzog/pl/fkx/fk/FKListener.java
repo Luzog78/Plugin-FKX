@@ -327,7 +327,7 @@ public class FKListener {
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr:25580");
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr");
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }
@@ -353,7 +353,7 @@ public class FKListener {
         f.add("§7---");
         f.add(" ");
         f.add(" ");
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr:25580");
+        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a play.azion.fr");
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }

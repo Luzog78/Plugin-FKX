@@ -64,15 +64,13 @@ public class EntityDamageHandler implements Listener {
                 p.setLevel(0);
                 p.setExp(0);
                 p.teleport(p.getBedSpawnLocation() == null ?
-                        fp.getTeam() == null || fp.getTeam().getSpawn() == null ?
-                                fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
-                                        fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?
-                                                Main.world == null ?
-                                                        p.getLocation()
-                                                        : Main.world.getSpawnLocation()
-                                                : fp.getManager().getLobby().getSpawn()
-                                        : fp.getManager().getSpawn().getSpawn()
-                                : fp.getTeam().getSpawn()
+                        fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
+                                fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?
+                                        Main.world == null ?
+                                                p.getLocation()
+                                                : Main.world.getSpawnLocation()
+                                        : fp.getManager().getLobby().getSpawn()
+                                : fp.getManager().getSpawn().getSpawn()
                         : p.getBedSpawnLocation());
 
                 new ArrayList<ItemStack>() {{

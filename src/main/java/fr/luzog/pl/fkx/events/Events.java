@@ -698,7 +698,9 @@ public class Events implements Listener {
         e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
                 || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
                 || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true));
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
+                || (b.getType() == Material.CHEST && FKManager.getCurrentGame().getOptions().getAssaults().isActivated()
+                && FKManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
     }
 
     @EventHandler
@@ -706,7 +708,9 @@ public class Events implements Listener {
         e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
                 || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
                 || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true));
+                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
+                || (b.getType() == Material.CHEST && FKManager.getCurrentGame().getOptions().getAssaults().isActivated()
+                && FKManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
     }
 
     @EventHandler
