@@ -44,7 +44,7 @@ public class Broadcast {
     }
 
     /**
-     * <strong>Success (FK_PREFIX)</strong>
+     * <strong>Success (GAME_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GREEN
      * <br><strong>&nbsp; - Strong Color :</strong> RED
@@ -55,7 +55,7 @@ public class Broadcast {
     }
 
     /**
-     * <strong>Error (FK_PREFIX)</strong>
+     * <strong>Error (GAME_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> RED
      * <br><strong>&nbsp; - Strong Color :</strong> DARK_RED
@@ -66,7 +66,7 @@ public class Broadcast {
     }
 
     /**
-     * <strong>FK Logement (FK_PREFIX)</strong>
+     * <strong>Logment (GAME_PREFIX)</strong>
      * <br>
      * <br><strong>&nbsp; - Base Color :</strong> GOLD
      * <br><strong>&nbsp; - Strong Color :</strong> RED

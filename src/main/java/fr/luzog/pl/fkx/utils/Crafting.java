@@ -2,7 +2,7 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.events.Events;
-import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.game.GManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -606,10 +606,10 @@ public class Crafting implements Listener {
 
     public static void update(Inventory inv, HumanEntity whoClicked) {
         boolean craft = false;
-        FKManager fk = FKManager.getCurrentGame() == null
-                || FKManager.getCurrentGame().getPlayer(whoClicked.getName(), false) == null ? null
-                : FKManager.getCurrentGame();
-        Limits lim = fk == null || fk.getLimits() == null ? null : fk.getLimits();
+        GManager game = GManager.getCurrentGame() == null
+                || GManager.getCurrentGame().getPlayer(whoClicked.getName(), false) == null ? null
+                : GManager.getCurrentGame();
+        Limits lim = game == null || game.getLimits() == null ? null : game.getLimits();
         ArrayList<Material> blacklist = lim == null || lim.getCraft() == null ? new ArrayList<>() : lim.getCraft();
         ItemStack[] ingredients = new ArrayList<ItemStack>() {{
             for (Integer slot : SLOTS) add(inv.getItem(slot) == null ? null : inv.getItem(slot).clone());

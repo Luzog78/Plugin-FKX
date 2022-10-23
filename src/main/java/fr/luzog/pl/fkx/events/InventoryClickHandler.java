@@ -1,8 +1,8 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Limits;
 import org.bukkit.Material;
@@ -36,9 +36,9 @@ public class InventoryClickHandler implements Listener {
                 && (e.getCurrentItem().getType() == Material.GLOWSTONE_DUST || (e.getCurrentItem().getType() == Material.AIR
                 && e.getCursor() != null && e.getCursor().getType() == Material.POTION
                 && (e.getSlot() == 0 || e.getSlot() == 1 || e.getSlot() == 2)))
-                && FKManager.getCurrentGame() != null && FKManager.getCurrentGame().getLimits() != null
-                && FKManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) != null) {
-            Limits lim = FKManager.getCurrentGame().getLimits();
+                && GManager.getCurrentGame() != null && GManager.getCurrentGame().getLimits() != null
+                && GManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) != null) {
+            Limits lim = GManager.getCurrentGame().getLimits();
             HashMap<PotionEffectType, Integer> p = new HashMap<>();
             for (ItemStack is : Arrays.asList(e.getCursor(), e.getInventory().getItem(0),
                     e.getInventory().getItem(1), e.getInventory().getItem(2)))
@@ -57,29 +57,29 @@ public class InventoryClickHandler implements Listener {
                 }
         }
 
-        if (FKManager.getCurrentGame() != null && e.getInventory().getType() == InventoryType.ANVIL
+        if (GManager.getCurrentGame() != null && e.getInventory().getType() == InventoryType.ANVIL
                 && e.getRawSlot() == 2 && e.getCurrentItem() != null) {
-            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantGlobal().keySet())
+            for (Enchantment ench : GManager.getCurrentGame().getLimits().getEnchantGlobal().keySet())
                 if (e.getCurrentItem().containsEnchantment(ench) && e.getCurrentItem().getEnchantmentLevel(ench)
-                        > FKManager.getCurrentGame().getLimits().getEnchantGlobal().get(ench)) {
+                        > GManager.getCurrentGame().getLimits().getEnchantGlobal().get(ench)) {
                     e.setCancelled(true);
                     return;
                 }
-            for (Enchantment ench : FKManager.getCurrentGame().getLimits().getEnchantSpe().keySet()) {
+            for (Enchantment ench : GManager.getCurrentGame().getLimits().getEnchantSpe().keySet()) {
                 System.out.println(ench.getName());
-                for (Material mat : FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).keySet())
+                for (Material mat : GManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).keySet())
                     if (e.getCurrentItem().getType() == mat && e.getCurrentItem().containsEnchantment(ench)
                             && e.getCurrentItem().getEnchantmentLevel(ench)
-                            > FKManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).get(mat)) {
+                            > GManager.getCurrentGame().getLimits().getEnchantSpe().get(ench).get(mat)) {
                         e.setCancelled(true);
                         return;
                     }
             }
         }
 
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getWhoClicked().getName());
+        List<GPlayer> fps = GManager.getGlobalPlayer(e.getWhoClicked().getName());
 
-        for (FKPlayer fp : fps)
+        for (GPlayer fp : fps)
             if (fp != null)
                 fp.getStats().increaseClicksOnInventory();
 

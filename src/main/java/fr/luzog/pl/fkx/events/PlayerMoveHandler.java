@@ -1,8 +1,8 @@
 package fr.luzog.pl.fkx.events;
 
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKZone;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GZone;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,13 +14,13 @@ public class PlayerMoveHandler implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
 
-        for (FKPlayer p : fkps) {
+        for (GPlayer p : gPlayers) {
             if (p == null)
                 return;
 
-            if (p.getManager().getState() == FKManager.State.PAUSED && (p.getTeam() == null
+            if (p.getManager().getState() == GManager.State.PAUSED && (p.getTeam() == null
                     || !p.getTeam().getId().equals(p.getManager().getGods().getId()))
                     && (e.getFrom().getX() != e.getTo().getX()
                     || e.getFrom().getZ() != e.getFrom().getZ())) {
@@ -34,26 +34,26 @@ public class PlayerMoveHandler implements Listener {
                     p.getStats().increaseJumps();
             }
 
-            FKZone from = p.getZone(e.getFrom()), to = p.getZone(e.getTo());
+            GZone from = p.getZone(e.getFrom()), to = p.getZone(e.getTo());
             if (from == null && to != null)
                 e.getPlayer().sendMessage("§aVous entrez dans "
-                        + (to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
-                        : to.getId().equals(FKZone.SPAWN_ID) ? "le §4Spawn§a !"
+                        + (to.getId().equals(GZone.LOBBY_ID) ? "le §6Lobby§a !"
+                        : to.getId().equals(GZone.SPAWN_ID) ? "le §4Spawn§a !"
                         : "la zone §f" + to.getId()));
 
             else if (from != null && to == null)
                 e.getPlayer().sendMessage("§aVous sortez "
-                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a !"
-                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a !"
+                        + (from.getId().equals(GZone.LOBBY_ID) ? "du §6Lobby§a !"
+                        : from.getId().equals(GZone.SPAWN_ID) ? "du §4Spawn§a !"
                         : "de la zone §f" + from.getId()));
 
             else if (from != null && !from.getId().equals(to.getId()))
                 e.getPlayer().sendMessage("§aVous sortez "
-                        + (from.getId().equals(FKZone.LOBBY_ID) ? "du §6Lobby§a "
-                        : from.getId().equals(FKZone.SPAWN_ID) ? "du §4Spawn§a "
+                        + (from.getId().equals(GZone.LOBBY_ID) ? "du §6Lobby§a "
+                        : from.getId().equals(GZone.SPAWN_ID) ? "du §4Spawn§a "
                         : "de la zone §f" + from.getId()) + "§a pour entrer dans "
-                        + (to.getId().equals(FKZone.LOBBY_ID) ? "le §6Lobby§a !"
-                        : to.getId().equals(FKZone.SPAWN_ID) ? "le §4Spawn§a !"
+                        + (to.getId().equals(GZone.LOBBY_ID) ? "le §6Lobby§a !"
+                        : to.getId().equals(GZone.SPAWN_ID) ? "le §4Spawn§a !"
                         : "la zone §f" + to.getId()));
 
             if (!e.isCancelled()) {

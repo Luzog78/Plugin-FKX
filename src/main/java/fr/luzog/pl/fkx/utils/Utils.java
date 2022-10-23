@@ -1,8 +1,8 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.Bukkit;
@@ -31,6 +31,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Utils {
+
+    public static final String loreSeparator = "------------------";
 
     /**
      * If the location is within the bounds of the two locations, return true
@@ -581,20 +583,20 @@ public class Utils {
      * @return An {@link ArrayList} of {@link String}s
      */
     public static ArrayList<String> getAllPlayers() {
-        return getAllPlayers(FKManager.getCurrentGame());
+        return getAllPlayers(GManager.getCurrentGame());
     }
 
     /**
      * It gets all the players in the game and in the server, and returns them as an ArrayList
      *
-     * @param manager The {@link FKManager} object that you want to get the players from.
+     * @param manager The {@link GManager} object that you want to get the players from.
      *
      * @return A list of all players in the game.
      */
-    public static ArrayList<String> getAllPlayers(FKManager manager) {
+    public static ArrayList<String> getAllPlayers(GManager manager) {
         HashSet<String> players = new HashSet<>();
         if (manager != null && manager.getPlayers() != null)
-            players.addAll(manager.getPlayers().stream().map(FKPlayer::getName).collect(Collectors.toList()));
+            players.addAll(manager.getPlayers().stream().map(GPlayer::getName).collect(Collectors.toList()));
         players.addAll(Bukkit.getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
         return new ArrayList<>(players);
     }

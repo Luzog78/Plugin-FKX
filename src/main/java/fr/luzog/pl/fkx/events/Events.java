@@ -6,11 +6,10 @@ import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Utils.InputText;
-import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPickableLocks;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.GUIs.Guis;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPermissions;
+import fr.luzog.pl.fkx.game.GPickableLocks;
+import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -28,7 +27,6 @@ import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.BrewEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.event.weather.WeatherChangeEvent;
 import org.bukkit.inventory.ItemStack;
@@ -45,7 +43,7 @@ public class Events implements Listener {
         add(new Freeze());
         add(new Crafting());
         add(new Ad());
-        add(new FKPickableLocks.Listener());
+        add(new GPickableLocks.Listener());
         add(new InputText());
         add(new InCaseThereIsAProblem.Listener());
 
@@ -629,51 +627,51 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onDropItem(PlayerDropItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
-        if (fkps.isEmpty()) {
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
+        if (gPlayers.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer fkp : fkps) {
-            if (fkp != null)
-                fkp.getStats().increaseDroppedItems();
+        for (GPlayer gPlayer : gPlayers) {
+            if (gPlayer != null)
+                gPlayer.getStats().increaseDroppedItems();
 
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
-                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
+                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
                 e.setCancelled(true);
         }
     }
 
     @EventHandler
     public static void onPickupItem(PlayerPickupItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
-        if (fkps.isEmpty()) {
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
+        if (gPlayers.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer fkp : fkps) {
-            if (fkp != null)
-                fkp.getStats().increasePickedItems();
+        for (GPlayer gPlayer : gPlayers) {
+            if (gPlayer != null)
+                gPlayer.getStats().increasePickedItems();
 
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
-                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
+                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
                 e.setCancelled(true);
         }
     }
 
     @EventHandler
     public static void onBedEnter(PlayerBedEnterEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
-        if (fkps.isEmpty()) {
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
+        if (gPlayers.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer fkp : fkps)
-            if (fkp != null && fkp.getManager().getState() == FKManager.State.PAUSED
-                    && !fkp.getTeam().getId().equals(fkp.getManager().getGods().getId()))
+        for (GPlayer gPlayer : gPlayers)
+            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
+                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
                 e.setCancelled(true);
     }
 
@@ -695,22 +693,22 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onBlockExplode(BlockExplodeEvent e) {
-        e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
-                || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
-                || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
-                || (b.getType() == Material.CHEST && FKManager.getCurrentGame().getOptions().getAssaults().isActivated()
-                && FKManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
+        e.blockList().removeIf(b -> GManager.getCurrentGame() == null
+                || GManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
+                || !GManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                GPermissions.Type.BREAKSPE : GPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
+                || (b.getType() == Material.CHEST && GManager.getCurrentGame().getOptions().getAssaults().isActivated()
+                && GManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
     }
 
     @EventHandler
     public static void onEntityExplode(EntityExplodeEvent e) {
-        e.blockList().removeIf(b -> FKManager.getCurrentGame() == null
-                || FKManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
-                || !FKManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
-                || (b.getType() == Material.CHEST && FKManager.getCurrentGame().getOptions().getAssaults().isActivated()
-                && FKManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
+        e.blockList().removeIf(b -> GManager.getCurrentGame() == null
+                || GManager.getCurrentGame().getPickableLocks().isPickableLock(b.getLocation())
+                || !GManager.getCurrentGame().hasPermission(specialMat.contains(b.getType()) ?
+                GPermissions.Type.BREAKSPE : GPermissions.Type.BREAK, Utils.normalize(b.getLocation()), true)
+                || (b.getType() == Material.CHEST && GManager.getCurrentGame().getOptions().getAssaults().isActivated()
+                && GManager.getCurrentGame().getParticipantsTeams().stream().anyMatch(t -> !t.isEliminated() && t.isInside(Utils.normalize(b.getLocation())))));
     }
 
     @EventHandler
@@ -738,13 +736,13 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getName());
-        if (fkps.isEmpty()) {
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
+        if (gPlayers.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer p : fkps)
+        for (GPlayer p : gPlayers)
             if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
                 p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
     }
@@ -762,13 +760,13 @@ public class Events implements Listener {
     @EventHandler
     public static void onShoot(EntityShootBowEvent e) {
         if (e.getEntity() instanceof Player) {
-            List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEntity().getName());
-            if (fkps.isEmpty()) {
+            List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
+            if (gPlayers.isEmpty()) {
                 e.setCancelled(true);
                 return;
             }
 
-            for (FKPlayer p : fkps)
+            for (GPlayer p : gPlayers)
                 if (p != null)
                     p.getStats().increaseArrowsShot();
         }
@@ -776,21 +774,21 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEnchant(EnchantItemEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getEnchanter().getName());
-        if (fkps.isEmpty()) {
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEnchanter().getName());
+        if (gPlayers.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer p : fkps)
+        for (GPlayer p : gPlayers)
             if (p != null)
                 p.getStats().increaseEnchantedItems();
 
-        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
-                || FKManager.getCurrentGame().getPlayer(e.getEnchanter().getName(), false) == null)
+        if (GManager.getCurrentGame() == null || GManager.getCurrentGame().getLimits() == null
+                || GManager.getCurrentGame().getPlayer(e.getEnchanter().getName(), false) == null)
             return;
 
-        Limits lim = FKManager.getCurrentGame().getLimits();
+        Limits lim = GManager.getCurrentGame().getLimits();
 
         for (Enchantment enchant : e.getEnchantsToAdd().keySet())
             if (lim.getEnchantSpe().containsKey(enchant)
@@ -804,9 +802,9 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onOpenInventory(InventoryOpenEvent e) {
-        List<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
 
-        for (FKPlayer p : fkps)
+        for (GPlayer p : gPlayers)
             if (p != null)
                 p.getStats().increaseInventoriesOpened();
     }
@@ -840,11 +838,11 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onPotion(BrewEvent e) {
-        if (FKManager.getCurrentGame() == null || FKManager.getCurrentGame().getLimits() == null
+        if (GManager.getCurrentGame() == null || GManager.getCurrentGame().getLimits() == null
                 || e.getContents().getIngredient().getType() != Material.GLOWSTONE_DUST)
             return;
 
-        Limits lim = FKManager.getCurrentGame().getLimits();
+        Limits lim = GManager.getCurrentGame().getLimits();
         HashMap<PotionEffectType, Integer> p = new HashMap<>();
         for (ItemStack is : Arrays.asList(e.getContents().getItem(0),
                 e.getContents().getItem(1), e.getContents().getItem(2)))
@@ -870,7 +868,7 @@ public class Events implements Listener {
             e.setCurrentItem(Items.builder(e.getRecipe().getResult().getType())
                     .setName("§bHoue Sacrée")
                     .setLore(
-                            "§8" + Guis.loreSeparator,
+                            "§8" + Utils.loreSeparator,
                             " ",
                             "  §8Un grand merci au §dBêta Testeur",
                             "  §f Maxtriller§8 d'avoir aidé à la",
@@ -880,7 +878,7 @@ public class Events implements Listener {
                             "  §8 vous pouvez utiliser cette houe.",
                             "  §8Alors prenez-en bien soin !",
                             " ",
-                            "§8" + Guis.loreSeparator
+                            "§8" + Utils.loreSeparator
                     )
                     .addEnchant(Enchantment.DIG_SPEED, 10)
                     .build());

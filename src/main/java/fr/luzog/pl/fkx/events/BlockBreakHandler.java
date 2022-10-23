@@ -1,10 +1,10 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPermissions;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,7 +15,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 
 public class BlockBreakHandler implements Listener {
 
@@ -30,22 +33,22 @@ public class BlockBreakHandler implements Listener {
 
     @EventHandler
     public static void onBreakBlock(BlockBreakEvent e) {
-        FKPlayer fp;
-        if (FKManager.getCurrentGame() == null
-                || (fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
+        GPlayer fp;
+        if (GManager.getCurrentGame() == null
+                || (fp = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
             e.setCancelled(true);
             return;
         }
 
         if (!fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ?
-                FKPermissions.Type.BREAKSPE : FKPermissions.Type.BREAK,
+                GPermissions.Type.BREAKSPE : GPermissions.Type.BREAK,
                 Utils.normalize(e.getBlock().getLocation()), 10)) {
             e.setCancelled(true);
             return;
         }
 
         if (Events.unbreakableMat.contains(e.getBlock().getType())
-                && fp.getTeam() != null && fp.getTeam().getId().equals(FKTeam.GODS_ID)) {
+                && fp.getTeam() != null && fp.getTeam().getId().equals(GTeam.GODS_ID)) {
             e.setCancelled(true);
             e.getPlayer().sendMessage(Main.PREFIX + "§cBlock Incassable.");
             return;

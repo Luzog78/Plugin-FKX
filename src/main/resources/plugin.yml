@@ -5,14 +5,14 @@
 #############################
 
 # Plugin Infos
-name: FK
-version: Beta 1.7
-description: "\n\n    §6--------[ §9§lFK §6]--------§r\n\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 1.0.0 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n\n    §6---------------------------------"
+name: FKX
+version: 2.1
+description: "\n\n    §6-------------[ §9§lFKX §6]-------------§r\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 2.1.7 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n    §6-------------------------------\n \n"
 
 # Authors Infos
 author: Luzog78
 authors: [ ]
-website: https://discord.io/Luzog78
+website: https://luzog.fr/
 
 # Dev Infos
 main: fr.luzog.pl.fkx.Main
@@ -44,104 +44,104 @@ commands:
   # Admin
   execute:
     description: Force to execute command
-    permission: fkx.admin.execute
+    permission: game.admin.execute
   invsee:
     aliases: [ seeinventory ]
     description: See an inventory
-    permission: fkx.admin.invsee
+    permission: game.admin.invsee
   sun:
     description: Change Weather.
-    permission: fkx.admin.sun
+    permission: game.admin.sun
   rain:
     description: Change Weather.
-    permission: fkx.admin.rain
+    permission: game.admin.rain
   thunder:
     description: Change Weather.
-    permission: fkx.admin.thunder
+    permission: game.admin.thunder
   gm:
     aliases: [ g ]
     description: Change GameMode
-    permission: fkx.admin.gm
+    permission: game.admin.gm
   gm0:
     aliases: [ g0 ]
     description: Change GameMode
-    permission: fkx.admin.gm0
+    permission: game.admin.gm0
   gm1:
     aliases: [ g1 ]
     description: Change GameMode
-    permission: fkx.admin.gm1
+    permission: game.admin.gm1
   gm2:
     aliases: [ g2 ]
     description: Change GameMode
-    permission: fkx.admin.gm2
+    permission: game.admin.gm2
   gm3:
     aliases: [ g3 ]
     description: Change GameMode
-    permission: fkx.admin.gm3
+    permission: game.admin.gm3
   vanish:
     aliases: [ v ]
     description: Toggle Vanish Mod
-    permission: fkx.admin.vanish
+    permission: game.admin.vanish
 
   # Cheat
   ench:
     aliases: [ enchantment ]
     description: Enchant an item
-    permission: fkx.cheat.ench
+    permission: game.cheat.ench
   feed:
     aliases: [ nourriture ]
     description: Feed - Saturation Effect
-    permission: fkx.cheat.feed
+    permission: game.cheat.feed
   god:
     description: Become Invulnerable
-    permission: fkx.cheat.god
+    permission: game.cheat.god
   heal:
     aliases: [ guerissement ]
     description: Heal - Instant Heal Effect
-    permission: fkx.cheat.heal
+    permission: game.cheat.heal
   sethealth:
     description: Set Max Health
-    permission: fkx.cheat.sethealth
+    permission: game.cheat.sethealth
   speed:
     description: Set Walk/Fly Speed
-    permission: fkx.cheat.speed
+    permission: game.cheat.speed
 
 
 
   # Fun commands
   hat:
     description: Change ur helmet ^^
-    permission: fkx.fun.hat
+    permission: game.fun.hat
   head:
     description: Get Player's Head
-    permission: fkx.fun.head
+    permission: game.fun.head
   rename:
     description: Modify the Name or the Lore of an Item
-    permission: fkx.fun.rename
+    permission: game.fun.rename
   #  funcommands:
   #    description: Send all Fun Commands
   #  roll:
   #    description: Roll a Dice
   lightning:
     description: Strike a lightning !!
-    permission: fkx.fun.lightning
+    permission: game.fun.lightning
   damage:
     description: Give damages X_X
-    permission: fkx.fun.damage
+    permission: game.fun.damage
   freeze:
     description: Freeze a player -_-
-    permission: fkx.fun.freeze
+    permission: game.fun.freeze
   bounce:
     description: Bounce a player high in the sky ! :)
-    permission: fkx.fun.bounce
+    permission: game.fun.bounce
   burn:
     description: Set on fire a player xD
-    permission: fkx.fun.burn
+    permission: game.fun.burn
   #  explode:
   #    description: Create an explosion ;)
   shuffle:
     description: Shuffle Player's inventory x)
-    permission: fkx.fun.shuffle
+    permission: game.fun.shuffle
 
 
   # Location Commands
@@ -178,13 +178,13 @@ commands:
   ec:
     aliases: [ enderchest, viewec, viewenderchest ]
     description: See an EnderChest
-    permission: fkx.utils.ec
+    permission: game.utils.ec
   craft:
     description: Open the Workbench
-    permission: fkx.utils.craft
+    permission: game.utils.craft
   input:
     description: Open the Input GUI
-    permission: fkx.utils.input
+    permission: game.utils.input
   trash:
     description: Open the Trash
-    permission: fkx.utils.trash
+    permission: game.utils.trash

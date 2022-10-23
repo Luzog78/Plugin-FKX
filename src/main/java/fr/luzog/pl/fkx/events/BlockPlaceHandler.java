@@ -1,9 +1,9 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPermissions;
+import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -16,15 +16,15 @@ public class BlockPlaceHandler implements Listener {
 
     @EventHandler
     public static void onPlaceBlock(BlockPlaceEvent e) {
-        List<FKPlayer> fps = FKManager.getGlobalPlayer(e.getPlayer().getName());
+        List<GPlayer> fps = GManager.getGlobalPlayer(e.getPlayer().getName());
         if (fps.isEmpty()) {
             e.setCancelled(true);
             return;
         }
 
-        for (FKPlayer fp : fps) {
+        for (GPlayer fp : fps) {
             if (fp == null || !fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ?
-                    FKPermissions.Type.PLACESPE : FKPermissions.Type.PLACE, Utils.normalize(e.getBlock().getLocation()))) {
+                    GPermissions.Type.PLACESPE : GPermissions.Type.PLACE, Utils.normalize(e.getBlock().getLocation()))) {
                 e.setCancelled(true);
                 return;
             }

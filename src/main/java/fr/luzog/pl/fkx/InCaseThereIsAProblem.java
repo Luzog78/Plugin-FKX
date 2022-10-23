@@ -6,7 +6,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class InCaseThereIsAProblem {

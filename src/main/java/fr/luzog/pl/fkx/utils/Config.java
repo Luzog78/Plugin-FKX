@@ -1,7 +1,7 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.*;
+import fr.luzog.pl.fkx.game.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -221,11 +221,11 @@ public class Config {
             return this;
         }
 
-        public FKManager.State getState() {
-            return super.match(STATE, FKManager.State.values());
+        public GManager.State getState() {
+            return super.match(STATE, GManager.State.values());
         }
 
-        public Manager setState(FKManager.State state, boolean force) {
+        public Manager setState(GManager.State state, boolean force) {
             super.set(STATE, state.name(), force);
             return this;
         }
@@ -239,11 +239,11 @@ public class Config {
             return this;
         }
 
-        public FKManager.Weather getCurrentWeather() {
-            return super.match(WEATHER, FKManager.Weather.values());
+        public GManager.Weather getCurrentWeather() {
+            return super.match(WEATHER, GManager.Weather.values());
         }
 
-        public Manager setCurrentWeather(FKManager.Weather weather, boolean force) {
+        public Manager setCurrentWeather(GManager.Weather weather, boolean force) {
             super.set(WEATHER, weather.name(), force);
             return this;
         }
@@ -296,67 +296,6 @@ public class Config {
             super.set(String.format(OPTION_ACTIVATED, option), activated, force);
             return this;
         }
-
-//        public FKOptions.FKOption getOption(String option) {
-//            try {
-//                return option == null ? null : new FKOptions.FKOption(getOptionName(option), getOptionActivation(option), isOptionActivated(option));
-//            } catch (Exception e) {
-//                return null;
-//            }
-//        }
-//
-//        public Manager setOption(String option, FKOptions.FKOption fkOption, boolean force) {
-//            if (fkOption == null) {
-//                super.set(String.format(OPTION_NAME, option), null, force);
-//                super.set(String.format(OPTION_ACTIVATION, option), null, force);
-//                super.set(String.format(OPTION_ACTIVATED, option), null, force);
-//            } else {
-//                super.set(String.format(OPTION_NAME, option), fkOption.getName(), force);
-//                super.set(String.format(OPTION_ACTIVATION, option), fkOption.getActivationDay(), force);
-//                super.set(String.format(OPTION_ACTIVATED, option), fkOption.isActivated(), force);
-//            }
-//            return this;
-//        }
-//
-//        public FKOptions getOptions(String path) {
-//            if (path == null || isNull(path) || super.getKeys(path, false) == null)
-//                return null;
-//            FKOptions options = new FKOptions(
-//                    new FKOptions.FKOption("öµñàù", -1, false),
-//                    new FKOptions.FKOption("àöñùµ", -1, false),
-//                    new FKOptions.FKOption("ñöàµù", -1, false),
-//                    new FKOptions.FKOption("ùàµöñ", -1, false)
-//            );
-//            boolean isOK = false;
-//            for (String option : super.getKeys(path, false))
-//                if (getOption(path + "." + option) != null)
-//                    if (option.equalsIgnoreCase("pvp")) {
-//                        options.setPvp(getOption(option));
-//                        isOK = true;
-//                    } else if (option.equalsIgnoreCase("nether")) {
-//                        options.setNether(getOption(option));
-//                        isOK = true;
-//                    } else if (option.equalsIgnoreCase("assaults")) {
-//                        options.setAssaults(getOption(option));
-//                        isOK = true;
-//                    } else if (option.equalsIgnoreCase("end")) {
-//                        options.setEnd(getOption(option));
-//                        isOK = true;
-//                    }
-//            return isOK ? options : null;
-//        }
-//
-//        public Manager setOptions(FKOptions options, boolean force) {
-//            if (options == null) {
-//                super.set(OPTIONS, new HashMap<>(), force);
-//                return this;
-//            }
-//            setOption(OPTIONS + ".pvp", options.getPvp(), force);
-//            setOption(OPTIONS + ".nether", options.getNether(), force);
-//            setOption(OPTIONS + ".assaults", options.getAssaults(), force);
-//            setOption(OPTIONS + ".end", options.getEnd(), force);
-//            return this;
-//        }
 
         public String getListenerName() {
             return super.getStr(LISTENER_NAME);
@@ -497,47 +436,47 @@ public class Config {
             return this;
         }
 
-        public FKPermissions getGlobalPermissions() {
+        public GPermissions getGlobalPermissions() {
             return super.getPermissions(PERM_GLOBAL);
         }
 
-        public Manager setGlobalPermissions(FKPermissions perm, boolean force) {
+        public Manager setGlobalPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERM_GLOBAL, perm, force);
             return this;
         }
 
-        public FKPermissions getNeutralPermissions() {
+        public GPermissions getNeutralPermissions() {
             return super.getPermissions(PERM_NEUTRAL);
         }
 
-        public Manager setNeutralPermissions(FKPermissions perm, boolean force) {
+        public Manager setNeutralPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERM_NEUTRAL, perm, force);
             return this;
         }
 
-        public FKPermissions getFriendlyPermissions() {
+        public GPermissions getFriendlyPermissions() {
             return super.getPermissions(PERM_FRIENDLY);
         }
 
-        public Manager setFriendlyPermissions(FKPermissions perm, boolean force) {
+        public Manager setFriendlyPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERM_FRIENDLY, perm, force);
             return this;
         }
 
-        public FKPermissions getHostilePermissions() {
+        public GPermissions getHostilePermissions() {
             return super.getPermissions(PERM_HOSTILE);
         }
 
-        public Manager setHostilePermissions(FKPermissions perm, boolean force) {
+        public Manager setHostilePermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERM_HOSTILE, perm, force);
             return this;
         }
 
-        public FKPermissions getPriorityPermissions() {
+        public GPermissions getPriorityPermissions() {
             return super.getPermissions(PERM_PRIORITY);
         }
 
-        public Manager setPriorityPermissions(FKPermissions perm, boolean force) {
+        public Manager setPriorityPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERM_PRIORITY, perm, force);
             return this;
         }
@@ -563,8 +502,8 @@ public class Config {
             return this;
         }
 
-        public FKZone.Type getType() {
-            return super.match(TYPE, FKZone.Type.values());
+        public GZone.Type getType() {
+            return super.match(TYPE, GZone.Type.values());
         }
 
         public Zone setType(String type, boolean force) {
@@ -599,11 +538,11 @@ public class Config {
             return this;
         }
 
-        public FKPermissions getPermissions() {
+        public GPermissions getPermissions() {
             return super.getPermissions(PERMISSIONS);
         }
 
-        public Zone setPermissions(FKPermissions perm, boolean force) {
+        public Zone setPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERMISSIONS, perm, force);
             return this;
         }
@@ -721,11 +660,11 @@ public class Config {
             return this;
         }
 
-        public FKPermissions getPermissions() {
+        public GPermissions getPermissions() {
             return super.getPermissions(PERMISSIONS);
         }
 
-        public Team setPermissions(FKPermissions perm, boolean force) {
+        public Team setPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERMISSIONS, perm, force);
             return this;
         }
@@ -773,16 +712,16 @@ public class Config {
             return this;
         }
 
-        public FKPlayer.Compass getCompass() {
+        public GPlayer.Compass getCompass() {
             if (contains(COMPASS) && contains(COMPASS + ".location"))
-                return new FKPlayer.Compass(getStr(COMPASS + ".name"),
+                return new GPlayer.Compass(getStr(COMPASS + ".name"),
                         getDouble(COMPASS + ".radius"),
                         super.getLoc(COMPASS + ".location"));
             else
                 return null;
         }
 
-        public Player setCompass(FKPlayer.Compass compass, boolean force) {
+        public Player setCompass(GPlayer.Compass compass, boolean force) {
             if (compass == null)
                 super.set(COMPASS, null, force);
             else {
@@ -802,11 +741,11 @@ public class Config {
             return this;
         }
 
-        public FKPermissions getPermissions() {
+        public GPermissions getPermissions() {
             return super.getPermissions(PERMISSIONS);
         }
 
-        public Player setPermissions(FKPermissions perm, boolean force) {
+        public Player setPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERMISSIONS, perm, force);
             return this;
         }
@@ -998,7 +937,7 @@ public class Config {
             return this;
         }
 
-        public static FKPickableLocks.Lock mapToLock(Map<?, ?> map) {
+        public static GPickableLocks.Lock mapToLock(Map<?, ?> map) {
             try {
                 Map<?, ?> coolMap, locMap;
                 if (map.containsKey("id") && map.containsKey("level")
@@ -1014,7 +953,7 @@ public class Config {
                             Double.parseDouble(locMap.get("y") + ""),
                             Double.parseDouble(locMap.get("z") + ""));
 
-                    return new FKPickableLocks.Lock(map.get("id") + "", Integer.parseInt(map.get("level") + ""),
+                    return new GPickableLocks.Lock(map.get("id") + "", Integer.parseInt(map.get("level") + ""),
                             Boolean.parseBoolean(map.get("pickable") + ""),
                             Boolean.parseBoolean(map.get("picked") + ""),
                             Boolean.parseBoolean(map.get("auto-bc") + ""),
@@ -1030,7 +969,7 @@ public class Config {
             return null;
         }
 
-        public static Map<String, Object> lockToMap(FKPickableLocks.Lock lock) {
+        public static Map<String, Object> lockToMap(GPickableLocks.Lock lock) {
             LinkedHashMap<String, Long> coolMap = new LinkedHashMap<String, Long>() {{
                 put("original", lock.getOriginalCoolDown());
                 put("current", lock.getCoolDown());
@@ -1055,12 +994,12 @@ public class Config {
             }};
         }
 
-        public ArrayList<FKPickableLocks.Lock> getLocks() {
+        public ArrayList<GPickableLocks.Lock> getLocks() {
             return getMapList(LOCKS).stream().map(PickableLocks::mapToLock).filter(Objects::nonNull)
                     .collect(Collectors.toCollection(ArrayList::new));
         }
 
-        public PickableLocks setLocks(ArrayList<FKPickableLocks.Lock> locks, boolean force) {
+        public PickableLocks setLocks(ArrayList<GPickableLocks.Lock> locks, boolean force) {
             super.set(LOCKS, locks.stream().map(PickableLocks::lockToMap)
                     .collect(Collectors.toList()), force);
             return this;
@@ -1303,7 +1242,7 @@ public class Config {
             if (force || isNull(path))
                 config.set(path, o);
         } catch (Exception e) {
-            System.out.println(Color.RED);
+            System.out.println(fr.luzog.pl.fkx.utils.Color.RED);
             e.printStackTrace();
             System.out.println(Color.RESET);
         }
@@ -1395,19 +1334,19 @@ public class Config {
         }};
     }
 
-    public FKPermissions getPermissions(String path) {
+    public GPermissions getPermissions(String path) {
         if (config.get(path) == null || getKeys(path, false).isEmpty())
             return null;
-        FKPermissions perms = new FKPermissions(FKPermissions.Definition.DEFAULT);
+        GPermissions perms = new GPermissions(GPermissions.Definition.DEFAULT);
         for (String s : getKeys(path, false))
             try {
-                FKPermissions.Type type = FKPermissions.Type.valueOf(s.toUpperCase().replace("-", "_"));
-                FKPermissions.Definition def = config.contains(path + "." + s) ?
+                GPermissions.Type type = GPermissions.Type.valueOf(s.toUpperCase().replace("-", "_"));
+                GPermissions.Definition def = config.contains(path + "." + s) ?
                         config.isBoolean(path + "." + s) ?
                                 config.getBoolean(path + "." + s) ?
-                                        FKPermissions.Definition.ON
-                                        : FKPermissions.Definition.OFF
-                                : match(path + "." + s, FKPermissions.Definition.values())
+                                        GPermissions.Definition.ON
+                                        : GPermissions.Definition.OFF
+                                : match(path + "." + s, GPermissions.Definition.values())
                         : null;
                 if (def != null)
                     perms.setPermission(type, def);
@@ -1416,13 +1355,13 @@ public class Config {
         return perms;
     }
 
-    public Config setPermissions(String path, FKPermissions perms, boolean force) {
+    public Config setPermissions(String path, GPermissions perms, boolean force) {
         if (perms == null)
             set(path, new HashMap<>(), force);
         else
             perms.getPermissions().forEach((type, def) ->
                     set(path + "." + type.name().toLowerCase().replace("_", "-"),
-                            def == FKPermissions.Definition.ON ? true : def == FKPermissions.Definition.OFF ? false : def.name().toLowerCase(), force));
+                            def == GPermissions.Definition.ON ? true : def == GPermissions.Definition.OFF ? false : def.name().toLowerCase(), force));
         return this;
     }
 

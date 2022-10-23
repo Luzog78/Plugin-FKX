@@ -1,9 +1,9 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
@@ -23,13 +23,13 @@ public class PlayerInteractHandler implements Listener {
 
     @EventHandler
     public static void onInteract(PlayerInteractEvent e) {
-        FKPlayer fp;
-        if (FKManager.getCurrentGame() == null
-                || (fp = FKManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null)
+        GPlayer fp;
+        if (GManager.getCurrentGame() == null
+                || (fp = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null)
             return;
 
-        if (FKManager.getCurrentGame().getState() != FKManager.State.RUNNING
-                && !Objects.equals(fp.getTeamId(), FKTeam.GODS_ID)) {
+        if (GManager.getCurrentGame().getState() != GManager.State.RUNNING
+                && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID)) {
             e.setCancelled(true);
             return;
         }
@@ -39,12 +39,12 @@ public class PlayerInteractHandler implements Listener {
 
         if (a == Action.RIGHT_CLICK_BLOCK && e.hasBlock())
             if (e.getClickedBlock().getType() == Material.TNT
-                    && !FKManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
+                    && !GManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
                 p.sendMessage("§cLes assauts ne sont pas activés.");
                 e.setCancelled(true);
                 return;
             } else if (e.getClickedBlock().getType() == Material.CHEST) {
-                if (Objects.equals(fp.getTeamId(), FKTeam.SPECS_ID)
+                if (Objects.equals(fp.getTeamId(), GTeam.SPECS_ID)
                         && p.getGameMode() != org.bukkit.GameMode.SPECTATOR) {
                     p.sendMessage("§cVous ne pouvez pas ouvrir de coffre.");
                     e.setCancelled(true);
@@ -54,11 +54,11 @@ public class PlayerInteractHandler implements Listener {
                 Block b = e.getClickedBlock();
                 Location l = Utils.normalize(b.getLocation(), true);
 
-                for (FKTeam t : FKManager.getCurrentGame().getTeams())
+                for (GTeam t : GManager.getCurrentGame().getTeams())
                     if (t.isInside(b.getLocation()))
                         if (Objects.equals(fp.getTeamId(), t.getId())) {
                             break;
-                        } else if (Objects.equals(fp.getTeamId(), FKTeam.GODS_ID)) {
+                        } else if (Objects.equals(fp.getTeamId(), GTeam.GODS_ID)) {
                             if (sneak) {
                                 if (t.isEliminated())
                                     p.sendMessage("§cÉquipe déjà en éliminée.");
@@ -69,7 +69,7 @@ public class PlayerInteractHandler implements Listener {
                                 e.setCancelled(true);
                             }
                             break;
-                        } else if (!FKManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
+                        } else if (!GManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
                             p.sendMessage("§7§oVous ouvrez un coffre §6" + t.getColor() + t.getName()
                                     + "§7§o, prenez garde avant le début des assauts...");
                             break;
@@ -77,7 +77,7 @@ public class PlayerInteractHandler implements Listener {
                             if (!sneak && fp.getTeam() != null)
                                 if (t.isEliminating())
                                     p.sendMessage("§cÉquipe déjà en élimination.");
-                                else if (!fp.getTeam().everyoneIsNearOf(l) && !Objects.equals(fp.getTeamId(), FKTeam.GODS_ID))
+                                else if (!fp.getTeam().everyoneIsNearOf(l) && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))
                                     p.sendMessage("§cToute votre équipe n'est pas à proximité du coffre.");
                                 else
                                     t.tryToEliminate(fp.getTeam(), l);

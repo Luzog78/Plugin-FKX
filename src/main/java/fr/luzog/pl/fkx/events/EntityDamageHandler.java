@@ -1,9 +1,9 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Loots;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -32,7 +32,7 @@ public class EntityDamageHandler implements Listener {
         LivingEntity entity = (LivingEntity) e.getEntity();
         Location tempLoc = entity.getLocation().add(0, 0.5, 0);
 
-        if (FKManager.getCurrentGame() != null && entity.hasMetadata(FKTeam.PLUNDER_STAND_TAG)
+        if (GManager.getCurrentGame() != null && entity.hasMetadata(GTeam.PLUNDER_STAND_TAG)
                 && e.getDamage() < 1_000_000_000_000_000_000_000.0
                 && e.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) {
             e.setCancelled(true);
@@ -41,9 +41,9 @@ public class EntityDamageHandler implements Listener {
 
         if (e.getEntity() instanceof Player) {
             Player p = (Player) e.getEntity();
-            FKPlayer fp = FKManager.getCurrentGame() == null ? null : FKManager.getCurrentGame().getPlayer(p.getName(), false);
+            GPlayer fp = GManager.getCurrentGame() == null ? null : GManager.getCurrentGame().getPlayer(p.getName(), false);
 
-            if (fp == null || (fp.getManager().getState() == FKManager.State.PAUSED
+            if (fp == null || (fp.getManager().getState() == GManager.State.PAUSED
                     && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))) {
                 e.setCancelled(true);
                 return;
@@ -86,7 +86,7 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(FKTeam.PLUNDER_STAND_TAG))
+                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(GTeam.PLUNDER_STAND_TAG))
                         if (entity instanceof Creeper) {
                             if (((Creeper) entity).isPowered())
                                 new Loots()

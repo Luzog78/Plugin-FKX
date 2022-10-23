@@ -5,8 +5,6 @@ import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
-
 public class CustomNBT {
     private ItemStack is;
     private net.minecraft.server.v1_8_R3.ItemStack cis;

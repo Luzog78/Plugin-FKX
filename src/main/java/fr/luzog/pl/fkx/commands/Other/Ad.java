@@ -1,29 +1,19 @@
 package fr.luzog.pl.fkx.commands.Other;
 
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.GUIs.GuiAd;
-import fr.luzog.pl.fkx.utils.Broadcast;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.guis.GuiAd;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Config;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftItemStack;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerEditBookEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
 
-import javax.annotation.Nullable;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -249,8 +239,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             u.succ("Nous prenons en charge votre demande," +
                     " patientez quelques insant en attendant une réponse.");
         }
-        if (FKManager.getCurrentGame() != null)
-            FKManager.getCurrentGame().getGods().getPlayers().forEach(p -> {
+        if (GManager.getCurrentGame() != null)
+            GManager.getCurrentGame().getGods().getPlayers().forEach(p -> {
                 if (p.getPlayer() != null) {
                     p.getPlayer().sendMessage(AD_PREFIX + "§aRequêtes disponibles pour les grands maîtres de la part de §6"
                             + ad.getSender() + "...");
@@ -278,13 +268,13 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
-        if (FKManager.getCurrentGame() == null) {
+        if (GManager.getCurrentGame() == null) {
             sender.sendMessage("§cAucune partie en cours...");
             sender.sendMessage("§cRéessayez plus tard !");
             return false;
         }
 
-        boolean isPlayer = sender instanceof Player && FKManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
+        boolean isPlayer = sender instanceof Player && GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, isPlayer ? syntaxe_player : syntaxe_admin);
 
         if (args.length >= 1 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
@@ -295,7 +285,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
         if (isPlayer)
             if (args.length == 0)
                 post(u, new Item(u.getPlayer().getName(), null, null));
-            else if (FKManager.getCurrentGame().getGods().getPlayer(args[0]) != null)
+            else if (GManager.getCurrentGame().getGods().getPlayer(args[0]) != null)
                 if (args.length == 1)
                     post(u, new Item(u.getPlayer().getName(), args[0], null));
                 else
@@ -341,7 +331,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                     String arg = args[1].startsWith("-") || args[1].startsWith("+") ? args[1].substring(1) : args[1];
                     if (sender instanceof Player)
                         u.getPlayer().openInventory(GuiAd.getAdsInventory(GuiAd.SortType.valueOf(arg.toUpperCase()),
-                                args[1].startsWith("-"), FKManager.getCurrentGame() == null ? null : "fk",
+                                args[1].startsWith("-"), GManager.getCurrentGame() == null ? null : "fk",
                                 "ad page", Integer.parseInt(args[2])));
                     else
                         u.err(CmdUtils.err_not_player);
@@ -396,7 +386,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
         else if (args[0].equalsIgnoreCase("ad"))
             if (args.length == 1)
                 post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, null, null));
-            else if (FKManager.getCurrentGame().getGods().getPlayer(args[1]) != null)
+            else if (GManager.getCurrentGame().getGods().getPlayer(args[1]) != null)
                 if (args.length == 2)
                     post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, args[1], null));
                 else
@@ -415,7 +405,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
-        boolean isPlayer = sender instanceof Player && FKManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
+        boolean isPlayer = sender instanceof Player && GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
 
         new ArrayList<String>() {{
             if (args.length == 1)

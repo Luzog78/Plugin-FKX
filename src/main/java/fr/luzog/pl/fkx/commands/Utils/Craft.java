@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import static fr.luzog.pl.fkx.commands.Other.Ad.ads;
-
 public class Craft implements CommandExecutor, TabCompleter {
     public static final String syntaxe = "/craft [custom] [<players...>]";
 

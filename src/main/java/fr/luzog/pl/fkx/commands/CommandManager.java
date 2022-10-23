@@ -3,8 +3,8 @@ package fr.luzog.pl.fkx.commands;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.*;
 import fr.luzog.pl.fkx.commands.Cheat.*;
-import fr.luzog.pl.fkx.commands.Fk.FKCommand;
 import fr.luzog.pl.fkx.commands.Fun.*;
+import fr.luzog.pl.fkx.commands.Game.GCmd;
 import fr.luzog.pl.fkx.commands.Location.Tp;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Other.Test;
@@ -16,13 +16,14 @@ import fr.luzog.pl.fkx.commands.Utils.Trash;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandExecutor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public enum CommandManager {
+public class CommandManager {
 
-    ADMIN(
+    private static final ArrayList<CommandItem> commands = new ArrayList<>(Arrays.asList(
+            // Admin
             new CommandItem(new Execute(), "execute"),
             new CommandItem(new Gm(), "gm"),
             new CommandItem(new Gm(GameMode.SURVIVAL), "gm0"),
@@ -33,24 +34,18 @@ public enum CommandManager {
             new CommandItem(new Vanish(), "vanish"),
             new CommandItem(new Weather(Weather.WeatherType.SUN), "sun"),
             new CommandItem(new Weather(Weather.WeatherType.RAIN), "rain"),
-            new CommandItem(new Weather(Weather.WeatherType.THUNDER), "thunder")
-    ),
+            new CommandItem(new Weather(Weather.WeatherType.THUNDER), "thunder"),
 
-    CHAT(
-
-    ),
-
-    CHEAT(
+            // Cheat
             new CommandItem(new Enchant(), "ench"),
             new CommandItem(new Feed(), "feed"),
             new CommandItem(new Freeze(), "freeze"),
             new CommandItem(new God(), "god"),
             new CommandItem(new Heal(), "heal"),
             new CommandItem(new SetHealth(), "sethealth"),
-            new CommandItem(new Speed(), "speed")
-    ),
+            new CommandItem(new Speed(), "speed"),
 
-    FUN(
+            // Fun
             new CommandItem(new Bounce(), "bounce"),
             new CommandItem(new Burn(), "burn"),
             new CommandItem(new Damage(), "damage"),
@@ -58,78 +53,41 @@ public enum CommandManager {
             new CommandItem(new Head(), "head"),
             new CommandItem(new Lightning(), "lightning"),
             new CommandItem(new Rename(), "rename"),
-            new CommandItem(new Shuffle(), "shuffle")
-    ),
+            new CommandItem(new Shuffle(), "shuffle"),
 
-    LOCATION(
-            new CommandItem(new Tp(), "tp")
-    ),
+            // Game
+            new CommandItem(new GCmd(), Main.CMD),
 
-    OTHER(
+            // Location
+            new CommandItem(new Tp(), "tp"),
+
+            // Other
             new CommandItem(new Ad(), "ad"),
             new CommandItem(new Test(), "test"),
-            new CommandItem(new FKCommand(), "fk")
-    ),
 
-    SERVER(
-            new CommandItem(new R(), "r")
-    ),
+            // Server
+            new CommandItem(new R(), "r"),
 
-    UTILS(
+            // Utils
             new CommandItem(new Craft(), "craft"),
             new CommandItem(new EnderChest(), "ec"),
             new CommandItem(new InputText(), "input"),
             new CommandItem(new Trash(), "trash")
-    );
+    ));
 
-
-    private List<CommandItem> commands;
-
-    CommandManager(CommandItem... commands) {
-        this.commands = Arrays.stream(commands).collect(Collectors.toList());
+    public static List<CommandItem> getCommands() {
+        return Arrays.asList(commands.toArray(new CommandItem[0]));
     }
 
-    public static void setupCommands() {
-
-//        cmd(new Broadcast(), "broadcast");
-//        cmd(new ClearChat(), "clearchat");
-
-//        cmd(new Home(), "home");
-//        cmd(new SetHome(), "sethome");
-//        cmd(new Spawn(), "spawn");
-
-//        cmd(new Save(), "save");
-
-        /*
-         *
-         * ///// Other //////
-         * getCommand("basickitcmd").setExecutor(new BasicKitCmd());
-         * getCommand("randomchest").setExecutor(new RandomChest(main));
-         *
-         * ///// Server /////
-         * getCommand("ping").setExecutor(new Tps(main));
-         * getCommand("version").setExecutor(new Version(main));
-         *
-         * ///// Utils /////
-         * getCommand("clearlag").setExecutor(new ClearLag(main));
-         * getCommand("reset").setExecutor(new Reset(main)); //ordre
-         */
-
+    public static void registerCommand(CommandItem command) {
+        commands.add(command);
+        Arrays.stream(command.getCommands()).forEach(c ->
+                Main.instance.getCommand(c).setExecutor(command.getExecutor()));
     }
 
     public static void init() {
-        for (CommandManager manager : CommandManager.values())
-            manager.getCommands().forEach(cmd ->
-                    Arrays.stream(cmd.getCommands()).collect(Collectors.toList()).forEach(c ->
-                            Main.instance.getCommand(c).setExecutor(cmd.getExecutor())));
-    }
-
-    public List<CommandItem> getCommands() {
-        return commands;
-    }
-
-    public void setCommands(List<CommandItem> commands) {
-        this.commands = commands;
+        commands.forEach(command -> Arrays.stream(command.getCommands()).forEach(c ->
+                Main.instance.getCommand(c).setExecutor(command.getExecutor())));
     }
 
     public static class CommandItem {

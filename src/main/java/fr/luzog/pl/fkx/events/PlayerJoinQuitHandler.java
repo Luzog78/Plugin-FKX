@@ -1,8 +1,8 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,21 +25,21 @@ public class PlayerJoinQuitHandler implements Listener {
     public void onPlayerJoin(PlayerJoinEvent e) {
         e.setJoinMessage(null);
 
-        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
+        ArrayList<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
 
-        for(FKPlayer fkp : fkps) {
-            fkp.getStats().increaseConnections();
-            if(fkp.getLastUuid() == null || !fkp.getLastUuid().equals(e.getPlayer().getUniqueId()))
-                fkp.setLastUuid(e.getPlayer().getUniqueId(), true);
-            if(!fkp.getName().equals(e.getPlayer().getName()))
-                fkp.setName(e.getPlayer().getName(), true);
-            if(fkp.getTeam() != null)
-                fkp.getTeam().updatePlayers();
+        for(GPlayer gPlayer : gPlayers) {
+            gPlayer.getStats().increaseConnections();
+            if(gPlayer.getLastUuid() == null || !gPlayer.getLastUuid().equals(e.getPlayer().getUniqueId()))
+                gPlayer.setLastUuid(e.getPlayer().getUniqueId(), true);
+            if(!gPlayer.getName().equals(e.getPlayer().getName()))
+                gPlayer.setName(e.getPlayer().getName(), true);
+            if(gPlayer.getTeam() != null)
+                gPlayer.getTeam().updatePlayers();
         }
 
-        String displayName = fkps.isEmpty() ? e.getPlayer().getName()
-                : fkps.size() > 1 ? fkps.stream().map(FKPlayer::getDisplayName).collect(Collectors.joining("§r"))
-                : fkps.get(0).getDisplayName();
+        String displayName = gPlayers.isEmpty() ? e.getPlayer().getName()
+                : gPlayers.size() > 1 ? gPlayers.stream().map(GPlayer::getDisplayName).collect(Collectors.joining("§r"))
+                : gPlayers.get(0).getDisplayName();
         Bukkit.broadcastMessage(join + displayName);
     }
 
@@ -47,21 +47,21 @@ public class PlayerJoinQuitHandler implements Listener {
     public void onPlayerLeave(PlayerQuitEvent e) {
         e.setQuitMessage(null);
 
-        ArrayList<FKPlayer> fkps = FKManager.getGlobalPlayer(e.getPlayer().getName());
+        ArrayList<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
 
-        String displayName = fkps.isEmpty() ? e.getPlayer().getName()
-                : fkps.size() > 1 ? fkps.stream().map(FKPlayer::getDisplayName).collect(Collectors.joining("§r"))
-                : fkps.get(0).getDisplayName();
+        String displayName = gPlayers.isEmpty() ? e.getPlayer().getName()
+                : gPlayers.size() > 1 ? gPlayers.stream().map(GPlayer::getDisplayName).collect(Collectors.joining("§r"))
+                : gPlayers.get(0).getDisplayName();
         Bukkit.broadcastMessage((e.getPlayer().isBanned() ? ban : quit) + displayName);
 
         new BukkitRunnable() {
             @Override
             public void run() {
-                for(FKPlayer fkp : fkps) {
-                    if(!fkp.getName().equals(e.getPlayer().getName()))
-                        fkp.setName(e.getPlayer().getName(), true);
-                    if(fkp.getTeam() != null)
-                        fkp.getTeam().updatePlayers();
+                for(GPlayer gPlayer : gPlayers) {
+                    if(!gPlayer.getName().equals(e.getPlayer().getName()))
+                        gPlayer.setName(e.getPlayer().getName(), true);
+                    if(gPlayer.getTeam() != null)
+                        gPlayer.getTeam().updatePlayers();
                 }
             }
         }.runTask(Main.instance);

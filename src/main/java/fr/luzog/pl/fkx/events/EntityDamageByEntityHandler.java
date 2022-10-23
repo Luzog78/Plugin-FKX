@@ -1,10 +1,10 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKPermissions;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
+import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPermissions;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import org.bukkit.GameMode;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -20,7 +20,7 @@ public class EntityDamageByEntityHandler implements Listener {
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();
 
-            FKPlayer fp = FKManager.getCurrentGame() == null ? null : FKManager.getCurrentGame().getPlayer(p.getName(), false);
+            GPlayer fp = GManager.getCurrentGame() == null ? null : GManager.getCurrentGame().getPlayer(p.getName(), false);
             /*
              *  FKTeam t;
              *  if (FKManager.getCurrentGame() != null && event.getEntity().hasMetadata(FKTeam.GUARDIAN_TAG)
@@ -36,7 +36,7 @@ public class EntityDamageByEntityHandler implements Listener {
 
             if (event.getEntity() instanceof Player) {
                 Player e = (Player) event.getEntity();
-                FKPlayer fe = FKManager.getCurrentGame() == null ? null : FKManager.getCurrentGame().getPlayer(e.getName(), false);
+                GPlayer fe = GManager.getCurrentGame() == null ? null : GManager.getCurrentGame().getPlayer(e.getName(), false);
 
                 if (fe == null || fp == null) {
                     if (!p.isOp() || p.getGameMode() != GameMode.CREATIVE) {
@@ -44,15 +44,15 @@ public class EntityDamageByEntityHandler implements Listener {
                         return;
                     }
                 } else if (!fp.hasPermission(fp.getTeam().getPlayers().contains(fe) ?
-                        FKPermissions.Type.FRIENDLY_FIRE : FKPermissions.Type.PVP, e.getLocation())) {
+                        GPermissions.Type.FRIENDLY_FIRE : GPermissions.Type.PVP, e.getLocation())) {
                     event.setCancelled(true);
                     return;
                 }
             } else {
-                if ((event.getEntity().hasMetadata(FKTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
-                        || (fp != null && (fp.getTeam() == null || !fp.getTeam().getId().equals(FKTeam.GODS_ID)))))
-                        || (!event.getEntity().hasMetadata(FKTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
-                        || (fp != null && !fp.hasPermission(FKPermissions.Type.MOBS,
+                if ((event.getEntity().hasMetadata(GTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
+                        || (fp != null && (fp.getTeam() == null || !fp.getTeam().getId().equals(GTeam.GODS_ID)))))
+                        || (!event.getEntity().hasMetadata(GTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
+                        || (fp != null && !fp.hasPermission(GPermissions.Type.MOBS,
                         event.getEntity().getLocation()))))) {
                     event.setCancelled(true);
                     return;

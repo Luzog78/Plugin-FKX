@@ -4,10 +4,14 @@ import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.CommandManager;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.events.Events;
-import fr.luzog.pl.fkx.fk.*;
-import fr.luzog.pl.fkx.utils.*;
+import fr.luzog.pl.fkx.game.GListener;
+import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.utils.Color;
-import org.bukkit.*;
+import fr.luzog.pl.fkx.utils.Config;
+import fr.luzog.pl.fkx.utils.Crafting;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -19,11 +23,12 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Beta 1.7";
+    public static final Object VERSION = "Version 2.1";
+    public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
 
-    public static String FK_SEASON, IP, SYS_PREFIX, PREFIX, HEADER, FOOTER, REBOOT_KICK_MESSAGE;
+    public static String SEASON, IP, SYS_PREFIX, PREFIX, HEADER, FOOTER, REBOOT_KICK_MESSAGE;
     public static ArrayList<String> ORGA;
     public static Main instance = null;
     public static World world = null, nether = null, end = null;
@@ -42,7 +47,7 @@ public class Main extends JavaPlugin implements Listener {
         globalConfig = new Config.Globals("Globals.yml").load()
                 .setVersion(VERSION, true)
                 .setLang("fr-FR", false)
-                .setSeason("X", false)
+                .setSeason("Fallen Kingdom X", false)
                 .setIp("play.azion.fr", false)
                 .setOrga(Arrays.asList("Mathis_Bruel", "Luzog78"), false)
                 .setWorlds("world", "world_nether", "world_the_end", false)
@@ -53,24 +58,24 @@ public class Main extends JavaPlugin implements Listener {
                 .save()
                 .load(); // Reload the config for the next lines
 
-        FK_SEASON = globalConfig.getSeason().replace(" ", "").toUpperCase();
+        SEASON = globalConfig.getSeason().replace(" ", "").toUpperCase();
         IP = globalConfig.getIp();
         ORGA = new ArrayList<>(globalConfig.getOrga());
-        centerLength = 9 + FK_SEASON.length();
+        centerLength = 9 + SEASON.length();
 
         SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";
-        PREFIX = "§8§l[§6FK-" + FK_SEASON + "§8§l] >> §7";
+        PREFIX = "§8§l[§6" + SEASON + "§8§l] >> §7";
 
         String side = String.format("%" + sideLength + "s", "").replace(" ", "-");
-        HEADER = "§9" + side + " §8[ §6FK-" + FK_SEASON + " §8] §9" + side + "§r";
-        FOOTER = String.format("§9%" + (63 + FK_SEASON.length()) + "s§r", "").replace(" ", "-");
+        HEADER = "§9" + side + "-- §8[ §6" + SEASON + " §8] §9-" + side + "§r";
+        FOOTER = String.format("§9%" + (63 + SEASON.length()) + "s§r", "").replace(" ", "-");
 
         REBOOT_KICK_MESSAGE = Main.HEADER + "\n\n§cRedémarrage du serveur.\n§6Reconnectez vous dans moins d'une minute !\n\n" + Main.FOOTER;
 
         System.out.println(" ");
         Color.sout(HEADER);
         souf("          §fInitialisation des differentes composantes");
-        souf("              §fdu plugin de §bFallen Kingdom " + FK_SEASON + "§f...");
+        souf("              §fdu plugin §b" + SEASON + "§f...");
         souf("");
         souf("");
 
@@ -104,19 +109,19 @@ public class Main extends JavaPlugin implements Listener {
                 Ad.initFromConfig();
 
                 soufInstruction("§6Initialisation du module : §eRunnable§6...");
-                FKListener.scheduleMainTask();
+                GListener.scheduleMainTask();
 
-                soufInstruction("§6Initialisation du module : §eFKManager§6...");
-                FKManager.initFromConfig(false);
-                if (FKManager.getCurrentGame() != null)
-                    FKManager.getCurrentGame().getListener().scheduleTask();
+                soufInstruction("§6Initialisation du module : §eGame Manager§6...");
+                GManager.initFromConfig(false);
+                if (GManager.getCurrentGame() != null)
+                    GManager.getCurrentGame().getListener().scheduleTask();
 
                 soufInstruction("§6Initialisation du module : §eCrafts§6...");
                 Crafting.initCrafts();
 
-                String last = globalConfig.getLastGame() == null ? FKManager.registered.isEmpty() ? null : FKManager.registered.get(0).getId() : globalConfig.getLastGame();
+                String last = globalConfig.getLastGame() == null ? GManager.registered.isEmpty() ? null : GManager.registered.get(0).getId() : globalConfig.getLastGame();
                 soufInstruction("§6Set de la derniere partie : " + (last != null ? "§a" + last : "§cAucune"));
-                FKManager.currentGameId = last;
+                GManager.currentGameId = last;
 
                 souf("");
                 soufInstruction("§aInitialisations terminees !");
@@ -224,22 +229,22 @@ public class Main extends JavaPlugin implements Listener {
         soufInstruction("§6Nettoyage du §eScoreboard §6principal :");
         soufInstruction("  > §6Suppression des teams temporaires...");
         Bukkit.getScoreboardManager().getMainScoreboard().getTeams().forEach(t -> {
-            if (t.getName().startsWith("fkt"))
+            if (t.getName().startsWith("gt"))
                 t.unregister();
         });
         soufInstruction("  > §6Suppression des objectifs caches...");
         Bukkit.getScoreboardManager().getMainScoreboard().getObjectives().forEach(o -> {
-            if (o.getName().startsWith("fko"))
+            if (o.getName().startsWith("go"))
                 o.unregister();
         });
 
-        soufInstruction("§6Sauvegarde legere de toutes les §eFKGames§6...");
-        FKManager.saveAll(true);
+        soufInstruction("§6Sauvegarde legere de toutes les §eGames§6...");
+        GManager.saveAll(true);
 
         soufInstruction("§6Desactivation de tous les §eRunnable§6...");
-        FKListener.cancelMainTask();
-        if (FKManager.getCurrentGame() != null)
-            FKManager.getCurrentGame().getListener().cancelTask();
+        GListener.cancelMainTask();
+        if (GManager.getCurrentGame() != null)
+            GManager.getCurrentGame().getListener().cancelTask();
 
         souf("");
         soufInstruction("§cFin du processus de cloture.");
@@ -266,7 +271,7 @@ public class Main extends JavaPlugin implements Listener {
         soufInstruction("§6Sauvegarde de §eGlobalsConfig§6...");
         globalConfig.load()
                 .setVersion(VERSION, true)
-                .setLastGame(FKManager.currentGameId, true);
+                .setLastGame(GManager.currentGameId, true);
 
         if (world != null && nether != null && end != null)
             globalConfig.setWorlds(world.getName(), nether.getName(), end.getName(), true);
@@ -279,8 +284,8 @@ public class Main extends JavaPlugin implements Listener {
         soufInstruction("§6Sauvegarde de §eAd§6...");
         Ad.saveToConfig();
 
-        soufInstruction("§6Sauvegarde de toutes les donnees des §eFKGames§6...");
-        FKManager.saveAll(false);
+        soufInstruction("§6Sauvegarde de toutes les donnees des §eGames§6...");
+        GManager.saveAll(false);
 
         if (headerAndFooter) {
             souf("");

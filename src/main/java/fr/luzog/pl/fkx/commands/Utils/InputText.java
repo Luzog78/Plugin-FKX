@@ -1,14 +1,11 @@
 package fr.luzog.pl.fkx.commands.Utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.events.Events;
-import fr.luzog.pl.fkx.fk.GUIs.Guis;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Color;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
 import net.minecraft.server.v1_8_R3.*;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -23,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -108,7 +104,7 @@ public class InputText implements CommandExecutor, TabCompleter, Listener {
             super.setItem(0, CraftItemStack.asNMSCopy(Items.builder(Material.PAPER)
                     .setName(">")
                     .setLore(
-                            "§8" + Guis.loreSeparator,
+                            "§8" + Utils.loreSeparator,
                             " ",
                             "  §7Veuillez entrer une valeur pour",
                             "  §7 l'argument §f" + (results.size() + 1) + "§7 sur §8" + length + "§7.",
@@ -126,7 +122,7 @@ public class InputText implements CommandExecutor, TabCompleter, Listener {
                                     .map(Object::toString)
                                     .collect(Collectors.toCollection(ArrayList::new))) : ""),
                             " ",
-                            "§8" + Guis.loreSeparator
+                            "§8" + Utils.loreSeparator
                     )
                     .build()));
         }

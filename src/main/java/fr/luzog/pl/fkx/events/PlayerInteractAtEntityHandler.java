@@ -1,9 +1,7 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
-import fr.luzog.pl.fkx.fk.FKManager;
-import fr.luzog.pl.fkx.fk.FKPlayer;
-import fr.luzog.pl.fkx.fk.FKTeam;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.utils.CustomNBT;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -76,7 +74,7 @@ public class PlayerInteractAtEntityHandler implements Listener {
             return;
         }*/
 
-        if (e.hasMetadata(FKTeam.PLUNDER_STAND_TAG)) {
+        if (e.hasMetadata(GTeam.PLUNDER_STAND_TAG)) {
             event.setCancelled(true);
             return;
         }

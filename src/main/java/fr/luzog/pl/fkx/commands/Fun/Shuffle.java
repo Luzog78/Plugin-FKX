@@ -9,7 +9,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 public class Shuffle implements CommandExecutor, TabCompleter {
     public static final String syntaxe = "/shuffle (hotbar | inv) <players...>";

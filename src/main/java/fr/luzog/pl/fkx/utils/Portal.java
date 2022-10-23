@@ -1,7 +1,7 @@
 package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
-import fr.luzog.pl.fkx.fk.FKManager;
+import fr.luzog.pl.fkx.game.GManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -77,7 +77,7 @@ public class Portal {
         return null;
     }
 
-    public boolean tryToTeleport(Entity e, FKManager manager, boolean save) {
+    public boolean tryToTeleport(Entity e, GManager manager, boolean save) {
         if (!isOpened() || nextSpawn(e.getLocation()) == null || isInTeleportation(e))
             return false;
         inTeleportation.put(e.getUniqueId(), Bukkit.getScheduler().scheduleSyncDelayedTask(Main.instance, () -> {
@@ -106,7 +106,7 @@ public class Portal {
         return inTeleportation.containsKey(entity.getUniqueId());
     }
 
-    public void resetTeleportation(FKManager manager, boolean save) {
+    public void resetTeleportation(GManager manager, boolean save) {
         inTeleportation.forEach((uuid, taskID) -> Bukkit.getScheduler().cancelTask(taskID));
         inTeleportation.clear();
         if (save && manager != null)
