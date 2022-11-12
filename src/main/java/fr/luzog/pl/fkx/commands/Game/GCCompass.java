@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GCCompass {
@@ -23,6 +24,23 @@ public class GCCompass {
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
+
+        GManager game = GManager.getCurrentGame();
+        if (game == null) {
+            u.err("Aucune partie en cours.");
+            return true;
+        }
+        GPlayer fp = game.getPlayer(u.getPlayer().getName(), false);
+        if (fp == null) {
+            u.err("Vous n'êtes pas dans la partie.");
+            return true;
+        }
+        if(!Main.globalConfig.isCompassActivated() && !sender.isOp()
+                && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID)
+                && !Objects.equals(fp.getTeamId(), GTeam.SPECS_ID)) {
+            u.err("La boussole est désactivée.");
+            return true;
+        }
 
         if (args.length == 0) {
             u.synt();
@@ -44,18 +62,8 @@ public class GCCompass {
                     u.err(CmdUtils.err_number_format + " (" + args[2] + ")");
                 }
         } else {
-            GManager game = GManager.getCurrentGame();
-            if (game == null) {
-                u.err("Aucune partie en cours.");
-                return true;
-            }
             if (!(sender instanceof Player)) {
                 u.err(CmdUtils.err_not_player);
-                return true;
-            }
-            GPlayer fp = game.getPlayer(u.getPlayer().getName(), false);
-            if (fp == null) {
-                u.err("Vous n'êtes pas dans la partie.");
                 return true;
             }
             Location loc = null;

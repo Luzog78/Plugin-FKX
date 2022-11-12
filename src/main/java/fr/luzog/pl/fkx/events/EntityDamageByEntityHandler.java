@@ -5,6 +5,7 @@ import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPermissions;
 import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.game.GTeam;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.GameMode;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -17,6 +18,20 @@ public class EntityDamageByEntityHandler implements Listener {
 
     @EventHandler
     public static void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        if(event.getEntity() instanceof Player) {
+            Player player = (Player) event.getEntity();
+            String damager;
+            if(event.getDamager() instanceof Player) {
+                GPlayer fp = GManager.getCurrentGame() == null ? null
+                        : GManager.getCurrentGame().getPlayer(event.getDamager().getName(), false);
+                damager = "§f" + (fp == null ? ((Player) event.getDamager()).getDisplayName() : fp.getDisplayName());
+            } else {
+                Utils.Pair<String, String> pair = Events.entitiesFrenchNames.get(event.getDamager().getType());
+                damager = "§7" + pair.getKey() + " " + pair.getValue();
+            }
+            player.setMetadata(Events.lastDamagerMeta, new FixedMetadataValue(Main.instance, damager));
+        }
+
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();
 

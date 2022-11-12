@@ -23,7 +23,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 2.1";
+    public static final Object VERSION = "Version 2.2";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
@@ -55,6 +55,8 @@ public class Main extends JavaPlugin implements Listener {
                 .setCustomCraftingTableActivated(true, false)
                 .setCustomLootingBlocksSystemActivated(true, false)
                 .setCustomLootingMobsSystemActivated(true, false)
+                .setAdActivated(true, false)
+                .setCompassActivated(true, false)
                 .save()
                 .load(); // Reload the config for the next lines
 

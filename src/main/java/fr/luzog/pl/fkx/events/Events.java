@@ -75,6 +75,8 @@ public class Events implements Listener {
     public static final String lastDamageLootingLevelTag = "lastDamageLootingLevel";
     public static final String lastDamageSilkTouchTag = "lastDamageSilkTouch";
 
+    public static final String lastDamagerMeta = "lastDamager";
+
     public static List<Material> specialMat = Arrays.asList(Material.TNT, Material.TORCH, Material.REDSTONE_TORCH_ON,
             Material.REDSTONE_TORCH_OFF, Material.YELLOW_FLOWER, Material.RED_ROSE, Material.WHEAT, /*Material.HAY_BLOCK,*/
             Material.SEEDS, Material.MELON_SEEDS, Material.PUMPKIN_SEEDS, Material.CARROT, Material.CARROT_ITEM,
@@ -97,6 +99,76 @@ public class Events implements Listener {
     public static List<Material> leather = Arrays.asList(Material.LEATHER_HELMET, Material.LEATHER_CHESTPLATE,
             Material.LEATHER_LEGGINGS, Material.LEATHER_BOOTS, Material.STONE_SWORD, Material.STONE_AXE,
             Material.STONE_PICKAXE, Material.STONE_SPADE, Material.STONE_HOE);
+
+    public static Map<EntityType, Utils.Pair<String, String>> entitiesFrenchNames =
+            new HashMap<EntityType, Utils.Pair<String, String>>() {{
+                put(EntityType.BAT, new Utils.Pair<>("une", "Chauve-souris"));
+                put(EntityType.BLAZE, new Utils.Pair<>("un", "Blaze"));
+                put(EntityType.CAVE_SPIDER, new Utils.Pair<>("une", "Araignée de cave"));
+                put(EntityType.CHICKEN, new Utils.Pair<>("un", "Poulet"));
+                put(EntityType.COW, new Utils.Pair<>("une", "Vache"));
+                put(EntityType.CREEPER, new Utils.Pair<>("un", "Creeper"));
+                put(EntityType.ENDER_DRAGON, new Utils.Pair<>("le", "Dragon de l'End"));
+                put(EntityType.ENDERMAN, new Utils.Pair<>("un", "Enderman"));
+                put(EntityType.ENDERMITE, new Utils.Pair<>("une", "Endermite"));
+                put(EntityType.GHAST, new Utils.Pair<>("un", "Ghast"));
+                put(EntityType.GIANT, new Utils.Pair<>("un", "Géant"));
+                put(EntityType.GUARDIAN, new Utils.Pair<>("un", "Gardien"));
+                put(EntityType.HORSE, new Utils.Pair<>("un", "Cheval"));
+                put(EntityType.IRON_GOLEM, new Utils.Pair<>("un", "Golem de fer"));
+                put(EntityType.MAGMA_CUBE, new Utils.Pair<>("un", "Cube de magma"));
+                put(EntityType.MUSHROOM_COW, new Utils.Pair<>("une", "Vache champignon"));
+                put(EntityType.OCELOT, new Utils.Pair<>("un", "Ocelot"));
+                put(EntityType.PIG, new Utils.Pair<>("un", "Cochon"));
+                put(EntityType.PIG_ZOMBIE, new Utils.Pair<>("un", "Cochon Zombie"));
+                put(EntityType.SHEEP, new Utils.Pair<>("un", "Mouton"));
+                put(EntityType.SILVERFISH, new Utils.Pair<>("un", "Poisson argenté"));
+                put(EntityType.SKELETON, new Utils.Pair<>("un", "Squelette"));
+                put(EntityType.SLIME, new Utils.Pair<>("un", "Slime"));
+                put(EntityType.SNOWMAN, new Utils.Pair<>("un", "Bonhomme de neige"));
+                put(EntityType.SPIDER, new Utils.Pair<>("une", "Araignée"));
+                put(EntityType.SQUID, new Utils.Pair<>("un", "Calmar"));
+                put(EntityType.VILLAGER, new Utils.Pair<>("un", "Villageois"));
+                put(EntityType.WITCH, new Utils.Pair<>("une", "Sorcière"));
+                put(EntityType.WITHER, new Utils.Pair<>("un", "Wither"));
+                put(EntityType.WOLF, new Utils.Pair<>("un", "Loup"));
+                put(EntityType.ZOMBIE, new Utils.Pair<>("un", "Zombie"));
+
+                put(EntityType.ARMOR_STAND, new Utils.Pair<>("un", "Mannequin"));
+                put(EntityType.ARROW, new Utils.Pair<>("une", "Flèche"));
+                put(EntityType.BOAT, new Utils.Pair<>("un", "Bateau"));
+                put(EntityType.COMPLEX_PART, new Utils.Pair<>("une", "Partie complexe"));
+                put(EntityType.DROPPED_ITEM, new Utils.Pair<>("un", "Item"));
+                put(EntityType.EGG, new Utils.Pair<>("un", "Oeuf"));
+                put(EntityType.ENDER_CRYSTAL, new Utils.Pair<>("un", "Cristal d'ender"));
+                put(EntityType.ENDER_SIGNAL, new Utils.Pair<>("un", "Signal d'ender"));
+                put(EntityType.ENDER_PEARL, new Utils.Pair<>("une", "Perle d'ender"));
+                put(EntityType.EXPERIENCE_ORB, new Utils.Pair<>("une", "Orbe d'expérience"));
+                put(EntityType.FALLING_BLOCK, new Utils.Pair<>("un", "Bloc tombant"));
+                put(EntityType.FIREBALL, new Utils.Pair<>("une", "Boule de feu"));
+                put(EntityType.FIREWORK, new Utils.Pair<>("un", "Feu d'artifice"));
+                put(EntityType.FISHING_HOOK, new Utils.Pair<>("un", "Hameçon"));
+                put(EntityType.ITEM_FRAME, new Utils.Pair<>("un", "Cadre d'item"));
+                put(EntityType.LEASH_HITCH, new Utils.Pair<>("", "Attache"));
+                put(EntityType.LIGHTNING, new Utils.Pair<>("un", "Éclair"));
+                put(EntityType.MINECART, new Utils.Pair<>("un", "Train"));
+                put(EntityType.MINECART_CHEST, new Utils.Pair<>("un", "Train avec coffre"));
+                put(EntityType.MINECART_COMMAND, new Utils.Pair<>("un", "Train avec commande"));
+                put(EntityType.MINECART_FURNACE, new Utils.Pair<>("un", "Train avec four"));
+                put(EntityType.MINECART_HOPPER, new Utils.Pair<>("un", "Train avec hopper"));
+                put(EntityType.MINECART_MOB_SPAWNER, new Utils.Pair<>("un", "Train avec spawner"));
+                put(EntityType.MINECART_TNT, new Utils.Pair<>("un", "Train avec TNT"));
+                put(EntityType.PAINTING, new Utils.Pair<>("un", "Tableau"));
+                put(EntityType.PRIMED_TNT, new Utils.Pair<>("une", "TNT"));
+                put(EntityType.SMALL_FIREBALL, new Utils.Pair<>("une", "Petite boule de feu"));
+                put(EntityType.SNOWBALL, new Utils.Pair<>("une", "Boule de neige"));
+                put(EntityType.SPLASH_POTION, new Utils.Pair<>("une", "Potion"));
+                put(EntityType.THROWN_EXP_BOTTLE, new Utils.Pair<>("une", "Bouteille d'expérience"));
+                put(EntityType.WEATHER, new Utils.Pair<>("la", "Météo"));
+                put(EntityType.WITHER_SKULL, new Utils.Pair<>("un", "Crâne de wither"));
+
+                put(EntityType.PLAYER, new Utils.Pair<>("un", "Joueur"));
+            }};
 
     public static List<BlockLootsItem> breakBlockLoots = new ArrayList<BlockLootsItem>() {{
 //        add(new BlockLootsItem(Arrays.asList(Material.LOG, Material.LOG_2), false, new Loots().add(new ItemStack(Material.LOG))));
@@ -736,12 +808,14 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
-        if (gPlayers.isEmpty()) {
+        if (GManager.getCurrentGame() == null || GManager.getCurrentGame()
+                .getPlayer(e.getEntity().getName(), false) == null
+                || GManager.getCurrentGame().getState() != GManager.State.RUNNING) {
             e.setCancelled(true);
             return;
         }
 
+        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
         for (GPlayer p : gPlayers)
             if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
                 p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));

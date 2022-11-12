@@ -1,6 +1,9 @@
 package fr.luzog.pl.fkx.commands.Other;
 
+import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.guis.GuiAd;
 import fr.luzog.pl.fkx.utils.CmdUtils;
 import fr.luzog.pl.fkx.utils.Config;
@@ -276,6 +279,11 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
 
         boolean isPlayer = sender instanceof Player && GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, isPlayer ? syntaxe_player : syntaxe_admin);
+
+        if(!Main.globalConfig.isAdActivated() && !sender.isOp() && isPlayer) {
+            u.err("Le /ad est désactivé !");
+            return true;
+        }
 
         if (args.length >= 1 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
             u.synt();

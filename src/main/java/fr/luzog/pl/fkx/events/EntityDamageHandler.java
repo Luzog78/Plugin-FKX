@@ -18,6 +18,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 public class EntityDamageHandler implements Listener {
 
@@ -54,7 +56,114 @@ public class EntityDamageHandler implements Listener {
 
             if (entity.getHealth() - e.getFinalDamage() <= 0) {
                 fp.getStats().increaseDeaths();
-                Broadcast.mess(fp.getDisplayName() + "§c est mort.");
+                List<String> m = new ArrayList<>();
+                switch (e.getCause()) {
+                    case BLOCK_EXPLOSION:
+                        m.add("a été explosé.");
+                        m.add("a été explosé.");
+                        m.add("a pété... §oPÉTÉ !");
+                        break;
+                    case CONTACT:
+                    case CUSTOM:
+                        break;
+                    case DROWNING:
+                        m.add("s'est noyé.");
+                        m.add("ne savait pas nager.");
+                        m.add("glouglouglouu...");
+                        break;
+                    case ENTITY_ATTACK:
+                        String s = e.getEntity().getMetadata(Events.lastDamagerMeta).get(0).asString();
+                        m.add("a été tué par " + s + "§r.");
+                        m.add("s'est fait décimé par " + s + "§r.");
+                        m.add("s'est fait violenté par " + s + "§r.");
+                        m.add("a perdu le combat contre " + s + "§r.");
+                        m.add("a perdu la bataille contre " + s + "§r.");
+                        m.add("s'est mesuré à " + s + "§r.");
+                        m.add("s'est opposé à " + s + "§r.");
+                        m.add("a défié " + s + "§r et a perdu...");
+                        break;
+                    case ENTITY_EXPLOSION:
+                        m.add("a été explosé.");
+                        m.add("n'est pas fan des creepers. ^^'");
+                        m.add("a pété... §oPÉTÉ !");
+                        break;
+                    case FALL:
+                        m.add("est mort de chute.");
+                        m.add("s'est écrasé par terre.");
+                        m.add("est descendu trop vite.");
+                        m.add("a fait un plongeon raté.");
+                        m.add("s'est pris pour un oiseau.");
+                        m.add("a imité une crêpe.");
+                        break;
+                    case FALLING_BLOCK:
+                        m.add("a été tué par un bloc.");
+                        break;
+                    case FIRE:
+                        m.add("a été carbonisé instantanément !!");
+                        break;
+                    case FIRE_TICK:
+                        m.add("a brûlé.");
+                        m.add("n'est pas fan des flammes.");
+                        m.add("a subit les flammes.");
+                        m.add("s'est fait décimer par le feu.");
+                        m.add("a voulu faire un barbecue.");
+                        break;
+                    case LAVA:
+                        m.add("a nagé dans la lave.");
+                        m.add("a tenté un plongeon dans le magma.");
+                        m.add("a voulu faire plouf dans la lave.");
+                        break;
+                    case LIGHTNING:
+                        m.add("a été frappé par la foudre.");
+                        m.add("s'est électrocuté.");
+                        m.add("a été touché par un éclair.");
+                        m.add("a subit un coup de foudre.");
+                        break;
+                    case MAGIC:
+                        m.add("a été tué par la magie.");
+                        break;
+                    case MELTING:
+                        m.add("a été fondu.");
+                        break;
+                    case POISON:
+                        m.add("a été empoisonné.");
+                        break;
+                    case PROJECTILE:
+                        m.add("s'est fait tirer dessus.");
+                        break;
+                    case STARVATION:
+                        m.add("est mort de faim.");
+                        m.add("a oublié de manger.");
+                        break;
+                    case SUFFOCATION:
+                        m.add("s'est étouffé.");
+                        m.add("s'est asphyxié.");
+                        m.add("a suffoqué.");
+                        break;
+                    case SUICIDE:
+                        m.add("s'est suicidé. lol.");
+                        break;
+                    case THORNS:
+                        m.add("s'est pris sa propre attaque.");
+                        break;
+                    case VOID:
+                        m.add("est tombé dans le vide.");
+                        m.add("a rejoint le vide.");
+                        m.add("est tombé dans l'infini...");
+                        break;
+                    case WITHER:
+                        m.add("a été infecté par le wither.");
+                        break;
+                    default:
+                        break;
+                }
+                if(m.size() == 0) {
+                    m.add("est mort.");
+                    m.add("n'est plus.");
+                    m.add("s'est fait décimé.");
+                }
+                Broadcast.mess(fp.getDisplayName() + "§c "
+                        + m.get(new Random().nextInt(m.size())).replace("§r", "§c"));
                 e.setCancelled(true);
                 p.setHealth(p.getMaxHealth());
                 p.setFoodLevel(20);
@@ -63,6 +172,7 @@ public class EntityDamageHandler implements Listener {
                         .setExperience((int) (Utils.lvlToExp(p.getLevel() + p.getExp()) * 0.75));
                 p.setLevel(0);
                 p.setExp(0);
+                p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
                 p.teleport(p.getBedSpawnLocation() == null ?
                         fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?
                                 fp.getManager().getLobby() == null || fp.getManager().getLobby().getSpawn() == null ?

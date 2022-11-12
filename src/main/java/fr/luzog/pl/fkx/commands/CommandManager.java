@@ -4,7 +4,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.*;
 import fr.luzog.pl.fkx.commands.Cheat.*;
 import fr.luzog.pl.fkx.commands.Fun.*;
-import fr.luzog.pl.fkx.commands.Game.GCmd;
+import fr.luzog.pl.fkx.commands.Game.GCMainCommand;
 import fr.luzog.pl.fkx.commands.Location.Tp;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Other.Test;
@@ -56,7 +56,7 @@ public class CommandManager {
             new CommandItem(new Shuffle(), "shuffle"),
 
             // Game
-            new CommandItem(new GCmd(), Main.CMD),
+            new CommandItem(new GCMainCommand(), Main.CMD),
 
             // Location
             new CommandItem(new Tp(), "tp"),

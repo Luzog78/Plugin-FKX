@@ -27,15 +27,31 @@ public class PlayerJoinQuitHandler implements Listener {
 
         ArrayList<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
 
-        for(GPlayer gPlayer : gPlayers) {
+        for (GPlayer gPlayer : gPlayers) {
             gPlayer.getStats().increaseConnections();
-            if(gPlayer.getLastUuid() == null || !gPlayer.getLastUuid().equals(e.getPlayer().getUniqueId()))
+            if (gPlayer.getLastUuid() == null || !gPlayer.getLastUuid().equals(e.getPlayer().getUniqueId()))
                 gPlayer.setLastUuid(e.getPlayer().getUniqueId(), true);
-            if(!gPlayer.getName().equals(e.getPlayer().getName()))
+            if (!gPlayer.getName().equals(e.getPlayer().getName()))
                 gPlayer.setName(e.getPlayer().getName(), true);
-            if(gPlayer.getTeam() != null)
+            if (gPlayer.getTeam() != null)
                 gPlayer.getTeam().updatePlayers();
         }
+
+        if (!e.getPlayer().hasPlayedBefore() && GManager.getCurrentGame() != null)
+            if (GManager.getCurrentGame().getState() == GManager.State.RUNNING
+                    || GManager.getCurrentGame().getState() == GManager.State.PAUSED) {
+                if (GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false) != null
+                        && GManager.getCurrentGame().getParticipantsTeams().contains(
+                        GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false).getTeam())
+                        && GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false).getTeam().getSpawn() != null)
+                    e.getPlayer().teleport(GManager.getCurrentGame()
+                            .getPlayer(e.getPlayer().getName(), false).getTeam().getSpawn());
+                else if (GManager.getCurrentGame().getSpawn().getSpawn() != null)
+                    e.getPlayer().teleport(GManager.getCurrentGame().getSpawn().getSpawn());
+                else if (GManager.getCurrentGame().getLobby().getSpawn() != null)
+                    e.getPlayer().teleport(GManager.getCurrentGame().getLobby().getSpawn());
+            } else if (GManager.getCurrentGame().getLobby().getSpawn() != null)
+                e.getPlayer().teleport(GManager.getCurrentGame().getLobby().getSpawn());
 
         String displayName = gPlayers.isEmpty() ? e.getPlayer().getName()
                 : gPlayers.size() > 1 ? gPlayers.stream().map(GPlayer::getDisplayName).collect(Collectors.joining("§r"))
@@ -57,10 +73,10 @@ public class PlayerJoinQuitHandler implements Listener {
         new BukkitRunnable() {
             @Override
             public void run() {
-                for(GPlayer gPlayer : gPlayers) {
-                    if(!gPlayer.getName().equals(e.getPlayer().getName()))
+                for (GPlayer gPlayer : gPlayers) {
+                    if (!gPlayer.getName().equals(e.getPlayer().getName()))
                         gPlayer.setName(e.getPlayer().getName(), true);
-                    if(gPlayer.getTeam() != null)
+                    if (gPlayer.getTeam() != null)
                         gPlayer.getTeam().updatePlayers();
                 }
             }

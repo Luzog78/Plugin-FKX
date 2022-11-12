@@ -34,7 +34,7 @@ public class GPickableLocks {
 
     public static final String LOCK_KEY = "§d§l-=[ §k0§d §nPasse Partout§d §l§k0§d§l ]=-",
             LOCK_ID_TAG = "gameLockIdTag", RARITY_TAG = "gameRarityTag";
-    public static final int maxDistance = 4;
+    public static final int maxDistance = 5;
     public static double RADIUS = 15;
 
     public static class Lock {
