@@ -197,7 +197,7 @@ public class GuiPortals {
                         Main.CMD + " portal " + t.name() + " cooldown " + Math.max((p.getCoolDown() / 20.0) - 1, 0.05) + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " cooldown " + Math.max((p.getCoolDown() / 20.0) - 5, 0.05) + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 1 " + Main.CMD + " portal " + t.name() + " cooldown %s%n" + refresh)
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " cooldown %d{0,}%n" + refresh)
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(5, 4), Items.builder(Material.BRICK)
@@ -223,10 +223,10 @@ public class GuiPortals {
                         "§7/" + Main.CMD + " portal " + t.name() + " data §f<data>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 1 " + Main.CMD + " portal " + t.name() + " closingMat %s%n" + refresh,
-                        "input 1 " + Main.CMD + " portal " + t.name() + " openingMat %s%n" + refresh
+                        "input " + Main.CMD + " portal " + t.name() + " closingMat %s%n" + refresh,
+                        "input " + Main.CMD + " portal " + t.name() + " openingMat %s%n" + refresh
                 )
-                .setMiddleCommandOnClick("input 1 " + Main.CMD + " portal " + t.name() + " data %s%n" + refresh)
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " data %d%n" + refresh)
                 .setCantClickOn(true)
                 .build());
 
@@ -262,7 +262,7 @@ public class GuiPortals {
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " over pos1 reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " portal " + t.name() + " over pos1 set %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " over pos1 set %l{X,Y,Z,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(1, 3), Items.builder(Material.GRASS)
@@ -295,7 +295,7 @@ public class GuiPortals {
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " over pos2 reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " portal " + t.name() + " over pos2 set %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " over pos2 set %l{X,Y,Z,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(2, 2), Items.builder(Material.WOOD)
@@ -333,7 +333,7 @@ public class GuiPortals {
                                 + " " + from.getPitch() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " over spawn reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 6 " + Main.CMD + " portal " + t.name() + " over spawn set %s %s %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " over spawn set %l{x,y,z,yw,pi,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
 
@@ -367,7 +367,7 @@ public class GuiPortals {
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " dim pos1 reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " portal " + t.name() + " dim pos1 set %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " dim pos1 set %l{X,Y,Z,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(7, 3), Items.builder(t.getSec())
@@ -400,7 +400,7 @@ public class GuiPortals {
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " dim pos2 reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " portal " + t.name() + " dim pos2 set %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " dim pos2 set %l{X,Y,Z,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(6, 2), Items.builder(t.getTer())
@@ -438,7 +438,7 @@ public class GuiPortals {
                                 + " " + from.getPitch() + " " + from.getWorld().getName() + "\n" + refresh,
                         Main.CMD + " portal " + t.name() + " dim spawn reset\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 6 " + Main.CMD + " portal " + t.name() + " dim spawn set %s %s %s %s %s %s%n" + Main.CMD + " portal " + t.name())
+                .setMiddleCommandOnClick("input " + Main.CMD + " portal " + t.name() + " dim spawn set %l{x,y,z,yw,pi,w}%n" + Main.CMD + " portal " + t.name())
                 .setCantClickOn(true)
                 .build());
 

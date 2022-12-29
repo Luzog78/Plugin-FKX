@@ -124,7 +124,7 @@ public class GuiZones {
                 .setLeftRightCommandOnClick(
                         Main.CMD + " zone " + z.getId() + " options --t " + c1 + "\n" + refresh,
                         Main.CMD + " zone " + z.getId() + " options --t " + c2 + "\n" + refresh)
-                .setMiddleCommandOnClick("input 1 " + Main.CMD + " zone " + z.getId() + " options --t %s%n" + Main.CMD + " zone " + z.getId())
+                .setMiddleCommandOnClick("input " + Main.CMD + " zone " + z.getId() + " options --t %s%n" + Main.CMD + " zone " + z.getId())
                 .build());
         inv.setItem(Utils.posOf(4, 3), Items.builder(Material.NAME_TAG)
                 .setName("§2Identifiant : §6" + z.getId())
@@ -136,7 +136,7 @@ public class GuiZones {
                         "§7/" + Main.CMD + " zone " + z.getId() + " id §f<id>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 1 " + Main.CMD + " zone " + z.getId() + " id %s%n" + Main.CMD + " zone",
+                        "input " + Main.CMD + " zone " + z.getId() + " id %s%n" + Main.CMD + " zone",
                         Main.CMD + " zone " + z.getId()
                 )
                 .setCantClickOn(true)
@@ -172,7 +172,7 @@ public class GuiZones {
                         from == null ? "null" : Main.CMD + " zone " + z.getId() + " options --pos1 " + from.getX()
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " zone " + z.getId() + " options --pos1 %s %s %s %s%n" + Main.CMD + " zone " + z.getId())
+                .setMiddleCommandOnClick("input " + Main.CMD + " zone " + z.getId() + " options --pos1 %l{x,y,z,w}%n" + Main.CMD + " zone " + z.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(6, 3), Items.builder(Material.BRICK)
@@ -200,7 +200,7 @@ public class GuiZones {
                         from == null ? "null" : Main.CMD + " zone " + z.getId() + " options --pos2 " + from.getX()
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getWorld().getName() + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 4 " + Main.CMD + " zone " + z.getId() + " options --pos2 %s %s %s %s%n" + Main.CMD + " zone " + z.getId())
+                .setMiddleCommandOnClick("input " + Main.CMD + " zone " + z.getId() + " options --pos2 %l{x,y,z,w}%n" + Main.CMD + " zone " + z.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(4, 4), Items.builder(Material.NETHER_STAR)
@@ -233,7 +233,7 @@ public class GuiZones {
                                 + " " + from.getY() + " " + from.getZ() + " " + from.getYaw()
                                 + " " + from.getPitch() + " " + from.getWorld().getName() + "\n" + refresh
                 )
-                .setMiddleCommandOnClick("input 6 " + Main.CMD + " zone " + z.getId() + " options --s %s %s %s %s %s %s%n" + Main.CMD + " zone " + z.getId())
+                .setMiddleCommandOnClick("input " + Main.CMD + " zone " + z.getId() + " options --s %l{x,y,z,yw,pi,w}%n" + Main.CMD + " zone " + z.getId())
                 .setCantClickOn(true)
                 .build());
 
@@ -276,7 +276,7 @@ public class GuiZones {
                                 "§7/" + Main.CMD + " zone create §f<id> §8[§f<opts...>§8]"
                         )
                         .setLeftRightCommandOnClick(
-                                "input 2 " + Main.CMD + " zone create %s %s%n" + navigationBaseCommand + " " + page,
+                                "input " + Main.CMD + " zone create %s %s%n" + navigationBaseCommand + " " + page,
                                 navigationBaseCommand + " " + page
                         )
                         .setCantClickOn(true)

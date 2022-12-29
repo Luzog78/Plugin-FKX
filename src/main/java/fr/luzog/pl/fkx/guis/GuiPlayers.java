@@ -215,9 +215,9 @@ public class GuiPlayers {
                 )
                 .setCantClickOn(true)
                 .setLeftRightShiftCommandOnClick(
-                        "kick " + player, "input 1 kick " + player + " %s%n" + Main.CMD + " players " + player,
-                        "ban " + player, "input 1 ban " + player + " %s%n" + Main.CMD + " players " + player)
-                .setMiddleCommandOnClick("input 1 ban-ip " + player + " %s%n" + Main.CMD + " players " + player)
+                        "kick " + player, "input kick " + player + " %s%n" + Main.CMD + " players " + player,
+                        "ban " + player, "input ban " + player + " %s%n" + Main.CMD + " players " + player)
+                .setMiddleCommandOnClick("input ban-ip " + player + " %s%n" + Main.CMD + " players " + player)
                 .build());
         inv.setItem(Utils.posOf(2, 3), Items.builder(Material.GHAST_TEAR)
                 .setName("§6Warn")
@@ -257,7 +257,7 @@ public class GuiPlayers {
                         "spawnpoint " + player + " " + opener.getLocation().getX() + " "
                                 + opener.getLocation().getY() + " " + opener.getLocation().getZ()
                                 + " " + opener.getLocation().getWorld().getName() + "\n" + Main.CMD + " players " + player)
-                .setMiddleCommandOnClick("input 4 spawnpoint " + player + " %s %s %s %s%n" + Main.CMD + " players " + player)
+                .setMiddleCommandOnClick("input spawnpoint " + player + " %l{x,y,z,w}%n" + Main.CMD + " players " + player)
                 .build());
         inv.setItem(Utils.posOf(2, 4), Items.builder(Material.COOKED_BEEF)
                 .setName("§2Nourriture")
@@ -357,7 +357,7 @@ public class GuiPlayers {
                 .setCantClickOn(true)
                 .setLeftRightCommandOnClick(
                         "bounce " + player,
-                        "input 3 bounce -v %s %s %s " + player + "%n" + Main.CMD + " players " + player
+                        "input bounce -v %f %f %f " + player + "%n" + Main.CMD + " players " + player
                 )
                 .build());
         inv.setItem(Utils.posOf(7, 4), Items.builder(Freeze.isFrozen(player) ? Material.PACKED_ICE : Material.ICE)

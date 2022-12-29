@@ -116,19 +116,19 @@ public class GOptions {
         }
 
         public static GOption getDefaultOptionPvP() {
-            return new GOption("pvp", "PvP", 2, false);
+            return new GOption("pvp", "PvP", 5, false);
         }
 
         public static GOption getDefaultOptionNether() {
-            return new GOption("nether", "Nether", 4, false);
+            return new GOption("nether", "Nether", 5, false);
         }
 
         public static GOption getDefaultOptionAssaults() {
-            return new GOption("assaults", "Assauts", 6, false);
+            return new GOption("assaults", "Assauts", 8, false);
         }
 
         public static GOption getDefaultOptionEnd() {
-            return new GOption("end", "End", 6, false);
+            return new GOption("end", "End", 8, false);
         }
 
         public String getFormattedActivation() {

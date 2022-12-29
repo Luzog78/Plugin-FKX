@@ -5,24 +5,24 @@ import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.DyeColor;
-import org.bukkit.Location;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.util.io.BukkitObjectInputStream;
+import org.bukkit.util.io.BukkitObjectOutputStream;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import javax.annotation.Nullable;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,6 +33,384 @@ import java.util.stream.Collectors;
 public class Utils {
 
     public static final String loreSeparator = "------------------";
+
+    /**
+     * It's a class that represents a Mojang profile
+     */
+    public static class MojangProfile {
+        private UUID uuid;
+        private String name;
+        private String rawTextures;
+        private String rawSignature;
+        private long timestamp;
+        private String profileId;
+        private String profileName;
+        private String skinURL;
+        private String capeURL;
+
+        public MojangProfile(UUID uuid, String name, String rawTextures, String rawSignature) {
+            this.uuid = uuid;
+            this.name = name;
+            this.rawTextures = rawTextures;
+            this.rawSignature = rawSignature;
+
+            timestamp = 0;
+            profileId = null;
+            profileName = null;
+            skinURL = null;
+            capeURL = null;
+
+            try {
+                JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.getDecoder().decode(this.rawTextures)));
+                if (obj.containsKey("timestamp"))
+                    timestamp = Long.parseLong(obj.get("timestamp").toString());
+                if (obj.containsKey("profileId"))
+                    profileId = obj.get("profileId").toString();
+                if (obj.containsKey("profileName"))
+                    profileName = obj.get("profileName").toString();
+                if (obj.containsKey("textures")) {
+                    JSONObject textures = (JSONObject) obj.get("textures");
+                    if (textures.containsKey("SKIN")) {
+                        JSONObject skin = (JSONObject) textures.get("SKIN");
+                        if (skin.containsKey("url"))
+                            skinURL = skin.get("url").toString();
+                    }
+                    if (textures.containsKey("CAPE")) {
+                        JSONObject cape = (JSONObject) textures.get("CAPE");
+                        if (cape.containsKey("url"))
+                            capeURL = cape.get("url").toString();
+                    }
+                }
+            } catch (ParseException ignored) {
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "MojangProfile{" +
+                    "uuid=" + uuid +
+                    ", name='" + name + '\'' +
+                    ", rawTextures='" + rawTextures + '\'' +
+                    ", rawSignature='" + rawSignature + '\'' +
+                    ", timestamp=" + timestamp +
+                    ", profileId='" + profileId + '\'' +
+                    ", profileName='" + profileName + '\'' +
+                    ", skinURL='" + skinURL + '\'' +
+                    ", capeURL='" + capeURL + '\'' +
+                    '}';
+        }
+
+        public UUID getUuid() {
+            return uuid;
+        }
+
+        public void setUuid(UUID uuid) {
+            this.uuid = uuid;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getRawTextures() {
+            return rawTextures;
+        }
+
+        public void setRawTextures(String rawTextures) {
+            this.rawTextures = rawTextures;
+        }
+
+        public String getRawSignature() {
+            return rawSignature;
+        }
+
+        public void setRawSignature(String rawSignature) {
+            this.rawSignature = rawSignature;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
+
+        public String getProfileId() {
+            return profileId;
+        }
+
+        public void setProfileId(String profileId) {
+            this.profileId = profileId;
+        }
+
+        public String getProfileName() {
+            return profileName;
+        }
+
+        public void setProfileName(String profileName) {
+            this.profileName = profileName;
+        }
+
+        public String getSkinURL() {
+            return skinURL;
+        }
+
+        public void setSkinURL(String skinURL) {
+            this.skinURL = skinURL;
+        }
+
+        public String getCapeURL() {
+            return capeURL;
+        }
+
+        public void setCapeURL(String capeURL) {
+            this.capeURL = capeURL;
+        }
+    }
+
+    /**
+     * Pair is a generic class that holds two objects of any type.
+     */
+    public static class Pair<A, B> {
+        private A a;
+        private B b;
+
+        public Pair(A a, B b) {
+            this.a = a;
+            this.b = b;
+        }
+
+        public A getKey() {
+            return a;
+        }
+
+        public B getValue() {
+            return b;
+        }
+
+        public void setKey(A a) {
+            this.a = a;
+        }
+
+        public void setValue(B b) {
+            this.b = b;
+        }
+    }
+
+    /**
+     * Triple is a class that holds three objects of any type.
+     */
+    public static class Triple<A, B, C> {
+        private A a;
+        private B b;
+        private C c;
+
+        public Triple(A a, B b, C c) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+
+        public A getA() {
+            return a;
+        }
+
+        public B getB() {
+            return b;
+        }
+
+        public C getC() {
+            return c;
+        }
+
+        public void setA(A a) {
+            this.a = a;
+        }
+
+        public void setB(B b) {
+            this.b = b;
+        }
+
+        public void setC(C c) {
+            this.c = c;
+        }
+    }
+
+    public static class SavedInventory {
+        private String id;
+        private String name;
+        private long creation;
+        private String creator;
+        private boolean opOnly;
+        private ArrayList<ItemStack> content;
+        private ItemStack[] armor;
+
+        public SavedInventory(String id, String name, long creation, String creator,
+                              boolean opOnly, String content, String armor) {
+            this.id = id;
+            this.name = name;
+            this.creation = creation;
+            this.creator = creator;
+            this.opOnly = opOnly;
+            setRawContent(content);
+            setRawArmor(armor);
+        }
+
+        public SavedInventory(String id, String name, String creator, boolean opOnly,
+                              List<ItemStack> content, ItemStack[] armor) {
+            this.id = id;
+            this.name = name;
+            this.creation = new Date().getTime();
+            this.creator = creator;
+            this.opOnly = opOnly;
+            setContent(content);
+            setArmor(armor);
+        }
+
+        public static SavedInventory fromMap(Map<String, Object> map) {
+            try {
+                String id = (String) map.get("id");
+                String name = map.containsKey("name") ? (String) map.get("name") : null;
+                long creation = map.containsKey("creation") ? (long) map.get("creation") : 0;
+                String creator = map.containsKey("creator") ? (String) map.get("creator") : null;
+                boolean opOnly = map.containsKey("op-only") && (boolean) map.get("op-only");
+                String content = map.containsKey("content") ? (String) map.get("content") : null;
+                String armor = map.containsKey("armor") ? (String) map.get("armor") : null;
+                return new SavedInventory(id, name, creation, creator, opOnly, content, armor);
+            } catch (Exception e) {
+                System.out.println(Color.RED + "Error while loading an inventory: " + e.getMessage());
+                e.printStackTrace();
+                System.out.println("So the inventory will be ignored.\nStop modifying the configs... lol. ^^" + Color.RESET);
+                return null;
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "SavedInventory{" +
+                    "id='" + id + '\'' +
+                    ", name='" + name + '\'' +
+                    ", creation=" + creation +
+                    ", creator='" + creator + '\'' +
+                    ", opOnly=" + opOnly +
+                    ", content='" + content + '\'' +
+                    ", armor='" + Arrays.toString(armor) + '\'' +
+                    '}';
+        }
+
+        public Map<String, Object> toMap() {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            map.put("name", name);
+            map.put("creation", creation);
+            map.put("creator", creator);
+            map.put("op-only", opOnly);
+            map.put("content", getRawContent());
+            map.put("armor", getRawArmor());
+            return map;
+        }
+
+        public void load(Player p) {
+            PlayerInventory inv = p.getInventory();
+            if (content != null) {
+                inv.addItem(content.stream().map(is -> is == null ?
+                        new ItemStack(Material.AIR) : is).toArray(ItemStack[]::new));
+            }
+            if (armor != null) {
+                for (int i = 0; i < armor.length && i < 4; i++) {
+                    if (armor[i] != null) {
+                        if(inv.getArmorContents()[i] != null || inv.getArmorContents()[i].getType() != Material.AIR) {
+                            inv.addItem(armor[i]);
+                        } else {
+                            ItemStack[] a = inv.getArmorContents().clone();
+                            a[i] = armor[i];
+                            inv.setArmorContents(a);
+                        }
+                    }
+                }
+            }
+        }
+
+        public ArrayList<ItemStack> getContent() {
+            return content;
+        }
+
+        public ItemStack[] getArmor() {
+            return armor;
+        }
+
+        public void setContent(Collection<ItemStack> content) {
+            this.content = new ArrayList<>(content);
+        }
+
+        public void setArmor(ItemStack[] armor) {
+            this.armor = new ItemStack[4];
+            for (int i = 0; i < armor.length && i < 4; i++) {
+                this.armor[i] = armor[i];
+            }
+        }
+
+        public String getRawContent() {
+            return itemStackArrayToBase64(content.toArray(new ItemStack[0]));
+        }
+
+        public String getRawArmor() {
+            return itemStackArrayToBase64(armor);
+        }
+
+        public void setRawContent(String content) {
+            setContent(new ArrayList<>(Arrays.asList(itemStackArrayFromBase64(content))));
+        }
+
+        public void setRawArmor(String armor) {
+            setArmor(itemStackArrayFromBase64(armor));
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public long getCreation() {
+            return creation;
+        }
+
+        public String getCreator() {
+            return creator;
+        }
+
+        public boolean isOpOnly() {
+            return opOnly;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public void setCreation(long creation) {
+            this.creation = creation;
+        }
+
+        public void setCreator(String creator) {
+            this.creator = creator;
+        }
+
+        public void setOpOnly(boolean opOnly) {
+            this.opOnly = opOnly;
+        }
+    }
 
     /**
      * If the location is within the bounds of the two locations, return true
@@ -418,142 +796,6 @@ public class Utils {
         }
     }
 
-    public static class MojangProfile {
-        private UUID uuid;
-        private String name;
-        private String rawTextures;
-        private String rawSignature;
-        private long timestamp;
-        private String profileId;
-        private String profileName;
-        private String skinURL;
-        private String capeURL;
-
-        public MojangProfile(UUID uuid, String name, String rawTextures, String rawSignature) {
-            this.uuid = uuid;
-            this.name = name;
-            this.rawTextures = rawTextures;
-            this.rawSignature = rawSignature;
-
-            timestamp = 0;
-            profileId = null;
-            profileName = null;
-            skinURL = null;
-            capeURL = null;
-
-            try {
-                JSONObject obj = (JSONObject) new JSONParser().parse(new String(Base64.getDecoder().decode(this.rawTextures)));
-                if (obj.containsKey("timestamp"))
-                    timestamp = Long.parseLong(obj.get("timestamp").toString());
-                if (obj.containsKey("profileId"))
-                    profileId = obj.get("profileId").toString();
-                if (obj.containsKey("profileName"))
-                    profileName = obj.get("profileName").toString();
-                if (obj.containsKey("textures")) {
-                    JSONObject textures = (JSONObject) obj.get("textures");
-                    if (textures.containsKey("SKIN")) {
-                        JSONObject skin = (JSONObject) textures.get("SKIN");
-                        if (skin.containsKey("url"))
-                            skinURL = skin.get("url").toString();
-                    }
-                    if (textures.containsKey("CAPE")) {
-                        JSONObject cape = (JSONObject) textures.get("CAPE");
-                        if (cape.containsKey("url"))
-                            capeURL = cape.get("url").toString();
-                    }
-                }
-            } catch (ParseException ignored) {
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "MojangProfile{" +
-                    "uuid=" + uuid +
-                    ", name='" + name + '\'' +
-                    ", rawTextures='" + rawTextures + '\'' +
-                    ", rawSignature='" + rawSignature + '\'' +
-                    ", timestamp=" + timestamp +
-                    ", profileId='" + profileId + '\'' +
-                    ", profileName='" + profileName + '\'' +
-                    ", skinURL='" + skinURL + '\'' +
-                    ", capeURL='" + capeURL + '\'' +
-                    '}';
-        }
-
-        public UUID getUuid() {
-            return uuid;
-        }
-
-        public void setUuid(UUID uuid) {
-            this.uuid = uuid;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getRawTextures() {
-            return rawTextures;
-        }
-
-        public void setRawTextures(String rawTextures) {
-            this.rawTextures = rawTextures;
-        }
-
-        public String getRawSignature() {
-            return rawSignature;
-        }
-
-        public void setRawSignature(String rawSignature) {
-            this.rawSignature = rawSignature;
-        }
-
-        public long getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(long timestamp) {
-            this.timestamp = timestamp;
-        }
-
-        public String getProfileId() {
-            return profileId;
-        }
-
-        public void setProfileId(String profileId) {
-            this.profileId = profileId;
-        }
-
-        public String getProfileName() {
-            return profileName;
-        }
-
-        public void setProfileName(String profileName) {
-            this.profileName = profileName;
-        }
-
-        public String getSkinURL() {
-            return skinURL;
-        }
-
-        public void setSkinURL(String skinURL) {
-            this.skinURL = skinURL;
-        }
-
-        public String getCapeURL() {
-            return capeURL;
-        }
-
-        public void setCapeURL(String capeURL) {
-            this.capeURL = capeURL;
-        }
-    }
-
     /**
      * Try to run the given runnable, and return true if it succeeded, or false if it failed.
      *
@@ -855,74 +1097,6 @@ public class Utils {
     }
 
     /**
-     * Pair is a generic class that holds two objects of any type.
-     */
-    public static class Pair<A, B> {
-        private A a;
-        private B b;
-
-        public Pair(A a, B b) {
-            this.a = a;
-            this.b = b;
-        }
-
-        public A getKey() {
-            return a;
-        }
-
-        public B getValue() {
-            return b;
-        }
-
-        public void setKey(A a) {
-            this.a = a;
-        }
-
-        public void setValue(B b) {
-            this.b = b;
-        }
-    }
-
-    /**
-     * Triple is a class that holds three objects of any type.
-     */
-    public static class Triple<A, B, C> {
-        private A a;
-        private B b;
-        private C c;
-
-        public Triple(A a, B b, C c) {
-            this.a = a;
-            this.b = b;
-            this.c = c;
-        }
-
-        public A getA() {
-            return a;
-        }
-
-        public B getB() {
-            return b;
-        }
-
-        public C getC() {
-            return c;
-        }
-
-        public void setA(A a) {
-            this.a = a;
-        }
-
-        public void setB(B b) {
-            this.b = b;
-        }
-
-        public void setC(C c) {
-            this.c = c;
-        }
-    }
-
-    /**
      * It takes a string, hash it, and returns a long
      *
      * @param s The string to hash.
@@ -976,5 +1150,84 @@ public class Utils {
         return exp <= 352 ? Math.sqrt(exp + 9) - 3
                 : exp <= 1507 ? 81.0 / 10.0 + Math.sqrt(2.0 / 5.0 * (exp - 7839.0 / 40.0))
                 : 325.0 / 18.0 + Math.sqrt(2.0 / 9.0 * (exp - 54215.0 / 72.0));
+    }
+
+    /**
+     * It takes an array of ItemStacks and converts it to a Base64 String
+     *
+     * @param items The ItemStack array to be converted.
+     * @return A Base64 {@link String} of the ItemStack array.
+     */
+    public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+
+            // Write the size of the inventory
+            dataOutput.writeInt(items.length);
+
+            // Save every element in the list
+            for (ItemStack item : items) {
+                dataOutput.writeObject(item);
+            }
+
+            // Serialize that array
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
+    }
+
+    /**
+     * It decodes and returns a ItemStack array from a given Base64 String.
+     *
+     * @param data The Base64 String to decode.
+     * @return The decoded ItemStack array.
+     */
+    public static ItemStack[] itemStackArrayFromBase64(String data) {
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack[] items = new ItemStack[dataInput.readInt()];
+
+            // Read the serialized inventory
+            for (int i = 0; i < items.length; i++) {
+                items[i] = (ItemStack) dataInput.readObject();
+            }
+
+            dataInput.close();
+            return items;
+        } catch (IOException | ClassNotFoundException e) {
+//            throw new IOException("Unable to decode class type.", e);
+            return new ItemStack[0];
+        }
+    }
+
+    @Deprecated
+    public static String itemStackToBase64(ItemStack item) throws IllegalStateException {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            BukkitObjectOutputStream dataOutput = new BukkitObjectOutputStream(outputStream);
+            dataOutput.writeInt(1);
+            dataOutput.writeObject(item);
+            dataOutput.close();
+            return Base64Coder.encodeLines(outputStream.toByteArray());
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to save item stacks.", e);
+        }
+    }
+
+    @Deprecated
+    public static ItemStack itemStackFromBase64(String data) {
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
+            BukkitObjectInputStream dataInput = new BukkitObjectInputStream(inputStream);
+            ItemStack item = (ItemStack) dataInput.readObject();
+            dataInput.close();
+            return item;
+        } catch (IOException | ClassNotFoundException e) {
+            return null;
+        }
     }
 }

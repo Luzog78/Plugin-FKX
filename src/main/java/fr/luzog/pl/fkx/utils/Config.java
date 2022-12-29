@@ -18,6 +18,12 @@ import java.util.stream.Collectors;
 
 public class Config {
 
+    public static class DuplicateKitException extends RuntimeException {
+        public DuplicateKitException(String message) {
+            super(message);
+        }
+    }
+
     public static class Globals extends Config {
         public static final String VERSION = "version", LANG = "lang", SEASON = "season", IP = "ip", ORGA = "orga",
                 OVERWORLD = "worlds.over", NETHER = "worlds.nether", END = "worlds.end",
@@ -200,6 +206,58 @@ public class Config {
             super.set(VANISH_PRE_SUF_IX, preSufIx, force);
             super.set(VANISH_IS_PREFIX, isPrefix, force);
             super.set(VANISH_PLAYERS, new ArrayList<>(players), force);
+            return this;
+        }
+    }
+
+    public static class Kit extends Config {
+        public static final String INFOS = "info", KITS = "kits";
+
+        public Kit(@Nonnull String path) {
+            super(path, true);
+        }
+
+        @Override
+        public Kit load() {
+            super.load();
+            return this;
+        }
+
+        @Override
+        public Kit save() {
+            super.save();
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public List<Map<Object, Object>> getInfos() {
+            List<Map<Object, Object>> l = new ArrayList<>();
+            for (Map<?, ?> map : super.getMapList(KITS))
+                try {
+                    l.add((Map<Object, Object>) map);
+                } catch (Exception ignored) {
+                }
+            return l;
+        }
+
+        public Kit setInfos(List<Map<Object, Object>> infos, boolean force) {
+            super.set(INFOS, infos, force);
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public List<Utils.SavedInventory> getKits() {
+            ArrayList<Utils.SavedInventory> l = new ArrayList<>();
+            for (Map<?, ?> map : super.getMapList(KITS))
+                try {
+                    l.add(Utils.SavedInventory.fromMap((Map<String, Object>) map));
+                } catch (Exception ignored) {
+                }
+            return l;
+        }
+
+        public Kit setKits(List<Utils.SavedInventory> kits, boolean force) {
+            super.set(KITS, kits.stream().map(Utils.SavedInventory::toMap).collect(Collectors.toList()), force);
             return this;
         }
     }
@@ -691,7 +749,7 @@ public class Config {
 
     public static class Player extends Config {
         public static final String LAST_UUID = "last-uuid", TEAM = "team", COMPASS = "compass",
-                STATS = "stats", PERMISSIONS = "permissions";
+                STATS = "stats", PERMISSIONS = "permissions", INVENTORIES = "inventories";
 
         public Player(@Nonnull String path) {
             super(path, true);
@@ -766,6 +824,22 @@ public class Config {
 
         public Player setPermissions(GPermissions perm, boolean force) {
             super.setPermissions(PERMISSIONS, perm, force);
+            return this;
+        }
+
+        @SuppressWarnings("unchecked")
+        public List<Utils.SavedInventory> getInventories() {
+            ArrayList<Utils.SavedInventory> l = new ArrayList<>();
+            for (Map<?, ?> map : super.getMapList(INVENTORIES))
+                try {
+                    l.add(Utils.SavedInventory.fromMap((Map<String, Object>) map));
+                } catch (Exception ignored) {
+                }
+            return l;
+        }
+
+        public Player setInventories(List<Utils.SavedInventory> inventories, boolean force) {
+            super.set(INVENTORIES, inventories.stream().map(Utils.SavedInventory::toMap).collect(Collectors.toList()), force);
             return this;
         }
     }
@@ -1206,6 +1280,12 @@ public class Config {
         if(isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return Float.parseFloat(config.get(path) + "");
+    }
+
+    public Map<String, Object> getMap(String path) {
+        if(isNull(path))
+            return new HashMap<>();
+        return config.getConfigurationSection(path).getValues(false);
     }
 
     public List<Boolean> getBoolList(String path) {

@@ -129,7 +129,7 @@ public class GuiLocks {
                         "§7/" + Main.CMD + " locks " + lock.getId() + " id §f<id>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 1 " + Main.CMD + " locks " + lock.getId() + " id %s%n" + Main.CMD + " locks",
+                        "input " + Main.CMD + " locks " + lock.getId() + " id %s%n" + Main.CMD + " locks",
                         Main.CMD + " locks " + lock.getId()
                 )
                 .setCantClickOn(true)
@@ -198,7 +198,7 @@ public class GuiLocks {
                         "§7Commande :",
                         "§7/" + Main.CMD + " locks " + lock.getId() + " level §f<niveau>"
                 )
-                .setGlobalCommandOnClick("input 1 " + Main.CMD + " locks " + lock.getId() + " level %s%n" + Main.CMD + " locks " + lock.getId())
+                .setGlobalCommandOnClick("input " + Main.CMD + " locks " + lock.getId() + " level %d%n" + Main.CMD + " locks " + lock.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(3, 4), Items.builder(Material.STAINED_GLASS_PANE)
@@ -257,7 +257,7 @@ public class GuiLocks {
                         "§7Commande :",
                         "§7/" + Main.CMD + " locks " + lock.getId() + " cooldown §f<délai>"
                 )
-                .setGlobalCommandOnClick("input 1 " + Main.CMD + " locks " + lock.getId() + " cooldown %s%n" + Main.CMD + " locks " + lock.getId())
+                .setGlobalCommandOnClick("input " + Main.CMD + " locks " + lock.getId() + " cooldown %d{0,}%n" + Main.CMD + " locks " + lock.getId())
                 .setCantClickOn(true)
                 .build());
         inv.setItem(Utils.posOf(7, 4), Items.builder(Material.STAINED_GLASS_PANE)

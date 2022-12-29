@@ -143,7 +143,7 @@ public class GuiCompass {
                         "§7/" + Main.CMD + " compass §f<x> <y> <z>"
                 )
                 .setLeftRightCommandOnClick(
-                        "input 3 " + Main.CMD + " compass custom %s %s %s%n" + Main.CMD + " compass",
+                        "input " + Main.CMD + " compass custom %l{x,y,z}%n" + Main.CMD + " compass",
                         Main.CMD + " compass"
                 )
                 .setCantClickOn(true)

@@ -18,7 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GCPlayers {
-    public static final String syntaxe = "/" + Main.CMD + " players [help | list | <player> [info | init | team | teams [<page>]] | page <page>]";
+    public static final String syntaxe = "/" + Main.CMD + " players [help | list | <player> ... | page <page>]",
+            syntaxe_players = "/" + Main.CMD + " players <player> [info | init | team | teams [<page>] | inv ...]",
+            syntaxe_players_inv = "/" + Main.CMD + " players <player> inv (save <clear?> [<id>] | load <delete?> [<id>] | del <id>)";
 
     public static boolean onCommand(CommandSender sender, Command command, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, command, msg, args, syntaxe);
@@ -53,6 +55,7 @@ public class GCPlayers {
                     u.err(CmdUtils.err_number_format + " (" + args[2] + ")");
                 }
         } else {
+            u.setSyntaxe(syntaxe_players);
             GPlayer gPlayer = GManager.getCurrentGame().getPlayer(args[1], false);
             Player p = gPlayer == null || gPlayer.getPlayer() == null ? Bukkit.getPlayerExact(args[1]) : gPlayer.getPlayer();
             if (args.length >= 3)
@@ -83,8 +86,8 @@ public class GCPlayers {
                     if (gPlayer == null || gPlayer.getTeam() == null)
                         u.err("Le joueur n'a pas de team");
                     else if (sender instanceof Player)
-                            u.getPlayer().openInventory(GuiTeams.getTeamInventory(u.getPlayer(), gPlayer.getTeam(),
-                                    Main.CMD + " players " + u.getPlayer().getName()));
+                        u.getPlayer().openInventory(GuiTeams.getTeamInventory(u.getPlayer(), gPlayer.getTeam(),
+                                Main.CMD + " players " + u.getPlayer().getName()));
                     else
                         u.err(CmdUtils.err_not_player);
                 } else if (args[2].equalsIgnoreCase("teams")) {
@@ -100,6 +103,28 @@ public class GCPlayers {
                         }
                     else
                         u.err(CmdUtils.err_not_player);
+                } else if (args[2].equalsIgnoreCase("inv")) {
+                    u.setSyntaxe(syntaxe_players_inv);
+                    if (gPlayer != null) {
+                        if (args.length >= 4) {
+                            if (args[3].equalsIgnoreCase("save")) {
+                                if (args.length >= 5 && (args[4].equalsIgnoreCase("true") || args[4].equalsIgnoreCase("false"))) {
+                                    String id = args.length >= 6 ? args[4] : null;
+                                    gPlayer.saveInventory(id, p.getInventory());
+                                    u.succ("Inventaire sauvegardé !");
+                                    if (args[4].equalsIgnoreCase("true"))
+                                        p.getInventory().clear();
+                                } else {
+                                    u.err("Voulez vous clear l'inventaire une fois enregistré ? (true/false)");
+                                    u.synt();
+                                }
+                            } else if (args[3].equalsIgnoreCase("load")) {
+                                // TODO : ??? gPlayer.getLastInventory(id, true);
+                            }
+                        } else
+                            u.synt();
+                    } else
+                        u.err("Joueur non trouvé");
                 } else
                     u.synt();
             else if (sender instanceof Player)

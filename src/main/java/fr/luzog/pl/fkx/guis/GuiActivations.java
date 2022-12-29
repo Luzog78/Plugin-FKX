@@ -91,7 +91,7 @@ public class GuiActivations {
                         + "\n "
                         + "\n§7Commande :"
                         + "\n§7/" + Main.CMD + " activations " + opt.getId() + " set §8(§2on §8|§4 off §8|§f <jour>§8)",
-                refresh, "input 1 " + Main.CMD + " activations " + opt.getId() + " set %s%n" + refresh));
+                refresh, "input " + Main.CMD + " activations " + opt.getId() + " set %s%n" + refresh));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Items.red())
                 .setAmount(3)

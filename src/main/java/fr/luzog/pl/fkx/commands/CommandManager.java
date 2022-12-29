@@ -11,7 +11,7 @@ import fr.luzog.pl.fkx.commands.Other.Test;
 import fr.luzog.pl.fkx.commands.Server.R;
 import fr.luzog.pl.fkx.commands.Utils.Craft;
 import fr.luzog.pl.fkx.commands.Utils.EnderChest;
-import fr.luzog.pl.fkx.commands.Utils.InputText;
+import fr.luzog.pl.fkx.commands.Utils.InputGUIAndTools;
 import fr.luzog.pl.fkx.commands.Utils.Trash;
 import org.bukkit.GameMode;
 import org.bukkit.command.CommandExecutor;
@@ -71,7 +71,7 @@ public class CommandManager {
             // Utils
             new CommandItem(new Craft(), "craft"),
             new CommandItem(new EnderChest(), "ec"),
-            new CommandItem(new InputText(), "input"),
+            new CommandItem(new InputGUIAndTools(), "input"),
             new CommandItem(new Trash(), "trash")
     ));
 

@@ -14,7 +14,7 @@ public class Test implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, "/test");
 
-        u.succ("Test!");
+        u.succ("test");
 
         return false;
     }

@@ -354,16 +354,16 @@ public class GManager {
                         new GPermissions.Item(GPermissions.Type.PLACE, GPermissions.Definition.OFF),
                         new GPermissions.Item(GPermissions.Type.MOBS, GPermissions.Definition.OFF))), false);
         setNormalZones(new ArrayList<GZone>() {{
-//            add(new FKZone("nether", FKZone.Type.ZONE,
-//                    Bukkit.getWorld("world_nether").getSpawnLocation(),
-//                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-//                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-//                    new FKPermissions(FKPermissions.Definition.ON)));
-//            add(new FKZone("end", FKZone.Type.ZONE,
-//                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
-//                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-//                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
-//                    new FKPermissions(FKPermissions.Definition.ON)));
+            add(new GZone("nether", GZone.Type.ZONE,
+                    Bukkit.getWorld("world_nether").getSpawnLocation(),
+                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    new GPermissions(GPermissions.Definition.ON)));
+            add(new GZone("end", GZone.Type.ZONE,
+                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
+                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    new GPermissions(GPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);
         setGods(new GTeam("gods", "Dieux", SpecialChars.STAR_5_6 + " Dieu ||  ", null, ChatColor.DARK_RED,

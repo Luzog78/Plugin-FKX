@@ -3,14 +3,17 @@ package fr.luzog.pl.fkx.game;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.PlayerStats;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 import java.io.File;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class GPlayer {
 
@@ -304,6 +307,50 @@ public class GPlayer {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setPermissions(personalPermissions, true).save();
+        }
+    }
+
+    public void saveInventory(@Nullable String id, PlayerInventory inventory) {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+            inventories.add(new Utils.SavedInventory(id + "", null, null, false,
+                    Arrays.asList(inventory.getContents()), inventory.getArmorContents()));
+            getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+        }
+    }
+
+    public Utils.SavedInventory getLastInventory(String id, boolean delete) {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+            Utils.SavedInventory inventory = inventories.stream().filter(inv -> inv.getId().equals(id + ""))
+                    .max(Comparator.comparing(Utils.SavedInventory::getCreation)).orElse(null);
+            if (delete && inventory != null) {
+                inventories.remove(inventory);
+                getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+            }
+            return inventory;
+        }
+        return null;
+    }
+
+    public List<Utils.SavedInventory> getInventories() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            return getConfig(getManager().getId()).load().getInventories();
+        }
+        return new ArrayList<>();
+    }
+
+    public void clearInventories() {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            getConfig(getManager().getId()).load().setInventories(new ArrayList<>(), true).save();
         }
     }
 }

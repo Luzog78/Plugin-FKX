@@ -84,7 +84,7 @@ public class GuiDate {
                         + "\n "
                         + "\n§7Commande :"
                         + "\n§7/" + Main.CMD + " date day set §f<jour>",
-                refresh, "input 1 " + Main.CMD + " date day set %s%n" + refresh));
+                refresh, "input " + Main.CMD + " date day set %d%n" + refresh));
 
         inv.setItem(Utils.posOf(1, 1), Items.builder(Items.red())
                 .setAmount(3)
@@ -170,7 +170,7 @@ public class GuiDate {
                         + "\n§7/" + Main.CMD + " date time set §f<time>"
                         + "\n§7/" + Main.CMD + " date time set §f<moment>"
                         + "\n§7/" + Main.CMD + " date time set §f<hh>:<mm>",
-                refresh, "input 1 " + Main.CMD + " date time set %s%n" + refresh));
+                refresh, "input " + Main.CMD + " date time set %s%n" + refresh));
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 3; j++)
@@ -223,7 +223,7 @@ public class GuiDate {
                         + "\n§7/" + Main.CMD + " date weather set §6sun §8[§f<timeout>§8]"
                         + "\n§7/" + Main.CMD + " date weather set §9rain §8[§f<timeout>§8]"
                         + "\n§7/" + Main.CMD + " date weather set §8thunder §8[§f<timeout>§8]",
-                refresh, "input 2 " + Main.CMD + " date weather set %s %s%n" + refresh));
+                refresh, "input " + Main.CMD + " date weather set %s %d{0,}%n" + refresh));
 
         inv.setItem(Utils.posOf(2, 2), Items.builder(Material.BUCKET)
                 .setName("§6Amener le Soleil")

@@ -23,7 +23,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 2.2";
+    public static final Object VERSION = "Version 2.3";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
@@ -34,6 +34,7 @@ public class Main extends JavaPlugin implements Listener {
     public static World world = null, nether = null, end = null;
 
     public static Config.Globals globalConfig;
+    public static Config.Kit kitConfig;
 
     public static boolean customCrafts, customCraftingTable, customLootingBlocksSystem, customLootingMobsSystem;
 
@@ -57,6 +58,20 @@ public class Main extends JavaPlugin implements Listener {
                 .setCustomLootingMobsSystemActivated(true, false)
                 .setAdActivated(true, false)
                 .setCompassActivated(true, false)
+                .save()
+                .load(); // Reload the config for the next lines
+
+        kitConfig = new Config.Kit("Kit.yml").load()
+                .setInfos(Collections.singletonList(new HashMap<Object, Object>() {{
+                    put("id", "Identifier string (must be unique)");
+                    put("name", "Display name of the kit (can be colored or null)");
+                    put("creation", "Creation timestamp (in milliseconds)");
+                    put("creator", "Creator name (can be null)");
+                    put("op-only", "Bolean value of the kit being only for OPs");
+                    put("content", "Base64 encoded ItemStack array of the kit content (max length must be 36)");
+                    put("armor", "Base64 encoded ItemStack array of the kit armor (length must be 4)");
+                }}), true)
+                .setKits(new ArrayList<>(), false)
                 .save()
                 .load(); // Reload the config for the next lines
 

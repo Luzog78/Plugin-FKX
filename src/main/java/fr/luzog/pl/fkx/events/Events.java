@@ -5,7 +5,7 @@ import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
 import fr.luzog.pl.fkx.commands.Other.Ad;
-import fr.luzog.pl.fkx.commands.Utils.InputText;
+import fr.luzog.pl.fkx.commands.Utils.InputGUIAndTools;
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPermissions;
 import fr.luzog.pl.fkx.game.GPickableLocks;
@@ -44,7 +44,7 @@ public class Events implements Listener {
         add(new Crafting());
         add(new Ad());
         add(new GPickableLocks.Listener());
-        add(new InputText());
+        add(new InputGUIAndTools());
         add(new InCaseThereIsAProblem.Listener());
 
         /* *** - Raw Listeners - *** */
