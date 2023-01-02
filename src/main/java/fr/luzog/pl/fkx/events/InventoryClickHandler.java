@@ -96,7 +96,9 @@ public class InventoryClickHandler implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (!s.equalsIgnoreCase("null"))
+                                if (s.equalsIgnoreCase("exit"))
+                                    e.getWhoClicked().closeInventory();
+                                else if (!s.equalsIgnoreCase("null"))
                                     ((Player) e.getWhoClicked()).performCommand(s);
                             }
                         }.runTaskLater(Main.instance, i);
@@ -107,7 +109,9 @@ public class InventoryClickHandler implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (!s.equalsIgnoreCase("null"))
+                                if (s.equalsIgnoreCase("exit"))
+                                    e.getWhoClicked().closeInventory();
+                                else if (!s.equalsIgnoreCase("null"))
                                     ((Player) e.getWhoClicked()).performCommand(s);
                             }
                         }.runTaskLater(Main.instance, i);
@@ -118,7 +122,9 @@ public class InventoryClickHandler implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (!s.equalsIgnoreCase("null"))
+                                if (s.equalsIgnoreCase("exit"))
+                                    e.getWhoClicked().closeInventory();
+                                else if (!s.equalsIgnoreCase("null"))
                                     ((Player) e.getWhoClicked()).performCommand(s);
                             }
                         }.runTaskLater(Main.instance, i);
@@ -129,7 +135,9 @@ public class InventoryClickHandler implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (!s.equalsIgnoreCase("null"))
+                                if (s.equalsIgnoreCase("exit"))
+                                    e.getWhoClicked().closeInventory();
+                                else if (!s.equalsIgnoreCase("null"))
                                     ((Player) e.getWhoClicked()).performCommand(s);
                             }
                         }.runTaskLater(Main.instance, i);
@@ -140,7 +148,9 @@ public class InventoryClickHandler implements Listener {
                         new BukkitRunnable() {
                             @Override
                             public void run() {
-                                if (!s.equalsIgnoreCase("null"))
+                                if (s.equalsIgnoreCase("exit"))
+                                    e.getWhoClicked().closeInventory();
+                                else if (!s.equalsIgnoreCase("null"))
                                     ((Player) e.getWhoClicked()).performCommand(s);
                             }
                         }.runTaskLater(Main.instance, i);

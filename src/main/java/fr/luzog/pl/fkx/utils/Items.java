@@ -32,6 +32,10 @@ public class Items {
         return i(Material.STAINED_GLASS_PANE, 1, (short) 4, " ", false, true, true);
     }
 
+    public static ItemStack pink() {
+        return i(Material.STAINED_GLASS_PANE, 1, (short) 6, " ", false, true, true);
+    }
+
     public static ItemStack lime() {
         return i(Material.STAINED_GLASS_PANE, 1, (short) 5, " ", false, true, true);
     }

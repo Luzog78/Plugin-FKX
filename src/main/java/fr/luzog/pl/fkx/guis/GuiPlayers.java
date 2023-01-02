@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.guis;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Cheat.Freeze;
+import fr.luzog.pl.fkx.commands.Fun.Head;
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Heads;
@@ -31,7 +32,7 @@ public class GuiPlayers {
 
     public static ItemStack getMain(@Nullable String from, String lastLoreLine, String command,
                                     Integer size, Integer online, Integer max) {
-        return Items.builder(Heads.MISC_EARTH1.getSkull())
+        return Items.builder(Heads.MISC_EARTH.getSkull())
                 .setName("§aListe des joueurs")
                 .setLore((from == null ? "" : "§a de " + from + "\n")
                         + "§8" + Guis.loreSeparator
@@ -376,6 +377,20 @@ public class GuiPlayers {
                 )
                 .setCantClickOn(true)
                 .setGlobalCommandOnClick("freeze " + player + "\n" + Main.CMD + " players " + player)
+                .build());
+
+        inv.setItem(Utils.posOf(7, 1), Items.builder(Heads.GREEN_CHEST.getSkull())
+                .setName("§3Inventaires")
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic pour voir les",
+                        "§7 inventaires sauvegardés",
+                        " ",
+                        "§7Commande :",
+                        "§7/" + Main.CMD + " players " + player + " inv"
+                )
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(Main.CMD + " players " + player + " inv")
                 .build());
 
         return inv;

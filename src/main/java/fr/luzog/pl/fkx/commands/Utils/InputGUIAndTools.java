@@ -398,7 +398,10 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
 
             for (int i = types.length - 1; i >= 0; i--) {
                 String s = results[i] + "";
-                sb.insert(indexes[i], s);
+                if (s.equals("") && sb.charAt(indexes[i]) == ' ' && (indexes[i] == 0 || sb.charAt(indexes[i] - 1) == ' '))
+                    sb.replace(indexes[i], indexes[i] + 1, "");
+                else
+                    sb.insert(indexes[i], s);
             }
 
             return sb.toString();
@@ -441,7 +444,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                             "  §7Notez qu'il faut remplacer le '>'",
                             "  §7 sinon, il sera pris en compte.",
                             "  §7Par ailleurs, si vous ne souhaitez",
-                            "  §7 préciser un argument, entrez '.'",
+                            "  §7 préciser un argument, supprimez le tout.",
                             " " + (!isWandable ? "" : ""
                                     + "\n  §dVous pouvez utiliser le Tool"
                                     + "\n  §d pour sélectionner une position."
@@ -451,10 +454,10 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                             "  §7" + command.getCommand().replace("\n", "§8\\n\n  §7"),
                             (command.getActual() == 0 ? "" : " "
                                     + "  §7Résultats :"
-                                    + "\n  §7 - §f" + String.join("\n  §7 - §f",
-                                    Arrays.stream(command.getResults())
-                                            .map(Object::toString)
-                                            .collect(Collectors.toCollection(ArrayList::new)))),
+                                    + "\n  §7 - §f" + Arrays.stream(command.getResults())
+                                    .filter(Objects::nonNull)
+                                    .map(Object::toString)
+                                    .collect(Collectors.joining("\n  §7 - §f"))),
                             " ",
                             "§8" + Utils.loreSeparator
                     )
@@ -470,7 +473,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
     }
 
     public static Utils.Pair<ItemStack, String> getTool(InputCommand command, Double x, Double y, Double z,
-                                     Float yaw, Float pitch, String world) {
+                                                        Float yaw, Float pitch, String world) {
         DecimalFormat df = new DecimalFormat("0.0###", new DecimalFormatSymbols(Locale.US));
         df.setRoundingMode(RoundingMode.HALF_DOWN);
         DecimalFormat ddf = new DecimalFormat("0.0#", new DecimalFormatSymbols(Locale.US));
@@ -663,7 +666,9 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        if (!c.equalsIgnoreCase("null") && !c.equals(""))
+                        if (c.equalsIgnoreCase("exit"))
+                            p.closeInventory();
+                        else if (!c.equalsIgnoreCase("null") && !c.equals(""))
                             p.performCommand(c);
                     }
                 }.runTaskLater(Main.instance, i);
@@ -747,7 +752,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
 
                 if (e.getRawSlot() == 2) {
                     String name = e.getCurrentItem().getItemMeta().getDisplayName();
-                    if (name.equals(".")) {
+                    if (!e.getCurrentItem().getItemMeta().hasDisplayName()) {
                         if (in.getValue().addResult("", true) == null) {
                             e.getWhoClicked().sendMessage("§cErreur : la valeur entrée n'est pas valide !");
                             return;
@@ -816,9 +821,9 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                     y = (double) e.getClickedBlock().getY();
                     z = (double) e.getClickedBlock().getZ();
                     world = e.getClickedBlock().getWorld().getName();
-                    if(tag.hasKey(wandYawTag))
+                    if (tag.hasKey(wandYawTag))
                         yaw = tag.getFloat(wandYawTag);
-                    if(tag.hasKey(wandPitchTag))
+                    if (tag.hasKey(wandPitchTag))
                         pitch = tag.getFloat(wandPitchTag);
                     break;
                 case RIGHT_CLICK_BLOCK:
@@ -827,9 +832,9 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                     y = loc.getY() + 1;
                     z = loc.getZ();
                     world = loc.getWorld().getName();
-                    if(tag.hasKey(wandYawTag))
+                    if (tag.hasKey(wandYawTag))
                         yaw = tag.getFloat(wandYawTag);
-                    if(tag.hasKey(wandPitchTag))
+                    if (tag.hasKey(wandPitchTag))
                         pitch = tag.getFloat(wandPitchTag);
                     break;
                 case LEFT_CLICK_AIR:
@@ -837,9 +842,9 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                     y = e.getPlayer().getLocation().getY();
                     z = e.getPlayer().getLocation().getZ();
                     world = e.getPlayer().getLocation().getWorld().getName();
-                    if(tag.hasKey(wandYawTag))
+                    if (tag.hasKey(wandYawTag))
                         yaw = tag.getFloat(wandYawTag);
-                    if(tag.hasKey(wandPitchTag))
+                    if (tag.hasKey(wandPitchTag))
                         pitch = tag.getFloat(wandPitchTag);
                     break;
                 case RIGHT_CLICK_AIR:

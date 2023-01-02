@@ -14,7 +14,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
-import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,6 +28,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Utils {
 
@@ -303,8 +303,8 @@ public class Utils {
                     '}';
         }
 
-        public Map<String, Object> toMap() {
-            Map<String, Object> map = new HashMap<>();
+        public LinkedHashMap<String, Object> toMap() {
+            LinkedHashMap<String, Object> map = new LinkedHashMap<>();
             map.put("id", id);
             map.put("name", name);
             map.put("creation", creation);
@@ -315,11 +315,37 @@ public class Utils {
             return map;
         }
 
-        public void load(Player p) {
+        public int count() {
+            int count = 0;
+            for (ItemStack item : Stream.concat(content.stream(), Arrays.stream(armor)).toArray(ItemStack[]::new)) {
+                if (item != null && item.getType() != Material.AIR) {
+                    count += item.getAmount();
+                }
+            }
+            return count;
+        }
+
+        /**
+         * It equips the player with the current inventory.
+         *
+         * @param p The player to equip the kit to
+         * @param clear Whether to clear the player's inventory before equipping the kit.<br>
+         *              If <i style="color: #ffffff">false</i>, the content will be <b><i>ADDED</i></b> and not <b><i>PLACED</i></b>.
+         */
+        public void equip(Player p, boolean clear) {
             PlayerInventory inv = p.getInventory();
+            if (clear) {
+                inv.clear();
+                inv.setArmorContents(null);
+            }
             if (content != null) {
-                inv.addItem(content.stream().map(is -> is == null ?
-                        new ItemStack(Material.AIR) : is).toArray(ItemStack[]::new));
+                ItemStack[] items = content.stream().map(is -> is == null ?
+                        new ItemStack(Material.AIR) : is).toArray(ItemStack[]::new);
+                if (!clear)
+                    inv.addItem(items);
+                else
+                    for (int i = 0; i < items.length && i < 36; i++)
+                        inv.setItem(i, items[i]);
             }
             if (armor != null) {
                 for (int i = 0; i < armor.length && i < 4; i++) {

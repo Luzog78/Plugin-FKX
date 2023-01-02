@@ -26,7 +26,8 @@ public class GuiGlobal {
     public static ItemStack getMainItem(GManager game, String lastLoreLine, String command) {
         if (game == null)
             return Items.l_gray();
-        return Items.builder(game.getState() == GManager.State.ENDED ? Heads.MISC_PURPLE_ORB.getSkull() : Heads.MISC_BLUE_ORB.getSkull())
+        return Items.builder(game.getState() == GManager.State.ENDED ? Heads.MISC_ENDER_PEARL_PURPLE.getSkull()
+                        : Heads.MISC_ENDER_PEARL_BLUE.getSkull())
                 .setName("§f" + game.getId())
                 .setLore(
                         "§8" + Guis.loreSeparator,
@@ -52,7 +53,10 @@ public class GuiGlobal {
         Inventory inv = Guis.getBaseInventory("§bStatus", 36, back,
                 getMainItem(game, null, "null"), null);
 
-        inv.setItem(Utils.posOf(4, 1), Items.builder(Heads.CHAR_P.getSkull())
+        inv.setItem(Utils.posOf(4, 1), Items.builder(
+                        game.getState() == GManager.State.PAUSED ? Heads.MISC_PLAY_BUTTON_RUBY.getSkull()
+                                : game.getState() == GManager.State.RUNNING ? Heads.MISC_PLAY_BUTTON_EMERALD.getSkull()
+                                : Heads.MISC_PLAY_BUTTON_SILVER.getSkull())
                 .setName("§bStatus : §a" + game.getState().name())
                 .setLore(
                         "§8" + Guis.loreSeparator,
@@ -207,7 +211,10 @@ public class GuiGlobal {
                 "Clic pour voir plus\n \n§7Commande :\n§7/" + Main.CMD + " perm", Main.CMD + " perm"));
         inv.setItem(Utils.posOf(2, 4), GuiActivations.getMainItem(
                 "Clic pour voir plus\n \n§7Commande :\n§7/" + Main.CMD + " activations", Main.CMD + " activations"));
-        inv.setItem(Utils.posOf(2, 3), Items.builder(Heads.CHAR_P.getSkull())
+        inv.setItem(Utils.posOf(2, 3), Items.builder(
+                        game.getState() == GManager.State.PAUSED ? Heads.MISC_PLAY_BUTTON_RUBY.getSkull()
+                                : game.getState() == GManager.State.RUNNING ? Heads.MISC_PLAY_BUTTON_EMERALD.getSkull()
+                                : Heads.MISC_PLAY_BUTTON_SILVER.getSkull())
                 .setName("§bStatus : §a" + game.getState().name())
                 .setLore(
                         "§8" + Guis.loreSeparator,

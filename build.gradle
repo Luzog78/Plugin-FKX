@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'fr.luzog.pl'
-version 'v2.3'
+version 'v2.4'
 
 compileJava.options.encoding = 'UTF-8'
 
@@ -18,10 +18,10 @@ repositories {
 dependencies {
     implementation 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     implementation 'com.github.azbh111:craftbukkit-1.8.8:R'
-    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation 'org.jetbrains:annotations:23.1.0'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
 
     implementation fileTree(dir: 'libs', include: ['**/*.jar'])
 }

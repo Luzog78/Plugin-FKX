@@ -50,7 +50,7 @@ public class Head implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         ArrayList<String> temp = new ArrayList<>(new HashSet<String>() {{
             addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toList()));
-            addAll(Arrays.stream(Heads.values()).map(Heads::getPlayer).collect(Collectors.toList()));
+            addAll(Arrays.stream(Heads.values()).map(Heads::getData).collect(Collectors.toList()));
         }});
         temp.removeIf(s -> !s.toLowerCase().startsWith(args[args.length - 1].toLowerCase()));
         return temp;

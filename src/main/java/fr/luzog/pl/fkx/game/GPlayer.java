@@ -14,6 +14,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class GPlayer {
 
@@ -27,6 +28,7 @@ public class GPlayer {
                 .setLastUuid(lastUuid, true)
                 .setTeam(teamId, true)
                 .setCompass(compass, true)
+                .setInventories(new ArrayList<>(), false)
                 .setStats(stats, true)
                 .setPermissions(personalPermissions, true)
 
@@ -310,15 +312,35 @@ public class GPlayer {
         }
     }
 
-    public void saveInventory(@Nullable String id, PlayerInventory inventory) {
+    public void saveInventory(@Nullable String id, @Nullable String name, @Nullable String creator, PlayerInventory inventory) {
         if (getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
             List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
-            inventories.add(new Utils.SavedInventory(id + "", null, null, false,
+            inventories.add(new Utils.SavedInventory(id + "", name, creator, false,
                     Arrays.asList(inventory.getContents()), inventory.getArmorContents()));
             getConfig(getManager().getId()).load().setInventories(inventories, true).save();
         }
+    }
+
+    public Utils.SavedInventory getInventory(String id, int idx, boolean delete) {
+        if (getManager() != null) {
+            if (!getConfig(getManager().getId()).exists())
+                saveToConfig(getManager().getId(), true);
+            List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+            try {
+                Utils.SavedInventory inventory = inventories.stream().filter(inv -> inv.getId().equals(id + ""))
+                        .collect(Collectors.toList()).get(idx);
+                if (delete && inventory != null) {
+                    inventories.remove(inventory);
+                    getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+                }
+                return inventory;
+            } catch (IndexOutOfBoundsException e) {
+                return null;
+            }
+        }
+        return null;
     }
 
     public Utils.SavedInventory getLastInventory(String id, boolean delete) {
@@ -335,6 +357,40 @@ public class GPlayer {
             return inventory;
         }
         return null;
+    }
+
+    public boolean deleteInventory(String id, int idx) {
+        try {
+            List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+            Utils.SavedInventory inventory = inventories.stream().filter(inv -> inv.getId().equals(id + ""))
+                    .collect(Collectors.toList()).get(idx);
+            inventories.remove(inventory);
+            getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+            return true;
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
+    }
+
+    public boolean deleteLastInventory(String id) {
+        List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+        Utils.SavedInventory inventory = inventories.stream().filter(inv -> inv.getId().equals(id + ""))
+                .max(Comparator.comparing(Utils.SavedInventory::getCreation)).orElse(null);
+        if (inventory == null)
+            return false;
+        inventories.remove(inventory);
+        getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+        return true;
+    }
+
+    public int deleteAllInventories(String id) {
+        List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
+        Stream<Utils.SavedInventory> s = inventories.stream().filter(inv -> inv.getId().equals(id + ""));
+        int size = (int) s.count();
+        s.forEach(inventories::remove);
+        if (size > 0)
+            getConfig(getManager().getId()).load().setInventories(inventories, true).save();
+        return size;
     }
 
     public List<Utils.SavedInventory> getInventories() {

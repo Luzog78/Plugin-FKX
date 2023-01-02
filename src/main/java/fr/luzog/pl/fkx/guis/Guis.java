@@ -1,17 +1,15 @@
 package fr.luzog.pl.fkx.guis;
 
-import fr.luzog.pl.fkx.utils.Items;
-import fr.luzog.pl.fkx.utils.SpecialChars;
-import fr.luzog.pl.fkx.utils.Utils;
+import fr.luzog.pl.fkx.utils.*;
+import fr.luzog.pl.fkx.utils.Utils.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class Guis {
 
@@ -199,7 +197,7 @@ public class Guis {
      * @return An {@link Inventory}
      */
     public static Inventory getPagedInventory(String name, int size, String back, @Nullable ItemStack main, @Nullable ItemStack second,
-                                              String navigationBaseCommand, int page, Collection<ItemStack> content) {
+                                              String navigationBaseCommand, int page, List<ItemStack> content) {
         Inventory inv = Bukkit.createInventory(null, size, name);
 
         if (size == 9) {
@@ -247,7 +245,7 @@ public class Guis {
                     : navigationArrow(page, max, true, navigationBaseCommand));
             inv.setItem(7, navigationFeather(page, max, isPerPage));
             inv.setItem(8, page + 1 == max || max == 0 ? Items.blue()
-                    : navigationArrow(page, max,false, navigationBaseCommand));
+                    : navigationArrow(page, max, false, navigationBaseCommand));
 
             int i = 0, start = 11;
             while (inv.firstEmpty() != -1) {
@@ -289,6 +287,263 @@ public class Guis {
             for (int ii = 0; ii < size; ii++)
                 if (inv.getItem(ii) == null || inv.getItem(ii).getType() == Material.AIR)
                     inv.setItem(ii, Items.gray());
+            return inv;
+        }
+    }
+
+    public static Inventory getInvInventory(String name, String back, @Nullable ItemStack main, @Nullable ItemStack second,
+                                            @Nullable ItemStack[] armor, ItemStack... content) {
+        Inventory inv = Bukkit.createInventory(null, 54, name);
+        Utils.fill(inv, 9, 35, false, Items.gray());
+        Utils.fill(inv, 36, 44, false, Items.yellow());
+        Utils.fill(inv, 48, 51, false, Items.pink());
+        for (int i : Arrays.asList(0, 1, 2, 6, 7, 45, 46, 47, 52, 53))
+            inv.setItem(i, Items.blue());
+        inv.setItem(3, Items.orange());
+        inv.setItem(5, Items.orange());
+        if (second != null)
+            inv.setItem(47, second);
+        inv.setItem(4, main == null ? Items.l_gray() : main);
+        inv.setItem(8, close());
+        if (back != null)
+            inv.setItem(0, back(back));
+
+        if (armor != null) {
+            ItemStack[] a = Stream.of(armor).map(is -> is == null || is.getType() == Material.AIR ?
+                            null : Items.builder(is.clone()).setCantClickOn(true).build())
+                    .limit(4).toArray(ItemStack[]::new);
+            for (int i = 0; i < a.length; i++)
+                if (a[i] != null)
+                    inv.setItem(48 + i, a[i]);
+        }
+
+        ItemStack[] h = Stream.of(content).map(is -> is == null || is.getType() == Material.AIR ?
+                        null : Items.builder(is.clone()).setCantClickOn(true).build())
+                .limit(9).toArray(ItemStack[]::new);
+        for (int i = 0; i < h.length; i++)
+            if (h[i] != null)
+                inv.setItem(36 + i, h[i]);
+
+        ItemStack[] c = Stream.of(content).map(is -> is == null || is.getType() == Material.AIR ?
+                        null : Items.builder(is.clone()).setCantClickOn(true).build())
+                .skip(9).limit(27).toArray(ItemStack[]::new);
+        for (int i = 0; i < c.length; i++)
+            if (c[i] != null)
+                inv.setItem(9 + i, c[i]);
+
+        return inv;
+    }
+
+    private static String generateOptions(int horizontalPosition, List<Utils.Pair<Integer, List<ItemStack>>> content) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < content.size(); i++) {
+            Utils.Pair<Integer, List<ItemStack>> pair = content.get(i);
+            if (pair.getKey() != 0)
+                sb.append(i).append(":").append(pair.getKey()).append(",");
+        }
+        if (sb.length() > 0)
+            sb.deleteCharAt(sb.length() - 1);
+        return horizontalPosition + (sb.length() > 0 ? ";" + sb : "");
+    }
+
+    private static String generateOptions(int horizontalPosition, List<Utils.Pair<Integer, List<ItemStack>>> content, int idx, int diff) {
+        List<Utils.Pair<Integer, List<ItemStack>>> temp = new ArrayList<>();
+        content.forEach(pair -> temp.add(new Utils.Pair<>(pair.getKey(), new ArrayList<>(pair.getValue()))));
+        try {
+            temp.get(idx).setKey(temp.get(idx).getKey() + diff);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
+        return generateOptions(horizontalPosition, temp);
+    }
+
+    private static ItemStack getComplexHorizontalNavigationItem(int horizontalIndex, int page, int size,
+                                                                int itemPerPage, boolean left,
+                                                                String navigationBaseCommand, int horizontalPosition,
+                                                                List<Utils.Pair<Integer, List<ItemStack>>> content) {
+        String cmd = navigationBaseCommand + " " + generateOptions(horizontalPosition, content,
+                horizontalIndex, left ? -1 : 1);
+        return (left ? page <= 0 : page + itemPerPage >= size) ? Items.blue()
+                : Items.builder((left ? Heads.ARROW_LEFT_OAK : Heads.ARROW_RIGHT_OAK).getSkull())
+                .setName("§fAller vers la " + (left ? "gauche" : "droite"))
+                .setLore(
+                        "§8" + Utils.loreSeparator,
+                        "§7Cliquez pour aller vers la " + (left ? "gauche" : "droite"),
+                        " ",
+                        "§8Page actuelle : §f" + (page + 1) + "§7/" + Math.max(1, size - itemPerPage + 1)
+                )
+                .setGlobalCommandOnClick(cmd)
+                .setCantClickOn(true)
+                .build();
+    }
+
+    public static Inventory getComplexScrollingInventory(String name, int size, String back,
+                                                         @Nullable ItemStack main, @Nullable ItemStack second,
+                                                         String navigationBaseCommand, int horizontalPosition,
+                                                         List<Utils.Pair<Integer, List<ItemStack>>> content) {
+        Inventory inv = Bukkit.createInventory(null, size, name);
+
+        ItemStack outOfBounds = Items.builder(Items.l_gray())
+                .setName("§7Pas d'item ici")
+                .setLore("§8" + Utils.loreSeparator)
+                .setCantClickOn(true)
+                .build();
+
+        int lines = (size <= 18 ? 1 : (size / 9) - 2);
+
+        String cmdUp = navigationBaseCommand + " " + generateOptions(horizontalPosition - 1, content),
+                cmdDown = navigationBaseCommand + " " + generateOptions(horizontalPosition + 1, content);
+
+        ItemStack up = horizontalPosition <= 0 ? Items.blue()
+                : Items.builder(Heads.ARROW_UP_OAK.getSkull())
+                .setName("§fAller vers le haut")
+                .setLore(
+                        "§8" + Utils.loreSeparator,
+                        "§7Cliquez pour aller vers le haut",
+                        " ",
+                        "§8Page actuelle : §f" + (horizontalPosition + 1) + "§7/" + Math.max(1, content.size() - lines + 1),
+                        " ",
+                        "§7Commande :",
+                        "§7/" + cmdUp
+                )
+                .setGlobalCommandOnClick(cmdUp)
+                .setCantClickOn(true)
+                .build(),
+                down = horizontalPosition + lines >= content.size() ? Items.blue()
+                        : Items.builder(Heads.ARROW_DOWN_OAK.getSkull())
+                        .setName("§fAller vers le bas")
+                        .setLore(
+                                "§8" + Utils.loreSeparator,
+                                "§7Cliquez pour aller vers le bas",
+                                " ",
+                                "§8Page actuelle : §f" + (horizontalPosition + 1) + "§7/" + Math.max(1, content.size() - lines + 1),
+                                " ",
+                                "§7Commande :",
+                                "§7/" + cmdDown
+                        )
+                        .setGlobalCommandOnClick(cmdDown)
+                        .setCantClickOn(true)
+                        .build();
+
+        if (size == 9) {
+            inv.setItem(0, back == null ? Items.blue() : back(back));
+            inv.setItem(1, main == null ? Items.l_gray() : main);
+            inv.setItem(2, second == null ? Items.orange() : second);
+            inv.setItem(8, close());
+
+            inv.setItem(3, up);
+            inv.setItem(7, down);
+
+            try {
+                Utils.Pair<Integer, List<ItemStack>> line = content.get(horizontalPosition);
+
+                inv.setItem(4, getComplexHorizontalNavigationItem(horizontalPosition,
+                        line.getKey(), line.getValue().size(), 1, true,
+                        navigationBaseCommand, horizontalPosition, content));
+                inv.setItem(6, getComplexHorizontalNavigationItem(horizontalPosition,
+                        line.getKey(), line.getValue().size(), 1, false,
+                        navigationBaseCommand, horizontalPosition, content));
+
+                ItemStack item = line.getValue().get(line.getKey());
+                inv.setItem(5, item == null || item.getType() == Material.AIR ? Items.l_gray() : item);
+            } catch (IndexOutOfBoundsException e) {
+                inv.setItem(4, Items.blue());
+                inv.setItem(6, Items.blue());
+                inv.setItem(5, outOfBounds);
+            }
+
+            return inv;
+        } else if (size == 18) {
+            inv.setItem(0, back == null ? Items.blue() : back(back));
+            inv.setItem(2, main == null ? Items.l_gray() : main);
+            inv.setItem(3, second == null ? Items.orange() : second);
+            inv.setItem(8, close());
+
+            inv.setItem(1, Items.blue());
+            inv.setItem(4, Items.blue());
+            inv.setItem(7, Items.blue());
+
+            inv.setItem(5, up);
+            inv.setItem(6, down);
+
+            try {
+                Utils.Pair<Integer, List<ItemStack>> line = content.get(horizontalPosition);
+
+                inv.setItem(9, getComplexHorizontalNavigationItem(horizontalPosition,
+                        line.getKey(), line.getValue().size(), 7, true,
+                        navigationBaseCommand, horizontalPosition, content));
+                inv.setItem(17, getComplexHorizontalNavigationItem(horizontalPosition,
+                        line.getKey(), line.getValue().size(), 7, false,
+                        navigationBaseCommand, horizontalPosition, content));
+
+                for (int i = 0; i < 7; i++) {
+                    try {
+                        ItemStack item = line.getValue().get(line.getKey() + i);
+                        inv.setItem(i + 10, item == null || item.getType() == Material.AIR ? Items.l_gray() : item);
+                    } catch (IndexOutOfBoundsException e) {
+                        inv.setItem(i + 10, Items.l_gray());
+                    }
+                }
+            } catch (IndexOutOfBoundsException e) {
+                inv.setItem(9, Items.blue());
+                inv.setItem(17, Items.blue());
+                for (int i = 0; i < 7; i++) {
+                    inv.setItem(10 + i, outOfBounds);
+                }
+            }
+
+            return inv;
+        } else {
+            inv.setItem(0, back == null ? Items.blue() : back(back));
+            inv.setItem(4, main == null ? Items.l_gray() : main);
+            inv.setItem(size - 5, second == null ? Items.blue() : second);
+            inv.setItem(8, close());
+
+            inv.setItem(1, Items.blue());
+            inv.setItem(2, Items.blue());
+            inv.setItem(6, Items.blue());
+            inv.setItem(7, Items.blue());
+            inv.setItem(size - 1, Items.blue());
+            inv.setItem(size - 2, Items.blue());
+            inv.setItem(size - 4, Items.blue());
+            inv.setItem(size - 6, Items.blue());
+            inv.setItem(size - 8, Items.blue());
+            inv.setItem(size - 9, Items.blue());
+
+            inv.setItem(3, Items.orange());
+            inv.setItem(5, Items.orange());
+
+            inv.setItem(size - 7, up);
+            inv.setItem(size - 3, down);
+
+            for (int lineIdx = 0; lineIdx < (size / 9) - 2; lineIdx++) {
+                try {
+                    Utils.Pair<Integer, List<ItemStack>> line = content.get(horizontalPosition + lineIdx);
+
+                    inv.setItem((lineIdx * 9) + 9, getComplexHorizontalNavigationItem(horizontalPosition + lineIdx,
+                            line.getKey(), line.getValue().size(), 7, true,
+                            navigationBaseCommand, horizontalPosition, content));
+                    inv.setItem((lineIdx * 9) + 17, getComplexHorizontalNavigationItem(horizontalPosition + lineIdx,
+                            line.getKey(), line.getValue().size(), 7, false,
+                            navigationBaseCommand, horizontalPosition, content));
+
+                    for (int i = 0; i < 7; i++) {
+                        try {
+                            ItemStack item = line.getValue().get(line.getKey() + i);
+                            inv.setItem((lineIdx * 9) + i + 10,
+                                    item == null || item.getType() == Material.AIR ? Items.l_gray() : item);
+                        } catch (IndexOutOfBoundsException e) {
+                            inv.setItem((lineIdx * 9) + i + 10, Items.l_gray());
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    inv.setItem((lineIdx * 9) + 9, Items.blue());
+                    inv.setItem((lineIdx * 9) + 17, Items.blue());
+                    for (int i = 0; i < 7; i++) {
+                        inv.setItem((lineIdx * 9) + i + 10, outOfBounds);
+                    }
+                }
+            }
+
             return inv;
         }
     }
