@@ -113,14 +113,12 @@ public class GCPlayers {
                     u.setSyntaxe(syntaxe_players_inv);
                     if (gPlayer != null) {
                         if (args.length == 3) {
-                            p.performCommand(Main.CMD + " " + String.join(" ", args) + " gui 0");
+                            u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " gui 0");
                         } else if (args[3].equalsIgnoreCase("gui")) {
                             if (args.length == 4) {
-                                p.performCommand(Main.CMD + " " + String.join(" ", args) + " 0");
+                                u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " 0");
                             } else {
                                 try {
-                                    System.out.println(Main.CMD + " " + String.join(" ", args));
-
                                     int page = Integer.parseInt(args[4].contains(";") ? args[4].split(";")[0] : args[4]);
                                     Map<Integer, Integer> options = new HashMap<Integer, Integer>() {{
                                         if (args[4].contains(";"))
@@ -136,10 +134,8 @@ public class GCPlayers {
                                                 put(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
                                             }
                                     }};
-
-                                    System.out.println(options);
-
-                                    p.openInventory(GuiInv.getMainInventory(p.getName(),
+                                    u.getPlayer().openInventory(GuiInv.getMainInventory(
+                                            u.getPlayer().getName(), gPlayer.getName(),
                                             Main.CMD + " players " + args[1],
                                             Main.CMD + " players " + args[1] + " inv gui",
                                             page, options, Main.CMD + " " + String.join(" ", args)));
@@ -197,11 +193,11 @@ public class GCPlayers {
                                         idx = last;
                                     else
                                         isLast = idx == last;
-                                    p.openInventory(GuiInv.getInvInventory(
-                                            GuiPlayers.getHead(p.getName(), null, "null"),
-                                            p.getName(), inv,
+                                    u.getPlayer().openInventory(GuiInv.getInvInventory(
+                                            GuiPlayers.getHead(gPlayer.getName(), null, "null"),
+                                            gPlayer.getName(), inv,
                                             isLast, idx,
-                                            Main.CMD + " players " + p.getName() + " inv"));
+                                            Main.CMD + " players " + gPlayer.getName() + " inv"));
                                 }
                             } else if (args[4].equalsIgnoreCase("del")) {
                                 if (idx != null) {
@@ -221,22 +217,47 @@ public class GCPlayers {
                             } else if (args[4].equalsIgnoreCase("save")) {
                                 if (idx != null) {
                                     u.err("Vous ne pouvez pas préciser d'index pour sauvegarder un inventaire.");
-                                } else if (args.length == 5 || !(args[5].equalsIgnoreCase("true") || args[5].equalsIgnoreCase("false"))) {
+                                } else if (args.length == 5) {
+                                    u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " gui false 0");
+                                } else if (args[5].equalsIgnoreCase("gui")) {
+                                    if (args.length == 6) {
+                                        u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " false 0");
+                                    } else if (args.length == 7) {
+                                        u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " 0");
+                                    } else {
+                                        try {
+                                            int page = Integer.parseInt(args[7]);
+                                            boolean clear = args[6].equalsIgnoreCase("true");
+                                            u.getPlayer().openInventory(GuiInv.getSaveInventory(id, gPlayer.getName(), clear,
+                                                    Main.CMD + " players " + gPlayer.getName() + " inv",
+                                                    Main.CMD + " players " + gPlayer.getName() + " inv " + id + " save gui", page));
+                                        } catch (NumberFormatException e) {
+                                            u.err("Indiquez un nombre de page valide. (" + args[7] + ")");
+                                        }
+                                    }
+                                } else if (args.length == 6 || !(args[6].equalsIgnoreCase("true") || args[6].equalsIgnoreCase("false"))) {
                                     u.err("Indiquez si vous souhaitez ensuite clear le joueur ou non en dernier argument (true/false).");
                                 } else {
-                                    String name = args.length >= 7 ?
-                                            String.join(" ", Arrays.copyOfRange(args, 6, args.length)) : null;
-                                    gPlayer.saveInventory(id, name, p.getName(), p.getInventory());
-                                    u.succ("Inventaire sauvegardé ! §7(§b" + id + "§7)");
-                                    if (args[5].equalsIgnoreCase("true"))
-                                        p.getInventory().clear();
+                                    Player origin = Bukkit.getPlayer(args[5]);
+                                    if (origin == null) {
+                                        u.err(CmdUtils.err_player_not_found + " (" + args[5] + ")");
+                                    } else {
+                                        String name = args.length >= 8 ?
+                                                String.join(" ", Arrays.copyOfRange(args, 7, args.length)) : null;
+                                        gPlayer.saveInventory(id, name, u.getPlayer().getName(), origin.getInventory());
+                                        u.succ("Inventaire sauvegardé ! §7(§b" + id + "§7)");
+                                        if (args[6].equalsIgnoreCase("true")) {
+                                            origin.getInventory().clear();
+                                            origin.getInventory().setArmorContents(new ItemStack[4]);
+                                        }
+                                    }
                                 }
                             } else if (args[4].equalsIgnoreCase("load")) {
                                 if (args.length == 5) {
                                     u.synt();
                                 } else if (args[5].equalsIgnoreCase("true") || args[5].equalsIgnoreCase("false")) {
                                     boolean delete = args[5].equalsIgnoreCase("true");
-                                    List<Player> players = args.length < 7 ? Collections.singletonList(p)
+                                    List<Player> players = args.length < 7 ? Collections.singletonList(u.getPlayer())
                                             : new ArrayList<Player>() {{
                                         for (String name : Arrays.copyOfRange(args, 6, args.length))
                                             if (name.equalsIgnoreCase("@a"))
@@ -263,33 +284,71 @@ public class GCPlayers {
                                                 + (players.size() > 1 ? "s" : "") + " ! §7(§b" + id
                                                 + (idx == null ? "" : "§7:§f" + idx) + "§7)");
                                     }
+                                } else if (args[5].equalsIgnoreCase("on")) {
+                                    if (args.length == 6) {
+                                        u.err("Vous devez préciser un joueur à équiper.");
+                                    } else if (args.length == 7 || !(args[7].equalsIgnoreCase("true") || args[7].equalsIgnoreCase("false"))) {
+                                        u.err("Vous devez préciser si vous souhaitez supprimer ensuite la sauvegarde ou non. (true/false)");
+                                    } else {
+                                        Player player = Bukkit.getPlayer(args[6]);
+                                        boolean delete = args[7].equalsIgnoreCase("true");
+                                        Utils.SavedInventory inv = idx == null ?
+                                                gPlayer.getLastInventory(id, delete)
+                                                : gPlayer.getInventory(id, idx, delete);
+                                        if (inv == null) {
+                                            u.err("Inventaire introuvable. §7(§b" + id + (idx == null ? "" : "§7:§f" + idx) + "§7)");
+                                        } else if (player == null) {
+                                            u.err(CmdUtils.err_player_not_found + " §7(§b" + args[6] + "§7)");
+                                        } else {
+                                            inv.equip(player, true);
+                                            u.succ("Inventaire chargé sur §6" + player.getDisplayName()
+                                                    + "§r ! §7(§b" + id + (idx == null ? "" : "§7:§f" + idx) + "§7)");
+                                        }
+                                    }
                                 } else if (args[5].equalsIgnoreCase("gui")) {
                                     if (args.length == 6) {
-                                        p.performCommand(Main.CMD + " " + String.join(" ", args) + " false 0");
+                                        u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " false 0");
                                     } else if (args[6].equalsIgnoreCase("true") || args[6].equalsIgnoreCase("false")) {
                                         if (args.length == 7) {
-                                            p.performCommand(Main.CMD + " " + String.join(" ", args) + " 0");
+                                            u.getPlayer().performCommand(Main.CMD + " " + String.join(" ", args) + " 0");
                                         } else {
                                             try {
                                                 int page = Integer.parseInt(args[7].contains(";") ? args[7].split(";")[0] : args[7]);
                                                 boolean delete = args[6].equalsIgnoreCase("true");
-                                                List<Player> players = !args[7].contains(";") ? new ArrayList<>()
-                                                        : new ArrayList<Player>() {{
+                                                List<String> online = Bukkit.getOnlinePlayers().stream()
+                                                        .map(Player::getName).collect(Collectors.toList());
+                                                List<String> players = !args[7].contains(";") ? new ArrayList<>()
+                                                        : new ArrayList<String>() {{
                                                     for (String name : args[7].split(";")[1].split(","))
                                                         if (name.equalsIgnoreCase("@a"))
-                                                            addAll(Bukkit.getOnlinePlayers());
+                                                            addAll(Bukkit.getOnlinePlayers().stream()
+                                                                    .map(Player::getName)
+                                                                    .collect(Collectors.toList()));
                                                         else if (name.equalsIgnoreCase("!@a"))
-                                                            removeAll(Bukkit.getOnlinePlayers());
-                                                        else if (name.startsWith("!")) {
-                                                            for (Player player : Bukkit.getOnlinePlayers())
-                                                                if (player.getName().equalsIgnoreCase(name.substring(1)))
-                                                                    remove(player);
+                                                            removeAll(Bukkit.getOnlinePlayers().stream()
+                                                                    .map(Player::getName)
+                                                                    .collect(Collectors.toList()));
+                                                        else if (name.startsWith("!"))
+                                                            if (online.stream().anyMatch(n ->
+                                                                    n.equalsIgnoreCase(name.substring(1)))) {
+                                                                for (String n : online)
+                                                                    if (n.equalsIgnoreCase(name.substring(1)))
+                                                                        remove(n);
+                                                            } else
+                                                                remove(name.substring(1));
+                                                        else if (online.stream().anyMatch(n ->
+                                                                n.equalsIgnoreCase(name))) {
+                                                            for (String n : online)
+                                                                if (n.equalsIgnoreCase(name))
+                                                                    add(n);
                                                         } else
-                                                            for (Player player : Bukkit.getOnlinePlayers())
-                                                                if (player.getName().equalsIgnoreCase(name))
-                                                                    remove(player);
+                                                            add(name);
                                                 }};
-                                                // TODO : ouvrir l'interface
+                                                u.getPlayer().openInventory(GuiInv.getLoadInventory(gPlayer.getName(),
+                                                        id + ":" + idx, delete, players,
+                                                        Main.CMD + " players " + gPlayer.getName() + " inv " + id + ":" + idx,
+                                                        Main.CMD + " players " + gPlayer.getName() + " inv "
+                                                                + id + ":" + idx + " load gui", page));
                                             } catch (NumberFormatException e) {
                                                 u.err("Indiquez un nombre de page valide. (" + args[7] + ")");
                                             }

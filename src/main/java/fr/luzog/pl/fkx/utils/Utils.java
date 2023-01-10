@@ -200,6 +200,14 @@ public class Utils {
         public void setValue(B b) {
             this.b = b;
         }
+
+        @Override
+        public String toString() {
+            return "Pair{" +
+                    "a=" + a +
+                    ", b=" + b +
+                    '}';
+        }
     }
 
     /**
@@ -238,6 +246,15 @@ public class Utils {
 
         public void setC(C c) {
             this.c = c;
+        }
+
+        @Override
+        public String toString() {
+            return "Triple{" +
+                    "a=" + a +
+                    ", b=" + b +
+                    ", c=" + c +
+                    '}';
         }
     }
 
@@ -328,15 +345,15 @@ public class Utils {
         /**
          * It equips the player with the current inventory.
          *
-         * @param p The player to equip the kit to
+         * @param p     The player to equip the kit to
          * @param clear Whether to clear the player's inventory before equipping the kit.<br>
-         *              If <i style="color: #ffffff">false</i>, the content will be <b><i>ADDED</i></b> and not <b><i>PLACED</i></b>.
+         *              If <i style="color: #ffffff">false</i>, the content will be <b><i>ADDED</i></b> and <b><i>not PLACED</i></b>.
          */
         public void equip(Player p, boolean clear) {
             PlayerInventory inv = p.getInventory();
             if (clear) {
                 inv.clear();
-                inv.setArmorContents(null);
+                inv.setArmorContents(new ItemStack[4]);
             }
             if (content != null) {
                 ItemStack[] items = content.stream().map(is -> is == null ?
@@ -350,7 +367,7 @@ public class Utils {
             if (armor != null) {
                 for (int i = 0; i < armor.length && i < 4; i++) {
                     if (armor[i] != null) {
-                        if(inv.getArmorContents()[i] != null || inv.getArmorContents()[i].getType() != Material.AIR) {
+                        if (inv.getArmorContents()[i] != null && inv.getArmorContents()[i].getType() != Material.AIR) {
                             inv.addItem(armor[i]);
                         } else {
                             ItemStack[] a = inv.getArmorContents().clone();
@@ -371,14 +388,19 @@ public class Utils {
         }
 
         public void setContent(Collection<ItemStack> content) {
-            this.content = new ArrayList<>(content);
+            this.content = content.stream().map(is -> is == null || is.getType() == Material.AIR ?
+                    null : is).collect(Collectors.toCollection(ArrayList::new));
+            if (this.content.stream().noneMatch(Objects::nonNull))
+                this.content = new ArrayList<>();
         }
 
         public void setArmor(ItemStack[] armor) {
             this.armor = new ItemStack[4];
             for (int i = 0; i < armor.length && i < 4; i++) {
-                this.armor[i] = armor[i];
+                this.armor[i] = armor[i] == null || armor[i].getType() == Material.AIR ? null : armor[i];
             }
+            if (Arrays.stream(this.armor).noneMatch(Objects::nonNull))
+                this.armor = new ItemStack[0];
         }
 
         public String getRawContent() {
@@ -1182,6 +1204,7 @@ public class Utils {
      * It takes an array of ItemStacks and converts it to a Base64 String
      *
      * @param items The ItemStack array to be converted.
+     *
      * @return A Base64 {@link String} of the ItemStack array.
      */
     public static String itemStackArrayToBase64(ItemStack[] items) throws IllegalStateException {
@@ -1209,6 +1232,7 @@ public class Utils {
      * It decodes and returns a ItemStack array from a given Base64 String.
      *
      * @param data The Base64 String to decode.
+     *
      * @return The decoded ItemStack array.
      */
     public static ItemStack[] itemStackArrayFromBase64(String data) {
@@ -1224,7 +1248,7 @@ public class Utils {
 
             dataInput.close();
             return items;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (/* IOException | ClassNotFoundException */ Exception e) {
 //            throw new IOException("Unable to decode class type.", e);
             return new ItemStack[0];
         }
@@ -1252,7 +1276,7 @@ public class Utils {
             ItemStack item = (ItemStack) dataInput.readObject();
             dataInput.close();
             return item;
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (/* IOException | ClassNotFoundException */ Exception e) {
             return null;
         }
     }

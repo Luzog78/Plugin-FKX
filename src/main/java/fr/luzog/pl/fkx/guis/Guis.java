@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Guis {
@@ -313,8 +314,8 @@ public class Guis {
                             null : Items.builder(is.clone()).setCantClickOn(true).build())
                     .limit(4).toArray(ItemStack[]::new);
             for (int i = 0; i < a.length; i++)
-                if (a[i] != null)
-                    inv.setItem(48 + i, a[i]);
+                if (a[a.length - 1 - i] != null)
+                    inv.setItem(48 + i, a[a.length - 1 - i]);
         }
 
         ItemStack[] h = Stream.of(content).map(is -> is == null || is.getType() == Material.AIR ?
@@ -546,6 +547,150 @@ public class Guis {
 
             return inv;
         }
+    }
+
+    public static String generateSelectorOptions(int page, List<Utils.Pair<String, Boolean>> content) {
+        StringBuilder sb = new StringBuilder();
+        for (Pair<String, Boolean> pair : content) {
+            if (pair.getValue())
+                sb.append(pair.getKey()).append(",");
+        }
+        if (sb.length() > 0)
+            sb.deleteCharAt(sb.length() - 1);
+        return page + (sb.length() > 0 ? ";" + sb : "");
+    }
+
+    public static ItemStack selectorNavigationArrow(int page, int maxPage, boolean previous,
+                                                    ArrayList<Utils.Pair<String, Boolean>> content,
+                                                    String baseCommand) {
+        String cmd1 = baseCommand + " " + generateSelectorOptions(previous ? page - 1 : page + 1, content),
+                cmd2 = baseCommand + " " + generateSelectorOptions(previous ? 0 : maxPage - 1, content);
+        return Items.builder(Material.ARROW)
+                .setName(previous ? "§fPage Précédente" : "§fPage Suivante")
+                .setLore(
+                        "§8" + loreSeparator,
+                        "§7Clic pour aller à  §f" + (page + (previous ? -1 : 1) + 1) + "§8/" + maxPage,
+                        "§7  (Shift pour aller à  §f" + (previous ? 1 : maxPage) + "§8/" + maxPage + "§7)",
+                        " ",
+                        "§7Commandes :",
+                        "§7/" + cmd1,
+                        "§7/" + cmd2
+                )
+                .setCantClickOn(true)
+                .setShiftCommandOnClick(cmd1, cmd2)
+                .build();
+    }
+
+    public static Inventory getSelectorInventory(String name, boolean singleOr6Lines, String back,
+                                                 @Nullable ItemStack main, @Nullable ItemStack second,
+                                                 String navigationBaseCommand, int page,
+                                                 LinkedHashMap<String, Boolean> options,
+                                                 String commandToExecuteWithOUTVar, boolean noSpace) {
+        Inventory inv = Bukkit.createInventory(null, singleOr6Lines ? 9 : 54, name);
+
+        ArrayList<Utils.Pair<String, Boolean>> content = options.entrySet().stream()
+                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        ArrayList<Utils.Pair<ItemStack, ItemStack>> items = content.stream()
+                .map(entry -> {
+                    ArrayList<Pair<String, Boolean>> opt1 = content.stream().map(entry1 ->
+                                    new Pair<>(entry1.getKey(), entry1.getValue()))
+                            .collect(Collectors.toCollection(ArrayList::new));
+                    opt1.get(content.indexOf(entry)).setValue(!entry.getValue());
+                    String cmd = navigationBaseCommand + " " + generateSelectorOptions(page, opt1);
+                    return new Pair<>(
+                            Items.builder(Heads.getSkullOf(entry.getKey()))
+                                    .setName("§e" + entry.getKey() + "§7 : " + (entry.getValue() ? "§aEnabled" : "§cDisabled"))
+                                    .setLore("§8" + Utils.loreSeparator, "§7Click to toggle")
+                                    .setCantClickOn(true)
+                                    .setGlobalCommandOnClick(cmd)
+                                    .build(),
+                            Items.builder(Material.INK_SACK)
+                                    .setDurability((short) (entry.getValue() ? 10 : 8))
+                                    .setName("§e" + entry.getKey() + "§7 : " + (entry.getValue() ? "§aEnabled" : "§cDisabled"))
+                                    .setLore("§8" + Utils.loreSeparator, "§7Click to toggle")
+                                    .setCantClickOn(true)
+                                    .setGlobalCommandOnClick(cmd)
+                                    .build());
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        StringBuilder selection = new StringBuilder();
+        for (Pair<String, Boolean> pair : content) {
+            if (pair.getValue())
+                selection.append(pair.getKey()).append(",").append(noSpace ? "" : " ");
+        }
+        if (selection.length() > 0)
+            selection.deleteCharAt(selection.length() - 2);
+        String cmd = commandToExecuteWithOUTVar.replace("%OUT%", selection.toString());
+        ItemStack exe = Items.builder(Material.EMERALD)
+                .setName("§4Execute")
+                .setLore("§8" + Utils.loreSeparator,
+                        "§aClick to execute",
+                        " ",
+                        "§7Commandes :"
+                                + (cmd.length() == 0 ? "" : "\n§7/" + cmd.replace("\n", "\n§7/")))
+                .setCantClickOn(true)
+                .setGlobalCommandOnClick(cmd)
+                .build();
+
+        if (singleOr6Lines) {
+            inv.setItem(0, back == null ? Items.orange() : back(back));
+            inv.setItem(1, main == null ? Items.l_gray() : main);
+            inv.setItem(2, second == null ? Items.orange() : second);
+            inv.setItem(8, exe);
+
+            inv.setItem(3, navigationFeather(page, content.size(), 1));
+
+            inv.setItem(4, page == 0 ? Items.blue()
+                    : selectorNavigationArrow(page, content.size(), true, content, navigationBaseCommand));
+            inv.setItem(7, page + 1 == content.size() || content.size() == 0 ? Items.blue()
+                    : selectorNavigationArrow(page, content.size(), false, content, navigationBaseCommand));
+
+            try {
+                inv.setItem(5, items.get(page).getKey());
+                inv.setItem(6, items.get(page).getValue());
+            } catch (IndexOutOfBoundsException e) {
+                inv.setItem(4, Items.gray());
+            }
+
+        } else {
+            Utils.fill(inv, 0, 54 - 1, true, Items.blue());
+            for (int i : Arrays.asList(3, 5))
+                inv.setItem(i, Items.orange());
+            inv.setItem(4, main == null ? Items.l_gray() : main);
+            inv.setItem(54 - 4, second == null ? Items.orange() : second);
+            inv.setItem(0, back == null ? Items.blue() : back(back));
+            inv.setItem(8, close());
+            inv.setItem(54 - 6, exe);
+
+            int isPerPage = 14;
+            int max = ((int) (content.size() / (isPerPage + 0.0))) + (content.size() % isPerPage == 0 ? 0 : 1);
+
+            inv.setItem(54 - 9, page == 0 ? Items.blue()
+                    : selectorNavigationArrow(page, max, true, content, navigationBaseCommand));
+            inv.setItem(54 - 5, navigationFeather(page, max, isPerPage));
+            inv.setItem(54 - 1, page + 1 == max || max == 0 ? Items.blue()
+                    : selectorNavigationArrow(page, max, false, content, navigationBaseCommand));
+
+            int i = 0;
+            while (i < isPerPage) {
+                try {
+                    inv.setItem(Utils.posOf((i % 7) + 1, (i / 7) + 1),
+                            items.get(page * isPerPage + i).getKey());
+                    inv.setItem(Utils.posOf((i % 7) + 1, (i / 7) + 2),
+                            items.get(page * isPerPage + i).getValue());
+                } catch (IndexOutOfBoundsException ignore) {
+                }
+                i++;
+            }
+            for (int ii = 0; ii < 54; ii++)
+                if (inv.getItem(ii) == null || inv.getItem(ii).getType() == Material.AIR)
+                    inv.setItem(ii, Items.gray());
+        }
+
+        return inv;
     }
 
 }
