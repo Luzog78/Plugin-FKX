@@ -324,6 +324,8 @@ public class GListener {
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
+        if(fp != null)
+            f.add("§8Kills : §b" + fp.getStats().getKills() + " §7-- §8Deaths : §a" + fp.getStats().getDeaths());
         f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a " + Main.IP);
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);

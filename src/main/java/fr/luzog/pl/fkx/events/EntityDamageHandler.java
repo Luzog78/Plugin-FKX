@@ -157,7 +157,7 @@ public class EntityDamageHandler implements Listener {
                     default:
                         break;
                 }
-                if(m.size() == 0) {
+                if (m.size() == 0) {
                     m.add("est mort.");
                     m.add("n'est plus.");
                     m.add("s'est fait décimé.");
@@ -196,21 +196,20 @@ public class EntityDamageHandler implements Listener {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    if (!e.isCancelled() && Main.customLootingMobsSystem && !entity.hasMetadata(GTeam.PLUNDER_STAND_TAG))
-                        if (entity instanceof Creeper) {
-                            if (((Creeper) entity).isPowered())
-                                new Loots()
-                                        .add(0.333, new ItemStack(Material.TNT))
-                                        .add(0.333, new ItemStack(Material.TNT))
-                                        .lootsInclusive()
-                                        .forEach(is -> entity.getWorld().dropItemNaturally(tempLoc, is));
-                            else
-                                new Loots()
-                                        .add(0.5, new ItemStack(Material.SULPHUR))
-                                        .add(0.5, new ItemStack(Material.SULPHUR))
-                                        .lootsInclusive()
-                                        .forEach(is -> entity.getWorld().dropItemNaturally(tempLoc, is));
-                        } else
+                    if (!e.isCancelled() && !entity.hasMetadata(GTeam.PLUNDER_STAND_TAG)) {
+                        if (entity instanceof Creeper && Main.isCreeperActivated) {
+                            Random r = new Random();
+                            (((Creeper) entity).isPowered() ? Main.chargedCreeperLoots : Main.normalCreeperLoots)
+                                    .forEach(pair -> {
+                                        double chance = pair.getValue();
+                                        while (chance > 1) {
+                                            entity.getWorld().dropItemNaturally(tempLoc, new ItemStack(pair.getKey()));
+                                            chance -= 1;
+                                        }
+                                        if (r.nextDouble() < chance)
+                                            entity.getWorld().dropItemNaturally(tempLoc, new ItemStack(pair.getKey()));
+                                    });
+                        } else if (Main.customLootingMobsSystem) {
                             Events.killMobLoots.forEach(loot -> {
                                 if (entity.getType() == loot.getType() && (loot.getData() == Events.EntityData.WHATEVER || (loot.getData() != Events.EntityData.WHATEVER
                                         && (entity instanceof Creeper && ((Creeper) entity).isPowered() == (loot.getData() == Events.EntityData.CREEPER_SUPERCHARGED))
@@ -228,6 +227,8 @@ public class EntityDamageHandler implements Listener {
                                         loot.getLoots().lootsInclusive(chanceLvl, silkTouch).forEach(is -> loc.getWorld().dropItemNaturally(loc, is));
                                 }
                             });
+                        }
+                    }
                 }
             }.runTask(Main.instance);
     }

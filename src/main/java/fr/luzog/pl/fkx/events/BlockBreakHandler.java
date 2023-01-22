@@ -41,7 +41,7 @@ public class BlockBreakHandler implements Listener {
         }
 
         if (!fp.hasPermission(Events.specialMat.contains(e.getBlock().getType()) ?
-                GPermissions.Type.BREAKSPE : GPermissions.Type.BREAK,
+                        GPermissions.Type.BREAKSPE : GPermissions.Type.BREAK,
                 Utils.normalize(e.getBlock().getLocation()), 10)) {
             e.setCancelled(true);
             return;
@@ -77,17 +77,28 @@ public class BlockBreakHandler implements Listener {
                     e.setCancelled(true);
                     e.getBlock().setType(Material.AIR, true);
                     ArrayList<ItemStack> drops = new ArrayList<>();
-                    double exp = 0;
+                    Location l = Utils.normalize(e.getBlock().getLocation());
                     if (item.isExclusive())
                         drops.add(item.getLoots().lootsExclusive(chanceLvl, finalSilkTouch));
                     else
                         drops.addAll(item.getLoots().lootsInclusive(chanceLvl, finalSilkTouch));
-//                        for(ItemStack i : drops)
-//                            if(i.getType() == Material.IRON_INGOT || i.getType() == Material.IRON_ORE)
-//                                exp += 0.7;
-//                            else if (i.getType() == Material.GOLD_INGOT || i.getType() == Material.GOLD_ORE)
-//                                exp += 1.0;
                     dropNormally(e.getBlock().getLocation(), drops);
+                    for (ItemStack i : drops)
+                        if (i.getType() == Material.COAL || i.getType() == Material.COAL_ORE)
+                            Utils.dropEXPOrb(0, 2, l);
+                        else if (i.getType() == Material.IRON_INGOT || i.getType() == Material.IRON_INGOT)
+                            Utils.dropEXPOrb(1, 3, l);
+                        else if (i.getType() == Material.GOLD_INGOT || i.getType() == Material.GOLD_ORE)
+                            Utils.dropEXPOrb(1, 5, l);
+                        else if (i.getType() == Material.LAPIS_ORE || i.getType() == Material.INK_SACK)
+                            Utils.dropEXPOrb(2, 3, l);
+                        else if (i.getType() == Material.QUARTZ || i.getType() == Material.QUARTZ_ORE)
+                            Utils.dropEXPOrb(2, 5, l);
+                        else if (i.getType() == Material.DIAMOND || i.getType() == Material.DIAMOND_ORE
+                                || i.getType() == Material.EMERALD || i.getType() == Material.EMERALD_ORE)
+                            Utils.dropEXPOrb(3, 7, l);
+                        else if (i.getType() == Material.REDSTONE || i.getType() == Material.REDSTONE_ORE)
+                            Utils.dropEXPOrb(1, 5, l);
                 }
             });
     }

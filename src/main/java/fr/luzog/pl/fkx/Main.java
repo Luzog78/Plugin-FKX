@@ -9,8 +9,10 @@ import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.utils.Color;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Crafting;
+import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.Listener;
@@ -23,7 +25,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 2.5";
+    public static final Object VERSION = "Version 2.6";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
@@ -37,6 +39,10 @@ public class Main extends JavaPlugin implements Listener {
     public static Config.Kit kitConfig;
 
     public static boolean customCrafts, customCraftingTable, customLootingBlocksSystem, customLootingMobsSystem;
+
+    public static boolean isCreeperActivated;
+    public static double creeperSuperchargedChance;
+    public static List<Utils.Pair<Material, Double>> normalCreeperLoots, chargedCreeperLoots;
 
     @Override
     public void onLoad() {
@@ -56,6 +62,21 @@ public class Main extends JavaPlugin implements Listener {
                 .setCustomCraftingTableActivated(true, false)
                 .setCustomLootingBlocksSystemActivated(true, false)
                 .setCustomLootingMobsSystemActivated(true, false)
+                .setCustomCreeperActivated(true, false)
+                .setCustomCreeperChance(0.1, false)
+                .setCustomNormalCreeperDrops(new ArrayList<Utils.Pair<Material, Double>>() {{
+                    add(new Utils.Pair<>(Material.SULPHUR, 1.0));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.2));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.2));
+                }}, false)
+                .setCustomChargedCreeperDrops(new ArrayList<Utils.Pair<Material, Double>>() {{
+                    add(new Utils.Pair<>(Material.SULPHUR, 1.0));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.8));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.5));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.2));
+                    add(new Utils.Pair<>(Material.SULPHUR, 0.1));
+                    add(new Utils.Pair<>(Material.TNT, 0.1));
+                }}, false)
                 .setAdActivated(true, false)
                 .setCompassActivated(true, false)
                 .save()
@@ -111,6 +132,11 @@ public class Main extends JavaPlugin implements Listener {
                 customCraftingTable = globalConfig.isCustomCraftingTableActivated();
                 customLootingBlocksSystem = globalConfig.isCustomLootingBlocksSystemActivated();
                 customLootingMobsSystem = globalConfig.isCustomLootingMobsSystemActivated();
+
+                isCreeperActivated = globalConfig.isCustomCreeperActivated();
+                creeperSuperchargedChance = globalConfig.getCustomCreeperChance();
+                normalCreeperLoots = globalConfig.getCustomNormalCreeperDrops();
+                chargedCreeperLoots = globalConfig.getCustomChargedCreeperDrops();
 
                 world = globalConfig.getOverworld();
                 nether = globalConfig.getNether();

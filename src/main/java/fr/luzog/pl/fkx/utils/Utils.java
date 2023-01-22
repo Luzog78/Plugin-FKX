@@ -7,10 +7,13 @@ import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.PacketPlayOutPlayerListHeaderFooter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
@@ -1279,5 +1282,16 @@ public class Utils {
         } catch (/* IOException | ClassNotFoundException */ Exception e) {
             return null;
         }
+    }
+
+    public static ExperienceOrb dropEXPOrb(int minSize, int maxSize, Location loc) {
+        return dropEXPOrb(new Random().nextInt(maxSize - minSize) + minSize, loc);
+    }
+
+    public static ExperienceOrb dropEXPOrb(int size, Location loc) {
+        ExperienceOrb orb = (ExperienceOrb) loc.getWorld().spawnEntity(loc, EntityType.EXPERIENCE_ORB);
+        orb.setExperience(size);
+        orb.setMetadata("exp", new FixedMetadataValue(Main.instance, size));
+        return orb;
     }
 }

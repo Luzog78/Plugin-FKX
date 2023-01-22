@@ -24,7 +24,7 @@ public class PlayerJoinQuitHandler implements Listener {
     public static String warn = "§8§l[§6§l" + WARNING + "§8§l] §7";
     public static String ban = "§8§l[§4§l" + FF_EXCALMATION + FF_EXCALMATION + "§8§l] §7";
     public static String connexionInventory = "connexion";
-    public static int maxConnexionInventories = 16;
+    public static int maxConnexionInventories = 10;
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {

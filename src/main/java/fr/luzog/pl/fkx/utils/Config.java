@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.utils;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.game.*;
+import javafx.util.Pair;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,12 +19,6 @@ import java.util.stream.Collectors;
 
 public class Config {
 
-    public static class DuplicateKitException extends RuntimeException {
-        public DuplicateKitException(String message) {
-            super(message);
-        }
-    }
-
     public static class Globals extends Config {
         public static final String VERSION = "version", LANG = "lang", SEASON = "season", IP = "ip", ORGA = "orga",
                 OVERWORLD = "worlds.over", NETHER = "worlds.nether", END = "worlds.end",
@@ -31,6 +26,10 @@ public class Config {
                 CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table",
                 CUSTOM_LOOTING_BLOCKS = "custom-options.block-looting-system",
                 CUSTOM_LOOTING_MOBS = "custom-options.mob-looting-system",
+                CUSTOM_CREEPER_ACTIVATED = "custom-options.creeper-handler.activated",
+                CUSTOM_CREEPER_CHANCE = "custom-options.creeper-handler.supercharged-chance",
+                CUSTOM_CREEPER_DROPS_NORMAL = "custom-options.creeper-handler.drop-chances.normal",
+                CUSTOM_CREEPER_DROPS_CHARGED = "custom-options.creeper-handler.drop-chances.charged",
                 ACTIVATION_AD = "activation.ad", ACTIVATION_COMPASS = "activation.compass",
                 LAST_GAME = "last-game", VANISH_PRE_SUF_IX = "vanish.pre-suf-ix", VANISH_IS_PREFIX = "vanish.is-prefix",
                 VANISH_PLAYERS = "vanish.players";
@@ -128,6 +127,76 @@ public class Config {
 
         public Globals setCustomLootingMobsSystemActivated(boolean customLootingMobs, boolean force) {
             super.set(CUSTOM_LOOTING_MOBS, customLootingMobs, force);
+            return this;
+        }
+
+        public boolean isCustomCreeperActivated() {
+            return super.getBool(CUSTOM_CREEPER_ACTIVATED);
+        }
+
+        public Globals setCustomCreeperActivated(boolean customCreeper, boolean force) {
+            super.set(CUSTOM_CREEPER_ACTIVATED, customCreeper, force);
+            return this;
+        }
+
+        public double getCustomCreeperChance() {
+            return super.getDouble(CUSTOM_CREEPER_CHANCE);
+        }
+
+        public Globals setCustomCreeperChance(double customCreeperChance, boolean force) {
+            super.set(CUSTOM_CREEPER_CHANCE, customCreeperChance, force);
+            return this;
+        }
+
+        public List<Utils.Pair<Material, Double>> getCustomNormalCreeperDrops() {
+            List<Utils.Pair<Material, Double>> map = new ArrayList<>();
+            super.getMapList(CUSTOM_CREEPER_DROPS_NORMAL).forEach(m -> {
+                if(m.containsKey("type")) {
+                    Material type = Material.getMaterial(m.get("type") + "");
+                    if (type != null)
+                        try {
+                            map.add(new Utils.Pair<>(type, m.containsKey("chance") ?
+                                    Double.parseDouble(m.get("chance") + "") : 1.0));
+                        } catch (NumberFormatException ignored) {
+                        }
+                }
+            });
+            return map;
+        }
+
+        public Globals setCustomNormalCreeperDrops(List<Utils.Pair<Material, Double>> customNormalCreeperDrops, boolean force) {
+            List<Map<String, ?>> map = new ArrayList<>();
+            customNormalCreeperDrops.forEach(m -> map.add(new HashMap<String, Object>() {{
+                put("type", m.getKey().name());
+                put("chance", m.getValue());
+            }}));
+            super.set(CUSTOM_CREEPER_DROPS_NORMAL, map, force);
+            return this;
+        }
+
+        public List<Utils.Pair<Material, Double>> getCustomChargedCreeperDrops() {
+            List<Utils.Pair<Material, Double>> map = new ArrayList<>();
+            super.getMapList(CUSTOM_CREEPER_DROPS_CHARGED).forEach(m -> {
+                if(m.containsKey("type")) {
+                    Material type = Material.getMaterial(m.get("type") + "");
+                    if (type != null)
+                        try {
+                            map.add(new Utils.Pair<>(type, m.containsKey("chance") ?
+                                    Double.parseDouble(m.get("chance") + "") : 1.0));
+                        } catch (NumberFormatException ignored) {
+                        }
+                }
+            });
+            return map;
+        }
+
+        public Globals setCustomChargedCreeperDrops(List<Utils.Pair<Material, Double>> customChargedCreeperDrops, boolean force) {
+            List<Map<String, ?>> map = new ArrayList<>();
+            customChargedCreeperDrops.forEach(m -> map.add(new HashMap<String, Object>() {{
+                put("type", m.getKey().name());
+                put("chance", m.getValue());
+            }}));
+            super.set(CUSTOM_CREEPER_DROPS_CHARGED, map, force);
             return this;
         }
 
@@ -1233,25 +1302,25 @@ public class Config {
     }
 
     public boolean getBool(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return config.getBoolean(path);
     }
 
     public byte getByte(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return Byte.parseByte(config.get(path) + "");
     }
 
     public short getShort(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return Short.parseShort(config.get(path) + "");
     }
 
     public char getChar(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         if ((config.get(path) + "").length() != 1)
             throw new RuntimeException("Invalid char");
@@ -1259,31 +1328,31 @@ public class Config {
     }
 
     public int getInt(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return config.getInt(path);
     }
 
     public long getLong(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return config.getLong(path);
     }
 
     public double getDouble(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return config.getDouble(path);
     }
 
     public float getFloat(String path) {
-        if(isNull(path))
+        if (isNull(path))
             throw new NumberFormatException("The path '" + path + "' is null");
         return Float.parseFloat(config.get(path) + "");
     }
 
     public Map<String, Object> getMap(String path) {
-        if(isNull(path))
+        if (isNull(path))
             return new HashMap<>();
         return config.getConfigurationSection(path).getValues(false);
     }

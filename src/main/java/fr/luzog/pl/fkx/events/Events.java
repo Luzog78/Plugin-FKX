@@ -205,17 +205,7 @@ public class Events implements Listener {
                 .add(0.05, new ItemStack(Material.LEAVES), -1, true)
 
                 .add(0.1, new ItemStack(Material.SAPLING), -1, false)
-
-//                .add(0.05, new ItemStack(Material.WOOD), 0, false)
-//                .add(0.10, new ItemStack(Material.WOOD), 1, false)
-//                .add(0.15, new ItemStack(Material.WOOD), 2, false)
-//                .add(0.2, new ItemStack(Material.WOOD), 3, false)
-
-
-                .add(0.07, new ItemStack(Material.APPLE), 0, false)
-                .add(0.1, new ItemStack(Material.APPLE), 1, false)
-                .add(0.15, new ItemStack(Material.APPLE), 2, false)
-                .add(0.2, new ItemStack(Material.APPLE), 3, false)
+                .add(0.3, new ItemStack(Material.APPLE), -1, false)
 
                 .add(0.007, new ItemStack(Material.GOLDEN_APPLE), 0, false)
                 .add(0.012, new ItemStack(Material.GOLDEN_APPLE), 1, false)
@@ -291,75 +281,74 @@ public class Events implements Listener {
     }};
 
     public static List<MobLootsItem> killMobLoots = new ArrayList<MobLootsItem>() {{
-        add(new MobLootsItem(EntityType.CREEPER, EntityData.CREEPER_NORMAL, false, new Loots()
-                .setChanceLvlAmountCoefficient(1)
-                .add(0.05, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.10, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.15, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.05, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, false)
-                .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, true)
-                .add(0.10, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.15, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.20, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, false)
-                .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, true)
-                .add(0.15, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.20, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.25, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, false)
-                .add(0.20, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, true)
-                .add(0.80, new ItemStack(Material.SULPHUR), -2, null)
-                .add(0.30, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, false)
-                .add(0.60, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, true)
-        ));
-        add(new MobLootsItem(EntityType.CREEPER, EntityData.CREEPER_SUPERCHARGED, false, new Loots()
-                // Just the same that normal creeper but x1.5
-                .setChanceLvlAmountCoefficient(1)
-                .add(0.075, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.150, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.225, new ItemStack(Material.SULPHUR), 0, null)
-                .add(0.075, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, false)
-                .add(0.150, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, true)
-                .add(0.150, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.225, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.300, new ItemStack(Material.SULPHUR), 1, null)
-                .add(0.150, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, false)
-                .add(0.175, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, true)
-                .add(0.225, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.300, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.375, new ItemStack(Material.SULPHUR), 2, null)
-                .add(0.175, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, false)
-                .add(0.300, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, true)
-                .add(1.200, new ItemStack(Material.SULPHUR), -2, null)
-                .add(0.450, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, false)
-                .add(0.900, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, true)
-        ));
+// Deprecated :
+// add(new MobLootsItem(EntityType.CREEPER, EntityData.CREEPER_NORMAL, false, new Loots()
+//         .setChanceLvlAmountCoefficient(1)
+//         .add(0.05, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.10, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.15, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.05, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, false)
+//         .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, true)
+//         .add(0.10, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.15, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.20, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, false)
+//         .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, true)
+//         .add(0.15, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.20, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.25, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, false)
+//         .add(0.20, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, true)
+//         .add(0.80, new ItemStack(Material.SULPHUR), -2, null)
+//         .add(0.30, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, false)
+//         .add(0.60, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, true)
+// ));
+// add(new MobLootsItem(EntityType.CREEPER, EntityData.CREEPER_SUPERCHARGED, false, new Loots()
+//         // Just the same that normal creeper but x1.5
+//         .setChanceLvlAmountCoefficient(1)
+//         .add(0.075, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.150, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.225, new ItemStack(Material.SULPHUR), 0, null)
+//         .add(0.075, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, false)
+//         .add(0.150, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 0, true)
+//         .add(0.150, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.225, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.300, new ItemStack(Material.SULPHUR), 1, null)
+//         .add(0.150, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, false)
+//         .add(0.175, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 1, true)
+//         .add(0.225, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.300, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.375, new ItemStack(Material.SULPHUR), 2, null)
+//         .add(0.175, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, false)
+//         .add(0.300, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), 2, true)
+//         .add(1.200, new ItemStack(Material.SULPHUR), -2, null)
+//         .add(0.450, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, false)
+//         .add(0.900, new ItemStack(Material.SKULL_ITEM, 1, (short) 4), -2, true)
+// ));
         add(new MobLootsItem(EntityType.SKELETON, EntityData.SKELETON_NORMAL, false, new Loots()
                 .setChanceLvlAmountCoefficient(1)
                 .add(0.05, new ItemStack(Material.BOW), 0, null)
                 .add(0.33, new ItemStack(Material.ARROW), 0, null)
                 .add(0.33, new ItemStack(Material.ARROW), 0, null)
                 .add(0.33, new ItemStack(Material.ARROW), 0, null)
-                .add(0.05, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 0, false)
-                .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 0, true)
+                .add(0.005, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 0, false)
+                .add(0.01, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 0, true)
                 .add(0.15, new ItemStack(Material.BOW), 1, null)
                 .add(0.66, new ItemStack(Material.ARROW), 1, null)
                 .add(0.66, new ItemStack(Material.ARROW), 1, null)
                 .add(0.66, new ItemStack(Material.ARROW), 1, null)
-                .add(0.10, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 1, false)
-                .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 1, true)
+                .add(0.01, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 1, false)
+                .add(0.02, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 1, true)
                 .add(0.25, new ItemStack(Material.BOW), 2, null)
                 .add(0.99, new ItemStack(Material.ARROW), 2, null)
                 .add(0.99, new ItemStack(Material.ARROW), 2, null)
                 .add(0.99, new ItemStack(Material.ARROW), 2, null)
-                .add(0.15, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 2, false)
-                .add(0.20, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 2, true)
+                .add(0.02, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 2, false)
+                .add(0.04, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), 2, true)
                 .add(0.50, new ItemStack(Material.BOW), -2, null)
                 .add(1, new ItemStack(Material.ARROW), -2, null)
                 .add(1, new ItemStack(Material.ARROW), -2, null)
                 .add(1, new ItemStack(Material.ARROW), -2, null)
-                .add(0.30, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), -2, false)
-                .add(0.60, new ItemStack(Material.SKULL_ITEM, 1, (short) 0), -2, true)
         ));
         add(new MobLootsItem(EntityType.SKELETON, EntityData.SKELETON_WITHER, true, new Loots()
                 .setChanceLvlProbaCoefficient(1)
@@ -786,7 +775,7 @@ public class Events implements Listener {
     @EventHandler
     public static void onSpawn(CreatureSpawnEvent e) {
         if (e.getEntity().getType() == EntityType.CREEPER)
-            if (new Random().nextInt(4) == 0)
+            if (Main.isCreeperActivated && new Random().nextDouble() < Main.creeperSuperchargedChance)
                 ((Creeper) e.getEntity()).setPowered(true);
     }
 
@@ -823,7 +812,13 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onEntityDeath(EntityDeathEvent e) {
-        if (Main.customLootingMobsSystem && !(e.getEntity() instanceof Player))
+        if (e.getEntity() instanceof Player)
+            return;
+
+        if (e.getEntity() instanceof Creeper) {
+            if (Main.isCreeperActivated)
+                e.getDrops().clear();
+        } else if (Main.customLootingMobsSystem)
             e.getDrops().clear();
     }
 

@@ -3,6 +3,7 @@ package fr.luzog.pl.fkx.game;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.*;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.Entity;
@@ -568,9 +569,13 @@ public class GManager {
                                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 2400, 255, false, false), true);
                                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
                                 }
-                            p.getPlayer().teleport(p.getTeam() == null ? getLobby().getSpawn()
+                            Location loc = (p.getTeam() == null ? getLobby().getSpawn()
                                     : Objects.equals(p.getTeamId(), GTeam.GODS_ID) || Objects.equals(p.getTeamId(), GTeam.SPECS_ID) ?
-                                    getSpawn().getSpawn() : p.getTeam().getSpawn());
+                                    getSpawn().getSpawn() : p.getTeam().getSpawn()).clone();
+                            while (loc.getBlock().getType() != Material.AIR || loc.getBlock().getRelative(BlockFace.UP).getType() != Material.AIR) {
+                                loc.add(0, 1, 0);
+                            }
+                            p.getPlayer().teleport(loc);
                         }
                     });
                     setPriority(new GPermissions(GPermissions.Definition.DEFAULT), true);
