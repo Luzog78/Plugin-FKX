@@ -184,7 +184,8 @@ public class GCPermissions {
                         if (args.length >= 4)
                             try {
                                 GPermissions.Definition def = GPermissions.Definition.valueOf(args[3].toUpperCase());
-                                perm.setPermission(type, def);
+                                perm.setPermission(type, args[1].equalsIgnoreCase("global")
+                                        && def == GPermissions.Definition.DEFAULT ? GPermissions.Definition.OFF : def);
                                 if (args[1].equalsIgnoreCase("global"))
                                     GManager.getCurrentGame().getConfig().load().setGlobalPermissions(perm, true).save();
                                 else if (args[1].equalsIgnoreCase("neutral"))

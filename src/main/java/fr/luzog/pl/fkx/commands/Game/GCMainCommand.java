@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.commands.Game;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPermissions;
+import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.guis.GuiGlobal;
 import fr.luzog.pl.fkx.utils.CmdUtils;
@@ -13,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GCMainCommand implements CommandExecutor, TabCompleter {
     public static final String syntaxe = "/" + Main.CMD + " [(? || help) | activations | banner | (bc || broadcast) | compass | date "
@@ -118,14 +121,14 @@ public class GCMainCommand implements CommandExecutor, TabCompleter {
         return r;
     }
 
-    public static boolean hasPerm(CommandSender sender, boolean god, boolean out) {
-        boolean r = !(sender instanceof Player) || sender.isOp()
-                || (GManager.getCurrentGame() != null && GManager.getCurrentGame()
-                .getPlayer(sender.getName(), false) != null && GManager.getCurrentGame()
-                .getPlayer(sender.getName(), false).getTeam() != null && (GManager.getCurrentGame()
-                .getPlayer(sender.getName(), false).getTeam().getId().equals(GTeam.GODS_ID)
-                || (!god && GManager.getCurrentGame().getPlayer(sender.getName(), false)
-                .getTeam().getId().equals(GTeam.SPECS_ID))));
+    public static boolean hasPerm(CommandSender sender, boolean fk, boolean out) {
+        GPlayer p;
+        boolean r = !(sender instanceof Player) || sender.isOp() || (
+                GManager.getCurrentGame() != null
+                        && (p = GManager.getCurrentGame().getPlayer(sender.getName(), false)) != null
+                        && (p.hasPermission(GPermissions.Type.FK, p.getPlayer().getLocation())
+                        || (!fk && Objects.equals(p.getTeamId(), GTeam.SPECS_ID)))
+        );
         if (!r && out)
             sender.sendMessage("§cVous n'avez pas la permission d'utiliser cette commande.");
         return r;

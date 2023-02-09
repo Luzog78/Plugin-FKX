@@ -308,6 +308,7 @@ public class Items {
 
         public Builder update() {
             item.setItemMeta(meta);
+            meta = item.getItemMeta();
             return this;
         }
 

@@ -15,10 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class EntityDamageHandler implements Listener {
 
@@ -49,7 +46,7 @@ public class EntityDamageHandler implements Listener {
 
             if (fp == null || spawnProtected.contains(p.getName())
                     || (fp.getManager().getState() == GManager.State.PAUSED
-                    && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))) {
+                    && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))) {
                 e.setCancelled(true);
                 return;
             }

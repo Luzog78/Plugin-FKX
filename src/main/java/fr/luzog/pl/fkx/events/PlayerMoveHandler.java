@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
+import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.game.GZone;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.event.EventHandler;
@@ -9,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PlayerMoveHandler implements Listener {
 
@@ -21,7 +23,7 @@ public class PlayerMoveHandler implements Listener {
                 return;
 
             if (p.getManager().getState() == GManager.State.PAUSED && (p.getTeam() == null
-                    || !p.getTeam().getId().equals(p.getManager().getGods().getId()))
+                    || !Objects.equals(p.getTeamId(), GTeam.GODS_ID))
                     && (e.getFrom().getX() != e.getTo().getX()
                     || e.getFrom().getZ() != e.getFrom().getZ())) {
                 e.getPlayer().teleport(e.getFrom());

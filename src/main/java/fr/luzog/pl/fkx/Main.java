@@ -25,7 +25,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 2.8";
+    public static final Object VERSION = "Version 2.9";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;

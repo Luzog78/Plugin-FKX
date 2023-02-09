@@ -8,6 +8,8 @@ import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class GuiPerm {
 
@@ -62,42 +64,102 @@ public class GuiPerm {
         return inv;
     }
 
+    public static Utils.Pair<ItemStack, ItemStack> getPermItem(GPermissions perms, GPermissions.Type t, String commandSpecification) {
+        GPermissions.Definition def = perms.getPermission(t);
+        Items.Builder b = Items.builder(Material.INK_SACK)
+                .setDurability((short) (def == GPermissions.Definition.ON ? 10 : def == GPermissions.Definition.OFF ? 1 : 8))
+                .setName("§6" + t.name() + " :  §f" + def.toFormattedString())
+                .setLore(
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic Gauche pour " + (def == GPermissions.Definition.ON ? "§4OFF" : "§2ON")
+                                + (def == GPermissions.Definition.DEFAULT ? "" : "\n§7Clic Droit pour §8DEFAULT"),
+                        " ",
+                        "§7Commandes :",
+                        "§7" + Main.CMD + " perm " + commandSpecification + " " + t.name() + " §8(§2ON §8| §4OFF§8)",
+                        "§7" + Main.CMD + " perm " + commandSpecification + " " + t.name() + " §8DEFAULT"
+                )
+                .setCantClickOn(true)
+                .setLeftRightCommandOnClick(Main.CMD + " perm " + commandSpecification + " " + t.name() + " "
+                                + (perms.getPermission(t) == GPermissions.Definition.ON ? "off" : "on")
+                                + "\n" + Main.CMD + " perm " + commandSpecification,
+                        (def == GPermissions.Definition.DEFAULT ? "" : Main.CMD + " perm " + commandSpecification
+                                + " " + t.name() + " default\n") + Main.CMD + " perm " + commandSpecification);
+        ItemStack temp = b.build().clone();
+        b.setDurability((short) 0);
+        switch (t) {
+            case PVP:
+                b.setType(Material.WOOD_SWORD);
+                break;
+
+            case FRIENDLY_FIRE:
+                b.setType(Material.DIAMOND_SWORD);
+                break;
+
+            case MOBS:
+                b.setType(Material.SKULL_ITEM).setDurability((short) 4);
+                break;
+
+            case BREAK:
+                b.setType(Material.WOOD_PICKAXE);
+                break;
+
+            case BREAKSPE:
+                b.setType(Material.DIAMOND_PICKAXE);
+                break;
+
+            case PLACE:
+                b.setType(Material.COBBLESTONE);
+                break;
+
+            case PLACESPE:
+                b.setType(Material.TNT);
+                break;
+
+            case CHAT_GLOBAL:
+                b.setType(Material.PAPER);
+                break;
+
+            case CHAT_TEAM:
+                b.setType(Material.EMPTY_MAP);
+                break;
+
+            case CHAT_PRIVATE:
+                b.setType(Material.MAP);
+                break;
+
+            case FK:
+                ItemStack fk = GManager.getBanner();
+                BannerMeta fkM = (BannerMeta) fk.getItemMeta(),
+                        m = (BannerMeta) b.setType(fk.getType()).setDurability(fk.getDurability()).update().getMeta();
+                if (fkM.getBaseColor() != null)
+                    m.setBaseColor(fkM.getBaseColor());
+                m.setPatterns(fkM.getPatterns());
+                b.setMeta(m);
+                break;
+
+            case KICK_WARN:
+                b.setType(Material.BOOK_AND_QUILL);
+                break;
+
+            case BAN:
+                b.setType(Material.NETHER_STAR);
+                break;
+        }
+        return new Utils.Pair<>(b.build(), temp);
+    }
+
     public static Inventory getPermsInv(GPermissions perms, ItemStack main, ItemStack second, String commandSpecification, String back) {
         Inventory inv = Guis.getBaseInventory("§fPermissions", 54, back, main, null);
 
-        int i = 1;
-        for (GPermissions.Type t : GPermissions.Type.values()) {
-            GPermissions.Definition def = perms.getPermission(t);
-            Items.Builder b = Items.builder(def == GPermissions.Definition.ON ? Items.lime()
-                            : def == GPermissions.Definition.OFF ? Items.red()
-                            : Items.gray())
-                    .setName("§6" + t.name() + " :  §f" + def.toFormattedString())
-                    .setLore(
-                            "§8" + Guis.loreSeparator,
-                            "§7Clic Gauche pour " + (def == GPermissions.Definition.ON ? "§4OFF" : "§2ON")
-                                    + (def == GPermissions.Definition.DEFAULT ? "" : "\n§7Clic Droit pour §8DEFAULT"),
-                            " ",
-                            "§7Commandes :",
-                            "§7" + Main.CMD + " perm " + commandSpecification + " " + t.name() + " §8(§2ON §8| §4OFF§8)",
-                            "§7" + Main.CMD + " perm " + commandSpecification + " " + t.name() + " §8DEFAULT"
-                    )
-                    .setCantClickOn(true)
-                    .setLeftRightCommandOnClick(Main.CMD + " perm " + commandSpecification + " " + t.name() + " "
-                                    + (perms.getPermission(t) == GPermissions.Definition.ON ? "off" : "on")
-                                    + "\n" + Main.CMD + " perm " + commandSpecification,
-                            (def == GPermissions.Definition.DEFAULT ? "" : Main.CMD + " perm " + commandSpecification
-                                    + " " + t.name() + " default\n") + Main.CMD + " perm " + commandSpecification);
-            Utils.fill(inv, Utils.posOf(i, 1), Utils.posOf(i, 4), b.build());
-            inv.setItem(Utils.posOf(i, i % 2 == 0 ? 4 : 3), b.setType(t == GPermissions.Type.PVP ?
-                    Material.WOOD_SWORD : t == GPermissions.Type.FRIENDLY_FIRE ? Material.DIAMOND_SWORD
-                    : t == GPermissions.Type.BREAK ? Material.WOOD_PICKAXE : t == GPermissions.Type.BREAKSPE ?
-                    Material.DIAMOND_PICKAXE : t == GPermissions.Type.MOBS ? Material.SKULL_ITEM
-                    : t == GPermissions.Type.PLACE ? Material.COBBLESTONE : t == GPermissions.Type.PLACESPE ?
-                    Material.TNT : Material.FIREWORK).setDurability((short) (t == GPermissions.Type.MOBS ? 4 : 0)).build());
-            i++;
-            if (i > 7)
-                break; // Security
-        }
+        int[] j = {10, 11, 12, 13, 14, 15, 16, 28, 29, 30, 32, 33, 34};
+        for (int i = 0; i < j.length; i++)
+            try {
+                Utils.Pair<ItemStack, ItemStack> pair = getPermItem(perms, GPermissions.Type.values()[i], commandSpecification);
+                inv.setItem(j[i], pair.getKey());
+                inv.setItem(j[i] + 9, pair.getValue());
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+            }
 
         inv.setItem(Utils.posOf(4, 1), second);
         return inv;

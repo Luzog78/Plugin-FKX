@@ -1,5 +1,6 @@
 package fr.luzog.pl.fkx.events;
 
+import com.google.common.base.Objects;
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPermissions;
@@ -48,7 +49,7 @@ public class BlockBreakHandler implements Listener {
         }
 
         if (Events.unbreakableMat.contains(e.getBlock().getType())
-                && fp.getTeam() != null && fp.getTeam().getId().equals(GTeam.GODS_ID)) {
+                && Objects.equal(fp.getTeamId(), GTeam.GODS_ID)) {
             e.setCancelled(true);
             e.getPlayer().sendMessage(Main.PREFIX + "§cBlock Incassable.");
             return;

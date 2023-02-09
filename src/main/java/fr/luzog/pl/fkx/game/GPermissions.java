@@ -12,9 +12,8 @@ public class GPermissions {
     public static enum Type {
         PVP, FRIENDLY_FIRE, MOBS,
         BREAK, BREAKSPE, PLACE, PLACESPE,
-//        CHAT_GLOBAL, CHAT_TEAM, CHAT_PRIVATE,
-//        FK, KICK_WARN, BAN
-        ;
+        CHAT_GLOBAL, CHAT_TEAM, CHAT_PRIVATE,
+        FK, KICK_WARN, BAN;
     }
 
     public static enum Definition {

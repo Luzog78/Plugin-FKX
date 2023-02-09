@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
+import java.util.Objects;
 
 public class BucketHandler implements Listener {
 
@@ -29,11 +30,11 @@ public class BucketHandler implements Listener {
         }
 
         if ((fp.getManager().getState() == GManager.State.PAUSED
-                && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))
                 || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? GPermissions.Type.PLACESPE :
                 GPermissions.Type.PLACE, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation()))
                 || fp.getManager().getTeams().stream().anyMatch(t -> t.isInside(e.getBlockClicked().getLocation())
-                && !t.getId().equals(fp.getTeam().getId()) && !fp.getTeam().getId().equals(GTeam.GODS_ID))) {
+                && !Objects.equals(t.getId(), fp.getTeamId()) && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))) {
             e.setCancelled(true);
             return;
         }
@@ -49,11 +50,11 @@ public class BucketHandler implements Listener {
         }
 
         if ((fp.getManager().getState() == GManager.State.PAUSED
-                && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))
+                && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))
                 || !fp.hasPermission(Events.specialMat.contains(e.getBucket()) ? GPermissions.Type.BREAKSPE :
                 GPermissions.Type.BREAK, Utils.normalize(e.getBlockClicked().getRelative(e.getBlockFace()).getLocation()))
                 || fp.getManager().getTeams().stream().anyMatch(t -> t.isInside(e.getBlockClicked().getLocation())
-                && !t.getId().equals(fp.getTeam().getId()) && !fp.getTeam().getId().equals(GTeam.GODS_ID))) {
+                && !Objects.equals(t.getId(), fp.getTeamId()) && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID))) {
             e.setCancelled(true);
             return;
         }

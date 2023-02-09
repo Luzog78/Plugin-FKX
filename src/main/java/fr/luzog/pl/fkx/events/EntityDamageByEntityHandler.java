@@ -14,6 +14,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Objects;
+
 public class EntityDamageByEntityHandler implements Listener {
 
     @EventHandler
@@ -70,7 +72,7 @@ public class EntityDamageByEntityHandler implements Listener {
                 }
             } else {
                 if ((event.getEntity().hasMetadata(GTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
-                        || (fp != null && (fp.getTeam() == null || !fp.getTeam().getId().equals(GTeam.GODS_ID)))))
+                        || (fp != null && (fp.getTeam() == null || !Objects.equals(fp.getTeamId(), GTeam.GODS_ID)))))
                         || (!event.getEntity().hasMetadata(GTeam.PLUNDER_STAND_TAG) && ((fp == null && !p.isOp())
                         || (fp != null && !fp.hasPermission(GPermissions.Type.MOBS,
                         event.getEntity().getLocation()))))) {
