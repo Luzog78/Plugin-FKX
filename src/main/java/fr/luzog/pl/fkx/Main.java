@@ -25,7 +25,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 2.6";
+    public static final Object VERSION = "Version 2.8";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
@@ -53,10 +53,11 @@ public class Main extends JavaPlugin implements Listener {
     public void onEnable() {
         globalConfig = new Config.Globals("Globals.yml").load()
                 .setVersion(VERSION, true)
-                .setLang("fr-FR", false)
+                .setLang("fr-FR", true)
                 .setSeason("Fallen Kingdom X", false)
                 .setIp("play.azion.fr", false)
                 .setOrga(Arrays.asList("Mathis_Bruel", "Luzog78"), false)
+                .setSpawnProtectionDuration(60, false)
                 .setWorlds("world", "world_nether", "world_the_end", false)
                 .setCustomVanillaCraftsActivated(false, false)
                 .setCustomCraftingTableActivated(true, false)
@@ -99,6 +100,7 @@ public class Main extends JavaPlugin implements Listener {
         SEASON = globalConfig.getSeason().replace(" ", "").toUpperCase();
         IP = globalConfig.getIp();
         ORGA = new ArrayList<>(globalConfig.getOrga());
+
         centerLength = 9 + SEASON.length();
 
         SYS_PREFIX = "§8[§l§4SYSTEM§r§8] §r";

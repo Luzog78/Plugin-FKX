@@ -341,7 +341,7 @@ public class GManager {
         setTime(0, false);
         setLinkedToSun(true, false);
         setOptions(GOptions.getDefaultOptions(), false);
-        setListener(new GListener(60 * 5), false);
+        setListener(new GListener(60 * 3), false);
         setLimits(new Limits(), false);
         setNether(new Portal("§dNether", loc, null, null, loc, null, null, Material.PORTAL, Material.AIR, (byte) 0, 100, false), false);
         setEnd(new Portal("§5End", loc, null, null, loc, null, null, Material.ENDER_PORTAL, Material.AIR, (byte) 0, 10, false), false);
@@ -356,14 +356,14 @@ public class GManager {
                         new GPermissions.Item(GPermissions.Type.MOBS, GPermissions.Definition.OFF))), false);
         setNormalZones(new ArrayList<GZone>() {{
             add(new GZone("nether", GZone.Type.ZONE,
-                    Bukkit.getWorld("world_nether").getSpawnLocation(),
-                    new Location(Bukkit.getWorld("world_nether"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-                    new Location(Bukkit.getWorld("world_nether"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    Main.nether.getSpawnLocation(),
+                    new Location(Main.nether, Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Main.nether, Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                     new GPermissions(GPermissions.Definition.ON)));
             add(new GZone("end", GZone.Type.ZONE,
-                    Bukkit.getWorld("world_the_end").getSpawnLocation(),
-                    new Location(Bukkit.getWorld("world_the_end"), Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
-                    new Location(Bukkit.getWorld("world_the_end"), Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
+                    Main.end.getSpawnLocation(),
+                    new Location(Main.end, Integer.MIN_VALUE, -1, Integer.MIN_VALUE),
+                    new Location(Main.end, Integer.MAX_VALUE, 256, Integer.MAX_VALUE),
                     new GPermissions(GPermissions.Definition.ON)));
         }}, false);
         setPlayers(new ArrayList<>(), false);

@@ -21,6 +21,7 @@ public class Config {
 
     public static class Globals extends Config {
         public static final String VERSION = "version", LANG = "lang", SEASON = "season", IP = "ip", ORGA = "orga",
+                SPAWN_PROTECTION_DURATION = "spawn-protection-duration",
                 OVERWORLD = "worlds.over", NETHER = "worlds.nether", END = "worlds.end",
                 CUSTOM_CRAFTS = "custom-options.vanilla-crafts",
                 CUSTOM_CRAFTING_TABLE = "custom-options.crafting-table",
@@ -68,6 +69,15 @@ public class Config {
 
         public List<String> getOrga() {
             return super.getStrList(ORGA);
+        }
+
+        public long getSpawnProtectionDuration() {
+            return super.getLong(SPAWN_PROTECTION_DURATION);
+        }
+
+        public Globals setSpawnProtectionDuration(long spawnProtectionDuration, boolean force) {
+            super.set(SPAWN_PROTECTION_DURATION, spawnProtectionDuration, force);
+            return this;
         }
 
         public World getOverworld() {

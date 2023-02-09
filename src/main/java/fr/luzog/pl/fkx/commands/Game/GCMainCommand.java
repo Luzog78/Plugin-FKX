@@ -80,7 +80,7 @@ public class GCMainCommand implements CommandExecutor, TabCompleter {
                         GCPortal.onCommand(sender, command, msg, args);
                     break;
                 case "stats":
-                    if (hasPerm(sender, true, true) && isNotNull(sender, true))
+                    if (isNotNull(sender, true))
                         GCStats.onCommand(sender, command, msg, args);
                     break;
                 case "teams":
@@ -162,7 +162,7 @@ public class GCMainCommand implements CommandExecutor, TabCompleter {
                 temp.add("players");
             if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("portal");
-            if (hasPerm(sender, true, false) && isNotNull(sender, false))
+            if (isNotNull(sender, false))
                 temp.add("stats");
             if (hasPerm(sender, true, false) && isNotNull(sender, false))
                 temp.add("teams");
@@ -221,7 +221,7 @@ public class GCMainCommand implements CommandExecutor, TabCompleter {
                         temp.addAll(GCPortal.onTabComplete(sender, command, msg, args));
                     break;
                 case "stats":
-                    if (hasPerm(sender, true, false) && isNotNull(sender, false))
+                    if (isNotNull(sender, false))
                         temp.addAll(GCStats.onTabComplete(sender, command, msg, args));
                     break;
                 case "teams":

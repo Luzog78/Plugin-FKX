@@ -35,6 +35,11 @@ public class EntityDamageByEntityHandler implements Listener {
         if (event.getDamager() instanceof Player) {
             Player p = (Player) event.getDamager();
 
+            if (EntityDamageHandler.spawnProtected.contains(p.getName())) {
+                EntityDamageHandler.spawnProtected.remove(p.getName());
+                p.sendMessage(EntityDamageHandler.spawnProtectionExpirationMessage);
+            }
+
             GPlayer fp = GManager.getCurrentGame() == null ? null : GManager.getCurrentGame().getPlayer(p.getName(), false);
             /*
              *  FKTeam t;
@@ -85,8 +90,11 @@ public class EntityDamageByEntityHandler implements Listener {
                 fp.getStats().increaseDamageDealt(event.getFinalDamage());
                 if (event.getEntity() instanceof Player && event.getCause() == EntityDamageByEntityEvent.DamageCause.PROJECTILE)
                     fp.getStats().increaseArrowsHit();
-                if (event.getEntity() instanceof Player && ((Player) event.getEntity()).getHealth() - event.getFinalDamage() <= 0)
+                if (event.getEntity() instanceof Player && !EntityDamageHandler.spawnProtected.contains(event.getEntity().getName())
+                        && ((Player) event.getEntity()).getHealth() - event.getFinalDamage() <= 0) {
                     fp.getStats().increaseKills();
+                    fp.saveStats();
+                }
             }
         }
     }

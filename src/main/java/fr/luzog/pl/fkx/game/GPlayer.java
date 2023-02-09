@@ -12,6 +12,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -178,8 +179,9 @@ public class GPlayer {
         if (getTeam() != null && getTeam().isInside(loc, incrementTeamRadius))
             return getTeam().getZone(true, incrementTeamRadius);
         for (GTeam team : getManager().getTeams())
-            if (team.isInside(loc, incrementTeamRadius))
-                return team.getZone(false, incrementTeamRadius);
+            if (!team.isEliminated())
+                if (team.isInside(loc, incrementTeamRadius))
+                    return team.getZone(false, incrementTeamRadius);
         for (GZone zone : getManager().getNormalZones())
             if (zone.isInside(loc))
                 return zone;
@@ -290,7 +292,19 @@ public class GPlayer {
         if (getManager() != null) {
             if (!getConfig(getManager().getId()).exists())
                 saveToConfig(getManager().getId(), true);
-            getConfig(getManager().getId()).load().setStats(stats, true).save();
+            Config.Player config = getConfig(getManager().getId()).load();
+            PlayerStats stats = config.getStats();
+            for (Field f : PlayerStats.class.getDeclaredFields()) {
+                f.setAccessible(true);
+                try {
+                    if (!Objects.equals(f.get(stats), f.get(this.stats))) {
+                        config.setStats(this.stats, true).save();
+                        break;
+                    }
+                } catch (IllegalAccessException ignored) {
+                }
+                f.setAccessible(false);
+            }
         }
     }
 

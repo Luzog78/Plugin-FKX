@@ -17,6 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 import static fr.luzog.pl.fkx.commands.Other.Ad.State.WAITING;
@@ -68,9 +69,15 @@ public class GListener {
     private Map<Integer, String> al; // Ancian ScoreBoard List -> to up to date
     private String scoreName = "Game" /* = "§6§l§n-=[ §1F§aa§3l§cl§5e§en §7K§6i§dn§4g§bd§2o§9m §8I §6]=-" */;
 
-    public GListener(long savingTimeOut) {
+    public GListener() {
+        this.savingTimeOut = 60 * 3; // 5 min in sec
+        savingCoolDown = savingTimeOut;
+        l = new HashMap<>();
+        al = new HashMap<>();
+    }
 
-        this.savingTimeOut = savingTimeOut; // 60 * 5; // 5 min in sec
+    public GListener(long savingTimeOutInSeconds) {
+        this.savingTimeOut = savingTimeOutInSeconds;
         savingCoolDown = savingTimeOut;
         l = new HashMap<>();
         al = new HashMap<>();
@@ -88,6 +95,7 @@ public class GListener {
             @Override
             public void run() {
                 if (countDown - 1 == 0) {
+                    manager.getPlayers().forEach(GPlayer::saveStats);
                     // TODO -> Save.save();
                     countDown = savingTimeOut * delayer;
                 } else
@@ -105,8 +113,8 @@ public class GListener {
                         Broadcast.succ("§e§lNouvelle journée !!§r Passage au jour !" + manager.getDay() + " !");
                         manager.checkActivations(false);
                         manager.saveManager(false);
-                        for(GPickableLocks.Lock lock : manager.getPickableLocks().getPickableLocks())
-                            if(lock.getLevel() == manager.getDay())
+                        for (GPickableLocks.Lock lock : manager.getPickableLocks().getPickableLocks())
+                            if (lock.getLevel() == manager.getDay())
                                 lock.broadcast();
                     } else if (manager.getTime() >= 24000 - 100 && manager.getTime() % 20 == 0)
                         Broadcast.log("Nouvelle journée dans !" + ((24000 - manager.getTime()) / 20) + " !secondes§r...");
@@ -324,9 +332,34 @@ public class GListener {
         f.add(" ");
 //        f.add("§6Save in " + (getSavingTime() < 60 ? "§c" + getSavingTime() + "§6s"
 //                : "§c" + ((int) (getSavingTime() / 60)) + "§6min and §c" + (getSavingTime() % 60) + "§6s"));
-        if(fp != null)
-            f.add("§8Kills : §b" + fp.getStats().getKills() + " §7-- §8Deaths : §a" + fp.getStats().getDeaths());
-        f.add("§8Online : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a " + Main.IP);
+        if (fp != null) {
+            double ratio;
+            String color;
+            if (fp.getStats().getKills() == 0 && fp.getStats().getDeaths() == 0) {
+                ratio = 1;
+                color = "§7⁼";
+            } else if (fp.getStats().getKills() == 0) {
+                ratio = Double.POSITIVE_INFINITY; // To avoid the "-" char
+                color = "§4⁻";
+            } else if (fp.getStats().getDeaths() == 0) {
+                ratio = Double.POSITIVE_INFINITY;
+                color = "§2⁺";
+            } else {
+                ratio = fp.getStats().getKills() / (fp.getStats().getDeaths() == 0 ? 0.5 : fp.getStats().getDeaths());
+                if (ratio < 1) {
+                    ratio = (1 / ratio);
+                    color = "§4⁻";
+                } else if (ratio > 1) {
+                    color = "§2⁺";
+                } else {
+                    color = "§7⁼";
+                }
+            }
+            f.add("§8Kills : §b" + fp.getStats().getKills() + "§7/§c" + fp.getStats().getDeaths()
+                    + " §7- §8Ratio : " + color + (ratio == Double.POSITIVE_INFINITY ? "∞"
+                    : new DecimalFormat("0.00").format(ratio)));
+        }
+        f.add("§8En ligne : §b" + Bukkit.getOnlinePlayers().size() + "§7/" + Bukkit.getMaxPlayers() + "   §8Ip :§a " + Main.IP);
         f.add("§c====================================");
         return Utils.getTabHeaderAndFooter(h, f);
     }

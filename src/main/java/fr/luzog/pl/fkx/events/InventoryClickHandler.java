@@ -26,36 +26,37 @@ public class InventoryClickHandler implements Listener {
 
     @EventHandler
     public static void onClick(InventoryClickEvent e) {
-        if (e.getInventory().getType() == InventoryType.BREWING && e.getCurrentItem().getType() == Material.POTION
-                && (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT)) {
-            e.setCancelled(true);
-            return;
-        }
-
-        if (e.getInventory().getType() == InventoryType.BREWING
-                && (e.getCurrentItem().getType() == Material.GLOWSTONE_DUST || (e.getCurrentItem().getType() == Material.AIR
-                && e.getCursor() != null && e.getCursor().getType() == Material.POTION
-                && (e.getSlot() == 0 || e.getSlot() == 1 || e.getSlot() == 2)))
-                && GManager.getCurrentGame() != null && GManager.getCurrentGame().getLimits() != null
-                && GManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) != null) {
-            Limits lim = GManager.getCurrentGame().getLimits();
-            HashMap<PotionEffectType, Integer> p = new HashMap<>();
-            for (ItemStack is : Arrays.asList(e.getCursor(), e.getInventory().getItem(0),
-                    e.getInventory().getItem(1), e.getInventory().getItem(2)))
-                if (is != null && is.getType() == Material.POTION) {
-                    Potion.fromItemStack(is).getEffects().forEach(pe -> {
-                        if (p.containsKey(pe.getType()))
-                            p.replace(pe.getType(), Math.max(pe.getAmplifier(), p.get(pe.getType())));
-                        else
-                            p.put(pe.getType(), pe.getAmplifier());
-                    });
-                }
-            for (PotionEffectType pet : p.keySet())
-                if (lim.getPotion().containsKey(pet) && p.get(pet) + 1 > lim.getPotion().get(pet)) {
-                    e.setCancelled(true);
-                    return;
-                }
-        }
+// DEPRECATED: Potion Limitations (Not needed anymore)
+//        if (e.getInventory().getType() == InventoryType.BREWING
+//                && e.getCurrentItem() != null && e.getCurrentItem().getType() == Material.POTION
+//                && (e.getClick() == ClickType.SHIFT_LEFT || e.getClick() == ClickType.SHIFT_RIGHT)) {
+//            e.setCancelled(true);
+//            return;
+//        }
+//        if (e.getInventory().getType() == InventoryType.BREWING
+//                && (e.getCurrentItem().getType() == Material.GLOWSTONE_DUST || (e.getCurrentItem().getType() == Material.AIR
+//                && e.getCursor() != null && e.getCursor().getType() == Material.POTION
+//                && (e.getSlot() == 0 || e.getSlot() == 1 || e.getSlot() == 2)))
+//                && GManager.getCurrentGame() != null && GManager.getCurrentGame().getLimits() != null
+//                && GManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false) != null) {
+//            Limits lim = GManager.getCurrentGame().getLimits();
+//            HashMap<PotionEffectType, Integer> p = new HashMap<>();
+//            for (ItemStack is : Arrays.asList(e.getCursor(), e.getInventory().getItem(0),
+//                    e.getInventory().getItem(1), e.getInventory().getItem(2)))
+//                if (is != null && is.getType() == Material.POTION) {
+//                    Potion.fromItemStack(is).getEffects().forEach(pe -> {
+//                        if (p.containsKey(pe.getType()))
+//                            p.replace(pe.getType(), Math.max(pe.getAmplifier(), p.get(pe.getType())));
+//                        else
+//                            p.put(pe.getType(), pe.getAmplifier());
+//                    });
+//                }
+//            for (PotionEffectType pet : p.keySet())
+//                if (lim.getPotion().containsKey(pet) && p.get(pet) + 1 > lim.getPotion().get(pet)) {
+//                    e.setCancelled(true);
+//                    return;
+//                }
+//        }
 
         if (GManager.getCurrentGame() != null && e.getInventory().getType() == InventoryType.ANVIL
                 && e.getRawSlot() == 2 && e.getCurrentItem() != null) {

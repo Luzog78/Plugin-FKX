@@ -28,8 +28,9 @@ public class PlayerInteractHandler implements Listener {
                 || (fp = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null)
             return;
 
-        if (GManager.getCurrentGame().getState() != GManager.State.RUNNING
-                && !Objects.equals(fp.getTeamId(), GTeam.GODS_ID)) {
+        boolean isGod = Objects.equals(fp.getTeamId(), GTeam.GODS_ID);
+
+        if (GManager.getCurrentGame().getState() != GManager.State.RUNNING && !isGod) {
             e.setCancelled(true);
             return;
         }
@@ -37,8 +38,13 @@ public class PlayerInteractHandler implements Listener {
         Action a = e.getAction();
         Player p = e.getPlayer();
 
+        if (EntityDamageHandler.spawnProtected.contains(p.getName())) {
+            EntityDamageHandler.spawnProtected.remove(p.getName());
+            p.sendMessage(EntityDamageHandler.spawnProtectionExpirationMessage);
+        }
+
         if (a == Action.RIGHT_CLICK_BLOCK && e.hasBlock())
-            if (e.getClickedBlock().getType() == Material.TNT
+            if (e.getClickedBlock().getType() == Material.TNT && !isGod
                     && !GManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
                 p.sendMessage("§cLes assauts ne sont pas activés.");
                 e.setCancelled(true);
@@ -58,16 +64,20 @@ public class PlayerInteractHandler implements Listener {
                     if (t.isInside(b.getLocation()))
                         if (Objects.equals(fp.getTeamId(), t.getId())) {
                             break;
-                        } else if (Objects.equals(fp.getTeamId(), GTeam.GODS_ID)) {
-                            if (sneak) {
-                                if (t.isEliminated())
-                                    p.sendMessage("§cÉquipe déjà en éliminée.");
-                                else if (t.isEliminating())
-                                    p.sendMessage("§cÉquipe déjà en élimination.");
-                                else
-                                    t.tryToEliminate(fp.getTeam(), l);
-                                e.setCancelled(true);
-                            }
+                        } else if (isGod) {
+//                            if (sneak) {
+//                                if (t.isEliminated())
+//                                    p.sendMessage("§cÉquipe déjà en éliminée.");
+//                                else if (t.isEliminating())
+//                                    p.sendMessage("§cÉquipe déjà en élimination.");
+//                                else
+//                                    t.tryToEliminate(fp.getTeam(), l);
+//                                e.setCancelled(true);
+//                            }
+                            break;
+                        } else if (Objects.equals(fp.getTeamId(), GTeam.SPECS_ID)) {
+                            p.sendMessage("§cVous ne pouvez pas ouvrir ce coffre.");
+                            e.setCancelled(true);
                             break;
                         } else if (!GManager.getCurrentGame().getOptions().getAssaults().isActivated()) {
                             p.sendMessage("§7§oVous ouvrez un coffre §6" + t.getColor() + t.getName()

@@ -63,94 +63,101 @@ public class GCStats {
                         } catch (IllegalAccessException ignored) {
                             u.err(CmdUtils.err_unknown);
                         }
-                    else if (args[2].equalsIgnoreCase("reset"))
-                        try {
-                            f.setAccessible(true);
-                            f.set(p.getStats(), 0);
-                            f.setAccessible(false);
-                            u.succ("La statistique a été réinitialisée.");
-                        } catch (IllegalAccessException ignored) {
-                            u.err(CmdUtils.err_unknown);
-                        }
-                    else if (args.length >= 5)
-                        if (args[2].equalsIgnoreCase("set"))
+                    else if (GCMainCommand.hasPerm(sender, true, true))
+                        if (args[2].equalsIgnoreCase("reset"))
                             try {
                                 f.setAccessible(true);
-                                if (f.getType() == int.class)
-                                    f.set(p.getStats(), Integer.parseInt(args[4]));
-                                else if (f.getType() == double.class)
-                                    f.set(p.getStats(), Double.parseDouble(args[4]));
-                                else if (f.getType() == float.class)
-                                    f.set(p.getStats(), Float.parseFloat(args[4]));
-                                else if (f.getType() == long.class)
-                                    f.set(p.getStats(), Long.parseLong(args[4]));
-                                else if (f.getType() == short.class)
-                                    f.set(p.getStats(), Short.parseShort(args[4]));
-                                else if (f.getType() == byte.class)
-                                    f.set(p.getStats(), Byte.parseByte(args[4]));
-                                else if (f.getType() == boolean.class)
-                                    f.set(p.getStats(), Boolean.parseBoolean(args[4]));
-                                else if (f.getType() == String.class)
-                                    f.set(p.getStats(), args[4]);
+                                f.set(p.getStats(), 0);
                                 f.setAccessible(false);
-                                u.succ("La statistique a été mise à jour !");
+                                p.saveStats();
+                                u.succ("La statistique a été réinitialisée.");
                             } catch (IllegalAccessException ignored) {
                                 u.err(CmdUtils.err_unknown);
-                            } catch (NumberFormatException e) {
-                                u.err(CmdUtils.err_number_format);
                             }
-                        else if (args[2].equalsIgnoreCase("increase"))
-                            try {
-                                f.setAccessible(true);
-                                if (f.getType() == int.class)
-                                    f.set(p.getStats(), (int) f.get(p.getStats()) + Integer.parseInt(args[4]));
-                                else if (f.getType() == double.class)
-                                    f.set(p.getStats(), (double) f.get(p.getStats()) + Double.parseDouble(args[4]));
-                                else if (f.getType() == float.class)
-                                    f.set(p.getStats(), (float) f.get(p.getStats()) + Float.parseFloat(args[4]));
-                                else if (f.getType() == long.class)
-                                    f.set(p.getStats(), (long) f.get(p.getStats()) + Long.parseLong(args[4]));
-                                else if (f.getType() == short.class)
-                                    f.set(p.getStats(), (short) f.get(p.getStats()) + Short.parseShort(args[4]));
-                                else if (f.getType() == byte.class)
-                                    f.set(p.getStats(), (byte) f.get(p.getStats()) + Byte.parseByte(args[4]));
-                                else if (f.getType() == boolean.class)
-                                    f.set(p.getStats(), (boolean) f.get(p.getStats()) || Boolean.parseBoolean(args[4]));
-                                else if (f.getType() == String.class)
-                                    f.set(p.getStats(), f.get(p.getStats()) + args[4]);
-                                f.setAccessible(false);
-                                u.succ("La statistique a été mise à jour !");
-                            } catch (IllegalAccessException ignored) {
-                                u.err(CmdUtils.err_unknown);
-                            } catch (NumberFormatException e) {
-                                u.err(CmdUtils.err_number_format);
-                            }
-                        else if (args[2].equalsIgnoreCase("decrease"))
-                            try {
-                                f.setAccessible(true);
-                                if (f.getType() == int.class)
-                                    f.set(p.getStats(), (int) f.get(p.getStats()) - Integer.parseInt(args[4]));
-                                else if (f.getType() == double.class)
-                                    f.set(p.getStats(), (double) f.get(p.getStats()) - Double.parseDouble(args[4]));
-                                else if (f.getType() == float.class)
-                                    f.set(p.getStats(), (float) f.get(p.getStats()) - Float.parseFloat(args[4]));
-                                else if (f.getType() == long.class)
-                                    f.set(p.getStats(), (long) f.get(p.getStats()) - Long.parseLong(args[4]));
-                                else if (f.getType() == short.class)
-                                    f.set(p.getStats(), (short) f.get(p.getStats()) - Short.parseShort(args[4]));
-                                else if (f.getType() == byte.class)
-                                    f.set(p.getStats(), (byte) f.get(p.getStats()) - Byte.parseByte(args[4]));
-                                else if (f.getType() == boolean.class)
-                                    f.set(p.getStats(), (boolean) f.get(p.getStats()) && Boolean.parseBoolean(args[4]));
-                                else if (f.getType() == String.class)
-                                    f.set(p.getStats(), args[4] + f.get(p.getStats()));
-                                f.setAccessible(false);
-                                u.succ("La statistique a été mise à jour !");
-                            } catch (IllegalAccessException ignored) {
-                                u.err(CmdUtils.err_unknown);
-                            } catch (NumberFormatException e) {
-                                u.err(CmdUtils.err_number_format);
-                            }
+                        else if (args.length >= 5)
+                            if (args[2].equalsIgnoreCase("set"))
+                                try {
+                                    f.setAccessible(true);
+                                    if (f.getType() == int.class)
+                                        f.set(p.getStats(), Integer.parseInt(args[4]));
+                                    else if (f.getType() == double.class)
+                                        f.set(p.getStats(), Double.parseDouble(args[4]));
+                                    else if (f.getType() == float.class)
+                                        f.set(p.getStats(), Float.parseFloat(args[4]));
+                                    else if (f.getType() == long.class)
+                                        f.set(p.getStats(), Long.parseLong(args[4]));
+                                    else if (f.getType() == short.class)
+                                        f.set(p.getStats(), Short.parseShort(args[4]));
+                                    else if (f.getType() == byte.class)
+                                        f.set(p.getStats(), Byte.parseByte(args[4]));
+                                    else if (f.getType() == boolean.class)
+                                        f.set(p.getStats(), Boolean.parseBoolean(args[4]));
+                                    else if (f.getType() == String.class)
+                                        f.set(p.getStats(), args[4]);
+                                    f.setAccessible(false);
+                                    p.saveStats();
+                                    u.succ("La statistique a été mise à jour !");
+                                } catch (IllegalAccessException ignored) {
+                                    u.err(CmdUtils.err_unknown);
+                                } catch (NumberFormatException e) {
+                                    u.err(CmdUtils.err_number_format);
+                                }
+                            else if (args[2].equalsIgnoreCase("increase"))
+                                try {
+                                    f.setAccessible(true);
+                                    if (f.getType() == int.class)
+                                        f.set(p.getStats(), (int) f.get(p.getStats()) + Integer.parseInt(args[4]));
+                                    else if (f.getType() == double.class)
+                                        f.set(p.getStats(), (double) f.get(p.getStats()) + Double.parseDouble(args[4]));
+                                    else if (f.getType() == float.class)
+                                        f.set(p.getStats(), (float) f.get(p.getStats()) + Float.parseFloat(args[4]));
+                                    else if (f.getType() == long.class)
+                                        f.set(p.getStats(), (long) f.get(p.getStats()) + Long.parseLong(args[4]));
+                                    else if (f.getType() == short.class)
+                                        f.set(p.getStats(), (short) f.get(p.getStats()) + Short.parseShort(args[4]));
+                                    else if (f.getType() == byte.class)
+                                        f.set(p.getStats(), (byte) f.get(p.getStats()) + Byte.parseByte(args[4]));
+                                    else if (f.getType() == boolean.class)
+                                        f.set(p.getStats(), (boolean) f.get(p.getStats()) || Boolean.parseBoolean(args[4]));
+                                    else if (f.getType() == String.class)
+                                        f.set(p.getStats(), f.get(p.getStats()) + args[4]);
+                                    f.setAccessible(false);
+                                    p.saveStats();
+                                    u.succ("La statistique a été mise à jour !");
+                                } catch (IllegalAccessException ignored) {
+                                    u.err(CmdUtils.err_unknown);
+                                } catch (NumberFormatException e) {
+                                    u.err(CmdUtils.err_number_format);
+                                }
+                            else if (args[2].equalsIgnoreCase("decrease"))
+                                try {
+                                    f.setAccessible(true);
+                                    if (f.getType() == int.class)
+                                        f.set(p.getStats(), (int) f.get(p.getStats()) - Integer.parseInt(args[4]));
+                                    else if (f.getType() == double.class)
+                                        f.set(p.getStats(), (double) f.get(p.getStats()) - Double.parseDouble(args[4]));
+                                    else if (f.getType() == float.class)
+                                        f.set(p.getStats(), (float) f.get(p.getStats()) - Float.parseFloat(args[4]));
+                                    else if (f.getType() == long.class)
+                                        f.set(p.getStats(), (long) f.get(p.getStats()) - Long.parseLong(args[4]));
+                                    else if (f.getType() == short.class)
+                                        f.set(p.getStats(), (short) f.get(p.getStats()) - Short.parseShort(args[4]));
+                                    else if (f.getType() == byte.class)
+                                        f.set(p.getStats(), (byte) f.get(p.getStats()) - Byte.parseByte(args[4]));
+                                    else if (f.getType() == boolean.class)
+                                        f.set(p.getStats(), (boolean) f.get(p.getStats()) && Boolean.parseBoolean(args[4]));
+                                    else if (f.getType() == String.class)
+                                        f.set(p.getStats(), args[4] + f.get(p.getStats()));
+                                    f.setAccessible(false);
+                                    p.saveStats();
+                                    u.succ("La statistique a été mise à jour !");
+                                } catch (IllegalAccessException ignored) {
+                                    u.err(CmdUtils.err_unknown);
+                                } catch (NumberFormatException e) {
+                                    u.err(CmdUtils.err_number_format);
+                                }
+                            else
+                                u.synt();
                         else
                             u.synt();
                     else
@@ -173,10 +180,12 @@ public class GCStats {
                 addAll(Utils.getAllPlayers());
             } else if (args.length == 3 && GManager.getCurrentGame().getPlayer(args[1], false) != null) {
                 add("get");
-                add("set");
-                add("increase");
-                add("decrease");
-                add("reset");
+                if (GCMainCommand.hasPerm(sender, true, false)) {
+                    add("set");
+                    add("increase");
+                    add("decrease");
+                    add("reset");
+                }
             } else if (args.length == 4 && GManager.getCurrentGame().getPlayer(args[1], false) != null) {
                 add("all");
                 for (Field field : PlayerStats.class.getDeclaredFields())

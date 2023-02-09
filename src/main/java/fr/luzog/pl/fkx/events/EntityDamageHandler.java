@@ -5,7 +5,6 @@ import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.game.GTeam;
 import fr.luzog.pl.fkx.utils.Broadcast;
-import fr.luzog.pl.fkx.utils.Loots;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,6 +21,9 @@ import java.util.List;
 import java.util.Random;
 
 public class EntityDamageHandler implements Listener {
+
+    public static List<String> spawnProtected = new ArrayList<>();
+    public static String spawnProtectionExpirationMessage = "§aVous êtes désormais §6vulnérable§a...";
 
     @EventHandler
     public static void onDamage(EntityDamageEvent e) {
@@ -45,7 +47,8 @@ public class EntityDamageHandler implements Listener {
             Player p = (Player) e.getEntity();
             GPlayer fp = GManager.getCurrentGame() == null ? null : GManager.getCurrentGame().getPlayer(p.getName(), false);
 
-            if (fp == null || (fp.getManager().getState() == GManager.State.PAUSED
+            if (fp == null || spawnProtected.contains(p.getName())
+                    || (fp.getManager().getState() == GManager.State.PAUSED
                     && !fp.getTeam().getId().equals(fp.getManager().getGods().getId()))) {
                 e.setCancelled(true);
                 return;
@@ -54,8 +57,9 @@ public class EntityDamageHandler implements Listener {
             if (e.getDamage() < 1_000_000_000_000_000_000_000.0) // Avoid /kill command
                 fp.getStats().increaseDamageTaken(e.getDamage());
 
-            if (entity.getHealth() - e.getFinalDamage() <= 0) {
+            if (entity.getHealth() - e.getFinalDamage() <= 0 && e.getCause() != EntityDamageEvent.DamageCause.POISON) {
                 fp.getStats().increaseDeaths();
+                fp.saveStats();
                 List<String> m = new ArrayList<>();
                 switch (e.getCause()) {
                     case BLOCK_EXPLOSION:
@@ -126,6 +130,7 @@ public class EntityDamageHandler implements Listener {
                         m.add("a été fondu.");
                         break;
                     case POISON:
+                        // Useless: Poison can't kill
                         m.add("a été empoisonné.");
                         break;
                     case PROJECTILE:
@@ -191,6 +196,16 @@ public class EntityDamageHandler implements Listener {
                 }};
                 p.getInventory().setArmorContents(new ItemStack[4]);
                 p.getInventory().clear();
+                spawnProtected.add(p.getName());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (spawnProtected.contains(p.getName())) {
+                            spawnProtected.remove(p.getName());
+                            p.sendMessage(spawnProtectionExpirationMessage);
+                        }
+                    }
+                }.runTaskLater(Main.instance, Main.globalConfig.getSpawnProtectionDuration());
             }
         } else if (entity.getHealth() - e.getFinalDamage() <= 0)
             new BukkitRunnable() {

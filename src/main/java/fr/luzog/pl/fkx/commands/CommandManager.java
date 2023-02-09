@@ -8,7 +8,6 @@ import fr.luzog.pl.fkx.commands.Game.GCMainCommand;
 import fr.luzog.pl.fkx.commands.Location.Tp;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.commands.Other.Test;
-import fr.luzog.pl.fkx.commands.Server.R;
 import fr.luzog.pl.fkx.commands.Utils.Craft;
 import fr.luzog.pl.fkx.commands.Utils.EnderChest;
 import fr.luzog.pl.fkx.commands.Utils.InputGUIAndTools;
@@ -66,7 +65,6 @@ public class CommandManager {
             new CommandItem(new Test(), "test"),
 
             // Server
-            new CommandItem(new R(), "r"),
 
             // Utils
             new CommandItem(new Craft(), "craft"),
