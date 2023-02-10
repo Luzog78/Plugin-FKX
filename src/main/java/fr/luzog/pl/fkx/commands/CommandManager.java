@@ -25,6 +25,7 @@ public class CommandManager {
 
     private static final ArrayList<CommandItem> commands = new ArrayList<>(Arrays.asList(
             // Admin
+            new CommandItem(new Ban(), "ban"),
             new CommandItem(new Execute(), "execute"),
             new CommandItem(new Gm(), "gm"),
             new CommandItem(new Gm(GameMode.SURVIVAL), "gm0"),
@@ -32,6 +33,8 @@ public class CommandManager {
             new CommandItem(new Gm(GameMode.ADVENTURE), "gm2"),
             new CommandItem(new Gm(GameMode.SPECTATOR), "gm3"),
             new CommandItem(new InvSee(), "invsee"),
+            new CommandItem(new Kick(), "kick"),
+            new CommandItem(new Pardon(), "pardon"),
             new CommandItem(new Vanish(), "vanish"),
             new CommandItem(new Weather(Weather.WeatherType.SUN), "sun"),
             new CommandItem(new Weather(Weather.WeatherType.RAIN), "rain"),

@@ -6,8 +6,8 @@
 
 # Plugin Infos
 name: FKX
-version: 2.10
-description: "\n\n    §6-------------[ §9§lFKX §6]-------------§r\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 2.10.4 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n    §6-------------------------------\n \n"
+version: 2.11
+description: "\n\n    §6-------------[ §9§lFKX §6]-------------§r\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 2.11.8 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n    §6-------------------------------\n \n"
 
 # Authors Infos
 author: Luzog78
@@ -45,10 +45,6 @@ commands:
   execute:
     description: Force to execute command
     permission: game.admin.execute
-  invsee:
-    aliases: [ seeinventory ]
-    description: See an inventory
-    permission: game.admin.invsee
   sun:
     description: Change Weather.
     permission: game.admin.sun
@@ -78,6 +74,17 @@ commands:
     aliases: [ g3 ]
     description: Change GameMode
     permission: game.admin.gm3
+  invsee:
+    aliases: [ seeinventory ]
+    description: See an inventory
+    permission: game.admin.invsee
+  kick:
+    description: Kick a player
+  ban:
+    description: Ban a player
+  pardon:
+    aliases: [ unban ]
+    description: Unban a player
   vanish:
     aliases: [ v ]
     description: Toggle Vanish Mod

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.commands.Admin.Kick;
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -25,6 +26,8 @@ public class PlayerJoinQuitHandler implements Listener {
     public static String ban = "§8§l[§4§l" + FF_EXCALMATION + FF_EXCALMATION + "§8§l] §7";
     public static String connexionInventory = "connexion";
     public static int maxConnexionInventories = 10;
+
+    public static List<String> silent = new ArrayList<>();
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
@@ -111,7 +114,11 @@ public class PlayerJoinQuitHandler implements Listener {
         String displayName = gPlayers.isEmpty() ? e.getPlayer().getName()
                 : gPlayers.size() > 1 ? gPlayers.stream().map(GPlayer::getDisplayName).collect(Collectors.joining("§r"))
                 : gPlayers.get(0).getDisplayName();
-        Bukkit.broadcastMessage((e.getPlayer().isBanned() ? ban : quit) + displayName);
+        if (silent.contains(e.getPlayer().getName())) {
+            silent.remove(e.getPlayer().getName());
+        } else {
+            Bukkit.broadcastMessage(quit + displayName);
+        }
 
         new BukkitRunnable() {
             @Override
