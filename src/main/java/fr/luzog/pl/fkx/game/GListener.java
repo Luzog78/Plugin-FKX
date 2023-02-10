@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.game;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Vanish;
+import fr.luzog.pl.fkx.commands.Chat.Msg;
 import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.utils.Broadcast;
 import fr.luzog.pl.fkx.utils.Color;
@@ -135,6 +136,20 @@ public class GListener {
 
                 setScoreLines();
                 updateScoreLines();
+
+                Msg.replies.forEach((p, r) -> {
+                    if (r == null)
+                        return;
+                    if (r.getValue() == 0)
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                Msg.replies.remove(p);
+                            }
+                        }.runTask(Main.instance);
+                    else
+                        r.setValue(r.getValue() - 5);
+                });
 
                 manager.getPlayers().forEach(gPlayer -> {
                     Player p = gPlayer.getPlayer();

@@ -2,6 +2,8 @@ package fr.luzog.pl.fkx.commands;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.*;
+import fr.luzog.pl.fkx.commands.Chat.Msg;
+import fr.luzog.pl.fkx.commands.Chat.Reply;
 import fr.luzog.pl.fkx.commands.Cheat.*;
 import fr.luzog.pl.fkx.commands.Fun.*;
 import fr.luzog.pl.fkx.commands.Game.GCMainCommand;
@@ -34,6 +36,10 @@ public class CommandManager {
             new CommandItem(new Weather(Weather.WeatherType.SUN), "sun"),
             new CommandItem(new Weather(Weather.WeatherType.RAIN), "rain"),
             new CommandItem(new Weather(Weather.WeatherType.THUNDER), "thunder"),
+
+            // Chat
+            new CommandItem(new Msg(), "msg"),
+            new CommandItem(new Reply(), "reply"),
 
             // Cheat
             new CommandItem(new Enchant(), "ench"),

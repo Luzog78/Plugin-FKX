@@ -6,8 +6,8 @@
 
 # Plugin Infos
 name: FKX
-version: 2.9
-description: "\n\n    §6-------------[ §9§lFKX §6]-------------§r\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 2.9.4 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n    §6-------------------------------\n \n"
+version: 2.10
+description: "\n\n    §6-------------[ §9§lFKX §6]-------------§r\n      This plugin is the New Fallen Kingdom\n          Server's Plugin.§r\n       Version 2.10.4 - Made by Luzog78§r\n           In July 2022§r\n        Enjoy !\n    §6-------------------------------\n \n"
 
 # Authors Infos
 author: Luzog78
@@ -82,6 +82,14 @@ commands:
     aliases: [ v ]
     description: Toggle Vanish Mod
     permission: game.admin.vanish
+
+  # Chat
+  msg:
+    aliases: [ m, tell, t, whisper, w, pm, message ]
+    description: Send a private message
+  reply:
+    aliases: [ r, rep, repondre ]
+    description: Reply to a private message
 
   # Cheat
   ench:

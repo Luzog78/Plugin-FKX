@@ -261,6 +261,176 @@ public class Utils {
         }
     }
 
+    public static class TripleMap<A, B, C> {
+        private final ArrayList<Triple<A, B, C>> list;
+
+        public TripleMap() {
+            list = new ArrayList<>();
+        }
+
+        public void put(A a, B b, C c) {
+            list.add(new Triple<>(a, b, c));
+        }
+
+        public Triple<A, B, C> get(int index) {
+            return list.get(index);
+        }
+
+        public List<Triple<A, B, C>> getByA(A a) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByB(B b) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getB().equals(b))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByC(C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getC().equals(c))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByAB(A a, B b) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getB().equals(b))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByAC(A a, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByBC(B b, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getB().equals(b) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getByABC(A a, B b, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getB().equals(b) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            return result;
+        }
+
+        public List<Triple<A, B, C>> getAll() {
+            return list;
+        }
+
+        public void remove(int index) {
+            list.remove(index);
+        }
+
+        public void remove(Triple<A, B, C> triple) {
+            list.remove(triple);
+        }
+
+        public void removeByA(A a) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByB(B b) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getB().equals(b))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByC(C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getC().equals(c))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByAB(A a, B b) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getB().equals(b))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByAC(A a, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByBC(B b, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getB().equals(b) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void removeByABC(A a, B b, C c) {
+            List<Triple<A, B, C>> result = new ArrayList<>();
+            for (Triple<A, B, C> triple : list) {
+                if (triple.getA().equals(a) && triple.getB().equals(b) && triple.getC().equals(c))
+                    result.add(triple);
+            }
+            list.removeAll(result);
+        }
+
+        public void clear() {
+            list.clear();
+        }
+
+        public int size() {
+            return list.size();
+        }
+
+        public boolean isEmpty() {
+            return list.isEmpty();
+        }
+
+        public boolean contains(Triple<A, B, C> triple) {
+            return list.contains(triple);
+        }
+    }
+
     public static class SavedInventory {
         private String id;
         private String name;

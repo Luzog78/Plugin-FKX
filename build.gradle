@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'fr.luzog.pl'
-version 'v2.9'
+version 'v2.10'
 
 compileJava.options.encoding = 'UTF-8'
 
