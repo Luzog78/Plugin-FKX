@@ -78,11 +78,11 @@ public class InventoryClickHandler implements Listener {
             }
         }
 
-        List<GPlayer> fps = GManager.getGlobalPlayer(e.getWhoClicked().getName());
-
-        for (GPlayer fp : fps)
-            if (fp != null)
-                fp.getStats().increaseClicksOnInventory();
+        GPlayer gp = null;
+        if (GManager.getCurrentGame() != null
+                && (gp = GManager.getCurrentGame().getPlayer(e.getWhoClicked().getName(), false)) != null) {
+            gp.getStats().increaseClicksOnInventory();
+        }
 
         if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.AIR)
             if (e.getWhoClicked() instanceof Player) {

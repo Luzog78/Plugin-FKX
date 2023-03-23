@@ -688,52 +688,52 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onDropItem(PlayerDropItemEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
-        if (gPlayers.isEmpty()) {
+        GPlayer gPlayer;
+        if (GManager.getCurrentGame() == null
+                || (gPlayer = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
             e.setCancelled(true);
             return;
         }
 
-        for (GPlayer gPlayer : gPlayers) {
-            if (gPlayer != null)
-                gPlayer.getStats().increaseDroppedItems();
-
-            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
-                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
-                e.setCancelled(true);
+        if (gPlayer.getManager().getState() == GManager.State.PAUSED
+                && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId())) {
+            e.setCancelled(true);
+            return;
         }
+
+        gPlayer.getStats().increaseDroppedItems();
     }
 
     @EventHandler
     public static void onPickupItem(PlayerPickupItemEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
-        if (gPlayers.isEmpty()) {
+        GPlayer gPlayer;
+        if (GManager.getCurrentGame() == null
+                || (gPlayer = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
             e.setCancelled(true);
             return;
         }
 
-        for (GPlayer gPlayer : gPlayers) {
-            if (gPlayer != null)
-                gPlayer.getStats().increasePickedItems();
-
-            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
-                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
-                e.setCancelled(true);
+        if (gPlayer.getManager().getState() == GManager.State.PAUSED
+                && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId())) {
+            e.setCancelled(true);
+            return;
         }
+
+        gPlayer.getStats().increasePickedItems();
     }
 
     @EventHandler
     public static void onBedEnter(PlayerBedEnterEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
-        if (gPlayers.isEmpty()) {
+        GPlayer gPlayer;
+        if (GManager.getCurrentGame() == null
+                || (gPlayer = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
             e.setCancelled(true);
             return;
         }
 
-        for (GPlayer gPlayer : gPlayers)
-            if (gPlayer != null && gPlayer.getManager().getState() == GManager.State.PAUSED
-                    && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
-                e.setCancelled(true);
+        if (gPlayer.getManager().getState() == GManager.State.PAUSED
+                && !gPlayer.getTeam().getId().equals(gPlayer.getManager().getGods().getId()))
+            e.setCancelled(true);
     }
 
     @EventHandler
@@ -791,23 +791,31 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onTeleport(PlayerTeleportEvent e) {
-        if (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL || e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL)
+        if (e.getCause() == PlayerTeleportEvent.TeleportCause.NETHER_PORTAL)
             e.setCancelled(true);
+        if (e.getCause() == PlayerTeleportEvent.TeleportCause.END_PORTAL) {
+            if (Main.end != null && e.getPlayer().getLocation().getWorld().getUID().equals(Main.end.getUID())
+                    && GManager.getCurrentGame() != null && GManager.getCurrentGame().getSpawn() != null
+                    && GManager.getCurrentGame().getSpawn().getSpawn() != null) {
+                e.getPlayer().teleport(GManager.getCurrentGame().getSpawn().getSpawn());
+            } else {
+                e.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
     public static void onFood(FoodLevelChangeEvent e) {
-        if (GManager.getCurrentGame() == null || GManager.getCurrentGame()
-                .getPlayer(e.getEntity().getName(), false) == null
-                || GManager.getCurrentGame().getState() != GManager.State.RUNNING) {
+        GPlayer p;
+        if (GManager.getCurrentGame() == null
+                || (p = GManager.getCurrentGame().getPlayer(e.getEntity().getName(), false)) == null
+                || p.getManager().getState() != GManager.State.RUNNING) {
             e.setCancelled(true);
             return;
         }
 
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
-        for (GPlayer p : gPlayers)
-            if (e.getEntity() instanceof Player && p != null && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
-                p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
+        if (e.getEntity() instanceof Player && e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel() > 0)
+            p.getStats().increaseRegainedFood((e.getFoodLevel() - ((Player) e.getEntity()).getFoodLevel()));
     }
 
     @EventHandler
@@ -829,32 +837,29 @@ public class Events implements Listener {
     @EventHandler
     public static void onShoot(EntityShootBowEvent e) {
         if (e.getEntity() instanceof Player) {
-            List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEntity().getName());
-            if (gPlayers.isEmpty()) {
+            GPlayer p;
+            if (GManager.getCurrentGame() == null
+                    || (p = GManager.getCurrentGame().getPlayer(e.getEntity().getName(), false)) == null) {
                 e.setCancelled(true);
                 return;
             }
 
-            for (GPlayer p : gPlayers)
-                if (p != null)
-                    p.getStats().increaseArrowsShot();
+            p.getStats().increaseArrowsShot();
         }
     }
 
     @EventHandler
     public static void onEnchant(EnchantItemEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getEnchanter().getName());
-        if (gPlayers.isEmpty()) {
+        GPlayer p;
+        if (GManager.getCurrentGame() == null
+                || (p = GManager.getCurrentGame().getPlayer(e.getEnchanter().getName(), false)) == null) {
             e.setCancelled(true);
             return;
         }
 
-        for (GPlayer p : gPlayers)
-            if (p != null)
-                p.getStats().increaseEnchantedItems();
+        p.getStats().increaseEnchantedItems();
 
-        if (GManager.getCurrentGame() == null || GManager.getCurrentGame().getLimits() == null
-                || GManager.getCurrentGame().getPlayer(e.getEnchanter().getName(), false) == null)
+        if (GManager.getCurrentGame().getLimits() == null)
             return;
 
         Limits lim = GManager.getCurrentGame().getLimits();
@@ -871,11 +876,12 @@ public class Events implements Listener {
 
     @EventHandler
     public static void onOpenInventory(InventoryOpenEvent e) {
-        List<GPlayer> gPlayers = GManager.getGlobalPlayer(e.getPlayer().getName());
-
-        for (GPlayer p : gPlayers)
-            if (p != null)
-                p.getStats().increaseInventoriesOpened();
+        GPlayer p;
+        if (GManager.getCurrentGame() == null
+                || (p = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false)) == null) {
+            return;
+        }
+        p.getStats().increaseInventoriesOpened();
     }
 
     @EventHandler

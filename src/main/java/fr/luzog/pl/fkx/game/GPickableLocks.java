@@ -324,7 +324,8 @@ public class GPickableLocks {
                 return;
 
             GPickableLocks pickableLocks = gPlayer.getManager().getPickableLocks();
-            if (!pickableLocks.isPickableLock(b.getLocation()) || pickableLocks.getLock(b.getMetadata(LOCK_ID_TAG).get(0).asString()) == null) {
+            if (!pickableLocks.isPickableLock(b.getLocation()) || b.hasMetadata(LOCK_ID_TAG)
+                    || pickableLocks.getLock(b.getMetadata(LOCK_ID_TAG).get(0).asString()) == null) {
                 if (is != null && new CustomNBT(is).hasKey(RARITY_TAG) && new CustomNBT(is).getString(RARITY_TAG).equals("admin"))
                     if (a == RIGHT_CLICK_BLOCK) {
                         p.sendMessage("§cCe bloc n'est pas un coffre crochetable." +

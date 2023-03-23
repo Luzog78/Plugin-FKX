@@ -271,11 +271,7 @@ public class GPlayer {
     }
 
     public String getDisplayName() {
-        return (Vanish.isVanished(name) && Vanish.isPrefix ? Vanish.pre_suf_ix : "")
-                + (getTeam() != null ? getTeam().getPrefix() : "")
-                + name
-                + (Vanish.isVanished(name) && !Vanish.isPrefix ? Vanish.pre_suf_ix : "")
-                + "§r";
+        return  (getTeam() != null ? getTeam().getPrefix() : "") + name + "§r";
     }
 
     public PlayerStats getStats() {

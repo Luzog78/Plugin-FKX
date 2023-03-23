@@ -8,9 +8,7 @@ import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Heads;
 import fr.luzog.pl.fkx.utils.Items;
 import fr.luzog.pl.fkx.utils.Utils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -200,36 +198,46 @@ public class GuiPlayers {
         inv.setItem(Utils.posOf(7, 3), Guis.tp(true, "tp " + player + " " + opener.getName()));
 
         inv.setItem(Utils.posOf(1, 3), Items.builder(Material.WOOD_PICKAXE)
-                .setName("§cKick / Ban / Ban-IP")
+                .setName("§6Kick")
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic gauche pour Expulser",
-                        "§7  (Shift pour préciser la raison)",
-                        "§7Clic droit pour Bannir",
-                        "§7  (Shift pour préciser la raison)",
-                        "§7Clic molette pour Bannir l'IP",
+                        "§7Clic gauche pour §6Expulser",
+                        "§7Clic droit pour préciser la raison",
                         " ",
                         "§7Commandes :",
-                        "§7/kick " + player + " §8[§f<raison>§8]",
-                        "§7/ban " + player + " §8[§f<raison>§8]",
-                        "§7/ban-ip " + player + " §8[§f<raison>§8]"
+                        "§7/kick " + player + " §8[§f<raison>§8]"
                 )
                 .setCantClickOn(true)
-                .setLeftRightShiftCommandOnClick(
-                        "kick " + player, "input kick " + player + " %s%n" + Main.CMD + " players " + player,
-                        "ban " + player, "input ban " + player + " %s%n" + Main.CMD + " players " + player)
-                .setMiddleCommandOnClick("input ban-ip " + player + " %s%n" + Main.CMD + " players " + player)
+                .setLeftRightCommandOnClick(
+                        "kick " + player,
+                        "input kick " + player + " %s%n" + Main.CMD + " players " + player
+                )
                 .build());
+        BanEntry banEntry = Bukkit.getBanList(BanList.Type.NAME).getBanEntries().stream()
+                .filter(b -> b.getTarget().equalsIgnoreCase(player)).findFirst().orElse(null);
         inv.setItem(Utils.posOf(2, 3), Items.builder(Material.GHAST_TEAR)
-                .setName("§6Warn")
+                .setName("§cBan")
                 .setLore(
                         "§8" + Guis.loreSeparator,
-                        "§7Clic pour donner un",
-                        " §7avertissement au joueur",
                         " ",
-                        "§cNe fonctionne pas encore :p"
+                        "  " + (banEntry == null ? "§2Le joueur n'est pas banni."
+                                : "§4Le joueur est banni.\n  §cPar §b" + banEntry.getSource()
+                                + "\n  §cPour la raison suivante :\n  §7" + banEntry.getReason()),
+                        " ",
+                        "§8" + Guis.loreSeparator,
+                        "§7Clic molette pour §cBannir",
+                        "§7Clic droit pour §aDébannir",
+                        " ",
+                        "§7Commandes :",
+                        "§7/ban " + player + " §8[§f<raison>§8]",
+                        "§7/pardon " + player
                 )
                 .setCantClickOn(true)
+                .setLeftRightCommandOnClick(
+                        "null",
+                        "pardon " + player + "%n" + Main.CMD + " players " + player
+                )
+                .setMiddleCommandOnClick("input ban " + player + " %s%n" + Main.CMD + " players " + player)
                 .build());
 
         inv.setItem(Utils.posOf(1, 4), Items.builder(Material.BED)
