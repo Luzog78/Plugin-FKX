@@ -451,7 +451,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                                     + "\n  §d §l[Clic droit]§d pour récupérer"
                                     + "\n "),
                             "  §7Commande(s) :",
-                            "  §7" + command.getCommand().replace("\n", "§8\\n\n  §7"),
+                            "  §7" + command.getCommand().replace("%n", "\n").replace("\n", "§8\\n\n  §7"),
                             (command.getActual() == 0 ? "" : " "
                                     + "  §7Résultats :"
                                     + "\n  §7 - §f" + Arrays.stream(command.getResults())
