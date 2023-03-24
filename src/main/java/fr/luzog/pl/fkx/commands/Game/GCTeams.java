@@ -412,8 +412,8 @@ public class GCTeams {
             if (arg.toLowerCase().equals("d") || arg.toLowerCase().startsWith("d ")) {
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "displayName"));
-                else if (handleString(arg, 2).length() > 32)
-                    u.err(" - Le Nom ne doit pas dépasser 32 caractères.");
+                else if (handleString(arg, 2).length() > 24)
+                    u.err(" - Le Nom ne doit pas dépasser 24 caractères.");
                 else {
                     t.setName(handleString(arg, 2), true);
                     u.succ(" - Nom : §f" + t.getColor() + t.getName());
@@ -421,8 +421,8 @@ public class GCTeams {
             } else if (arg.toLowerCase().equals("p") || arg.toLowerCase().startsWith("p ")) {
                 if (isEmpty)
                     u.err(" - " + CmdUtils.err_missing_arg.replace("%ARG%", "prefix"));
-                else if (handleString(arg, 2).length() > 32)
-                    u.err(" - Le Préfixe ne doit pas dépasser 32 caractères.");
+                else if (handleString(arg, 2).length() > 14)
+                    u.err(" - Le Préfixe ne doit pas dépasser 14 caractères.");
                 else {
                     t.setPrefix(handleString(arg, 2), true);
                     u.succ(" - Préfixe : §7'§f" + t.getColor() + t.getPrefix() + "§7'");

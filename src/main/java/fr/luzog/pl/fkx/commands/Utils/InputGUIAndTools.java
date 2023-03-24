@@ -40,7 +40,8 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
             + "\n§c - %d (entier), %d{i-j} (entre i et j),"
             + "\n§c - %f (nombre décimal), %f{k} (arrondi à k),"
             + "\n§c - %b (booléen)"
-            + "\n§c - Coordonnées (avec tool) : %l (décimales), %L (entières)";
+            + "\n§c - Coordonnées (avec tool) : %l (décimales), %L (entières)"
+            + "\n§c - %n (séparer les différentes commandes)";
     public static final String title = "§8Veuillez entre une valeur pour : §b%s";
 
     private static final String isWandTag = "isWand", isWandableTag = "isWandable", wandResultTag = "wandResult",
@@ -74,7 +75,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
             } else
                 try {
                     String command = String.join(" ", args)
-                            .replace("\\\\", "\uffff").replace("\\n", "\n").replace("%n", "\n").replace("\uffff", "\\");
+                            .replace("\\\\", "\uffff").replace("\\n", "\n").replace("\uffff", "\\");
                     u.getPlayer().closeInventory();
                     InputCommand ic = new InputCommand(command);
                     inputs.put(u.getPlayer().getUniqueId(),
@@ -403,8 +404,7 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                 else
                     sb.insert(indexes[i], s);
             }
-
-            return sb.toString();
+            return sb.toString().replace("%n", "\n");
         }
     }
 
@@ -757,12 +757,12 @@ public class InputGUIAndTools implements CommandExecutor, TabCompleter, Listener
                             e.getWhoClicked().sendMessage("§cErreur : la valeur entrée n'est pas valide !");
                             return;
                         }
-                    } else if (name.startsWith("\"") && name.endsWith("\"")) {
+                    } /* else if (name.startsWith("\"") && name.endsWith("\"")) {
                         if (in.getValue().addResult(name.substring(1, name.length() - 1)) == null) {
                             e.getWhoClicked().sendMessage("§cErreur : la valeur entrée n'est pas valide !");
                             return;
                         }
-                    } else {
+                    } */ else {
                         if (in.getValue().addResult(name.replace("\\\\", "\uffff").replace("\\\"", "\"").replace("\uffff", "\\")) == null) {
                             e.getWhoClicked().sendMessage("§cErreur : la valeur entrée n'est pas valide !");
                             return;
