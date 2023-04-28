@@ -20,6 +20,7 @@ import org.bukkit.scoreboard.Objective;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static fr.luzog.pl.fkx.commands.Other.Ad.State.WAITING;
 
@@ -30,6 +31,9 @@ public class GListener {
     public static final String[] a = new String[]{"⬆", "⬈", "➡", "⬊", "⬇", "⬋", "⬅", "⬉", "⬌", "⬍", "§d۞§r"};
     public static final String deactivated = "§c§oDesactivé";
     public static final String no_team = "§4§lAucune équipe";
+    public static String autoSaveInventory = "auto-save";
+    public static int maxAutoSaveInventories = 5;
+    public static long autoSaveInventoryTimeout = 600;
 
     public static int mainTaskID;
 
@@ -93,6 +97,8 @@ public class GListener {
             final long delayer = 4L; // Each at 1/4 sec so : original = time / (1/4) == time * 4
             long countDown = savingTimeOut * delayer;
 
+            long autoSaveInventoryCountDown = autoSaveInventoryTimeout;
+
             @Override
             public void run() {
                 if (countDown - 1 == 0) {
@@ -101,6 +107,25 @@ public class GListener {
                     countDown = savingTimeOut * delayer;
                 } else
                     countDown--;
+
+                if (autoSaveInventoryCountDown - 5 <= 0) {
+                    manager.getPlayers().forEach(p -> {
+                        List<Utils.SavedInventory> inventories = p.getInventories().stream().filter(inventory ->
+                                inventory.getId().equals(autoSaveInventory)).collect(Collectors.toList());
+                        if (inventories.size() > maxAutoSaveInventories) {
+                            int counter = 0;
+                            for (int i = inventories.size() - 1; i >= 0; i--) {
+                                counter++;
+                                if (counter > maxAutoSaveInventories) {
+                                    p.deleteInventory(autoSaveInventory, i);
+                                    counter--;
+                                }
+                            }
+                        }
+                    });
+                    autoSaveInventoryCountDown = autoSaveInventoryTimeout;
+                } else
+                    autoSaveInventoryCountDown -= 5;
 
                 refreshScoreName();
                 objective.setDisplayName(scoreName);
@@ -179,20 +204,22 @@ public class GListener {
 //                          + "m §e" + getOrientationChar(p.getLocation().getYaw(), p.getLocation().getX(), p.getLocation().getZ(), -256.5, -143.5);
                     long waitingAds;
                     try {
-                        if (gPlayer.getCompass() != null && gPlayer.getCompass().getLocation() != null)
+                        if (gPlayer.getCompass() != null && gPlayer.getCompass().getLocation() != null) {
+                            boolean sameWorld = p.getLocation().getWorld() == null
+                                    || gPlayer.getCompass().getLocation().getWorld().getUID().equals(p.getLocation().getWorld().getUID());
                             ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
                                     new PacketPlayOutChat(new ChatComponentText(
                                             (gPlayer.getCompass().getName() == null ? "§cnull" : "§6" + gPlayer.getCompass().getName())
                                                     + "  §7-  §6" + Utils.safeDistance(p.getLocation(),
                                                     gPlayer.getCompass().getLocation(), true, 1,
                                                     gPlayer.getCompass().getRadius())
-                                                    + "m  §e" + getOrientationChar(p.getLocation().getYaw(),
+                                                    + "m  " + (sameWorld ? "§e" + getOrientationChar(p.getLocation().getYaw(),
                                                     p.getLocation().getX(), p.getLocation().getZ(),
                                                     gPlayer.getCompass().getLocation().getX(),
                                                     gPlayer.getCompass().getLocation().getZ(),
-                                                    gPlayer.getCompass().getRadius())
+                                                    gPlayer.getCompass().getRadius()) : "§c۞")
                                     ), (byte) 2));
-                        else if (gPlayer.getTeam() != null && gPlayer.getTeam().getId().equals(GTeam.GODS_ID)
+                        } else if (gPlayer.getTeam() != null && gPlayer.getTeam().getId().equals(GTeam.GODS_ID)
                                 && (waitingAds = Ad.ads.stream().filter(a -> a.getState() == WAITING).count()) > 0)
                             ((CraftPlayer) p).getHandle().playerConnection.sendPacket(
                                     new PacketPlayOutChat(new ChatComponentText(

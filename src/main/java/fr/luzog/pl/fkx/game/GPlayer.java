@@ -1,13 +1,11 @@
 package fr.luzog.pl.fkx.game;
 
-import fr.luzog.pl.fkx.commands.Admin.Vanish;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.PlayerStats;
 import fr.luzog.pl.fkx.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import javax.annotation.Nullable;

@@ -60,7 +60,7 @@ public class Main extends JavaPlugin implements Listener {
                 .setSpawnProtectionDuration(60, false)
                 .setWorlds("world", "world_nether", "world_the_end", false)
                 .setCustomVanillaCraftsActivated(false, false)
-                .setCustomCraftingTableActivated(true, false)
+                .setCustomCraftingTableActivated(false, false)
                 .setCustomLootingBlocksSystemActivated(true, false)
                 .setCustomLootingMobsSystemActivated(true, false)
                 .setCustomCreeperActivated(true, false)

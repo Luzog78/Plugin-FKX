@@ -2,6 +2,7 @@ package fr.luzog.pl.fkx.events;
 
 import fr.luzog.pl.fkx.Main;
 import fr.luzog.pl.fkx.commands.Admin.Kick;
+import fr.luzog.pl.fkx.game.GListener;
 import fr.luzog.pl.fkx.game.GManager;
 import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Utils;
@@ -48,12 +49,17 @@ public class PlayerJoinQuitHandler implements Listener {
         if (GManager.getCurrentGame() != null) {
             GPlayer gPlayer = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false);
             if (gPlayer != null) {
-                Utils.SavedInventory savedInventory = gPlayer.getLastInventory(connexionInventory, false);
+                Utils.SavedInventory savedConnexionInventory = gPlayer.getLastInventory(connexionInventory, false);
+                Utils.SavedInventory savedAutoSavedInventory = gPlayer.getLastInventory(GListener.autoSaveInventory, false);
+                Utils.SavedInventory savedInventory = savedConnexionInventory == null ? savedAutoSavedInventory
+                        : savedAutoSavedInventory == null ? savedConnexionInventory
+                        : savedConnexionInventory.getCreation() > savedAutoSavedInventory.getCreation() ?
+                        savedConnexionInventory : savedAutoSavedInventory;
                 if (savedInventory != null) {
                     savedInventory.equip(gPlayer.getPlayer(), true);
                 } else {
-                    gPlayer.getPlayer().getInventory().clear();
-                    gPlayer.getPlayer().getInventory().setArmorContents(new ItemStack[4]);
+//                    gPlayer.getPlayer().getInventory().clear();
+//                    gPlayer.getPlayer().getInventory().setArmorContents(new ItemStack[4]);
                 }
                 gPlayer.getPlayer().updateInventory();
             }
@@ -92,7 +98,7 @@ public class PlayerJoinQuitHandler implements Listener {
             if (gPlayer != null) {
                 gPlayer.saveInventory(connexionInventory, null, Main.SYS_PREFIX, gPlayer.getPlayer().getInventory());
                 List<Utils.SavedInventory> invs = gPlayer.getInventories().stream().filter(inventory ->
-                                inventory.getId().equals(connexionInventory)).collect(Collectors.toList());
+                        inventory.getId().equals(connexionInventory)).collect(Collectors.toList());
                 if (invs.size() > 1) {
                     int nb = (int) invs.stream().filter(inv -> inv.getCreator().equalsIgnoreCase(Main.SYS_PREFIX)).count();
                     if (nb > maxConnexionInventories) {

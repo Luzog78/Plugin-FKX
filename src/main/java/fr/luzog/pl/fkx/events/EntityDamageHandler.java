@@ -174,6 +174,8 @@ public class EntityDamageHandler implements Listener {
                         .setExperience((int) (Utils.lvlToExp(p.getLevel() + p.getExp()) * 0.75));
                 p.setLevel(0);
                 p.setExp(0);
+                p.setFallDistance(0);
+                p.setFireTicks(0);
                 p.getActivePotionEffects().forEach(potionEffect -> p.removePotionEffect(potionEffect.getType()));
                 p.teleport(p.getBedSpawnLocation() == null ?
                         fp.getManager().getSpawn() == null || fp.getManager().getSpawn().getSpawn() == null ?

@@ -470,6 +470,11 @@ public class Events implements Listener {
         ));
         add(new MobLootsItem(EntityType.CHICKEN, false, new Loots()
                 .setChanceLvlAmountCoefficient(1)
+                .add(0.5, new ItemStack(Material.FEATHER), -1, null)
+                .add(0.5, new ItemStack(Material.FEATHER), -1, null)
+                .add(0.5, new ItemStack(Material.FEATHER), 1, null)
+                .add(0.5, new ItemStack(Material.FEATHER), 2, null)
+                .add(0.5, new ItemStack(Material.FEATHER), 3, null)
                 .add(0.5, new ItemStack(Material.ARROW), -1, null)
                 .add(0.5, new ItemStack(Material.ARROW), -1, null)
                 .add(0.5, new ItemStack(Material.ARROW), 1, null)

@@ -1,6 +1,7 @@
 package fr.luzog.pl.fkx.game;
 
 import fr.luzog.pl.fkx.Main;
+import fr.luzog.pl.fkx.events.PlayerJoinQuitHandler;
 import fr.luzog.pl.fkx.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.BlockFace;
@@ -538,7 +539,7 @@ public class GManager {
 
     public static GManager getGame(String id) {
         for (GManager game : registered)
-            if (game.getId() == id || (game.getId() != null && game.getId().equalsIgnoreCase(id)))
+            if (Objects.equals(game.getId(), id) || (game.getId() != null && game.getId().equalsIgnoreCase(id)))
                 return game;
         return null;
     }
@@ -591,7 +592,7 @@ public class GManager {
                             p.getPlayer().setFireTicks(0);
                             p.getPlayer().setExp(0);
                             p.getPlayer().setTotalExperience(0);
-                            if (p.getTeam() != null)
+                            if (p.getTeam() != null) {
                                 if (Objects.equals(p.getTeamId(), GTeam.GODS_ID)) {
                                     p.getPlayer().setGameMode(GameMode.CREATIVE);
                                     p.getPlayer().setFlying(true);
@@ -606,6 +607,7 @@ public class GManager {
                                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.NIGHT_VISION, 2400, 255, false, false), true);
                                     p.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 2400, 1, false, false), true);
                                 }
+                            }
                             Location loc = (p.getTeam() == null ? getLobby().getSpawn()
                                     : Objects.equals(p.getTeamId(), GTeam.GODS_ID) || Objects.equals(p.getTeamId(), GTeam.SPECS_ID) ?
                                     getSpawn().getSpawn() : p.getTeam().getSpawn()).clone();
@@ -613,6 +615,8 @@ public class GManager {
                                 loc.add(0, 1, 0);
                             }
                             p.getPlayer().teleport(loc);
+                            p.deleteAllInventories(PlayerJoinQuitHandler.connexionInventory);
+                            p.deleteAllInventories(GListener.autoSaveInventory);
                         }
                     });
                     setPriority(new GPermissions(GPermissions.Definition.DEFAULT), true);
@@ -625,24 +629,16 @@ public class GManager {
         Utils.countDown(null, countDown, false, true, true,
                 "Le jeu se suspend dans §c%i%§r secondes !\n§7Vous serez momentanément bloqués.",
                 "Le jeu est en pause.\n§7Excusez-nous pour la gêne occasionnée...",
-                "§e", "§6", "§c", "§4", "§4§l", new Runnable() {
-                    @Override
-                    public void run() {
-                        setState(State.PAUSED, true);
-                    }
-                });
+                "§e", "§6", "§c", "§4", "§4§l",
+                () -> setState(State.PAUSED, true));
     }
 
     public void resume(int countDown) {
         Utils.countDown(null, countDown, false, true, true,
                 "Le jeu reprend dans §c%i%§r secondes !\n§7Et la compétition continue.",
                 "Et c'est reparti !\n§7Amusez-vous !",
-                "§e", "§6", "§c", "§4", "§2§l", new Runnable() {
-                    @Override
-                    public void run() {
-                        setState(State.RUNNING, true);
-                    }
-                });
+                "§e", "§6", "§c", "§4", "§2§l",
+                () -> setState(State.RUNNING, true));
     }
 
     public void end() {
