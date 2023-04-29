@@ -13,7 +13,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class GPlayer {
 
@@ -393,8 +392,9 @@ public class GPlayer {
 
     public int deleteAllInventories(String id) {
         List<Utils.SavedInventory> inventories = getConfig(getManager().getId()).load().getInventories();
-        Stream<Utils.SavedInventory> s = inventories.stream().filter(inv -> inv.getId().equals(id + ""));
-        int size = (int) s.count();
+        List<Utils.SavedInventory> s = inventories.stream().filter(inv -> inv.getId().equals(id + ""))
+                .collect(Collectors.toList());
+        int size = s.size();
         s.forEach(inventories::remove);
         if (size > 0)
             getConfig(getManager().getId()).load().setInventories(inventories, true).save();

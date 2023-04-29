@@ -26,6 +26,7 @@ public class GCHelp {
         u.send("", "§a > §6/" + Main.CMD + " (perm || permissions) §7- §eChange les permissions");
         u.send("", "§a > §6/" + Main.CMD + " players §7- §eAffiche les informations des joueurs");
         u.send("", "§a > §6/" + Main.CMD + " portal §7- §eGère les portails");
+        u.send("", "§a > §6/" + Main.CMD + " season §7- §eModifie le nom de la saison");
         u.send("", "§a > §6/" + Main.CMD + " stats §7- §eModifie les stats des joueurs");
         u.send("", "§a > §6/" + Main.CMD + " teams §7- §eGère les équipes (complet)");
         u.send("", "§a > §6/" + Main.CMD + " title §7- §c ###### Envoie un titre aux joueurs");

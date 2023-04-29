@@ -135,14 +135,20 @@ public class GManager {
                         for (File fff : Objects.requireNonNull(ff.listFiles()))
                             if (fff.isFile() && fff.getName().toLowerCase().endsWith(".yml")) {
                                 Config.Zone zc = new Config.Zone(String.format("%s/zones/%s", f.getName(), fff.getName())).load();
-                                GZone zone = new GZone(fff.getName().substring(0, fff.getName().length() - 4), null,
-                                        new Location(Main.world, 0, 0, 0), null, null, new GPermissions(GPermissions.Definition.DEFAULT));
+                                String zoneName = fff.getName().substring(0, fff.getName().length() - 4);
+                                GZone zone = new GZone(zoneName, null, new Location(Main.world, 0, 0, 0), null, null,
+                                        new GPermissions(GPermissions.Definition.DEFAULT));
 
                                 Utils.tryTo(printStackTrace, () -> zone.setType(Objects.requireNonNull(zc.getType()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setSpawn(Objects.requireNonNull(zc.getSpawn()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setPos1(Objects.requireNonNull(zc.getPos1()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setPos2(Objects.requireNonNull(zc.getPos2()), false));
                                 Utils.tryTo(printStackTrace, () -> zone.setPermissions(Objects.requireNonNull(zc.getPermissions()), false));
+
+                                if (zoneName.equalsIgnoreCase("nether"))
+                                    manager.getNormalZones().removeIf(z -> z.getId().equalsIgnoreCase("nether"));
+                                if (zoneName.equalsIgnoreCase("end"))
+                                    manager.getNormalZones().removeIf(z -> z.getId().equalsIgnoreCase("end"));
 
                                 if (fff.getName().equalsIgnoreCase(GZone.LOBBY_FILE)) {
                                     zone.setType(GZone.Type.LOBBY, false);
