@@ -271,16 +271,12 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String msg, String[] args) {
-        if (GManager.getCurrentGame() == null) {
-            sender.sendMessage("§cAucune partie en cours...");
-            sender.sendMessage("§cRéessayez plus tard !");
-            return false;
-        }
+        boolean isPlayer = sender instanceof Player && !sender.isOp()
+                && (GManager.getCurrentGame() == null || GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null);
 
-        boolean isPlayer = sender instanceof Player && GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
         CmdUtils u = new CmdUtils(sender, cmd, msg, args, isPlayer ? syntaxe_player : syntaxe_admin);
 
-        if(!Main.globalConfig.isAdActivated() && !sender.isOp() && isPlayer) {
+        if (!Main.globalConfig.isAdActivated() && !sender.isOp() && isPlayer) {
             u.err("Le /ad est désactivé !");
             return true;
         }
@@ -290,8 +286,13 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             return false;
         }
 
-        if (isPlayer)
-            if (args.length == 0)
+        if (isPlayer) {
+            if (GManager.getCurrentGame() == null) {
+                sender.sendMessage("§cAucune partie en cours...");
+                sender.sendMessage("§cRéessayez plus tard !");
+            } else if (GManager.getCurrentGame().getState() != GManager.State.RUNNING)
+                sender.sendMessage("§cVous ne pouvez pas effectuer cette commande à ce stade de la partie.");
+            else if (args.length == 0)
                 post(u, new Item(u.getPlayer().getName(), null, null));
             else if (GManager.getCurrentGame().getGods().getPlayer(args[0]) != null)
                 if (args.length == 1)
@@ -302,7 +303,7 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
             else
                 post(u, new Item(u.getPlayer().getName(), null, String.join(" ", args)));
 
-        else if (args.length == 0)
+        } else if (args.length == 0)
             Bukkit.dispatchCommand(sender, "ad page 0");
         else if (args[0].equalsIgnoreCase("all")) {
             u.succ("Liste des requêtes (§f" + ads.size() + "§r) :");
@@ -392,7 +393,12 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
                 return false;
             }
         else if (args[0].equalsIgnoreCase("ad"))
-            if (args.length == 1)
+            if (GManager.getCurrentGame() == null) {
+                sender.sendMessage("§cAucune partie en cours...");
+                sender.sendMessage("§cRéessayez plus tard !");
+            } else if (GManager.getCurrentGame().getState() != GManager.State.RUNNING)
+                sender.sendMessage("§cVous ne pouvez pas effectuer cette commande à ce stade de la partie.");
+            else if (args.length == 1)
                 post(u, new Item(sender instanceof Player ? u.getPlayer().getName() : SYS_NAME, null, null));
             else if (GManager.getCurrentGame().getGods().getPlayer(args[1]) != null)
                 if (args.length == 2)
@@ -413,7 +419,8 @@ public class Ad implements CommandExecutor, TabCompleter, Listener {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command cmd, String msg, String[] args) {
         ArrayList<String> list = new ArrayList<>();
-        boolean isPlayer = sender instanceof Player && GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null;
+        boolean isPlayer = sender instanceof Player && !sender.isOp()
+                && (GManager.getCurrentGame() == null || GManager.getCurrentGame().getGods().getPlayer(sender.getName()) == null);
 
         new ArrayList<String>() {{
             if (args.length == 1)
