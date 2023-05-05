@@ -31,8 +31,6 @@ public class GListener {
     public static final String[] a = new String[]{"⬆", "⬈", "➡", "⬊", "⬇", "⬋", "⬅", "⬉", "⬌", "⬍", "§d۞§r"};
     public static final String deactivated = "§c§oDesactivé";
     public static final String no_team = "§4§lAucune équipe";
-    public static String autoSaveInventory = "auto-save";
-    public static int maxAutoSaveInventories = 5;
     public static long autoSaveInventoryTimeout = 600;
 
     public static int mainTaskID;
@@ -109,20 +107,7 @@ public class GListener {
                     countDown--;
 
                 if (autoSaveInventoryCountDown - 5 <= 0) {
-                    manager.getPlayers().forEach(p -> {
-                        List<Utils.SavedInventory> inventories = p.getInventories().stream().filter(inventory ->
-                                inventory.getId().equals(autoSaveInventory)).collect(Collectors.toList());
-                        if (inventories.size() > maxAutoSaveInventories) {
-                            int counter = 0;
-                            for (int i = inventories.size() - 1; i >= 0; i--) {
-                                counter++;
-                                if (counter > maxAutoSaveInventories) {
-                                    p.deleteInventory(autoSaveInventory, i);
-                                    counter--;
-                                }
-                            }
-                        }
-                    });
+                    manager.getPlayers().forEach(GPlayer::saveAutoSaveInventory);
                     autoSaveInventoryCountDown = autoSaveInventoryTimeout;
                 } else
                     autoSaveInventoryCountDown -= 5;

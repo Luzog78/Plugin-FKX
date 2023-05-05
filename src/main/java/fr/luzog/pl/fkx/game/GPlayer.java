@@ -73,6 +73,9 @@ public class GPlayer {
         }
     }
 
+    public static String autoSaveInventory = "auto-save";
+    public static int maxAutoSaveInventories = 5;
+
     private String name;
     private UUID lastUuid;
 
@@ -268,7 +271,7 @@ public class GPlayer {
     }
 
     public String getDisplayName() {
-        return  (getTeam() != null ? getTeam().getPrefix() : "") + name + "§r";
+        return (getTeam() != null ? getTeam().getPrefix() : "") + name + "§r";
     }
 
     public PlayerStats getStats() {
@@ -416,5 +419,24 @@ public class GPlayer {
                 saveToConfig(getManager().getId(), true);
             getConfig(getManager().getId()).load().setInventories(new ArrayList<>(), true).save();
         }
+    }
+
+    public int saveAutoSaveInventory() {
+        if (getPlayer() == null)
+            return -1;
+        saveInventory(autoSaveInventory, "Auto Save", null, getPlayer().getInventory());
+        List<Utils.SavedInventory> inventories = getInventories().stream().filter(inventory ->
+                inventory.getId().equals(autoSaveInventory)).collect(Collectors.toList());
+        int counter = 0;
+        if (inventories.size() > maxAutoSaveInventories) {
+            for (int i = inventories.size() - 1; i >= 0; i--) {
+                counter++;
+                if (counter > maxAutoSaveInventories) {
+                    deleteInventory(autoSaveInventory, i);
+                    counter--;
+                }
+            }
+        }
+        return counter;
     }
 }

@@ -6,6 +6,7 @@ import fr.luzog.pl.fkx.commands.Other.Ad;
 import fr.luzog.pl.fkx.events.Events;
 import fr.luzog.pl.fkx.game.GListener;
 import fr.luzog.pl.fkx.game.GManager;
+import fr.luzog.pl.fkx.game.GPlayer;
 import fr.luzog.pl.fkx.utils.Color;
 import fr.luzog.pl.fkx.utils.Config;
 import fr.luzog.pl.fkx.utils.Crafting;
@@ -25,7 +26,7 @@ import java.util.*;
 
 public class Main extends JavaPlugin implements Listener {
 
-    public static final Object VERSION = "Version 3.0.1";
+    public static final Object VERSION = "Version 3.2.5";
     public static final String CMD = "fk";
 
     private static int sideLength = 27, centerLength;
@@ -283,6 +284,11 @@ public class Main extends JavaPlugin implements Listener {
                 o.unregister();
         });
 
+        if (GManager.getCurrentGame() != null) {
+            soufInstruction("§6Sauvegarde de tous les inventaires d'auto-sauvegarde...");
+            GManager.getCurrentGame().getPlayers().forEach(GPlayer::saveAutoSaveInventory);
+        }
+
         soufInstruction("§6Sauvegarde legere de toutes les §eGames§6...");
         GManager.saveAll(true);
 
@@ -328,6 +334,11 @@ public class Main extends JavaPlugin implements Listener {
 
         soufInstruction("§6Sauvegarde de §eAd§6...");
         Ad.saveToConfig();
+
+        if (GManager.getCurrentGame() != null) {
+            soufInstruction("§6Sauvegarde de tous les inventaires d'auto-sauvegarde...");
+            GManager.getCurrentGame().getPlayers().forEach(GPlayer::saveAutoSaveInventory);
+        }
 
         soufInstruction("§6Sauvegarde de toutes les donnees des §eGames§6...");
         GManager.saveAll(false);

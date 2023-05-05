@@ -622,7 +622,7 @@ public class GManager {
                             }
                             p.getPlayer().teleport(loc);
                             p.deleteAllInventories(PlayerJoinQuitHandler.connexionInventory);
-                            p.deleteAllInventories(GListener.autoSaveInventory);
+                            p.deleteAllInventories(GPlayer.autoSaveInventory);
                         }
                     });
                     setPriority(new GPermissions(GPermissions.Definition.DEFAULT), true);

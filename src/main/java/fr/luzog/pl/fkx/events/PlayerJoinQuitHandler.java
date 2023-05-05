@@ -50,7 +50,7 @@ public class PlayerJoinQuitHandler implements Listener {
             GPlayer gPlayer = GManager.getCurrentGame().getPlayer(e.getPlayer().getName(), false);
             if (gPlayer != null) {
                 Utils.SavedInventory savedConnexionInventory = gPlayer.getLastInventory(connexionInventory, false);
-                Utils.SavedInventory savedAutoSavedInventory = gPlayer.getLastInventory(GListener.autoSaveInventory, false);
+                Utils.SavedInventory savedAutoSavedInventory = gPlayer.getLastInventory(GPlayer.autoSaveInventory, false);
                 Utils.SavedInventory savedInventory = savedConnexionInventory == null ? savedAutoSavedInventory
                         : savedAutoSavedInventory == null ? savedConnexionInventory
                         : savedConnexionInventory.getCreation() > savedAutoSavedInventory.getCreation() ?
